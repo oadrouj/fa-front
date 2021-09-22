@@ -1,0 +1,92 @@
+#step-one-root-div {
+    min-width: 100%;
+}
+p {
+    width: 100%;
+    font: Frutiger;
+    color: #898E99;
+    margin-bottom: 0px;
+}
+.message {
+    font-size: 46px;
+    font-weight: bold;
+}
+.consigne {
+    font-size: 28px;
+}
+#form {
+    width: 60%;
+}
+.groupText {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 3px;
+    margin-top: 18px;
+}
+.label {
+    font-size: 18px;
+}
+.input-block {
+    background-color: white;
+    border: 1px solid #979797;
+    border-radius: 10px;
+    width: 100%;
+    margin: 0px;
+    display: inline-block;
+    position: relative;
+}
+:host >>> .input-block > input {
+    width: 100%;
+    min-height: 43px;
+    border-radius: 10px;
+    padding-right: 6% !important;
+}
+.input-block > img {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+}
+.validationMessage {
+    font-size: 18px;
+    color: tomato;
+    display: block;
+}
+#div-btn-valider {
+    padding: 0px 1%;
+}
+:host >>> #div-btn-valider button {
+    background-color: #4A266B;
+    border: none;
+    border-radius: 20px;
+    color: #FFFFFF;
+    width: 155px;
+    float: right;
+} 
+:host >>> #div-btn-valider:hover button {
+    background-color: #9470B5;
+}
+#tbl-timeline {
+    min-width: 580px;
+}
+#tbl-timeline > tr {
+    min-width: 580px;
+}
+#tbl-timeline > tr > td {
+    position: relative;
+    padding: 0px;
+    margin: 0px;
+    text-align: center;
+}
+#tbl-timeline > tr > td > img {
+    width: 100%;
+}
+#tbl-timeline > tr > td > label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    transform: translateY(-50%);
+    color: white;
+}

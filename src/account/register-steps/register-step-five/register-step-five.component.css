@@ -1,0 +1,115 @@
+#step-two-root-div {
+    min-width: 100%;
+}
+p {
+    width: 100%;
+    font: Frutiger;
+    color: #898E99;
+    margin-bottom: 0px;
+}
+.message {
+    font-size: 46px;
+    font-weight: bold;
+}
+#content {
+    width: 80%;
+    min-height: 100%;
+    position: relative;
+}
+#tbl-timeline {
+    min-width: 580px;
+}
+#tbl-timeline > tr {
+    min-width: 580px;
+}
+#tbl-timeline > tr > td {
+    position: relative;
+    padding: 0px;
+    margin: 0px;
+    text-align: center;
+}
+#tbl-timeline > tr > td > img {
+    width: 100%;
+}
+#tbl-timeline > tr > td > label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    transform: translateY(-50%);
+    color: white;
+}
+#div-options-abonnement {
+    width: 80%;
+}
+:host >>> .p-timeline-event-marker {
+    border: 2px solid #707070;
+    width: 14px;
+    height: 14px;
+}
+:host >>> .p-timeline-event-connector {
+    background-color: #707070;
+}
+/* :host >>> .p-timeline-event:first .p-timeline-event-marker {
+    border: 2px solid #EBA20C;
+    width: 14px;
+    height: 14px;
+    background-color: #EBA20C;
+}
+:host >>> .p-timeline-event:first .p-timeline-event-connector {
+    background-color: #EBA20C;
+}
+:host >>> .p-timeline-event-content:first {
+    background-color: #EBA20C;
+    border: 2px solid #EBA20C;
+} */
+#div-two-choices {
+    width: 100%;
+}
+#div-two-choices > div {
+    width: 286px;
+    height: 286px;
+    display: inline-block;
+    border-radius: 25px;
+}
+#div-choice-one {
+    background-color: #58BBA4;
+}
+#div-choice-two {
+    background-color: #9F8FB5;
+}
+.div-stars {
+    width: 100%;
+}
+.div-stars img#img-etoile {
+    width: 23px;
+}
+.div-stars img#img-double-etoile {
+    width: 23px;
+}
+.p1-abonnement {
+    font-size: 44px;
+    color: white;
+    font-weight: bold;
+    width: 100%;
+}
+.p2-abonnement {
+    font-size: 66px;
+    color: white;
+    font-family: bebas-regular;
+    width: 100%;
+}
+:host >>> .bouton-abonnement button {
+    width: 216px;
+    height: 43px;
+    font-size: 23px;
+    color: #908E8E;
+    background-color: white;
+    border-radius: 25px;
+    border: none;
+}
+:host >>> .bouton-abonnement button:hover {
+    background-color: white;
+    border: 2px solid #908E8E;
+    color: #908E8E;
+}

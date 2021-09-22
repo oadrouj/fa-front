@@ -1,0 +1,58 @@
+#step-two-root-div {
+    min-width: 100%;
+}
+p {
+    width: 100%;
+    font: Frutiger;
+    color: #898E99;
+    margin-bottom: 0px;
+}
+.message {
+    font-size: 46px;
+    font-weight: bold;
+}
+.consigne {
+    font-size: 28px;
+}
+#content {
+    width: 80%;
+    min-height: 100%;
+    position: relative;
+}
+#tbl-timeline {
+    min-width: 580px;
+}
+#tbl-timeline > tr {
+    min-width: 580px;
+}
+#tbl-timeline > tr > td {
+    position: relative;
+    padding: 0px;
+    margin: 0px;
+    text-align: center;
+}
+#tbl-timeline > tr > td > img {
+    width: 100%;
+}
+#tbl-timeline > tr > td > label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    transform: translateY(-50%);
+    color: white;
+}
+#div-image-mail-validation {
+    width: 100%;
+}
+#div-image-mail-validation > img {
+    width: 188px;
+    cursor: pointer;
+}
+
+@media (min-width: 1700px) {
+    #content {
+        width: 80%;
+        max-width: 1300px;
+    }
+}

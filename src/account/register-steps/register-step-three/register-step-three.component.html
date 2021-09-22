@@ -1,0 +1,49 @@
+<div>
+    <table id="tbl-timeline" class=" mx-auto mt-6 mb-6">
+        <tr>
+            <td><img src="../../../assets/img/EtapeUnBackground.png" /></td>
+            <td><img src="../../../assets/img/EtapeDeuxBackground.png" /></td>
+            <td><img src="../../../assets/img/EtapeTroiBackground.png" /><label>3</label></td>
+            <td><img src="../../../assets/img/EtapeUnBackground.png" /></td>
+            <td><img src="../../../assets/img/EtapeQuatreBackground.png" /></td>
+        </tr>
+    </table>
+    <p class="message text-center">Félicitations !</p>
+    <p class="message text-center">Votre adresse e-mail a été validée.</p>
+    <p class="consigne mt-4 text-center">Dites-nous en plus à propos de entité pour nous permettre de
+        générer</p>
+    <p class="consigne text-center">vos factures et devis personnalisés.</p>
+    <div id="form" class="mx-auto">
+
+        <div id="div-cards" class="text-center m-6 card-container d-flex">
+            <p-card class="m-6" (click)="select('pp')">
+                <div [ngClass]="ppSelected ? 'card-selected' : ''" class="card-content" pRipple>
+                    Profetionnel particulier
+                </div>
+            </p-card>
+            <p-card class="m-6" (click)="select('ae')">
+                <div [ngClass]="aeSelected ? 'card-selected' : ''" class="card-content" pRipple>
+                    auto entrepreneur
+                </div>
+            </p-card>
+            <p-card class="m-6" (click)="select('sarl')">
+                <div [ngClass]="sarlSelected ? 'card-selected' : ''" class="card-content" pRipple>
+                    SARL 
+                </div>
+            </p-card>
+            <p-card class="m-6" (click)="select('sa')">
+                <div [ngClass]="saSelected ? 'card-selected' : ''" class="card-content" pRipple>
+                    SA
+                </div>
+            </p-card>
+        </div>
+
+        <div class="grid">
+            <div class="col-12 mt-3 mr-5">
+                <div id="div-btn-valider">
+                    <p-button label="Valider" (click)="save()"></p-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
