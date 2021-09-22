@@ -26,18 +26,25 @@
             </div>
         </div>
 
-        <p-table id="tableClients" [value]="clients" [rows]="5"
-            selectionMode="single" [(selection)]="client" dataKey="id" (onRowSelect)="onRowSelect($event)" 
-            (onSort)="customSort($event)" [customSort]="true" [lazy]="true" 
-            [scrollable]="true"
-            [virtualScroll]="true" [virtualRowHeight]="54" [totalRecords]="300" (onLazyLoad)="loadClientsLazy($event)">
+        <p-table id="tableClients" [value]="clients" [rows]="5" selectionMode="single" [(selection)]="client" dataKey="id" (onRowSelect)="onRowSelect($event)" (onSort)="customSort($event)" [customSort]="true" [lazy]="true" [scrollable]="true" [virtualScroll]="true"
+            [virtualRowHeight]="54" [totalRecords]="300" (onLazyLoad)="loadClientsLazy($event)">
             <ng-template pTemplate="header">
                 <tr>
-                    <th pSortableColumn="reference">RéFERENCE <p-sortIcon field="reference"></p-sortIcon></th>
-                    <th pSortableColumn="creationTime">DATE D'AJOUT <p-sortIcon field="creationTime"></p-sortIcon></th>
-                    <th pSortableColumn="nom">CLIENT <p-sortIcon field="nom"></p-sortIcon></th>
-                    <th pSortableColumn="telFix">fACTURES EN ATTENTE <p-sortIcon field="telFix"></p-sortIcon></th>
-                    <th pSortableColumn="telFix2">FACTURES PAYéES <p-sortIcon field="telFix2"></p-sortIcon></th>
+                    <th pSortableColumn="reference">RéFERENCE
+                        <p-sortIcon field="reference"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="creationTime">DATE D'AJOUT
+                        <p-sortIcon field="creationTime"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="nom">CLIENT
+                        <p-sortIcon field="nom"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="telFix">fACTURES EN ATTENTE
+                        <p-sortIcon field="telFix"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="telFix2">FACTURES PAYéES
+                        <p-sortIcon field="telFix2"></p-sortIcon>
+                    </th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-client>
@@ -193,11 +200,9 @@
     </div>
 </div>
 
-<p-dialog id="dialogClient" header="{{titreFormulaire}}" [(visible)]="display" [modal]="true" [baseZIndex]="10000"
-    [draggable]="false" [resizable]="false">
+<p-dialog id="dialogClient" header="{{titreFormulaire}}" [(visible)]="display" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
 
-    <p-selectButton [options]="categories2" [(ngModel)]="formClient.categorieClient" optionLabel="name" optionValue="code"
-        (click)="onFormCategorySelected()">
+    <p-selectButton [options]="categories2" [(ngModel)]="formClient.categorieClient" optionLabel="name" optionValue="code" (click)="onFormCategorySelected()">
     </p-selectButton>
 
     <div class="grid blockForm mx-3 mt-4 mb-2">
@@ -244,8 +249,7 @@
             <span>Pays</span>
         </div>
         <div class="col-7">
-            <p-dropdown [options]="countries" [(ngModel)]="formClient.pays" optionLabel="name" optionValue="isoCode"
-                         name="Pays"></p-dropdown>
+            <p-dropdown [options]="countries" [(ngModel)]="formClient.pays" optionLabel="name" optionValue="isoCode" name="Pays"></p-dropdown>
         </div>
         <div class="col-5 label">
             <span>Ville</span>
@@ -269,13 +273,13 @@
             <span>Téléphone fixe</span>
         </div>
         <div class="col-7">
-            <input type="text" pInputText placeholder="212 699 99 99 99" pKeyFilter="pint" [(ngModel)]="formClient.telFix"  />
+            <input type="text" pInputText placeholder="212 699 99 99 99" pKeyFilter="pint" [(ngModel)]="formClient.telFix" />
         </div>
         <div class="col-5 label">
             <span>Téléphone portable</span>
         </div>
         <div class="col-7">
-            <input type="text" pInputText placeholder="212 699 99 99 99" pKeyFilter="pint" [(ngModel)]="formClient.telPortable"  />
+            <input type="text" pInputText placeholder="212 699 99 99 99" pKeyFilter="pint" [(ngModel)]="formClient.telPortable" />
         </div>
         <div class="col-5 label" *ngIf="isFormProfetionnel">
             <span>Site Web</span>
@@ -301,15 +305,13 @@
             <span>Remise permanente</span>
         </div>
         <div class="col-7">
-            <p-inputNumber placeholder="00,00%" mode="decimal" suffix="%" :min="0" :max="100"
-             [minFractionDigits]="2" [maxFractionDigits]="2" [(ngModel)]="formClient.remisePermanente" ></p-inputNumber>
+            <p-inputNumber placeholder="00,00%" mode="decimal" suffix="%" :min="0" :max="100" [minFractionDigits]="2" [maxFractionDigits]="2" [(ngModel)]="formClient.remisePermanente"></p-inputNumber>
         </div>
         <div class="col-5 label">
             <span>Délai de paiement</span>
         </div>
         <div class="col-7">
-            <p-inputNumber placeholder="123..." mode="decimal" 
-            suffix=" Jours" :min="0" [(ngModel)]="formClient.delaiPaiement"></p-inputNumber>
+            <p-inputNumber placeholder="123..." mode="decimal" suffix=" Jours" :min="0" [(ngModel)]="formClient.delaiPaiement"></p-inputNumber>
         </div>
     </div>
     <ng-template pTemplate="footer">
