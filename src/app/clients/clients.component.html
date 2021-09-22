@@ -14,7 +14,7 @@
             <div class="col-5" id="filtreLeftBlock">
                 <span class="p-input-icon-left shadow-1">
                     <i class="pi pi-search"></i>
-                    <input type="text" class="test2" pInputText placeholder="Recherchez ici" [(ngModel)]="champsRecherche" />
+                    <input type="text" pInputText placeholder="Recherchez ici" [(ngModel)]="champsRecherche" />
                 </span>
             </div>
             <div class="col-7" id="filtreRightBlock">
@@ -30,7 +30,6 @@
             [virtualRowHeight]="54" [totalRecords]="300" (onLazyLoad)="loadClientsLazy($event)">
             <ng-template pTemplate="header">
                 <tr>
-
                     <th pSortableColumn="reference">RéFERENCE
                         <p-sortIcon field="reference"></p-sortIcon>
                     </th>

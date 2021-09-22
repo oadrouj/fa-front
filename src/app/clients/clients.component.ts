@@ -81,6 +81,7 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
       { name: 'EUR', code: 'EUR' },
       { name: 'DOL', code: 'DOL' }
     ];
+    
     this.chargerListeClients();
 
     this.countries = csc.getAllCountries();
