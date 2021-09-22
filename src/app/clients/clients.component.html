@@ -14,7 +14,7 @@
             <div class="col-5" id="filtreLeftBlock">
                 <span class="p-input-icon-left shadow-1">
                     <i class="pi pi-search"></i>
-                    <input id="test1" type="text" pInputText placeholder="Recherchez ici" [(ngModel)]="champsRecherche" />
+                    <input type="text" pInputText placeholder="Recherchez ici" [(ngModel)]="champsRecherche" />
                 </span>
             </div>
             <div class="col-7" id="filtreRightBlock">
@@ -203,7 +203,6 @@
 <p-dialog id="dialogClient" header="{{titreFormulaire}}" [(visible)]="display" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
 
     <p-selectButton [options]="categories2" [(ngModel)]="formClient.categorieClient" optionLabel="name" optionValue="code" (click)="onFormCategorySelected()">
-    
     </p-selectButton>
 
     <div class="grid blockForm mx-3 mt-4 mb-2">
