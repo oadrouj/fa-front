@@ -9,6 +9,8 @@ import { TenantsComponent } from './tenants/tenants.component';
 import { RolesComponent } from 'app/roles/roles.component';
 import { ChangePasswordComponent } from './users/change-password/change-password.component';
 import { ClientsComponent } from './clients/clients.component';
+import { DevisComponent } from './devis/devis.component';
+import { FacturesComponent } from './factures/factures.component';
 
 @NgModule({
     imports: [
@@ -17,7 +19,9 @@ import { ClientsComponent } from './clients/clients.component';
                 path: '',
                 component: AppComponent,
                 children: [
-                    { path: 'Clients', component: ClientsComponent,  canActivate: [AppRouteGuard] }
+                    { path: 'Clients', component: ClientsComponent,  canActivate: [AppRouteGuard] },
+                    { path: 'Devis', component: DevisComponent,  canActivate: [AppRouteGuard] },
+                    { path: 'Factures', component: FacturesComponent,  canActivate: [AppRouteGuard] }
                     // { path: 'home', component: HomeComponent,  canActivate: [AppRouteGuard] },
                     // { path: 'users', component: UsersComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
                     // { path: 'roles', component: RolesComponent, data: { permission: 'Pages.Roles' }, canActivate: [AppRouteGuard] },

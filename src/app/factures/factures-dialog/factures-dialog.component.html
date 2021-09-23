@@ -1,0 +1,182 @@
+<p-dialog [(visible)]="visible" [style]="{'width': '100vw', 'height': 'auto', 'min-height': '100vh'}" [closable]="false">
+    <ng-template pTemplate="header">
+        <button pButton icon="pi pi-times" class="closeButton" (click)="closeDialog.emit()"></button>
+        <h2>Nouveau Facture</h2>
+        <div class="flex">
+            <button pButton label="Enregistrer le brouillon" class="bg-turquoise mx-2"></button>class="bg-turquoise class="bg-turquoise
+            <button pButton label="Valider" class="bg-light-green mx-2"></button>class="bg-light-green
+            <button pButton label="Aperçu" class="bg-purple mx-2"></button>
+
+        </div>
+    </ng-template>
+
+    <div class="">
+        <div class="w-77 autoCompleteContainer border-bottom  flex justify-content-between
+ align-items-end
+
+ p-mt-4 p-pr-5">
+            <div>
+                <label for="" class="mb-3 block">Client</label>
+
+                <p-autoComplete [(ngModel)]="autoCompleteText" placeholder="Sélectionner un client" [suggestions]="suggestions" (completeMethod)="autoCompleteSearch($event)"></p-autoComplete>
+            </div>
+            <h2>Facture</h2>
+        </div>
+        <div class="grid">
+            <div class="md:col-12 w-77 ">
+                <div class="grid pt-4 border-bottom " id="new-devis-header">
+                    <div class="col-6">
+                        <div class="grid align-items-center
+">
+                            <div class="col-5">
+                                <p>Numéro de Facture</p>
+                            </div>
+                            <div class="col ">
+                                <p>D00002</p>
+                            </div>
+                            <div class="col text-center">
+                                <button pButton label="Changer" class="color-orange p-button-text"></button>
+                            </div>
+                        </div>
+                        <div class="grid align-items-center
+">
+                            <div class="col-5">
+                                <p>Date d'émission</p>
+                            </div>
+                            <div class="col-7">
+                                <p-calendar [(ngModel)]="dateEmission" icon="pi pi-calendar" [showIcon]="true"> </p-calendar>
+                            </div>
+                        </div>
+                        <div class="grid align-items-center
+">
+                            <div class="col-5">
+                                <p>Echéance de paiement</p>
+                            </div>
+                            <div class="col-7">
+                                <p-dropdown [options]="echeancePayementOptions" [(ngModel)]="echeancePayementSelected" [showClear]="false">
+                                    {{!!echeancePayementSelected}}
+                                    <ng-template pTemplate="selectedItem" *ngIf="echeancePayementSelected != ''" let-option>
+                                        <div>
+                                            {{echeancePayementSelected}} jours
+                                        </div>
+                                    </ng-template>
+                                    <ng-template pTemplate="item" let-option>
+                                        {{option}} jours
+                                    </ng-template>
+                                </p-dropdown>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="flex flex-column align-items-end
+
+">
+                            <div>
+                                <p>Message d'introduction</p>
+                                <textarea pInputTextArea name="" id="" cols="60" rows="6"></textarea>
+                            </div>
+                            <div>
+                                <p>Pied de page</p>
+                                <textarea pInputTextArea name="" id="" cols="60" rows="6"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p-table #myTable [columns]="newDevisContentItemsCols" [value]="DevisContentItemsList" [id]="'newDevis'" [scrollable]="true" [rows]="100" scrollHeight="250px" [virtualScroll]="true" [virtualRowHeight]="40" [lazy]="true" (onLazyLoad)="loadLazy($event)"
+                    [class]="'table'">
+                    <ng-template pTemplate="header" let-columns>
+                        <tr>
+                            <ng-container *ngFor="let col of columns">
+                                <th [colSpan]="col.colspan">
+                                    {{col.header}}
+                                </th>
+                            </ng-container>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-rowData let-columns="columns">
+                        <tr style="height:40px">
+                            <ng-container *ngFor="let col of columns">
+                                <!--  -->
+                                <ng-container [ngSwitch]="col.type">
+                                    <ng-container *ngSwitchCase="'inputText'">
+                                        <td [colSpan]="col.colspan">
+                                            <input pInputText type="text" [(ngModel)]="rowData[col.field]" />
+                                        </td>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'inputNumber'">
+                                        <td [colSpan]="col.colspan" class="w-20">
+                                            <p-inputNumber [(ngModel)]="rowData[col.field]" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix"></p-inputNumber>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'dropdown'">
+                                        <td [colSpan]="col.colspan" class="w-20">
+                                            <p-dropdown [options]="[]" [(ngModel)]="rowData[col.field]"></p-dropdown>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'calendar'">
+                                        <td [colSpan]="col.colspan">
+                                            <p-calendar [(ngModel)]="rowData[col.field]" [appendTo]="myTable" [showIcon]="true" icon="pi pi-calendar"></p-calendar>
+                                        </td>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'button'">
+                                        <td [colSpan]="col.colspan" class="text-center">
+                                            <button pButton [label]="col.label!" [icon]="'pi pi-' + col.icon"></button>
+                                        </td>
+                                    </ng-container>
+                                </ng-container>
+                            </ng-container>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="loadingbody" let-columns="columns">
+                        <tr style="height:40px">
+                            <td *ngFor="let col of columns">
+                                <div class="loading-text"></div>
+                                <p-skeleton [ngStyle]="{'width': '100%'}"></p-skeleton>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="summary" let-yourColumnArrayVaraible>
+                        <div class="flex justify-content-between
+ align-items-start
+">
+                            <button pButton (click)="addLigneToNewDevisTable()" label="Ajouter une ligne" icon="pi pi-arrow-down" iconPos="right" class="bg-orange"></button>
+                            <div class="new-devis-summary text-right">
+                                <div class="grid my-1">
+                                    <div class="col-7 color-gray"><span>TOTAL HT</span></div>
+                                    <div class="col-5 color-orange"><span>800.00 MAD</span></div>
+                                </div>
+                                <div class="grid my-1">
+                                    <div class="col-7 color-gray"><span>REMISE</span></div>
+                                    <div class="col-5 color-orange"><span>200.00 MAD</span></div>
+                                </div>
+                                <div class="grid my-1">
+                                    <div class="col-7 color-gray"><span>TVA</span></div>
+                                    <div class="col-5 color-orange"><span>120.00 MAD</span></div>
+                                </div>
+                                <hr>
+                                <div class="grid">
+                                    <div class="col-7 color-gray"><span>TOTAL ESTIME TTC</span></div>
+                                    <div class="col-5 color-orange"><span>720.00 MAD</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-table>
+            </div>
+            <div class="w-23">
+                <p-accordion class="shadow-2">
+                    <div class="py-3 px-4 bg-white color-orange">Options</div>
+                    <p-accordionTab header="Remise" [selected]="false">
+                        your content
+                    </p-accordionTab>
+                    <p-accordionTab header="TVA">
+                        your content
+                    </p-accordionTab>
+                    <p-accordionTab header="Devise">
+                        your content
+                    </p-accordionTab>
+                </p-accordion>
+            </div>
+        </div>
+    </div>
+</p-dialog>

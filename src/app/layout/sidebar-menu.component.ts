@@ -47,7 +47,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             new MenuItem("Tableau de bord", '/app/Dashboard', '../assets/img/DashboardIcon.png'),
             new MenuItem("Clients", '/app/Clients', '../assets/img/ClientMeniItemIcon.png'),
             new MenuItem("Catalogue", '/app/Catalogue', '../assets/img/CatalogueIcon.png'),
-            new MenuItem("Devis", '/app/Davis', '../assets/img/DevisIcon.png'),
+            new MenuItem("Devis", '/app/Devis', '../assets/img/DevisIcon.png'),
             new MenuItem("Factures", '/app/Factures', '../assets/img/FactureIcon.png'),
             new MenuItem("Mon profil", '/app/MonProfil', '../assets/img/MonProfilIcon.png'),
             new MenuItem("Paramètres", '/app/Parametres', '../assets/img/ParametreIcon.png')
