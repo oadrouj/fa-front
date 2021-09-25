@@ -1,9 +1,9 @@
 <p-toast [style]="{marginTop: 'marginTop'}" styleClass=""></p-toast>
 
-<p-dialog [(visible)]="visible" [style]="{'width': '100vw'}" [closable]="false" [autoZIndex]="1040">
+<p-dialog [(visible)]="visible" [style]="{'width': '100vw'}" [closable]="false">
     <ng-template pTemplate="header">
         <button pButton icon="pi pi-times" class="closeButton" (click)="closeDialog.emit()"></button>
-        <h2>Nouveau devis</h2>
+        <h2>{{dialogTitle}} devis</h2>
         <div class="flex">
             <button pButton label="Enregistrer le brouillon" class="bg-orange mx-2"></button>
             <button pButton label="Valider" class="bg-light-green mx-2" (click)="validateDevis()"></button>
@@ -29,7 +29,7 @@
                                     <span>Numéro de devis</span>
                                 </div>
                                 <div class="col ">
-                                    <span>{{devisItem.reference}}</span>
+                                    <span>{{reference}}</span>
                                 </div>
                                 <div class="col text-center">
                                     <button pButton label="Changer" class="color-green p-button-text"></button>
@@ -67,11 +67,11 @@
                             <div class="flex flex-column align-items-end">
                                 <div>
                                     <p>Message d'introduction</p>
-                                    <textarea pInputTextArea formControlName="introduction" name="" id="" cols="40" rows="4">{{devisItem.introduction}}</textarea>
+                                    <textarea pInputTextArea formControlName="introduction" name="" id="" cols="40" rows="4"></textarea>
                                 </div>
                                 <div>
                                     <p>Pied de page</p>
-                                    <textarea pInputTextArea formControlName="pied_page" name="" id="" cols="40" rows="4">{{devisItem.pied_page}}</textarea>
+                                    <textarea pInputTextArea formControlName="pied_page" name="" id="" cols="40" rows="4"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -94,17 +94,20 @@
                                         <ng-container [ngSwitch]="col.type">
                                             <ng-container *ngSwitchCase="'inputText'">
                                                 <td [colSpan]="col.colspan">
-                                                    <input pInputText type="text" [formControlName]="col.field" />
+                                                    <input pInputText type="text" [formControlName]="col.field" [disabled]="col.disabled" />
                                                 </td>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'inputNumber'">
                                                 <td [colSpan]="col.colspan" class="w-20">
-                                                    <p-inputNumber [formControlName]="col.field" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix"></p-inputNumber>
+                                                    <p-inputNumber *ngIf="!col.inputEvent" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix">
+                                                    </p-inputNumber>
+                                                    <p-inputNumber *ngIf="col.inputEvent" (onInput)="col.inputEvent(i)" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix">
+                                                    </p-inputNumber>
                                                 </td>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'dropdown'">
                                                 <td [colSpan]="col.colspan" class="w-20">
-                                                    <p-dropdown [options]="col.options" [formControlName]="col.field" [appendTo]="myTable">
+                                                    <p-dropdown [options]="col.options" [formControlName]="col.field" [disabled]="col.disabled" [appendTo]="myTable">
                                                         <ng-template pTemplate="selectedItem">
                                                             <div class="" *ngIf="group.get(col.field).value">
                                                                 {{group.get(col.field).value}}
@@ -118,7 +121,8 @@
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'calendar'">
                                                 <td [colSpan]="col.colspan">
-                                                    <p-calendar [formControlName]="col.field" [appendTo]="myTable" [showIcon]="true" icon="pi pi-calendar"></p-calendar>
+                                                    <p-calendar [formControlName]="col.field" [disabled]="col.disabled" [appendTo]="myTable" [showIcon]="true" icon="pi pi-calendar">
+                                                    </p-calendar>
                                                 </td>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'button'">
@@ -137,11 +141,16 @@
                                     <div class="new-devis-summary text-right">
                                         <div class="grid my-1">
                                             <div class="col-7 color-gray"><span>TOTAL HT</span></div>
-                                            <div class="col-5 color-green"><span>800.00 MAD</span></div>
+                                            <div class="col-5 color-green"><span>{{summaryTotalHT | number:'1.2-2' }}
+                                                    {{' ' + Currency}}</span></div>
                                         </div>
                                         <div class="grid my-1">
                                             <div class="col-7 color-gray"><span>REMISE</span></div>
-                                            <div class="col-5 color-green"><span>200.00 MAD</span></div>
+                                            <div class="col-5 color-green">
+                                                <span>
+                                                    {{devisOptionsFormGroup.get('remise') | number:'1.2-2' }}{{' ' + Currency}}
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="grid my-1">
                                             <div class="col-7 color-gray"><span>TVA</span></div>
@@ -158,17 +167,18 @@
                         </p-table>
                     </div>
                 </div>
-                <div class="w-23">
+                <div class="w-23" [formGroup]="devisOptionsFormGroup">
                     <p-accordion class="shadow-2">
                         <div class="py-3 px-4 bg-white color-green">Options</div>
                         <p-accordionTab header="Remise" [selected]="false">
-                            your content
+                            <p-toggleButton onLabel="Activer" offLabel="Désactiver" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleRemiseOption($event)"></p-toggleButton>
+                            <input pInputText formControlName="remise" />
                         </p-accordionTab>
                         <p-accordionTab header="TVA">
-                            your content
+                            <p-toggleButton onLabel="Activer" offLabel="Désactiver" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleTVAOption($event.checked)"></p-toggleButton>
                         </p-accordionTab>
                         <p-accordionTab header="Devise">
-                            your content
+                            <p-dropdown [options]="devisOptions.devise.list" formControlName="devise" placeholder="Sélectionner un devise"></p-dropdown>
                         </p-accordionTab>
                     </p-accordion>
                 </div>
