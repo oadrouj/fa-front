@@ -3,7 +3,6 @@ import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/a
 import { BehaviorSubject, Subject } from 'rxjs';
 import {DevisItem} from '../../shared/models/DevisItem'
 import {DialogStatus} from '../../shared/enums/DialogState.enum'
-import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-devis',

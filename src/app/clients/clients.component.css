@@ -66,6 +66,9 @@
     text-transform: uppercase;
     background-color: transparent;
 }
+:host >>> .p-datatable .p-datatable-scrollable-header {
+    background: transparent;
+}
 :host >>> #tableClients .p-datatable .p-datatable-thead > tr > th i.pi-sort-alt.p-sortable-column-icon {
     display: none;
 }

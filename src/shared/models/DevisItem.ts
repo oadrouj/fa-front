@@ -2,7 +2,7 @@ import { DevisContentItem } from "./DevisContentItem"
 
 export class DevisItem {
     reference!: string
-    client!: string
+    client!: string 
     date_emission!: Date
     echeance!: number
     introduction!: string
