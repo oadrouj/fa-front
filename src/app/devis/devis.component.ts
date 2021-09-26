@@ -13,6 +13,10 @@ import { DialogModule } from 'primeng/dialog';
 })
 
 export class DevisComponent implements OnInit {
+  summaryTotalHT: number;
+  summaryTVA: number;
+  summaryTotalTTC: number;
+  montantTTCAllDevis: number = 0;
   constructor(
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
@@ -20,6 +24,7 @@ export class DevisComponent implements OnInit {
 
   ngOnInit() {
     this.selectedDevisItem = this.devisList[0]
+    
     this.emitNotificationSelectedDevisChanged(this.selectedDevisItem)
 
     this.devisList.forEach(
@@ -37,15 +42,27 @@ export class DevisComponent implements OnInit {
 
         devis.montant_ttc = devis.contentItems
           .map((item) => item.total_ttc)
-          .reduce((accum, current) => accum + current)
+          .reduce((accum, current) => accum + current) - devis.remise
+
+        this.montantTTCAllDevis += devis.montant_ttc;
+        
         }
     )
+
+    this.calculateSummaryTotalHTAndTVA();
   }
 
   searchText = ''
-  clientOptions = [{ name: 'Ali' }, { name: 'Ziko' }, { name: 'Dekkers' }]
-  clientSuggestions: any
   selectedClient = ''
+  selectedDate = ''
+  selectedEcheance = ''
+  selectedMontant = ''
+  selectedStatut = ''
+  clientSuggestions : string[]
+  dateOptions = [new Date('02/10/2020'), new Date('11/02/2022'), new Date('09/03/2021')]
+  echeanceOptions = [15, 20, 30]
+  montantOptions = [960.00, 1000.00, 1200.00]
+  statutOptions = ['Créé', 'Validé', 'Converti', 'Expiré']
 
   cols = [
     {
@@ -103,6 +120,7 @@ export class DevisComponent implements OnInit {
       statut: 'Brouillon',
       introduction: 'introduction here',
       pied_page: 'pied page here',
+      remise: 200,
       contentItems: [
         {
           description: 'Consultation1',
@@ -135,6 +153,7 @@ export class DevisComponent implements OnInit {
       statut: 'Brouillon',
       introduction: 'introduction here',
       pied_page: 'pied page here',
+      remise: 0,
       contentItems: [
         {
           description: 'Consultation 2',
@@ -157,6 +176,7 @@ export class DevisComponent implements OnInit {
       statut: 'Brouillon',
       introduction: 'introduction here',
       pied_page: 'pied page here',
+      remise: 0,
       contentItems: [
         {
           description: 'Consultation 2',
@@ -179,6 +199,7 @@ export class DevisComponent implements OnInit {
       statut: 'Brouillon',
       introduction: 'introduction here',
       pied_page: 'pied page here',
+      remise: 0,
       contentItems: [
         {
           description: 'Consultation 2',
@@ -214,6 +235,31 @@ export class DevisComponent implements OnInit {
   autoCompleteSearch(event: any) {}
 
   clientAutoCompleteSearch(event: any) {
+    // this.mylookupservice.getResults(event.query).then(data => {
+      this.clientSuggestions = ['Karim', 'Omar']
+  // });
+  }
+  
+
+  filterSubject = new Subject<any>();
+  emitFilterEvent(filterType: string, value: any){
+    if(filterType == 'filterByInput')
+      this.filterSubject.next({
+        type: 'filterByInput', 
+        value
+      });
+
+    else if(filterType == 'filterByButton') 
+      this.filterSubject.next({
+        type: 'filterByButton',
+        value: {
+          client: this.selectedClient,
+          date: this.selectedDate,
+          echeance: this.selectedEcheance,
+          statut: this.selectedStatut,
+          montant_ttc: this.selectedMontant
+        }
+      })
     
   }
 
@@ -289,6 +335,7 @@ export class DevisComponent implements OnInit {
 
   selectionChange(devisItem: DevisItem) {
     this.selectedDevisItem = devisItem
+    this.calculateSummaryTotalHTAndTVA();
     this.emitNotificationSelectedDevisChanged(devisItem);
   }
 
@@ -296,5 +343,15 @@ export class DevisComponent implements OnInit {
     return new Date()
   }
 
+  calculateSummaryTotalHTAndTVA() {
+    this.summaryTotalHT = this.selectedDevisItem.contentItems
+      .map((item) => item.total_ht)
+      .reduce((accum, current) => accum + current)
+
+      this.summaryTVA = this.selectedDevisItem.contentItems
+        .map((item) => (item.total_ht * item.tva) / 100)
+        .reduce((accum, current) => accum + current)
+    
+  }
  
 }

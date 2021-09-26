@@ -1,5 +1,5 @@
-<p-table [columns]="cols" [value]="tableData" selectionMode="single" [(selection)]="defaultRowToBeSelected" dataKey="reference" (onRowSelect)="onRowSelect($event)" [id]="styleId" [scrollable]="true" [rows]="100" scrollHeight="250px" [virtualScroll]="true"
-    [virtualRowHeight]="40" [class]="styleClass">
+<p-table #tbl [columns]="cols" [value]="tableData" selectionMode="single" [(selection)]="defaultRowToBeSelected" dataKey="reference" (onRowSelect)="onRowSelect($event)" [id]="styleId" [scrollable]="true" [rows]="100" scrollHeight="250px" [virtualScroll]="true"
+    [globalFilterFields]="globalFilterFields" [virtualRowHeight]="40" [class]="styleClass">
     <ng-template pTemplate="header" let-columns>
         <tr>
             <th *ngFor="let col of columns">
