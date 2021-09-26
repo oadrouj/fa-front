@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/api';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import {DevisItem} from '../../shared/models/DevisItem'
+import {DialogStatus} from '../../shared/enums/DialogState.enum'
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-devis',
@@ -18,16 +20,25 @@ export class DevisComponent implements OnInit {
 
   ngOnInit() {
     this.selectedDevisItem = this.devisList[0]
-
-    this.selectedDevisItem.contentItems = this.selectedDevisItem.contentItems.map(
-      (item: any) => ({ ...item, total_ht: item.pu * item.quantite }),
-    )
+    this.emitNotificationSelectedDevisChanged(this.selectedDevisItem)
 
     this.devisList.forEach(
-      (devis: DevisItem) =>
-        (devis.montant_ttc = devis.contentItems
+      (devis: DevisItem) =>{
+        devis.contentItems = devis.contentItems.map(
+          (item: any) => {
+            let total_ht = item.pu * item.quantite;
+            return {
+               ...item, 
+               total_ttc: total_ht+ (item.tva * total_ht/100),
+               total_ht, 
+            }
+          },
+        )
+
+        devis.montant_ttc = devis.contentItems
           .map((item) => item.total_ttc)
-          .reduce((accum, current) => accum + current)),
+          .reduce((accum, current) => accum + current)
+        }
     )
   }
 
@@ -87,7 +98,7 @@ export class DevisComponent implements OnInit {
     {
       reference: 'D00004',
       client: 'Omar Attioui',
-      date_emission: new Date('01/01/2021'),
+      date_emission: new Date('10/09/2021'),
       echeance: 15,
       statut: 'Brouillon',
       introduction: 'introduction here',
@@ -100,7 +111,8 @@ export class DevisComponent implements OnInit {
           unite: 'Heures',
           pu: 100.0,
           tva: 20,
-          total_ttc: 1000.0,
+          total_ht: 0,
+          total_ttc: 0,
         },
         {
           description: 'Consultation2',
@@ -109,14 +121,15 @@ export class DevisComponent implements OnInit {
           unite: 'Heures',
           pu: 100.0,
           tva: 20,
-          total_ttc: 960.0,
+          total_ht: 0,
+          total_ttc: 0,
         },
       ],
     },
 
     {
       reference: 'D00002',
-      client: 'Omar Attioui',
+      client: 'Karim',
       date_emission: new Date('01/01/2021'),
       echeance: 15,
       statut: 'Brouillon',
@@ -130,14 +143,15 @@ export class DevisComponent implements OnInit {
           unite: 'Heures',
           pu: 100.0,
           tva: 20,
-          total_ttc: 560.0,
+          total_ht: 0,
+          total_ttc: 0,
         },
       ],
     },
 
     {
       reference: 'D00003',
-      client: 'Omar tttt',
+      client: 'Chorouk',
       date_emission: new Date('01/01/2021'),
       echeance: 15,
       statut: 'Brouillon',
@@ -151,14 +165,15 @@ export class DevisComponent implements OnInit {
           unite: 'Heures',
           pu: 100.0,
           tva: 20,
-          total_ttc: 560.0,
+          total_ht: 0,
+          total_ttc: 0,
         },
       ],
     },
 
     {
       reference: 'D00005',
-      client: 'Omar tttt',
+      client: 'Ilyass',
       date_emission: new Date('01/01/2021'),
       echeance: 15,
       statut: 'Brouillon',
@@ -172,8 +187,10 @@ export class DevisComponent implements OnInit {
           unite: 'Heures',
           pu: 100.0,
           tva: 20,
-          total_ttc: 560.0,
+          total_ht: 0,
+          total_ttc: 0,
         },
+        
       ],
     },
   ]
@@ -181,6 +198,7 @@ export class DevisComponent implements OnInit {
   statusItems = []
 
   displayDialog = false
+  dialogState !:  DialogStatus
 
   autoCompleteText = ''
   suggestions = []
@@ -199,13 +217,25 @@ export class DevisComponent implements OnInit {
     
   }
 
+  dialogStatusEvent = new Subject<DialogStatus>()
+  emitDialogStatus(dialogStatus: DialogStatus) {
+    this.dialogStatusEvent.next(dialogStatus)
+  }
+
+  newDevis() {
+    this.displayDialog = true
+    this.emitDialogStatus(DialogStatus.New)
+  }
   editDevis() {
     this.displayDialog = true
+    this.dialogState = DialogStatus.Edit
+    this.emitDialogStatus(DialogStatus.Edit)
   }
 
   duplicateDevis() {
     this.selectedDevisItem.reference = 'D00002'
     this.displayDialog = true
+    this.emitDialogStatus(DialogStatus.Duplicate)
   }
 
   eventsSubject = new Subject<DevisItem>()
@@ -214,7 +244,7 @@ export class DevisComponent implements OnInit {
     this.eventsSubject.next(deviItem)
   }
 
-  notifySelectedDevisChanged = new Subject<DevisItem>()
+  notifySelectedDevisChanged = new BehaviorSubject<DevisItem>(null)
   emitNotificationSelectedDevisChanged(deviItem: DevisItem) {
     this.notifySelectedDevisChanged.next(deviItem)
   }
@@ -225,7 +255,6 @@ export class DevisComponent implements OnInit {
       header: 'Confirmation',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        console.log(this.selectedDevisItem)
         this.devisList = this.devisList.filter((devis) => {
           return devis.reference != this.selectedDevisItem.reference
         })
@@ -259,8 +288,13 @@ export class DevisComponent implements OnInit {
   }
 
   selectionChange(devisItem: DevisItem) {
-    console.log('selection change work')
     this.selectedDevisItem = devisItem
     this.emitNotificationSelectedDevisChanged(devisItem);
   }
+
+  get getDateEcheance() {
+    return new Date()
+  }
+
+ 
 }

@@ -6,4 +6,5 @@ export class DevisContentItem {
     pu!: number
     tva!: number
     total_ttc!: number
+    total_ht!: number
 }

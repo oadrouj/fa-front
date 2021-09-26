@@ -60,6 +60,7 @@ import { FacturesComponent } from './factures/factures.component';
 import { FacturesDialogComponent } from './factures/factures-dialog/factures-dialog.component';
 import { DevisDialogComponent } from './devis/devis-dialog/devis-dialog.component';
 import { CalendarModule } from 'primeng/calendar';
+import { ToggleButtonModule } from 'primeng/togglebutton';
 import { TableComponent } from './table/table.component';
 
 @NgModule({
@@ -128,7 +129,7 @@ import { TableComponent } from './table/table.component';
     SplitButtonModule,
     AutoCompleteModule,
     AccordionModule,
-    
+    ToggleButtonModule,
     
   ],
   providers: [MessageService, ConfirmationService],

@@ -12,7 +12,7 @@
                     <h1 class="title color-green">DEVIS</h1>
                 </div>
 
-                <button pButton (click)="displayDialog = true" class="bg-green btn-new-devis text-normal" label="Nouvelle Devis"></button>
+                <button pButton (click)="newDevis()" class="bg-green btn-new-devis text-normal" label="Nouveau Devis"></button>
 
             </div>
             <p class="subtitle">Visualisez, modifiez et gérez toutes vos factures !</p>
@@ -66,9 +66,9 @@
                         <img src="assets/img/logo.png" alt="">
                     </div>
                     <div class="col-7 text-right">
-                        <h1>Devis D00001</h1>
-                        <p class="date my-1">Date d'émission: 01/01/2021</p>
-                        <p class="date my-1">Date d'échéqnce: 31/01/2021</p>
+                        <h1>Devis {{selectedDevisItem.reference}}</h1>
+                        <p class="date my-1">Date d'émission: {{selectedDevisItem.date_emission | date:'shortDate'}}</p>
+                        <p class="date my-1">Date d'échéqnce: {{getDateEcheance | date:'shortDate'}}</p>
                     </div>
                 </div>
                 <div class="grid px-1 py-4">
@@ -80,8 +80,7 @@
                         <span>Maroc</span>
                         <span class="mt-3">06 69 99 99</span>
                     </div>
-                    <div class="col-6 align-items-center
- grid flex-column">
+                    <div class="col-6 align-items-center grid flex-column">
                         <span class="color-gray">De</span>
                         <span>FACTURI</span>
                     </div>
@@ -185,5 +184,5 @@
 
 
 <!-- Dialog -->
-<app-devis-dialog [visible]="displayDialog" [devisItem]="selectedDevisItem" (closeDialog)="displayDialog = false" [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()">
+<app-devis-dialog [visible]="displayDialog" (closeDialog)="displayDialog = false" [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()" [dialogStatusEvent]="dialogStatusEvent.asObservable()">
 </app-devis-dialog>
