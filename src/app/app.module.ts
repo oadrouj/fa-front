@@ -50,9 +50,17 @@ import {KeyFilterModule} from 'primeng/keyfilter';
 import {InputNumberModule} from 'primeng/inputnumber';
 import {ToastModule} from 'primeng/toast';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
-
+import {AccordionModule} from 'primeng/accordion';
+import {SplitButtonModule} from 'primeng/splitbutton';
+import {AutoCompleteModule} from 'primeng/autocomplete';
 import { ClientsComponent } from './clients/clients.component';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { DevisComponent } from './devis/devis.component';
+import { FacturesComponent } from './factures/factures.component';
+import { FacturesDialogComponent } from './factures/factures-dialog/factures-dialog.component';
+import { DevisDialogComponent } from './devis/devis-dialog/devis-dialog.component';
+import { CalendarModule } from 'primeng/calendar';
+import { TableComponent } from './table/table.component';
 
 @NgModule({
   declarations: [
@@ -83,7 +91,13 @@ import { ConfirmationService, MessageService } from 'primeng/api';
     SidebarLogoComponent,
     SidebarUserPanelComponent,
     SidebarMenuComponent,
-    ClientsComponent
+    ClientsComponent,
+    DevisComponent,
+    FacturesComponent,
+    FacturesDialogComponent,
+    DevisDialogComponent,
+    TableComponent,
+
   ],
   imports: [
     CommonModule,
@@ -109,7 +123,13 @@ import { ConfirmationService, MessageService } from 'primeng/api';
     KeyFilterModule,
     InputNumberModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    CalendarModule,
+    SplitButtonModule,
+    AutoCompleteModule,
+    AccordionModule,
+    
+    
   ],
   providers: [MessageService, ConfirmationService],
   entryComponents: [

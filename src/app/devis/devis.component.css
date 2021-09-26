@@ -1,0 +1,243 @@
+.main {
+    padding-right: .8rem;
+    background: #f1f6ff;
+    min-height: 100vh;
+}
+
+.header {
+    padding-right: 4rem;
+}
+
+.header h1 {
+    line-height: 0px;
+    margin-top: 19px;
+    font-size: 1.5rem;
+}
+
+.btn-new-devis {
+    max-width: 124px;
+    font-size: 0.85rem;
+    padding: .5rem .8rem;
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    color: #898e99;
+}
+
+.searchInput {
+    height: 42px;
+    border-radius: 26px;
+    background: #f1eded;
+    color: #70707082;
+    border: none;
+}
+
+i.pi-search {
+    font-weight: 800;
+    color: #70707082;
+}
+
+.searchInput,
+i.pi-search {
+    font-size: 0.9rem;
+}
+
+:host>>>.filterContainer .p-dropdown,
+:host>>>.filterContainer .p-autocomplete .p-autocomplete-input {
+    border: none;
+    margin-right: 6px;
+    width: 82px;
+}
+
+:host>>>.filterContainer .p-dropdown .p-inputtext,
+:host>>>.filterContainer .p-autocomplete .p-autocomplete-input {
+    padding: 6px 0px 6px 6px;
+    color: #7d86a9;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+:host>>>.filterContainer .p-dropdown .pi-chevron-down {
+    font-size: 0.75rem;
+}
+
+.filterBtn {
+    min-height: 30px;
+    background-color: #0d6939;
+    padding: .6rem .7rem;
+    font-size: 0.86rem;
+}
+
+:host>>>.filterBtn .pi-filter {
+    font-size: 0.85rem;
+}
+
+:host ::ng-deep #devisList .p-datatable {
+    margin-top: 2.625rem;
+}
+
+:host>>>#devisList .p-datatable .p-datatable-thead>tr>th,
+:host>>>#devisList .p-datatable .p-datatable-tbody>tr>td {
+    /* padding: 10px; */
+    font-size: 0.95rem;
+}
+
+:host ::ng-deep #devisList .p-datatable .p-datatable-thead>tr>th,
+:host ::ng-deep #devisList .p-datatable .p-datatable-scrollable-header {
+    background: transparent;
+    color: var(--green-color);
+    font-weight: 400;
+}
+
+:host ::ng-deep #devisList .p-datatable .p-datatable-tbody>tr>td {
+    color: #898e99;
+}
+
+:host ::ng-deep #devisList .p-datatable .p-datatable-tbody>tr.p-highlight {
+    background: #c3ead6;
+}
+
+
+/* List details footer */
+
+.devisTotal {
+    position: absolute;
+    bottom: 0rem;
+    min-height: 3.2rem;
+    padding-left: 1.5rem;
+    padding-right: 20%;
+    border-top: 1px solid var(--light-gray-color);
+}
+
+.devisTotal :nth-child(1) {
+    font-size: 1.42rem;
+}
+
+.devisTotal :nth-child(2) {
+    font-size: 0.95rem;
+}
+
+
+/* Devis details */
+
+.devis-details {
+    background-color: #faf9f9;
+    min-height: 782px;
+    margin-bottom: 0.7rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 50%);
+}
+
+.devis-details .header {
+    padding: 20px 20px;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+.devis-details .content h1 {
+    line-height: 12px;
+    font-size: 1.5rem;
+}
+
+.devis-details .content .date {
+    font-size: 1rem;
+    color: #898e99;
+}
+
+.border-radius-6 {
+    border-radius: 6px;
+}
+
+:host ::ng-deep .p-splitbutton {
+    font-weight: 400;
+}
+
+:host>>>.p-splitbutton .p-splitbutton-menubutton {
+    width: 1.357rem;
+}
+
+:host ::ng-deep .p-splitbutton .pi-chevron-down {
+    font-size: 0.8rem;
+}
+
+:host ::ng-deep .p-splitbutton * {
+    background-color: var(--green-color);
+}
+
+:host ::ng-deep .p-splitbutton-defaultbutton {
+    padding: 8px;
+    font-size: 0.75rem;
+}
+
+:host ::ng-deep .p-splitbutton-menubutton {
+    padding: 0;
+}
+
+.devis-details .header .p-button-text {
+    font-size: 0.74rem;
+    padding: 3px;
+    color: var(--green-color);
+}
+
+:host ::ng-deep .devis-details .p-datatable {
+    margin-top: .6rem;
+}
+
+:host ::ng-deep .devis-details .p-datatable tr>th,
+:host ::ng-deep .devis-details .p-datatable tr,
+:host ::ng-deep .devis-details .p-datatable .p-datatable-scrollable-header {
+    background: transparent;
+}
+
+:host ::ng-deep .devis-details .p-datatable tr>th,
+:host ::ng-deep .devis-details .p-datatable tr>td {
+    font-size: 0.65rem;
+    padding: 1rem .35rem;
+    text-align: center;
+}
+
+:host ::ng-deep .devis-details .p-datatable .p-datatable-thead {
+    border: 1px solid #e4e4e4;
+}
+
+:host ::ng-deep .devis-details .p-datatable .p-datatable-thead th {
+    color: var(--green-color);
+}
+
+:host ::ng-deep .devis-details .p-datatable-footer {
+    padding-top: 1.5rem;
+    padding-right: 0;
+    margin-left: 80px;
+    font-weight: 400;
+    background-color: transparent;
+    border: none;
+}
+
+:host ::ng-deep .devis-details .p-datatable-footer .p-col-9 {
+    text-align: right;
+    padding-right: 30px;
+}
+
+:host ::ng-deep .devis-details .p-datatable-footer .p-grid * {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+:host ::ng-deep .devis-details .p-datatable-footer span {
+    font-size: 0.75rem;
+}
+
+
+/* TODO: should review this part */
+
+:host ::ng-deep .p-datatable-footer hr {
+    width: 53%;
+    margin-right: 16px;
+    margin-top: 0;
+    margin-bottom: .8rem;
+    border-color: var(--light-gray-color);
+    border-style: solid;
+}
+
+
+/* Dialog styles */

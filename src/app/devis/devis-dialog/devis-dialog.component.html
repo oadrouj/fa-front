@@ -1,0 +1,182 @@
+<p-toast [style]="{marginTop: 'marginTop'}" styleClass=""></p-toast>
+
+<p-dialog [(visible)]="visible" [style]="{'width': '100vw'}" [closable]="false" [autoZIndex]="1040">
+    <ng-template pTemplate="header">
+        <button pButton icon="pi pi-times" class="closeButton" (click)="closeDialog.emit()"></button>
+        <h2>Nouveau devis</h2>
+        <div class="flex">
+            <button pButton label="Enregistrer le brouillon" class="bg-orange mx-2"></button>
+            <button pButton label="Valider" class="bg-light-green mx-2" (click)="validateDevis()"></button>
+            <button pButton label="Aperçu" class="bg-purple mx-2"></button>
+        </div>
+    </ng-template>
+    <form [formGroup]="formGroup">
+
+        <div class="">
+            <div class="w-77 autoCompleteContainer border-bottom  flex justify-content-between align-items-end mt-4 pr-5">
+                <div>
+                    <label for="" class="mb-3 block">Client</label>
+                    <p-autoComplete formControlName="client" placeholder="Sélectionner un client" [suggestions]="suggestions" (completeMethod)="autoCompleteSearch($event)"></p-autoComplete>
+                </div>
+                <h2>Devis</h2>
+            </div>
+            <div class="grid">
+                <div class="md:col-12 w-77 ">
+                    <div class="grid pt-4 border-bottom " id="new-devis-header">
+                        <div class="col-7">
+                            <div class="grid align-items-center">
+                                <div class="col-5">
+                                    <span>Numéro de devis</span>
+                                </div>
+                                <div class="col ">
+                                    <span>{{devisItem.reference}}</span>
+                                </div>
+                                <div class="col text-center">
+                                    <button pButton label="Changer" class="color-green p-button-text"></button>
+                                </div>
+                            </div>
+                            <div class="grid align-items-center">
+                                <div class="col-5">
+                                    <p>Date d'émission</p>
+                                </div>
+                                <div class="col-7">
+                                    <p-calendar formControlName="date_emission" icon="pi pi-calendar" [showIcon]="true">
+                                    </p-calendar>
+                                </div>
+                            </div>
+                            <div class="grid align-items-center">
+                                <div class="col-5">
+                                    <p>Echéance de paiement</p>
+                                </div>
+                                <div class="col-7">
+                                    <p-dropdown [options]="echeancePayementOptions" formControlName="echeance" [showClear]="false">
+                                        {{!!echeancePayementSelected}}
+                                        <ng-template pTemplate="selectedItem" *ngIf="echeancePayementSelected != ''" let-option>
+                                            <div>
+                                                {{formGroup.get('echeance')!.value}} jours
+                                            </div>
+                                        </ng-template>
+                                        <ng-template pTemplate="item" let-option>
+                                            {{option}} jours
+                                        </ng-template>
+                                    </p-dropdown>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="flex flex-column align-items-end">
+                                <div>
+                                    <p>Message d'introduction</p>
+                                    <textarea pInputTextArea formControlName="introduction" name="" id="" cols="40" rows="4">{{devisItem.introduction}}</textarea>
+                                </div>
+                                <div>
+                                    <p>Pied de page</p>
+                                    <textarea pInputTextArea formControlName="pied_page" name="" id="" cols="40" rows="4">{{devisItem.pied_page}}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div formArrayName="tableControl">
+                        <p-table #myTable [columns]="cols" [value]="getFormControls.controls" [id]="'newDevis'" [scrollable]="true" [rows]="100" scrollHeight="250px" [virtualRowHeight]="40" [class]="'table'">
+                            <ng-template pTemplate="header" let-columns>
+                                <tr>
+                                    <ng-container *ngFor="let col of columns; let i = index" indexo=i>
+                                        <th [colSpan]="col.colspan">
+                                            {{col.header}}
+                                        </th>
+                                    </ng-container>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-group let-columns="columns" let-i="rowIndex">
+                                <tr style="height:40px" [formGroupName]="i">
+                                    <ng-container *ngFor="let col of columns">
+                                        <!--  -->
+                                        <ng-container [ngSwitch]="col.type">
+                                            <ng-container *ngSwitchCase="'inputText'">
+                                                <td [colSpan]="col.colspan">
+                                                    <input pInputText type="text" [formControlName]="col.field" />
+                                                </td>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'inputNumber'">
+                                                <td [colSpan]="col.colspan" class="w-20">
+                                                    <p-inputNumber [formControlName]="col.field" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix"></p-inputNumber>
+                                                </td>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'dropdown'">
+                                                <td [colSpan]="col.colspan" class="w-20">
+                                                    <p-dropdown [options]="col.options" [formControlName]="col.field" [appendTo]="myTable">
+                                                        <ng-template pTemplate="selectedItem">
+                                                            <div class="" *ngIf="group.get(col.field).value">
+                                                                {{group.get(col.field).value}}
+                                                            </div>
+                                                        </ng-template>
+                                                        <ng-template let-option pTemplate="item">
+                                                            <div>{{option}}</div>
+                                                        </ng-template>
+                                                    </p-dropdown>
+                                                </td>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'calendar'">
+                                                <td [colSpan]="col.colspan">
+                                                    <p-calendar [formControlName]="col.field" [appendTo]="myTable" [showIcon]="true" icon="pi pi-calendar"></p-calendar>
+                                                </td>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'button'">
+                                                <td [colSpan]="col.colspan" class="text-center ">
+                                                    <button pButton [label]="col.label!" *ngIf="i != 0" (click)="deleteRow(i)" class="bg-pink-500" [icon]="'pi pi-' + col.icon"></button>
+                                                </td>
+                                            </ng-container>
+
+                                        </ng-container>
+                                    </ng-container>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="summary" let-yourColumnArrayVaraible>
+                                <div class="flex justify-content-between align-items-start ">
+                                    <button pButton (click)="addRow()" label="Ajouter une ligne" icon="pi pi-arrow-down" iconPos="right" class="bg-orange"></button>
+                                    <div class="new-devis-summary text-right">
+                                        <div class="grid my-1">
+                                            <div class="col-7 color-gray"><span>TOTAL HT</span></div>
+                                            <div class="col-5 color-green"><span>800.00 MAD</span></div>
+                                        </div>
+                                        <div class="grid my-1">
+                                            <div class="col-7 color-gray"><span>REMISE</span></div>
+                                            <div class="col-5 color-green"><span>200.00 MAD</span></div>
+                                        </div>
+                                        <div class="grid my-1">
+                                            <div class="col-7 color-gray"><span>TVA</span></div>
+                                            <div class="col-5 color-green"><span>120.00 MAD</span></div>
+                                        </div>
+                                        <hr>
+                                        <div class="grid">
+                                            <div class="col-7 color-gray"><span>TOTAL ESTIME TTC</span></div>
+                                            <div class="col-5 color-green"><span>720.00 MAD</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </div>
+                <div class="w-23">
+                    <p-accordion class="shadow-2">
+                        <div class="py-3 px-4 bg-white color-green">Options</div>
+                        <p-accordionTab header="Remise" [selected]="false">
+                            your content
+                        </p-accordionTab>
+                        <p-accordionTab header="TVA">
+                            your content
+                        </p-accordionTab>
+                        <p-accordionTab header="Devise">
+                            your content
+                        </p-accordionTab>
+                    </p-accordion>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <!-- <p-button icon="pi pi-check" (click)="displayDialog=false" label="Ok" styleClass="p-button-text" placeholder="Sélectionner un texte"></p-button> -->
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,177 @@
+<div class="main grid p-pt-6">
+    <div class="w-57 md:col-12 p-p-0 positon-relative">
+        <div class="pl-3">
+            <div class="header flex justify-content-between
+ align-items-start
+  p-pr-6">
+                <div class="flex  flex-wrap align-items-start
+">
+                    <img src="assets/icons/facture_icon.png" class=" p-mr-3" />
+                    <h1 class="title color-orange">FACTURE</h1>
+                </div>
+
+                <button pButton (click)="displayDialog = true" class="bg-orange btn-new-devis p-text-normal" label="Nouvelle Devis"></button>
+
+            </div>
+            <p class="subtitle">Visualisez, modifiez et gérez toutes vos factures !</p>
+
+            <span class="p-input-icon-left mt-2">
+        <i class="pi pi-search"></i>
+        <input pInputText [(ngModel)]="searchText" class="searchInput" placeholder="Rechercher ici" />
+      </span>
+
+            <div class="flex align-items-center
+ p-pt-5 filterContainer">
+                <p-dropdown [options]="clientOptions" [(ngModel)]="selectedClient" placeholder="Client" optionLabel="name" [showClear]="false"></p-dropdown>
+                <p-dropdown [options]="clientOptions" [(ngModel)]="selectedClient" placeholder="Date" optionLabel="name" [showClear]="false"></p-dropdown>
+                <p-dropdown [options]="clientOptions" [(ngModel)]="selectedClient" placeholder="Echéance" optionLabel="name" [showClear]="false"></p-dropdown>
+                <p-dropdown [options]="clientOptions" [(ngModel)]="selectedClient" placeholder="Montant" optionLabel="name" [showClear]="false"></p-dropdown>
+                <p-dropdown [options]="clientOptions" [(ngModel)]="selectedClient" placeholder="Statut" optionLabel="name" [showClear]="false"></p-dropdown>
+                <button pButton pRipple class="p-button-rounded  ml-3" label="Filtrer" icon="pi pi-filter"></button>
+            </div>
+        </div>
+
+
+
+        <app-table [tableData]="devisList" [cols]="cols" [styleClass]="'table'" [styleId]="'devisList'" [loadLazy]="loadLazy">
+        </app-table>
+
+        <div class="devisTotal flex justify-content-between
+ align-items-center
+ w-100">
+            <span class="color-gray ">Total TTC</span>
+            <span class="color-gray">720.00 MAD</span>
+        </div>
+    </div>
+
+    <div class="w-43 md:col-12 p-p-0">
+        <div class="devis-details">
+            <div class="header flex justify-content-between
+">
+                <p-splitButton class=" border-radius-6" label="Brouillon" [model]="statusItems"></p-splitButton>
+                <div class="flex">
+                    <button pButton label="Télécharger" class="p-button-text"></button>
+                    <button pButton label="Imprimer" class="p-button-text"></button>
+                    <button pButton label="Dupliquer" class="p-button-text"></button>
+                    <button pButton label="Modifier" class="p-button-text"></button>
+                    <button pButton label="Supprimer" class="p-button-text"></button>
+                </div>
+            </div>
+            <div class="content pt-2 p-px-3">class="content
+                <div class="grid px-1">
+                    <div class="col-5 pt-3">
+                        <img src="assets/images/logo.png" alt="">
+                    </div>
+                    <div class="col-7 text-right">
+                        <h1>Facture D00001</h1>
+                        <p class="subtitle my-1">Date d'émission: 01/01/2021</p>class="subtitle
+                        <p class="subtitle my-1">Date d'échéqnce: 31/01/2021</p>
+                    </div>
+                </div>
+                <div class="grid px-1">
+                    <div class="col-6 ">
+                        <p class="color-gray">Pour:</p>
+                        <p>Omar Attioui</p>
+                        <p>12 rue de Casablanca</p>
+                        <p>Casablanca 2000</p>
+                        <p>Maroc</p>
+                        <p class="mt-2">06 69 99 99</p>
+                    </div>
+                    <div class="col-6 text-center">
+                        <p class="color-gray">De</p>
+                        <p>FACTURI</p>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <p-table [columns]="DevisContentItemsCols" [value]="DevisContentItemsList">
+
+                <ng-template pTemplate="header" let-yourColumnArrayVaraible>
+                    <tr>
+                        <ng-container *ngFor="let colVar of yourColumnArrayVaraible">
+                            <th [colSpan]="colVar.colspan">
+                                {{colVar.header}}
+                            </th>
+                        </ng-container>
+
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-yourRowVaraible let-yourColumnArrayVaraible="columns">
+                    <tr>
+                        <ng-container *ngFor="let colVar of yourColumnArrayVaraible">
+                            <ng-container [ngSwitch]="colVar.type">
+                                <ng-container *ngSwitchCase="'calendar'">
+                                    <td [colSpan]="colVar.colspan">
+                                        {{yourRowVaraible[colVar.field] | date:'shortDate'}}
+                                    </td>
+                                </ng-container>
+                                <ng-container *ngSwitchDefault>
+                                    <td [colSpan]="colVar.colspan">
+                                        {{yourRowVaraible[colVar.field]}}
+                                    </td>
+                                </ng-container>
+                            </ng-container>
+
+                        </ng-container>
+
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="summary" let-yourColumnArrayVaraible>
+
+                    <div class="grid">
+                        <div class="col-9">
+                            <span>MONTANT TOTAL HT</span>
+                        </div>
+                        <div class="col-3">
+                            <span>800.00 MAD</span>
+                        </div>
+                    </div>
+
+                    <div class="grid">
+                        <div class="col-9">
+                            <span>REMISE</span>
+                        </div>
+                        <div class="col-3">
+                            <span>200.00 MAD</span>
+                        </div>
+                    </div>
+
+                    <div class="grid ">
+                        <div class="col-9">
+                            <span>TVA</span>
+                        </div>
+                        <div class="col-3">
+                            <span>120.00 MAD</span>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="grid">
+                        <div class="col-9">
+                            <span>TOTAL ESTIME TTC</span>
+                        </div>
+                        <div class="col-3">
+                            <span>720.00 MAD</span>
+                        </div>
+                    </div>
+
+                </ng-template>
+
+            </p-table>
+
+
+        </div>
+    </div>
+</div>
+
+
+<!--  #region Dialog -->
+
+<app-factures-dialog [visible]="displayDialog" (closeDialog)="displayDialog = false">
+
+</app-factures-dialog>
+
+<!-- #endregion -->
