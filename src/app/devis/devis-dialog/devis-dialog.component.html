@@ -16,7 +16,7 @@
             <div class="w-77 autoCompleteContainer border-bottom  flex justify-content-between align-items-end mt-4 pr-5">
                 <div>
                     <label for="" class="mb-3 block">Client</label>
-                    <p-autoComplete formControlName="client" placeholder="Sélectionner un client" [suggestions]="suggestions" (completeMethod)="autoCompleteSearch($event)"></p-autoComplete>
+                    <p-autoComplete formControlName="client" placeholder="Sélectionner un client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)"></p-autoComplete>
                 </div>
                 <h2>Devis</h2>
             </div>
@@ -40,7 +40,7 @@
                                     <p>Date d'émission</p>
                                 </div>
                                 <div class="col-7">
-                                    <p-calendar formControlName="date_emission" icon="pi pi-calendar" [showIcon]="true">
+                                    <p-calendar formControlName="date_emission" dateFormat="dd-mm-yy" icon="pi pi-calendar" [showIcon]="true">
                                     </p-calendar>
                                 </div>
                             </div>
@@ -76,6 +76,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div formArrayName="tableControl">
                         <p-table #myTable [columns]="cols" [value]="getFormControls.controls" [id]="'newDevis'" [scrollable]="true" [rows]="100" scrollHeight="250px" [virtualRowHeight]="40" [class]="'table'">
                             <ng-template pTemplate="header" let-columns>
@@ -99,7 +100,7 @@
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'inputNumber'">
                                                 <td [colSpan]="col.colspan" class="w-20">
-                                                    <p-inputNumber *ngIf="!col.inputEvent" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix">
+                                                    <p-inputNumber *ngIf="!col.inputEvent" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="' ' + Currency">
                                                     </p-inputNumber>
                                                     <p-inputNumber *ngIf="col.inputEvent" (onInput)="col.inputEvent(i)" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix">
                                                     </p-inputNumber>
@@ -107,7 +108,7 @@
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'dropdown'">
                                                 <td [colSpan]="col.colspan" class="w-20">
-                                                    <p-dropdown [options]="col.options" [formControlName]="col.field" [disabled]="col.disabled" [appendTo]="myTable">
+                                                    <p-dropdown [options]="col.options" [formControlName]="col.field" [disabled]="col.disabled" [appendTo]="myTable" (onChange)="col.changeEvent(i)">
                                                         <ng-template pTemplate="selectedItem">
                                                             <div class="" *ngIf="group.get(col.field).value">
                                                                 {{group.get(col.field).value}}
@@ -121,7 +122,7 @@
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'calendar'">
                                                 <td [colSpan]="col.colspan">
-                                                    <p-calendar [formControlName]="col.field" [disabled]="col.disabled" [appendTo]="myTable" [showIcon]="true" icon="pi pi-calendar">
+                                                    <p-calendar [formControlName]="col.field" dateFormat="dd-mm-yy" [disabled]="col.disabled" [appendTo]="myTable" [showIcon]="true" icon="pi pi-calendar">
                                                     </p-calendar>
                                                 </td>
                                             </ng-container>
@@ -148,18 +149,26 @@
                                             <div class="col-7 color-gray"><span>REMISE</span></div>
                                             <div class="col-5 color-green">
                                                 <span>
-                                                    {{devisOptionsFormGroup.get('remise') | number:'1.2-2' }}{{' ' + Currency}}
+                                                    {{devisOptionsFormGroup.get('remise').value | number:'1.2-2' }}{{' ' + Currency}}
                                                 </span>
                                             </div>
                                         </div>
                                         <div class="grid my-1">
                                             <div class="col-7 color-gray"><span>TVA</span></div>
-                                            <div class="col-5 color-green"><span>120.00 MAD</span></div>
+                                            <div class="col-5 color-green">
+                                                <span>
+                                                    {{summaryTVA | number:'1.2-2' }} {{' ' + Currency}}
+                                                </span>
+                                            </div>
                                         </div>
                                         <hr>
                                         <div class="grid">
                                             <div class="col-7 color-gray"><span>TOTAL ESTIME TTC</span></div>
-                                            <div class="col-5 color-green"><span>720.00 MAD</span></div>
+                                            <div class="col-5 color-green">
+                                                <span>
+                                                    {{summaryTotalTTC | number:'1.2-2' }} {{' ' + Currency}}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -171,14 +180,15 @@
                     <p-accordion class="shadow-2">
                         <div class="py-3 px-4 bg-white color-green">Options</div>
                         <p-accordionTab header="Remise" [selected]="false">
-                            <p-toggleButton onLabel="Activer" offLabel="Désactiver" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleRemiseOption($event)"></p-toggleButton>
-                            <input pInputText formControlName="remise" />
+                            <p-toggleButton #tglBtn onLabel="Activer" offLabel="Désactiver" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleRemiseOption($event)"></p-toggleButton>
+                            <input pInputText *ngIf="!tglBtn.checked" formControlName="remise" (input)="remiseValueChanged()" pKeyFilter="money" class="mt-2" />
                         </p-accordionTab>
                         <p-accordionTab header="TVA">
-                            <p-toggleButton onLabel="Activer" offLabel="Désactiver" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleTVAOption($event.checked)"></p-toggleButton>
+                            <p-toggleButton onLabel="Désactiver" formControlName="tva" (onChange)="toggleTVAOption($event.checked)" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check"></p-toggleButton>
                         </p-accordionTab>
                         <p-accordionTab header="Devise">
-                            <p-dropdown [options]="devisOptions.devise.list" formControlName="devise" placeholder="Sélectionner un devise"></p-dropdown>
+                            <p-dropdown formControlName="devise" [options]="devisOptions.devise.list" (onChange)="Currency = $event.value" placeholder="Sélectionner un devise">
+                            </p-dropdown>
                         </p-accordionTab>
                     </p-accordion>
                 </div>
@@ -186,7 +196,4 @@
         </div>
     </form>
 
-    <ng-template pTemplate="footer">
-        <!-- <p-button icon="pi pi-check" (click)="displayDialog=false" label="Ok" styleClass="p-button-text" placeholder="Sélectionner un texte"></p-button> -->
-    </ng-template>
 </p-dialog>

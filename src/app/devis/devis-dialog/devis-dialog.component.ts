@@ -18,29 +18,17 @@ import { Observable, Subscription } from 'rxjs'
   providers: [MessageService],
   styleUrls: ['./devis-dialog.component.css'],
 })
+
 export class DevisDialogComponent implements OnInit {
   constructor(
     private messageService: MessageService,
     private formBuilder: FormBuilder,
   ) {}
 
-  initialiseFormGroup() {
-    const length = this.selectedDevisItem
-      ? this.selectedDevisItem.contentItems.length
-      : 1
-    this.formGroup = this.formBuilder.group({
-      client: ['', Validators.required],
-      date_emission: ['', Validators.required],
-      echeance: ['30', Validators.required],
-      introduction: ['', Validators.required],
-      pied_page: ['', Validators.required],
-      tableControl: this.formBuilder.array(
-        Array.from({ length }).fill(this.initiateTableForm()),
-      ),
-    })
-  }
+
   ngOnInit(): void {
-    this.initialiseFormGroup()
+    this.initiateFormGroup()
+    
     this.devisOptionsFormGroup = this.initiateDevisOptionsGroup()
     this.eventsSubscription = this.SelectDevisItemEvent.subscribe(
       (devisItem: DevisItem) => {
@@ -51,31 +39,35 @@ export class DevisDialogComponent implements OnInit {
 
     this.eventsSubscription = this.dialogStatusEvent.subscribe(
       (dialogStatus: DialogStatus) => {
-        this.clearTableControl()
-        this.formGroup.reset()
+       
+        this.initiateSummaryValues()
         switch (dialogStatus) {
           case DialogStatus.New:
+            this.initiateFormGroupForNewDevis();
             this.dialogTitle = 'Nouveau'
             this.devisItem = new DevisItem()
             this.reference = this.getNewReference()
             this.isFirstLigneToAdd = true
-            this.addRow()
             break
 
           case DialogStatus.Edit:
+            this.initiateFormGroupWithTableControls()
             this.dialogTitle = 'Modifier'
-            this.initialiseFormGroup()
             this.devisItem = this.selectedDevisItem
             this.reference = this.selectedDevisItem.reference
             this.setFormGroup()
+            this.devisOptionsFormGroup.get('remise').setValue(this.devisItem.remise)
+            this.calculateSummaryTotalHTAndTTC();
             break
 
           case DialogStatus.Duplicate:
+            this.initiateFormGroupWithTableControls()
             this.dialogTitle = 'Dupliquer'
-            this.initialiseFormGroup()
             this.devisItem = this.selectedDevisItem
             this.reference = this.getNewReference()
             this.setFormGroup()
+            this.devisOptionsFormGroup.get('remise').setValue(this.devisItem.remise)
+            this.calculateSummaryTotalHTAndTTC();
             break
           default:
             break
@@ -87,6 +79,7 @@ export class DevisDialogComponent implements OnInit {
   @Input() visible = false
   @Input() SelectDevisItemEvent = new Observable<DevisItem>()
   @Input() dialogStatusEvent!: Observable<DialogStatus>
+  @Input() clientAutoCompleteSearch: (_) => void
   @Output() closeDialog = new EventEmitter()
 
   formGroup!: FormGroup
@@ -98,11 +91,20 @@ export class DevisDialogComponent implements OnInit {
   reference!: string
   dialogTitle!: string
   Currency: string = 'MAD'
-  summaryTotalHT!: number
-  summaryTotalTTC!: number
-  summaryRemise!: number
-  summaryTVA!: number
-
+  clientSuggestions !: string[]
+  autoCompleteText = ''
+  dateEmission!: Date
+  echeancePayementOptions = [30, 60, 90]
+  echeancePayementSelected = this.echeancePayementOptions[0] || ''
+  isFirstLigneToAdd = true
+  summaryTotalHT = 0
+  summaryTotalTTC = 0
+  summaryTVA = 0
+  devisOptions = {
+    remise: { checked: false },
+    tva: { checked: true },
+    devise: { list: ['MAD', 'USD', 'EURO'] },
+  }
   cols = [
     {
       header: 'DESCRIPTION',
@@ -115,7 +117,7 @@ export class DevisDialogComponent implements OnInit {
       header: 'Qté',
       field: 'quantite',
       type: 'inputNumber',
-      inputEvent: (rowIndex) => this.calculateTotalHTAndTTC(rowIndex),
+      inputEvent: (rowIndex) => this.calculateRowTotalHTAndTTC(rowIndex),
     },
     {
       header: 'UNITE',
@@ -127,7 +129,7 @@ export class DevisDialogComponent implements OnInit {
       header: 'PU HT',
       field: 'pu',
       type: 'inputNumber',
-      inputEvent: (rowIndex) => this.calculateTotalHTAndTTC(rowIndex),
+      inputEvent: (rowIndex) => this.calculateRowTotalHTAndTTC(rowIndex),
     },
     { header: 'TOTAL HT', field: 'total_ht', type: 'inputNumber' },
     {
@@ -135,34 +137,63 @@ export class DevisDialogComponent implements OnInit {
       field: 'tva',
       type: 'dropdown',
       options: [10, 20, 30, 40],
+      changeEvent: (rowIndex) => this.calculateRowTotalHTAndTTC(rowIndex),
     },
     {
       header: 'TOTAL TTC',
       field: 'total_ttc',
       type: 'inputNumber',
       colspan: 2,
-      suffix: ' MAD',
     },
     { header: '', field: 'delete', type: 'button', label: '', icon: 'trash' },
   ]
 
-  suggestions = []
-  autoCompleteText = ''
-  dateEmission!: Date
-  echeancePayementOptions = [30, 60, 90]
-  echeancePayementSelected = this.echeancePayementOptions[0] || ''
-  isFirstLigneToAdd = true
-  devisOptions = {
-    remise: { checked: false },
-    tva: { checked: true },
-    devise: { list: ['MAD', 'USD', 'EURO'] },
+  get getFormControls() {
+    const control = this.formGroup.get('tableControl') as FormArray
+    return control
   }
 
-  private clearTableControl() {
-    ;(this.formGroup.get('tableControl') as FormArray).controls = []
+  get getDevisContentItems() {
+    return this.getFormControls.value as DevisContentItem[]
   }
 
-  loadLazy(event: LazyLoadEvent) {}
+  initiateFormGroup(){
+    this.formGroup = this.formBuilder.group({
+      client: ['', Validators.required],
+      date_emission: [new Date(), Validators.required],
+      echeance: ['30', Validators.required],
+      introduction: ['', Validators.required],
+      pied_page: ['', Validators.required],
+      tableControl: this.formBuilder.array([]),
+    })
+  }
+
+  initiateFormGroupWithTableControls() {
+    const length = this.selectedDevisItem
+      ? this.selectedDevisItem.contentItems.length
+      : 1
+    this.formGroup = this.formBuilder.group({
+      client: ['', Validators.required],
+      date_emission: [new Date(), Validators.required],
+      echeance: ['30', Validators.required],
+      introduction: ['', Validators.required],
+      pied_page: ['', Validators.required],
+      tableControl: this.formBuilder.array(
+        Array.from({ length }).fill(this.initiateTableForm()),
+      ),
+    })
+  }
+
+  initiateFormGroupForNewDevis(){
+    this.formGroup = this.formBuilder.group({
+      client: ['', Validators.required],
+      date_emission: [new Date(), Validators.required],
+      echeance: ['30', Validators.required],
+      introduction: ['', Validators.required],
+      pied_page: ['', Validators.required],
+      tableControl: this.formBuilder.array([this.initiateTableForm()]),
+    })
+  }
 
   setFormGroup() {
     this.formGroup.setValue({
@@ -189,16 +220,19 @@ export class DevisDialogComponent implements OnInit {
   }
 
   initiateDevisOptionsGroup() {
+    const remise = this.selectedDevisItem ? this.selectedDevisItem.remise : 0
     return this.formBuilder.group({
-      remise: [0],
-      devise: [this.devisOptions.devise.list[0]]
+      remise: [remise],
+      devise: [this.devisOptions.devise.list[0]],
+      tva: [true],
     })
   }
 
-  get getFormControls() {
-    const control = this.formGroup.get('tableControl') as FormArray
-    return control
+  private clearTableControl() {
+    (this.formGroup.get('tableControl') as FormArray).controls = []
   }
+
+  loadLazy(event: LazyLoadEvent) {}
 
   getNewReference() {
     return 'N00001'
@@ -223,28 +257,59 @@ export class DevisDialogComponent implements OnInit {
   deleteRow(index: number) {
     const control = this.formGroup.get('tableControl') as FormArray
     control.removeAt(index)
+    this.RecalculateRows();
   }
 
   autoCompleteSearch(event: any) {}
 
-  calculateTotalHTAndTTC(rowIndex: number) {
-    const tableArray = this.getFormControls.value as DevisContentItem[]
-    const row = tableArray[rowIndex]
+  calculateRowTotalHTAndTTC(rowIndex: number) {
+    const row = this.getDevisContentItems[rowIndex]
     const total_ht = row.pu * row.quantite
-    const total_ttc = total_ht + (total_ht * row.tva) / 100
+    let total_ttc = total_ht;
+    
+    if(this.devisOptionsFormGroup.get('tva').value) {
+      total_ttc = total_ht + (total_ht * row.tva) / 100
+    }
+
     this.getFormControls.controls[rowIndex].patchValue({
       total_ht,
       total_ttc,
     })
+    this.calculateSummaryTotalHTAndTTC()
+  }
 
-    this.summaryTotalHT = (this.getFormControls.value as DevisContentItem[])
+  RecalculateRows(){
+    this.getDevisContentItems.forEach((_, index) => {
+      this.calculateRowTotalHTAndTTC(index);
+    })
+  }
+
+  calculateSummaryTotalHTAndTTC() {
+    this.summaryTotalHT = this.getDevisContentItems
       .map((item) => item.total_ht)
       .reduce((accum, current) => accum + current)
+
+    if (this.devisOptionsFormGroup.get('tva').value)
+      this.summaryTVA = this.getDevisContentItems
+        .map((item) => (item.total_ht * item.tva) / 100)
+        .reduce((accum, current) => accum + current)
+    else this.summaryTVA = 0
+
+    this.summaryTotalTTC =
+      this.summaryTotalHT +
+      this.summaryTVA -
+      this.devisOptionsFormGroup.get('remise').value
+  }
+
+  initiateSummaryValues(){
+    this.summaryTVA = 0;
+    this.summaryTotalHT = 0;
+    this.summaryTotalTTC = 0;
   }
 
   toggleTVAOption(isChecked: boolean) {
     const controls = this.getFormControls.controls
-    if (isChecked) {
+    if (!isChecked) {
       controls.forEach((control) => {
         control.get('tva').disable()
       })
@@ -253,19 +318,24 @@ export class DevisDialogComponent implements OnInit {
         control.get('tva').enable()
       })
     }
+
+    this.calculateSummaryTotalHTAndTTC();
+    this.RecalculateRows();
   }
 
   toggleRemiseOption(event: any) {
-      this.devisOptions.remise.checked = event.checked
-      
+    this.devisOptions.remise.checked = event.checked
+    if (event.checked) this.devisOptionsFormGroup.get('remise').setValue(0)
+
+    this.calculateSummaryTotalHTAndTTC()
   }
 
-  changeRemiseValue(event) {
-    console.log(event)
+  remiseValueChanged(event) {
+    this.calculateSummaryTotalHTAndTTC()
     // this.devisOptions.remise.value = event.value
   }
 
-  alert(){
+  alert() {
     alert('test')
   }
   warnService(detail: string) {

@@ -8,6 +8,7 @@ export class DevisItem {
     introduction!: string
     pied_page!: string
     contentItems!: DevisContentItem[]
-    montant_ttc?: number
     statut!: string
+    montant_ttc?: number
+    remise?: number
 }

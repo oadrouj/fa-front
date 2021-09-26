@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DevisItem } from '@shared/models/DevisItem';
+import { Table } from 'primeng/table';
 import { Subscription, Observable } from 'rxjs';
 
 @Component({
@@ -16,11 +17,13 @@ export class TableComponent implements OnInit {
   @Input() styleId!: string
   @Input() loadLazy!: (event: any) => void
   @Input() actionsButtons! : [{label?: string, icon: string}]
+  @Input() globalFilterFields!: string[]
   @Output() selectionChange = new EventEmitter<any>()
+  @Input() events!: Observable<DevisItem>;
+  @Input() filterEvent!: Observable<any>;
+  @ViewChild('tbl') table: Table
 
   private eventsSubscription!: Subscription;
-  @Input() events!: Observable<DevisItem>;
-
   selectedItem!: DevisItem
   defaultRowToBeSelected : any
   constructor() { }
@@ -32,6 +35,22 @@ export class TableComponent implements OnInit {
       this.defaultRowToBeSelected = {...this.tableData[index], rowId: 0};
       this.selectionChange.emit(res)
      
+    })
+
+    this.eventsSubscription = this.filterEvent.subscribe((res: any) => {
+      if(res.type == 'filterByInput')
+        this.table.filterGlobal(res.value, 'contains');
+      else {
+        for(let item in res.value ) {
+          if(res.value[item] != '') {
+            this.table.filter(res.value[item], item, 'contains');
+            console.log(item, res.value[item])
+          }
+        
+        }
+        
+      }
+        
     })
 
   }
