@@ -53,14 +53,12 @@ export class DevisComponent implements OnInit {
 
   searchText = ''
   selectedClient = ''
-  selectedDate = ''
+  selectedDate = new Date()
   selectedEcheance = ''
   selectedMontant = ''
   selectedStatut = ''
   clientSuggestions : string[]
-  dateOptions = [new Date('02/10/2020'), new Date('11/02/2022'), new Date('09/03/2021')]
   echeanceOptions = [15, 20, 30]
-  montantOptions = [960.00, 1000.00, 1200.00]
   statutOptions = ['Créé', 'Validé', 'Converti', 'Expiré']
 
   cols = [
@@ -100,7 +98,7 @@ export class DevisComponent implements OnInit {
   Currency = 'MAD'
 
   DevisContentItemsCols = [
-    { header: 'DESCRIPTION', field: 'description', type: 'text', colspan: 0 },
+    { header: 'DESCRIPTION', field: 'description', type: 'text', colspan: 2 },
     { header: 'DATE', field: 'date', type: 'date', colspan: 0 },
     { header: 'QUANTITE', field: 'quantite', type: 'text' },
     { header: 'UNITE', field: 'unite', type: 'text' },

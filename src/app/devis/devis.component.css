@@ -5,23 +5,19 @@
 }
 
 .header {
-    padding-right: 4rem;
+    padding-right: 1.5rem;
 }
 
 .header h1 {
-    line-height: 0px;
-    margin-top: 19px;
-    font-size: 1.5rem;
+    font-size: 1.875rem;
 }
 
 .btn-new-devis {
-    max-width: 124px;
-    font-size: 0.85rem;
-    padding: .5rem .8rem;
+    height: 40px;
 }
 
 .subtitle {
-    font-size: 0.95rem;
+    font-size: 1.25rem;
     color: #898e99;
 }
 
@@ -44,14 +40,18 @@ i.pi-search {
 }
 
 :host>>>.filterContainer .p-dropdown,
-:host>>>.filterContainer .p-autocomplete .p-autocomplete-input {
+:host>>>.filterContainer .p-autocomplete .p-autocomplete-input,
+:host>>>.filterContainer .p-calendar .p-inputtext,
+:host>>>.filterContainer .p-inputnumber-input {
     border: none;
     margin-right: 6px;
     width: 82px;
 }
 
-:host>>>.filterContainer .p-dropdown .p-inputtext,
-:host>>>.filterContainer .p-autocomplete .p-autocomplete-input {
+:host>>>.filterContainer .p-inputtext,
+:host>>>.filterContainer .p-dropdown .p-cal,
+:host>>>.filterContainer .p-autocomplete .p-autocomplete-input,
+:host>>>.filterContainer .p-inputnumber-input {
     padding: 6px 0px 6px 6px;
     color: #7d86a9;
     font-size: 0.8rem;
@@ -63,10 +63,10 @@ i.pi-search {
 }
 
 .filterBtn {
-    min-height: 30px;
+    min-height: 35px;
     background-color: #0d6939;
-    padding: .6rem .7rem;
-    font-size: 0.86rem;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
 }
 
 :host>>>.filterBtn .pi-filter {
@@ -74,7 +74,7 @@ i.pi-search {
 }
 
 :host ::ng-deep #devisList .p-datatable {
-    margin-top: 2.625rem;
+    margin-top: 1rem;
 }
 
 :host>>>#devisList .p-datatable .p-datatable-thead>tr>th,
@@ -123,7 +123,8 @@ i.pi-search {
 
 .devis-details {
     background-color: #faf9f9;
-    min-height: 782px;
+    /* min-height: 782px; */
+    min-height: max(calc(100vh - 60px), 710px);
     margin-bottom: 0.7rem;
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 50%);
@@ -135,12 +136,11 @@ i.pi-search {
 }
 
 .devis-details .content h1 {
-    line-height: 12px;
-    font-size: 1.5rem;
+    font-size: 2rem;
 }
 
 .devis-details .content .date {
-    font-size: 1rem;
+    font-size: 1.3rem;
     color: #898e99;
 }
 
@@ -166,7 +166,7 @@ i.pi-search {
 
 :host ::ng-deep .p-splitbutton-defaultbutton {
     padding: 8px;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
 }
 
 :host ::ng-deep .p-splitbutton-menubutton {
@@ -174,7 +174,7 @@ i.pi-search {
 }
 
 .devis-details .header .p-button-text {
-    font-size: 0.74rem;
+    font-size: 0.85rem;
     padding: 3px;
     color: var(--green-color);
 }
@@ -191,8 +191,8 @@ i.pi-search {
 
 :host ::ng-deep .devis-details .p-datatable tr>th,
 :host ::ng-deep .devis-details .p-datatable tr>td {
-    font-size: 0.65rem;
-    padding: 1rem .35rem;
+    font-size: 0.75rem;
+    padding: 1rem .25rem;
     text-align: center;
 }
 
@@ -205,10 +205,11 @@ i.pi-search {
 }
 
 :host ::ng-deep .devis-details .p-datatable-footer {
+    width: 60%;
     padding-top: 1.5rem;
-    padding-right: 0;
-    margin-left: 80px;
-    font-weight: 400;
+    padding-right: 16px;
+    margin-left: auto;
+    text-align: end;
     background-color: transparent;
     border: none;
 }
@@ -224,7 +225,8 @@ i.pi-search {
 }
 
 :host ::ng-deep .devis-details .p-datatable-footer span {
-    font-size: 0.75rem;
+    font-size: 0.95rem;
+    font-weight: 400;
 }
 
 
