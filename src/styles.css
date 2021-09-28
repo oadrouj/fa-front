@@ -24,14 +24,6 @@
     --purple-color: #5D3D7D;
 }
 
-.leftSection {
-    width: 52%;
-}
-
-.rightSection {
-    width: 48%;
-}
-
 .w-80 {
     width: 80%;
 }
@@ -42,15 +34,6 @@
 
 .positon-relative {
     position: relative;
-}
-
-:host ::ng-deep .p-datatable-footer hr {
-    width: 65%;
-    margin-right: 0;
-    margin-top: 0;
-    margin-bottom: 1.1rem;
-    border-color: var(--light-gray-color);
-    border-style: solid;
 }
 
 
@@ -112,4 +95,12 @@
 
 .vertical-baseline {
     vertical-align: baseline;
+}
+
+.submitted .ng-invalid:not(form,
+div)
+/* .ng-invalid .p-autocomplete-input */
+
+{
+    border: 1px red solid !important;
 }

@@ -180,5 +180,5 @@
 
 
 <!-- Dialog -->
-<app-devis-dialog [visible]="displayDialog" (closeDialog)="displayDialog = false" [clientAutoCompleteSearch]="clientAutoCompleteSearch" [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()" [dialogStatusEvent]="dialogStatusEvent.asObservable()">
+<app-devis-dialog [visible]="displayDialog" (closeDialogEvent)="displayDialog = false" [clientAutoCompleteSearch]="clientAutoCompleteSearch" [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()" [dialogStatusEvent]="dialogStatusEvent.asObservable()">
 </app-devis-dialog>
