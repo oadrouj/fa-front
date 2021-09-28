@@ -1,5 +1,5 @@
 .main {
-    padding-right: .8rem;
+    padding-right: 0.8rem;
     background: #f1f6ff;
     min-height: 100vh;
 }
@@ -14,7 +14,8 @@
 
 .btn-new-devis {
     color: #fff !important;
-    height: 40px;
+    width: 164px;
+    height: 48px;
 }
 
 .subtitle {
@@ -64,10 +65,10 @@ i.pi-search {
 }
 
 .filterBtn {
-    min-height: 35px;
+    max-height: 35px;
     background-color: var(--orange-color);
     font-size: 1rem;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem .8rem;
 }
 
 :host>>>.filterBtn .pi-filter {
@@ -76,6 +77,10 @@ i.pi-search {
 
 :host ::ng-deep #devisList .p-datatable {
     margin-top: 1rem;
+}
+
+:host>>>#devisList .p-datatable .p-datatable-tbody>tr {
+    background: transparent;
 }
 
 :host>>>#devisList .p-datatable .p-datatable-thead>tr>th,
@@ -180,7 +185,7 @@ i.pi-search {
 }
 
 :host ::ng-deep .devis-details .p-datatable {
-    margin-top: .6rem;
+    margin-top: 0.6rem;
 }
 
 :host ::ng-deep .devis-details .p-datatable tr>th,
@@ -192,7 +197,7 @@ i.pi-search {
 :host ::ng-deep .devis-details .p-datatable tr>th,
 :host ::ng-deep .devis-details .p-datatable tr>td {
     font-size: 0.75rem;
-    padding: 1rem .25rem;
+    padding: 1rem 0.25rem;
     text-align: center;
 }
 
@@ -229,18 +234,23 @@ i.pi-search {
     font-weight: 400;
 }
 
-
-/* TODO: should review this part */
+:host>>>.p-button {
+    border: none;
+}
 
 :host ::ng-deep .p-datatable-footer hr {
-    width: 53%;
-    margin-right: 16px;
+    width: 65%;
+    margin-right: 0;
     margin-top: 0;
-    margin-bottom: .8rem;
+    margin-bottom: 1.1rem;
     border-color: var(--light-gray-color);
     border-style: solid;
 }
 
-:host>>>.p-button {
-    border: none;
+.leftSection {
+    width: 52%;
+}
+
+.rightSection {
+    width: 48%;
 }

@@ -3,8 +3,8 @@
 }
 
 :host>>>#nouveauClientBlock #nouveauClient .p-button {
-    width: 142px;
-    height: 40px;
+    width: 164px;
+    height: 48px;
     background-color: #2A95D1;
 }
 
@@ -36,10 +36,10 @@
 
 :host>>>#filtreRightBlock .p-button {
     max-height: 35px;
+    max-width: 110px;
     background-color: #2A95D1;
     color: white;
     border-radius: 20px;
-    padding: 0.5rem 0.8rem;
 }
 
 :host>>>#filtreRightBlock .p-dropdown {
@@ -73,10 +73,6 @@
 
 :host>>>#filtreRightBlock .p-dropdown .p-dropdown-label {
     padding-top: 4px;
-}
-
-:host>>>#tableClients .p-datatable {
-    margin-top: 1rem;
 }
 
 :host>>>#tableClients .p-datatable .p-datatable-thead>tr>th {
@@ -137,23 +133,22 @@
 }
 
 #headerApercu {
-    min-height: 18vh;
-    max-height: 18vh;
+    min-height: 10vh;
+    max-height: 10vh;
     border-bottom: 1px solid #DDDDDD;
     position: relative;
 }
 
 #headerApercu div {
     position: absolute;
-    right: 10px;
+    right: 0px;
     top: 50%;
     transform: translateY(-50%);
 }
 
 :host>>>#headerApercu .p-button {
     color: #2A95D1;
-    font-size: .9rem;
-    padding: .5rem .6rem;
+    font-size: 15px;
 }
 
 #rappelClient span {

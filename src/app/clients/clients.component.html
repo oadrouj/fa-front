@@ -1,4 +1,4 @@
-<div class="grid grid-nogutter pt-5">
+<div class="grid grid-nogutter ">
     <div id="blockLeft" class="col-6 pt-2">
         <div class="pl-2">
             <div class="grid p-2">
@@ -11,7 +11,7 @@
                     <p-button id="nouveauClient" label="Nouveau client" (click)="showDialogNouveau()"></p-button>
                 </div>
             </div>
-            <div class="grid py-1 px-2">
+            <div class="grid p-2">
                 <div class="col-5" id="filtreLeftBlock">
                     <span class="p-input-icon-left shadow-1">
                         <i class="pi pi-search"></i>
@@ -19,7 +19,7 @@
                     </span>
                 </div>
                 <div class="col-7" id="filtreRightBlock">
-                    <p-button class="content filterBtn" label="Filtrer" icon="pi pi-filter" iconPos="left" (click)="chargerListeClients()"></p-button>
+                    <p-button class="content" label="Filtrer" icon="pi pi-filter" iconPos="left" (click)="chargerListeClients()"></p-button>
                     <p-dropdown class="content" [options]="types" [(ngModel)]="selectedType" optionLabel="name" optionValue="code">
                     </p-dropdown>
                     <p-dropdown class="content" [options]="categories" [(ngModel)]="selectedCategory" optionLabel="name" optionValue="code">

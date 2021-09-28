@@ -13,7 +13,8 @@
 }
 
 .btn-new-devis {
-    height: 40px;
+    width: 164px;
+    height: 48px;
 }
 
 .subtitle {
@@ -63,10 +64,10 @@ i.pi-search {
 }
 
 .filterBtn {
-    min-height: 35px;
+    max-height: 35px;
     background-color: #0d6939;
     font-size: 1rem;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem .8rem;
 }
 
 :host>>>.filterBtn .pi-filter {
@@ -77,9 +78,12 @@ i.pi-search {
     margin-top: 1rem;
 }
 
+:host>>>#devisList .p-datatable .p-datatable-tbody>tr {
+    background: transparent;
+}
+
 :host>>>#devisList .p-datatable .p-datatable-thead>tr>th,
 :host>>>#devisList .p-datatable .p-datatable-tbody>tr>td {
-    /* padding: 10px; */
     font-size: 0.95rem;
 }
 
@@ -229,17 +233,19 @@ i.pi-search {
     font-weight: 400;
 }
 
-
-/* TODO: should review this part */
-
 :host ::ng-deep .p-datatable-footer hr {
-    width: 53%;
-    margin-right: 16px;
+    width: 65%;
+    margin-right: 0;
     margin-top: 0;
-    margin-bottom: .8rem;
+    margin-bottom: 1.1rem;
     border-color: var(--light-gray-color);
     border-style: solid;
 }
 
+.leftSection {
+    width: 52%;
+}
 
-/* Dialog styles */
+.rightSection {
+    width: 48%;
+}
