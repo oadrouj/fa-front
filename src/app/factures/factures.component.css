@@ -1,61 +1,90 @@
 .main {
-    margin-top: 10vh;
-    margin-left: 16.3%;
-    padding-right: 1rem;
-    background: #F1F6FF;
+    padding-right: 0.8rem;
+    background: #f1f6ff;
     min-height: 100vh;
 }
 
+.header {
+    padding-right: 1.5rem;
+}
+
 .header h1 {
-    line-height: 0px;
-    margin-top: 19px;
+    font-size: 1.875rem;
 }
 
 .btn-new-devis {
-    width: 155px;
+    color: #fff !important;
+    width: 164px;
+    height: 48px;
 }
 
 .subtitle {
     font-size: 1.25rem;
-    color: #898E99;
+    color: #898e99;
 }
 
 .searchInput {
-    height: 50px;
+    height: 42px;
     border-radius: 26px;
-    background: #F1EDED;
+    background: #f1eded;
     color: #70707082;
     border: none;
 }
 
 i.pi-search {
-    font-size: 21px;
     font-weight: 800;
     color: #70707082;
 }
 
-:host>>>.filterContainer .p-dropdown {
-    border: none;
-    margin-right: 6px;
+.searchInput,
+i.pi-search {
+    font-size: 0.9rem;
 }
 
-:host>>>.filterContainer .p-dropdown .p-inputtext {
+:host>>>.filterContainer .p-dropdown,
+:host>>>.filterContainer .p-autocomplete .p-autocomplete-input,
+:host>>>.filterContainer .p-calendar .p-inputtext,
+:host>>>.filterContainer .p-inputnumber-input {
+    border: none;
+    margin-right: 6px;
+    width: 82px;
+}
+
+:host>>>.filterContainer .p-inputtext,
+:host>>>.filterContainer .p-dropdown .p-cal,
+:host>>>.filterContainer .p-autocomplete .p-autocomplete-input,
+:host>>>.filterContainer .p-inputnumber-input {
     padding: 6px 0px 6px 6px;
-    color: #7D86A9;
+    color: #7d86a9;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+:host>>>.filterContainer .p-dropdown .pi-chevron-down {
+    font-size: 0.75rem;
 }
 
 .filterBtn {
-    height: 40px;
-    background-color: #e79d08;
+    max-height: 35px;
+    background-color: var(--orange-color);
+    font-size: 1rem;
+    padding: 0.5rem .8rem;
+}
+
+:host>>>.filterBtn .pi-filter {
+    font-size: 0.85rem;
 }
 
 :host ::ng-deep #devisList .p-datatable {
-    margin-top: 2.625rem;
+    margin-top: 1rem;
+}
+
+:host>>>#devisList .p-datatable .p-datatable-tbody>tr {
+    background: transparent;
 }
 
 :host>>>#devisList .p-datatable .p-datatable-thead>tr>th,
 :host>>>#devisList .p-datatable .p-datatable-tbody>tr>td {
-    /* padding: 10px; */
     font-size: 0.95rem;
 }
 
@@ -67,8 +96,11 @@ i.pi-search {
 }
 
 :host ::ng-deep #devisList .p-datatable .p-datatable-tbody>tr>td {
-    background: #F2E4C8;
-    color: #898E99;
+    color: #898e99;
+}
+
+:host ::ng-deep #devisList .p-datatable .p-datatable-tbody>tr.p-highlight {
+    background: var(--light-orange-color);
 }
 
 
@@ -76,7 +108,7 @@ i.pi-search {
 
 .devisTotal {
     position: absolute;
-    bottom: 1rem;
+    bottom: 0rem;
     min-height: 3.2rem;
     padding-left: 1.5rem;
     padding-right: 20%;
@@ -88,27 +120,33 @@ i.pi-search {
 }
 
 .devisTotal :nth-child(2) {
-    font-size: .95rem;
+    font-size: 0.95rem;
 }
 
 
 /* Devis details */
 
 .devis-details {
-    background-color: #FAF9F9;
-    min-height: 95%;
+    background-color: #faf9f9;
+    /* min-height: 782px; */
+    min-height: max(calc(100vh - 60px), 710px);
+    margin-bottom: 0.7rem;
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 50%);
 }
 
 .devis-details .header {
-    padding: 25px 20px;
-    border-bottom: 1px solid #D8D8D8;
+    padding: 20px 20px;
+    border-bottom: 1px solid #d8d8d8;
 }
 
 .devis-details .content h1 {
-    line-height: 12px;
-    font-size: 1.68rem;
+    font-size: 2rem;
+}
+
+.devis-details .content .date {
+    font-size: 1.3rem;
+    color: #898e99;
 }
 
 .border-radius-6 {
@@ -116,7 +154,15 @@ i.pi-search {
 }
 
 :host ::ng-deep .p-splitbutton {
-    width: 96px;
+    font-weight: 400;
+}
+
+:host>>>.p-splitbutton .p-splitbutton-menubutton {
+    width: 1.357rem;
+}
+
+:host ::ng-deep .p-splitbutton .pi-chevron-down {
+    font-size: 0.8rem;
 }
 
 :host ::ng-deep .p-splitbutton * {
@@ -125,6 +171,7 @@ i.pi-search {
 
 :host ::ng-deep .p-splitbutton-defaultbutton {
     padding: 8px;
+    font-size: 0.875rem;
 }
 
 :host ::ng-deep .p-splitbutton-menubutton {
@@ -132,39 +179,64 @@ i.pi-search {
 }
 
 .devis-details .header .p-button-text {
-    font-size: .8rem;
-    padding: 6px;
+    font-size: 0.85rem;
+    padding: 3px;
     color: var(--orange-color);
 }
 
-:host ::ng-deep .p-splitbutton-defaultbutton {
-    font-size: .85rem;
+:host ::ng-deep .devis-details .p-datatable {
+    margin-top: 0.6rem;
 }
 
 :host ::ng-deep .devis-details .p-datatable tr>th,
 :host ::ng-deep .devis-details .p-datatable tr,
 :host ::ng-deep .devis-details .p-datatable .p-datatable-scrollable-header {
     background: transparent;
-    font-size: 0.75rem;
 }
 
-:host ::ng-deep .devis-details .p-datatable {
-    margin-top: 2rem;
+:host ::ng-deep .devis-details .p-datatable tr>th,
+:host ::ng-deep .devis-details .p-datatable tr>td {
+    font-size: 0.75rem;
+    padding: 1rem 0.25rem;
+    text-align: center;
+}
+
+:host ::ng-deep .devis-details .p-datatable .p-datatable-thead {
+    border: 1px solid #e4e4e4;
+}
+
+:host ::ng-deep .devis-details .p-datatable .p-datatable-thead th {
+    color: var(--orange-color);
 }
 
 :host ::ng-deep .devis-details .p-datatable-footer {
-    padding-top: 2rem;
-    font-weight: 400;
+    width: 60%;
+    padding-top: 1.5rem;
+    padding-right: 16px;
+    margin-left: auto;
+    text-align: end;
     background-color: transparent;
+    border: none;
 }
 
 :host ::ng-deep .devis-details .p-datatable-footer .p-col-9 {
     text-align: right;
-    padding-right: 50px;
+    padding-right: 30px;
 }
 
+:host ::ng-deep .devis-details .p-datatable-footer .p-grid * {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
 
-/* TODO: should review this part */
+:host ::ng-deep .devis-details .p-datatable-footer span {
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+:host>>>.p-button {
+    border: none;
+}
 
 :host ::ng-deep .p-datatable-footer hr {
     width: 65%;
@@ -175,5 +247,10 @@ i.pi-search {
     border-style: solid;
 }
 
+.leftSection {
+    width: 52%;
+}
 
-/* Dialog styles */
+.rightSection {
+    width: 48%;
+}

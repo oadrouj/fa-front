@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core'
 import {
   FormBuilder,
   Validators,
@@ -32,14 +32,12 @@ export class DevisDialogComponent implements OnInit {
     this.devisOptionsFormGroup = this.initiateDevisOptionsGroup()
     this.eventsSubscription = this.SelectDevisItemEvent.subscribe(
       (devisItem: DevisItem) => {
-        this.clearTableControl()
         this.selectedDevisItem = devisItem
       },
     )
 
     this.eventsSubscription = this.dialogStatusEvent.subscribe(
       (dialogStatus: DialogStatus) => {
-       
         this.initiateSummaryValues()
         switch (dialogStatus) {
           case DialogStatus.New:
@@ -47,7 +45,6 @@ export class DevisDialogComponent implements OnInit {
             this.dialogTitle = 'Nouveau'
             this.devisItem = new DevisItem()
             this.reference = this.getNewReference()
-            this.isFirstLigneToAdd = true
             break
 
           case DialogStatus.Edit:
@@ -80,12 +77,12 @@ export class DevisDialogComponent implements OnInit {
   @Input() SelectDevisItemEvent = new Observable<DevisItem>()
   @Input() dialogStatusEvent!: Observable<DialogStatus>
   @Input() clientAutoCompleteSearch: (_) => void
-  @Output() closeDialog = new EventEmitter()
-
+  @Output() closeDialogEvent = new EventEmitter()
   formGroup!: FormGroup
   tableControl!: FormArray
   devisOptionsFormGroup!: FormGroup
   eventsSubscription!: Subscription
+  @ViewChild('frm') frm!: HTMLFormElement
   selectedDevisItem!: DevisItem
   devisItem: DevisItem = new DevisItem()
   reference!: string
@@ -96,7 +93,6 @@ export class DevisDialogComponent implements OnInit {
   dateEmission!: Date
   echeancePayementOptions = [30, 60, 90]
   echeancePayementSelected = this.echeancePayementOptions[0] || ''
-  isFirstLigneToAdd = true
   summaryTotalHT = 0
   summaryTotalTTC = 0
   summaryTVA = 0
@@ -148,13 +144,13 @@ export class DevisDialogComponent implements OnInit {
     { header: '', field: 'delete', type: 'button', label: '', icon: 'trash' },
   ]
 
-  get getFormControls() {
+  get getFromArrayControl() {
     const control = this.formGroup.get('tableControl') as FormArray
     return control
   }
 
   get getDevisContentItems() {
-    return this.getFormControls.value as DevisContentItem[]
+    return this.getFromArrayControl.value as DevisContentItem[]
   }
 
   initiateFormGroup(){
@@ -210,9 +206,9 @@ export class DevisDialogComponent implements OnInit {
     return this.formBuilder.group({
       description: ['', Validators.required],
       date: [new Date(), Validators.required],
-      quantite: ['', Validators.required],
+      quantite: [1, Validators.required],
       unite: ['Heures', Validators.required],
-      pu: ['', Validators.required],
+      pu: [0, Validators.required],
       tva: ['20', Validators.required],
       total_ht: [''],
       total_ttc: [''],
@@ -232,6 +228,11 @@ export class DevisDialogComponent implements OnInit {
     (this.formGroup.get('tableControl') as FormArray).controls = []
   }
 
+  closeDialog(){
+    this.closeDialogEvent.emit()
+    this.clearTableControl();
+
+  }
   loadLazy(event: LazyLoadEvent) {}
 
   getNewReference() {
@@ -239,19 +240,8 @@ export class DevisDialogComponent implements OnInit {
   }
 
   addRow() {
-    const control = this.formGroup.get('tableControl') as FormArray
-    const arrayCount = this.getFormControls.controls.length - 1
-    if (
-      this.isFirstLigneToAdd ||
-      (this.getFormControls.controls[arrayCount].value.description != '' &&
-        this.getFormControls.controls[arrayCount].value.pu != 0)
-    ) {
-      control.push(this.initiateTableForm())
-      this.isFirstLigneToAdd = false
-    } else
-      this.warnService(
-        "Avant d'ajouter une autre ligne remplir la dernière ligne",
-      )
+      this.getFromArrayControl.push(this.initiateTableForm())
+    
   }
 
   deleteRow(index: number) {
@@ -271,7 +261,7 @@ export class DevisDialogComponent implements OnInit {
       total_ttc = total_ht + (total_ht * row.tva) / 100
     }
 
-    this.getFormControls.controls[rowIndex].patchValue({
+    this.getFromArrayControl.controls[rowIndex].patchValue({
       total_ht,
       total_ttc,
     })
@@ -308,7 +298,7 @@ export class DevisDialogComponent implements OnInit {
   }
 
   toggleTVAOption(isChecked: boolean) {
-    const controls = this.getFormControls.controls
+    const controls = this.getFromArrayControl.controls
     if (!isChecked) {
       controls.forEach((control) => {
         control.get('tva').disable()
@@ -335,9 +325,6 @@ export class DevisDialogComponent implements OnInit {
     // this.devisOptions.remise.value = event.value
   }
 
-  alert() {
-    alert('test')
-  }
   warnService(detail: string) {
     this.messageService.add({
       severity: 'warn',
@@ -354,11 +341,22 @@ export class DevisDialogComponent implements OnInit {
     })
   }
 
+  saveBrouillon(){
+    
+  }
+
   validateDevis() {
+    console.log(this.formGroup.get('tableControl').valid)
+    this.frm.nativeElement.classList.add('submitted');
     if (this.formGroup.valid) {
       console.log(this.formGroup.value)
+      
     } else {
       this.errorService('Veillez remplir les chemps obligatoires')
     }
+  }
+
+  previewDevis(){
+
   }
 }

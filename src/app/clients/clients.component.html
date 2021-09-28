@@ -1,28 +1,30 @@
-<div class="grid grid-nogutter">
+<div class="grid grid-nogutter ">
     <div id="blockLeft" class="col-6 pt-2">
-        <div class="grid p-2">
-            <div class="col-8" id="titreBlock">
-                <img id="logoTitre" src="../../assets/img/ClientsTitreIcon.png" />
-                <span id="titre" class="ml-2">Clients</span>
-                <p id="sousTitre">Tous vos clients en un seul endroit !</p>
+        <div class="pl-2">
+            <div class="grid p-2">
+                <div class="col-8" id="titreBlock">
+                    <img id="logoTitre" src="../../assets/img/ClientsTitreIcon.png" class="vertical-baseline" />
+                    <span id="titre" class="ml-2">Clients</span>
+                    <p id="sousTitre" class="mt-2">Tous vos clients en un seul endroit !</p>
+                </div>
+                <div class="col-4" id="nouveauClientBlock">
+                    <p-button id="nouveauClient" label="Nouveau client" (click)="showDialogNouveau()"></p-button>
+                </div>
             </div>
-            <div class="col-4" id="nouveauClientBlock">
-                <p-button id="nouveauClient" label="Nouveau client" (click)="showDialogNouveau()"></p-button>
-            </div>
-        </div>
-        <div class="grid p-2">
-            <div class="col-5" id="filtreLeftBlock">
-                <span class="p-input-icon-left shadow-1">
-                    <i class="pi pi-search"></i>
-                    <input type="text" pInputText placeholder="Recherchez ici" [(ngModel)]="champsRecherche" />
-                </span>
-            </div>
-            <div class="col-7" id="filtreRightBlock">
-                <p-button class="content" label="Filtrer" icon="pi pi-filter" iconPos="left" (click)="chargerListeClients()"></p-button>
-                <p-dropdown class="content" [options]="types" [(ngModel)]="selectedType" optionLabel="name" optionValue="code">
-                </p-dropdown>
-                <p-dropdown class="content" [options]="categories" [(ngModel)]="selectedCategory" optionLabel="name" optionValue="code">
-                </p-dropdown>
+            <div class="grid p-2">
+                <div class="col-5" id="filtreLeftBlock">
+                    <span class="p-input-icon-left shadow-1">
+                        <i class="pi pi-search"></i>
+                        <input type="text" pInputText placeholder="Recherchez ici" [(ngModel)]="champsRecherche" />
+                    </span>
+                </div>
+                <div class="col-7" id="filtreRightBlock">
+                    <p-button class="content" label="Filtrer" icon="pi pi-filter" iconPos="left" (click)="chargerListeClients()"></p-button>
+                    <p-dropdown class="content" [options]="types" [(ngModel)]="selectedType" optionLabel="name" optionValue="code">
+                    </p-dropdown>
+                    <p-dropdown class="content" [options]="categories" [(ngModel)]="selectedCategory" optionLabel="name" optionValue="code">
+                    </p-dropdown>
+                </div>
             </div>
         </div>
 

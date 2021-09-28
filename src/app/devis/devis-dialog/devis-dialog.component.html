@@ -2,21 +2,21 @@
 
 <p-dialog [(visible)]="visible" [style]="{'width': '100vw'}" [closable]="false">
     <ng-template pTemplate="header">
-        <button pButton icon="pi pi-times" class="closeButton" (click)="closeDialog.emit()"></button>
+        <button pButton icon="pi pi-times" class="closeButton" (click)="closeDialog()"></button>
         <h2>{{dialogTitle}} devis</h2>
         <div class="flex">
-            <button pButton label="Enregistrer le brouillon" class="bg-orange mx-2"></button>
+            <button pButton label="Enregistrer le brouillon" (click)="saveBrouillon()" class="bg-orange mx-2"></button>
             <button pButton label="Valider" class="bg-light-green mx-2" (click)="validateDevis()"></button>
-            <button pButton label="Aperçu" class="bg-purple mx-2"></button>
+            <button pButton label="Aperçu" class="bg-purple mx-2" (click)="previewDevis()"></button>
         </div>
     </ng-template>
-    <form [formGroup]="formGroup">
+    <form #frm [formGroup]="formGroup">
 
         <div class="">
             <div class="w-77 autoCompleteContainer border-bottom  flex justify-content-between align-items-end mt-4 pr-5">
                 <div>
                     <label for="" class="mb-3 block">Client</label>
-                    <p-autoComplete formControlName="client" placeholder="Sélectionner un client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)"></p-autoComplete>
+                    <p-autoComplete formControlName="client" class="test" placeholder="Sélectionner un client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)"></p-autoComplete>
                 </div>
                 <h2>Devis</h2>
             </div>
@@ -78,7 +78,7 @@
                     </div>
 
                     <div formArrayName="tableControl">
-                        <p-table #myTable [columns]="cols" [value]="getFormControls.controls" [id]="'newDevis'" [scrollable]="true" [rows]="100" scrollHeight="250px" [virtualRowHeight]="40" [class]="'table'">
+                        <p-table #myTable [columns]="cols" [value]="getFromArrayControl.controls" [id]="'newDevis'" [scrollable]="true" [rows]="100" scrollHeight="250px" [virtualRowHeight]="40" [class]="'table'">
                             <ng-template pTemplate="header" let-columns>
                                 <tr>
                                     <ng-container *ngFor="let col of columns; let i = index" indexo=i>
