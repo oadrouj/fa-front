@@ -26,7 +26,7 @@
 
                 <div class="flex align-items-center pt-4 filterContainer">
                     <p-autoComplete [(ngModel)]="selectedClient" placeholder="Client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)"></p-autoComplete>
-                    <p-calendar [(ngModel)]="selectedDate"></p-calendar>
+                    <p-calendar [(ngModel)]="selectedDate" placeholder="Date"></p-calendar>
                     <p-dropdown [options]="echeanceOptions" [(ngModel)]="selectedEcheance" placeholder="Echéance" [showClear]="false"></p-dropdown>
                     <p-inputNumber [(ngModel)]="selectedMontant" placeholder="Montant"></p-inputNumber>
                     <p-dropdown [options]="statutOptions" [(ngModel)]="selectedStatut" placeholder="Statut" [showClear]="false"></p-dropdown>
@@ -35,7 +35,7 @@
             </div>
 
             <app-table #dt1 [tableData]="devisList" [cols]="cols" [currency]="Currency" [styleClass]="'table'" (selectionChange)="selectionChange($event)" [styleId]="'devisList'" [loadLazy]="loadLazy" [events]="eventsSubject.asObservable()" [filterEvent]="filterSubject.asObservable()"
-                [globalFilterFields]="['reference','client','date_emission','echeance','total_ttc','statut']">
+                [globalFilterFields]="['reference','client','date_emission','echeance','montant_ttc','statut']">
             </app-table>
 
             <div class="devisTotal flex justify-content-between align-items-center w-100">

@@ -53,7 +53,7 @@ export class DevisComponent implements OnInit {
 
   searchText = ''
   selectedClient = ''
-  selectedDate = new Date()
+  selectedDate !: Date
   selectedEcheance = ''
   selectedMontant = ''
   selectedStatut = ''
@@ -118,6 +118,7 @@ export class DevisComponent implements OnInit {
       introduction: 'introduction here',
       pied_page: 'pied page here',
       remise: 200,
+      montant_ttc : 0,
       contentItems: [
         {
           description: 'Consultation1',
@@ -151,6 +152,7 @@ export class DevisComponent implements OnInit {
       introduction: 'introduction here',
       pied_page: 'pied page here',
       remise: 0,
+      montant_ttc: 0,
       contentItems: [
         {
           description: 'Consultation 2',
@@ -174,6 +176,7 @@ export class DevisComponent implements OnInit {
       introduction: 'introduction here',
       pied_page: 'pied page here',
       remise: 0,
+      montant_ttc: 0,
       contentItems: [
         {
           description: 'Consultation 2',
@@ -185,7 +188,7 @@ export class DevisComponent implements OnInit {
           total_ht: 0,
           total_ttc: 0,
         },
-      ],
+       ],
     },
 
     {
@@ -197,6 +200,7 @@ export class DevisComponent implements OnInit {
       introduction: 'introduction here',
       pied_page: 'pied page here',
       remise: 0,
+      montant_ttc: 0,
       contentItems: [
         {
           description: 'Consultation 2',
@@ -251,7 +255,7 @@ export class DevisComponent implements OnInit {
         type: 'filterByButton',
         value: {
           client: this.selectedClient,
-          date: this.selectedDate,
+          date_emission: this.selectedDate,
           echeance: this.selectedEcheance,
           statut: this.selectedStatut,
           montant_ttc: this.selectedMontant

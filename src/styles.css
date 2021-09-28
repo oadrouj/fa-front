@@ -98,7 +98,8 @@
 }
 
 .submitted .ng-invalid:not(form,
-div)
+div,
+tr)
 /* .ng-invalid .p-autocomplete-input */
 
 {

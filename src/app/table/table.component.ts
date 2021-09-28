@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DevisItem } from '@shared/models/DevisItem';
+import { FilterMatchMode, FilterService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { Subscription, Observable } from 'rxjs';
 
@@ -26,9 +27,11 @@ export class TableComponent implements OnInit {
   private eventsSubscription!: Subscription;
   selectedItem!: DevisItem
   defaultRowToBeSelected : any
-  constructor() { }
+  constructor(
+  ) { }
 
   ngOnInit(): void {
+
     this.defaultRowToBeSelected = {...this.tableData[0], rowId: 0}
     this.eventsSubscription = this.events.subscribe((res: any) =>  {
       let index = this.tableData.findIndex((item: DevisItem) => item.reference == res.reference )
@@ -38,27 +41,35 @@ export class TableComponent implements OnInit {
     })
 
     this.eventsSubscription = this.filterEvent.subscribe((res: any) => {
-      if(res.type == 'filterByInput')
-        this.table.filterGlobal(res.value, 'contains');
+
+      if(res.type == 'filterByInput') {
+        console.log(new Date(res.value) )
+        if(new Date(res.value) instanceof Date)
+          this.table.filterGlobal(res.value, 'contains');
+        else
+        this.table.filterGlobal(res.value, 'equals');
+        
+      }
       else {
         for(let item in res.value ) {
           if(res.value[item] != '') {
-            this.table.filter(res.value[item], item, 'contains');
+            if(res.value[item] instanceof Date){
+              this.table.filter(res.value[item], item, 'equals');
+              console.log(res.value[item], item)
+            }
+            else
+              this.table.filter(res.value[item], item, 'contains');
+
             console.log(item, res.value[item])
           }
-        
         }
-        
       }
-        
     })
-
   }
 
   onRowSelect(event: any) {
     this.selectionChange.emit(event.data)
   }
 
-  
 
 }

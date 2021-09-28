@@ -209,9 +209,9 @@ export class DevisDialogComponent implements OnInit {
       quantite: [1, Validators.required],
       unite: ['Heures', Validators.required],
       pu: [0, Validators.required],
-      tva: ['20', Validators.required],
-      total_ht: [''],
-      total_ttc: [''],
+      tva: [20, Validators.required],
+      total_ht: [0],
+      total_ttc: [0]
     })
   }
 
@@ -219,6 +219,7 @@ export class DevisDialogComponent implements OnInit {
     const remise = this.selectedDevisItem ? this.selectedDevisItem.remise : 0
     return this.formBuilder.group({
       remise: [remise],
+      // remiseState: [false],
       devise: [this.devisOptions.devise.list[0]],
       tva: [true],
     })
@@ -231,6 +232,7 @@ export class DevisDialogComponent implements OnInit {
   closeDialog(){
     this.closeDialogEvent.emit()
     this.clearTableControl();
+    this.frm.nativeElement.classList.remove('submitted');
 
   }
   loadLazy(event: LazyLoadEvent) {}
@@ -315,7 +317,7 @@ export class DevisDialogComponent implements OnInit {
 
   toggleRemiseOption(event: any) {
     this.devisOptions.remise.checked = event.checked
-    if (event.checked) this.devisOptionsFormGroup.get('remise').setValue(0)
+    if (!event.checked) this.devisOptionsFormGroup.get('remise').setValue(0)
 
     this.calculateSummaryTotalHTAndTTC()
   }
@@ -335,24 +337,42 @@ export class DevisDialogComponent implements OnInit {
 
   errorService(detail: string) {
     this.messageService.add({
-      severity: 'warn',
+      severity: 'error',
       summary: 'Erreur',
       detail,
     })
   }
 
   saveBrouillon(){
-    
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Confirmed',
+      detail: 'You have accepted',
+    })
   }
 
   validateDevis() {
-    console.log(this.formGroup.get('tableControl').valid)
     this.frm.nativeElement.classList.add('submitted');
+    let controlsNames = []
+    const conrtolsObj = {
+      client: 'Client',
+      introduction: 'Message d\'introduction',
+      pied_page: 'Pied de page',
+      tableControl: 'Description',
+
+    }
+
+    for(let control in this.formGroup.controls)
+    {
+      if(!this.formGroup.controls[control].valid)
+        controlsNames = controlsNames.concat(conrtolsObj[control])
+    }
+    
     if (this.formGroup.valid) {
-      console.log(this.formGroup.value)
+      console.log(JSON.stringify(this.formGroup.value))
       
     } else {
-      this.errorService('Veillez remplir les chemps obligatoires')
+      this.errorService('Veuillez remplir les chemps obligatoires: ' + controlsNames.join(', '))
     }
   }
 
