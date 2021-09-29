@@ -19,6 +19,9 @@ import { API_BASE_URL } from '@shared/service-proxies/service-proxies';
 import { RootComponent } from './root.component';
 import { AppInitializer } from './app-initializer';
 
+
+import { GlobalEventsService } from './shared/globalEventsService';
+
 export function getCurrentLanguage(): string {
   if (abp.localization.currentLanguage.name) {
     return abp.localization.currentLanguage.name;
@@ -55,6 +58,7 @@ export function getCurrentLanguage(): string {
       provide: LOCALE_ID,
       useFactory: getCurrentLanguage,
     },
+    GlobalEventsService
   ],
   bootstrap: [RootComponent],
 })

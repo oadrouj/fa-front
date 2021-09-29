@@ -1,25 +1,26 @@
 import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { AppConsts } from '@shared/AppConsts';
 import { AppAuthService } from '@shared/auth/app-auth.service';
-import { environment } from 'environments/environment';
+import { GlobalEventsService } from '@shared/globalEventsService';
+import { Subscription } from 'rxjs';
 
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit{
-  codeCouleur : string;
-  // appConsts = AppConsts.codeCouleurHeader;
+  codeCouleurHeader: string;
+  eventSubscribtion: Subscription;
   constructor(
-    private _authService: AppAuthService
+    private _authService: AppAuthService,
+    private _globalEventsService: GlobalEventsService
   ) {}
 
   ngOnInit(){
-    
+    this.eventSubscribtion = this._globalEventsService.pageChangedColorSubjectObservable.subscribe((color) => {
+      this.codeCouleurHeader = color;
+    });
   }
 
   logout(): void {

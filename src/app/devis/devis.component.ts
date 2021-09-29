@@ -3,6 +3,7 @@ import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/a
 import { BehaviorSubject, Subject } from 'rxjs';
 import {DevisItem} from '../../shared/models/DevisItem'
 import {DialogStatus} from '../../shared/enums/DialogState.enum'
+import { GlobalEventsService } from '@shared/globalEventsService';
 
 @Component({
   selector: 'app-devis',
@@ -19,9 +20,11 @@ export class DevisComponent implements OnInit {
   constructor(
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-  ) {}
+    private _globalEventsService: GlobalEventsService
+  ) { }
 
   ngOnInit() {
+    this._globalEventsService.announcedThePageChangedColorSubject("#0d6939");
     this.selectedDevisItem = this.devisList[0]
     
     this.emitNotificationSelectedDevisChanged(this.selectedDevisItem)
@@ -270,8 +273,8 @@ export class DevisComponent implements OnInit {
   }
 
   newDevis() {
-    this.displayDialog = true
-    this.emitDialogStatus(DialogStatus.New)
+    this.displayDialog = true;
+    this.emitDialogStatus(DialogStatus.New);
   }
   editDevis() {
     this.displayDialog = true
