@@ -1,7 +1,9 @@
 import { AfterViewInit, Component, Injector, OnInit } from '@angular/core';
 import { AppComponentBase } from '@shared/app-component-base';
+import { GlobalEventsService } from '@shared/globalEventsService';
 import { ClientDto, ClientServiceProxy } from '@shared/service-proxies/service-proxies';
 import csc, { ICountry } from 'country-state-city';
+import { environment } from 'environments/environment';
 import { MessageService, ConfirmationService, LazyLoadEvent, SortEvent } from 'primeng/api';
 
 interface Category {
@@ -53,12 +55,15 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
   constructor(injector: Injector,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private _clientServiceProxy: ClientServiceProxy) {
+    private _clientServiceProxy: ClientServiceProxy,
+    private _globalEventsService: GlobalEventsService) {
     super(injector);
   }
 
   scrollHeight: string = "0px";
   ngOnInit(): void {
+    this._globalEventsService.announcedThePageChangedColorSubject("#2A95D1");
+    
     this.categories = [
       { name: 'Catégorie', code: '0' },
       { name: 'Particulier', code: 'PRTC' },

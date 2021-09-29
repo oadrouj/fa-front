@@ -42,11 +42,23 @@
     border-radius: 20px;
 }
 
-:host>>>#filtreRightBlock .p-dropdown {
-    max-width: 110px;
-    max-height: 35px;
-    margin-right: 4px;
+:host>>>#filtreRightBlock .p-dropdown,
+:host>>>#filtreRightBlock .p-autocomplete .p-autocomplete-input,
+:host>>>#filtreRightBlock .p-calendar .p-inputtext,
+:host>>>#filtreRightBlock .p-inputnumber-input {
     border: none;
+    margin-right: 6px;
+    width: 82px;
+}
+
+:host>>>#filtreRightBlock .p-inputtext,
+:host>>>#filtreRightBlock .p-dropdown .p-cal,
+:host>>>#filtreRightBlock .p-autocomplete .p-autocomplete-input,
+:host>>>#filtreRightBlock .p-inputnumber-input {
+    padding: 6px 0px 6px 6px;
+    color: #7d86a9;
+    font-size: 0.8rem;
+    font-weight: 500;
 }
 
 :host>>>#filtreLeftBlock .p-input-icon-left {
@@ -133,22 +145,23 @@
 }
 
 #headerApercu {
-    min-height: 10vh;
-    max-height: 10vh;
-    border-bottom: 1px solid #DDDDDD;
+    min-height: 17.5vh;
+    max-height: 17.5vh;
+    border-bottom: 1px solid #928484;
     position: relative;
 }
 
 #headerApercu div {
     position: absolute;
-    right: 0px;
+    right: 1rem;
     top: 50%;
     transform: translateY(-50%);
 }
 
 :host>>>#headerApercu .p-button {
     color: #2A95D1;
-    font-size: 15px;
+    font-size: 0.9rem;
+    padding: .4rem;
 }
 
 #rappelClient span {

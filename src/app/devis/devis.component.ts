@@ -3,6 +3,7 @@ import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/a
 import { BehaviorSubject, Subject } from 'rxjs';
 import {DevisItem} from '../../shared/models/DevisItem'
 import {DialogStatus} from '../../shared/enums/DialogState.enum'
+import { GlobalEventsService } from '@shared/globalEventsService';
 
 @Component({
   selector: 'app-devis',
@@ -19,9 +20,11 @@ export class DevisComponent implements OnInit {
   constructor(
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-  ) {}
+    private _globalEventsService: GlobalEventsService
+  ) { }
 
   ngOnInit() {
+    this._globalEventsService.announcedThePageChangedColorSubject("#0d6939");
     this.selectedDevisItem = this.devisList[0]
     
     this.emitNotificationSelectedDevisChanged(this.selectedDevisItem)
@@ -53,7 +56,7 @@ export class DevisComponent implements OnInit {
 
   searchText = ''
   selectedClient = ''
-  selectedDate = new Date()
+  selectedDate !: Date
   selectedEcheance = ''
   selectedMontant = ''
   selectedStatut = ''
@@ -118,6 +121,7 @@ export class DevisComponent implements OnInit {
       introduction: 'introduction here',
       pied_page: 'pied page here',
       remise: 200,
+      montant_ttc : 0,
       contentItems: [
         {
           description: 'Consultation1',
@@ -151,6 +155,7 @@ export class DevisComponent implements OnInit {
       introduction: 'introduction here',
       pied_page: 'pied page here',
       remise: 0,
+      montant_ttc: 0,
       contentItems: [
         {
           description: 'Consultation 2',
@@ -174,6 +179,7 @@ export class DevisComponent implements OnInit {
       introduction: 'introduction here',
       pied_page: 'pied page here',
       remise: 0,
+      montant_ttc: 0,
       contentItems: [
         {
           description: 'Consultation 2',
@@ -185,7 +191,7 @@ export class DevisComponent implements OnInit {
           total_ht: 0,
           total_ttc: 0,
         },
-      ],
+       ],
     },
 
     {
@@ -197,6 +203,7 @@ export class DevisComponent implements OnInit {
       introduction: 'introduction here',
       pied_page: 'pied page here',
       remise: 0,
+      montant_ttc: 0,
       contentItems: [
         {
           description: 'Consultation 2',
@@ -251,7 +258,7 @@ export class DevisComponent implements OnInit {
         type: 'filterByButton',
         value: {
           client: this.selectedClient,
-          date: this.selectedDate,
+          date_emission: this.selectedDate,
           echeance: this.selectedEcheance,
           statut: this.selectedStatut,
           montant_ttc: this.selectedMontant
@@ -266,8 +273,8 @@ export class DevisComponent implements OnInit {
   }
 
   newDevis() {
-    this.displayDialog = true
-    this.emitDialogStatus(DialogStatus.New)
+    this.displayDialog = true;
+    this.emitDialogStatus(DialogStatus.New);
   }
   editDevis() {
     this.displayDialog = true

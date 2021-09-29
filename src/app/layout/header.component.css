@@ -1,13 +1,13 @@
-:host >>> .main-header {
+:host>>>.main-header {
     margin-left: 0rem!important;
     z-index: 2000;
-    background-color: #2A95D1;
 }
+
 .pi-bell {
     padding: 12px 16px;
     color: white;
 }
 
-:host >>> .p-button-label {
+:host>>>.p-button-label {
     color: white;
 }

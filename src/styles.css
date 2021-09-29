@@ -39,6 +39,10 @@
 
 /* Colors and Backgrounds */
 
+.color-white {
+    color: #fff !important;
+}
+
 .color-green {
     color: var(--green-color) !important;
 }
@@ -98,7 +102,8 @@
 }
 
 .submitted .ng-invalid:not(form,
-div)
+div,
+tr)
 /* .ng-invalid .p-autocomplete-input */
 
 {

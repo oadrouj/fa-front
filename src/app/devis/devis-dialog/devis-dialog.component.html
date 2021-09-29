@@ -1,5 +1,4 @@
-<p-toast [style]="{marginTop: 'marginTop'}" styleClass=""></p-toast>
-
+<p-toast [style]="{marginTop: 'marginTop'}" [baseZIndex]="2500" styleClass="styleClass"></p-toast>
 <p-dialog [(visible)]="visible" [style]="{'width': '100vw'}" [closable]="false">
     <ng-template pTemplate="header">
         <button pButton icon="pi pi-times" class="closeButton" (click)="closeDialog()"></button>
@@ -16,7 +15,7 @@
             <div class="w-77 autoCompleteContainer border-bottom  flex justify-content-between align-items-end mt-4 pr-5">
                 <div>
                     <label for="" class="mb-3 block">Client</label>
-                    <p-autoComplete formControlName="client" class="test" placeholder="Sélectionner un client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)"></p-autoComplete>
+                    <p-autoComplete formControlName="client" class="autocomplete" placeholder="Sélectionner un client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)"></p-autoComplete>
                 </div>
                 <h2>Devis</h2>
             </div>
@@ -177,17 +176,17 @@
                     </div>
                 </div>
                 <div class="w-23" [formGroup]="devisOptionsFormGroup">
-                    <p-accordion class="shadow-2">
+                    <p-accordion #acrd class="shadow-2">
                         <div class="py-3 px-4 bg-white color-green">Options</div>
                         <p-accordionTab header="Remise" [selected]="false">
-                            <p-toggleButton #tglBtn onLabel="Activer" offLabel="Désactiver" onIcon="pi pi-check" offIcon="pi pi-times" (onChange)="toggleRemiseOption($event)"></p-toggleButton>
-                            <input pInputText *ngIf="!tglBtn.checked" formControlName="remise" (input)="remiseValueChanged()" pKeyFilter="money" class="mt-2" />
+                            <p-toggleButton #tglBtn onLabel="Désactiver" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check" (onChange)="toggleRemiseOption($event)"></p-toggleButton>
+                            <input pInputText *ngIf="tglBtn.checked" formControlName="remise" (input)="remiseValueChanged()" pKeyFilter="money" class="mt-2" />
                         </p-accordionTab>
                         <p-accordionTab header="TVA">
                             <p-toggleButton onLabel="Désactiver" formControlName="tva" (onChange)="toggleTVAOption($event.checked)" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check"></p-toggleButton>
                         </p-accordionTab>
                         <p-accordionTab header="Devise">
-                            <p-dropdown formControlName="devise" [options]="devisOptions.devise.list" (onChange)="Currency = $event.value" placeholder="Sélectionner un devise">
+                            <p-dropdown formControlName="devise" [options]="devisOptions.devise.list" (onChange)="Currency = $event.value" [appendTo]="acrd" placeholder="Sélectionner un devise">
                             </p-dropdown>
                         </p-accordionTab>
                     </p-accordion>

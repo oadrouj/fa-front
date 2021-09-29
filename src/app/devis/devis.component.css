@@ -23,21 +23,36 @@
 }
 
 .searchInput {
-    height: 42px;
+    /* height: 42px;
     border-radius: 26px;
     background: #f1eded;
-    color: #70707082;
+    color: #495057;
+    border: none; */
+}
+
+:host>>>.searchInput.p-input-icon-left {
+    max-width: 216px;
+    max-height: 35px;
+    width: 100%;
+    background-color: #F1EDED;
+    border-radius: 24px;
+}
+
+:host>>>.searchInput.p-input-icon-left>.p-inputtext {
+    max-height: 35px;
+    width: 100%;
+    background-color: #F1EDED;
     border: none;
+    border-radius: 24px;
 }
 
 i.pi-search {
     font-weight: 800;
-    color: #70707082;
 }
 
 .searchInput,
 i.pi-search {
-    font-size: 0.9rem;
+    font-size: 1rem;
 }
 
 :host>>>.filterContainer .p-dropdown,
@@ -76,26 +91,33 @@ i.pi-search {
 
 :host ::ng-deep #devisList .p-datatable {
     margin-top: 1rem;
+    padding-right: 1.5rem;
 }
 
 :host>>>#devisList .p-datatable .p-datatable-tbody>tr {
     background: transparent;
 }
 
-:host>>>#devisList .p-datatable .p-datatable-thead>tr>th,
-:host>>>#devisList .p-datatable .p-datatable-tbody>tr>td {
-    font-size: 0.95rem;
+:host>>>#devisList .p-datatable .p-datatable-thead>tr>th {
+    font-size: 0.85rem;
+    color: #2A95D1;
+    padding-right: 0px;
+    padding-left: 2px;
+    text-align: center;
+    text-transform: uppercase;
+    background-color: transparent;
 }
 
 :host ::ng-deep #devisList .p-datatable .p-datatable-thead>tr>th,
 :host ::ng-deep #devisList .p-datatable .p-datatable-scrollable-header {
     background: transparent;
     color: var(--green-color);
-    font-weight: 400;
 }
 
 :host ::ng-deep #devisList .p-datatable .p-datatable-tbody>tr>td {
+    font-size: 0.85rem;
     color: #898e99;
+    text-align: center;
 }
 
 :host ::ng-deep #devisList .p-datatable .p-datatable-tbody>tr.p-highlight {
@@ -236,7 +258,7 @@ i.pi-search {
 :host ::ng-deep .p-datatable-footer hr {
     width: 65%;
     margin-right: 0;
-    margin-top: 0;
+    margin-top: 0.8rem;
     margin-bottom: 1.1rem;
     border-color: var(--light-gray-color);
     border-style: solid;
@@ -248,4 +270,8 @@ i.pi-search {
 
 .rightSection {
     width: 48%;
+}
+
+.fromSocietyPrefix {
+    margin-left: -40px;
 }
