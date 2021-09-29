@@ -44,10 +44,10 @@ export class TableComponent implements OnInit {
 
       if(res.type == 'filterByInput') {
         console.log(new Date(res.value) )
-        if(new Date(res.value) instanceof Date)
+        if(!(new Date(res.value) instanceof Date))
           this.table.filterGlobal(res.value, 'contains');
         else
-        this.table.filterGlobal(res.value, 'equals');
+        this.table.filterGlobal(new Date(res.value), 'equals');
         
       }
       else {

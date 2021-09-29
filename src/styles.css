@@ -39,6 +39,10 @@
 
 /* Colors and Backgrounds */
 
+.color-white {
+    color: #fff !important;
+}
+
 .color-green {
     color: var(--green-color) !important;
 }

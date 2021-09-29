@@ -9,6 +9,7 @@ import {
 import { DialogStatus } from '@shared/enums/DialogState.enum'
 import { DevisContentItem } from '@shared/models/DevisContentItem'
 import { DevisItem } from '@shared/models/DevisItem'
+import { environment } from 'environments/environment'
 import { LazyLoadEvent, MessageService } from 'primeng/api'
 import { Observable, Subscription } from 'rxjs'
 
@@ -28,7 +29,7 @@ export class DevisDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.initiateFormGroup()
-    
+    environment.codeCouleur = 'red';
     this.devisOptionsFormGroup = this.initiateDevisOptionsGroup()
     this.eventsSubscription = this.SelectDevisItemEvent.subscribe(
       (devisItem: DevisItem) => {

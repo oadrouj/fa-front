@@ -2,6 +2,7 @@ import { AfterViewInit, Component, Injector, OnInit } from '@angular/core';
 import { AppComponentBase } from '@shared/app-component-base';
 import { ClientDto, ClientServiceProxy } from '@shared/service-proxies/service-proxies';
 import csc, { ICountry } from 'country-state-city';
+import { environment } from 'environments/environment';
 import { MessageService, ConfirmationService, LazyLoadEvent, SortEvent } from 'primeng/api';
 
 interface Category {
@@ -59,6 +60,7 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
 
   scrollHeight: string = "0px";
   ngOnInit(): void {
+    
     this.categories = [
       { name: 'Catégorie', code: '0' },
       { name: 'Particulier', code: 'PRTC' },
