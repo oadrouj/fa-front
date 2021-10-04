@@ -9,6 +9,7 @@ import {
 import { DialogStatus } from '@shared/enums/DialogState.enum'
 import { DevisContentItem } from '@shared/models/DevisContentItem'
 import { DevisItem } from '@shared/models/DevisItem'
+import { ReferenceService } from '@shared/services/reference.service'
 import { LazyLoadEvent, MessageService } from 'primeng/api'
 import { Observable, Subscription } from 'rxjs'
 
@@ -23,6 +24,7 @@ export class FacturesDialogComponent implements OnInit {
   constructor(
     private messageService: MessageService,
     private formBuilder: FormBuilder,
+    private referenceService: ReferenceService,
   ) {}
 
 
@@ -235,7 +237,7 @@ export class FacturesDialogComponent implements OnInit {
   loadLazy(event: LazyLoadEvent) {}
 
   getNewReference() {
-    return 'N00001'
+    return this.referenceService.getReferenceFromReferenceNumber(10);
   }
 
   addRow() {

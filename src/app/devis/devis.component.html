@@ -27,7 +27,7 @@
                 <div class="flex align-items-center pt-4 filterContainer">
                     <p-autoComplete [(ngModel)]="selectedClient" placeholder="Client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)"></p-autoComplete>
                     <p-calendar [(ngModel)]="selectedDate" placeholder="Date"></p-calendar>
-                    <p-dropdown [options]="echeanceOptions" [(ngModel)]="selectedEcheance" placeholder="Echéance" [showClear]="false"></p-dropdown>
+                    <p-inputNumber [(ngModel)]="selectedEcheance" placeholder="Echéance"></p-inputNumber>
                     <p-inputNumber [(ngModel)]="selectedMontant" placeholder="Montant"></p-inputNumber>
                     <p-dropdown [options]="statutOptions" [(ngModel)]="selectedStatut" placeholder="Statut" [showClear]="false"></p-dropdown>
                     <button pButton pRipple (click)="emitFilterEvent('filterByButton', $event.target.value)" class="filterBtn p-button-rounded  ml-2" label="Filtrer" icon="pi pi-filter"></button>
