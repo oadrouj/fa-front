@@ -492,6 +492,60 @@ export class ClientServiceProxy {
         }
         return _observableOf<void>(<any>null);
     }
+
+    /**
+     * @param motCle (optional) 
+     * @return Success
+     */
+    getClientForAutoComplete(motCle: string | null | undefined): Observable<ClientForAutoCompleteDtoListResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Client/GetClientForAutoComplete?";
+        if (motCle !== undefined)
+            url_ += "motCle=" + encodeURIComponent("" + motCle) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetClientForAutoComplete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetClientForAutoComplete(<any>response_);
+                } catch (e) {
+                    return <Observable<ClientForAutoCompleteDtoListResultDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ClientForAutoCompleteDtoListResultDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetClientForAutoComplete(response: HttpResponseBase): Observable<ClientForAutoCompleteDtoListResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ClientForAutoCompleteDtoListResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ClientForAutoCompleteDtoListResultDto>(<any>null);
+    }
 }
 
 @Injectable()
@@ -838,6 +892,289 @@ export class CustomAccountServiceProxy {
             }));
         }
         return _observableOf<UserDto>(<any>null);
+    }
+}
+
+@Injectable()
+export class DevisServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createDevis(body: CreateDevisInput | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Devis/CreateDevis";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateDevis(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateDevis(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreateDevis(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    updateDevis(body: UpdateDevisInput | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Devis/UpdateDevis";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateDevis(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateDevis(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdateDevis(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getByIdDevis(id: number | undefined): Observable<DevisDto> {
+        let url_ = this.baseUrl + "/api/services/app/Devis/GetByIdDevis?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByIdDevis(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByIdDevis(<any>response_);
+                } catch (e) {
+                    return <Observable<DevisDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<DevisDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetByIdDevis(response: HttpResponseBase): Observable<DevisDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = DevisDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<DevisDto>(<any>null);
+    }
+
+    /**
+     * @param devisId (optional) 
+     * @return Success
+     */
+    deleteDevis(devisId: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Devis/DeleteDevis?";
+        if (devisId === null)
+            throw new Error("The parameter 'devisId' cannot be null.");
+        else if (devisId !== undefined)
+            url_ += "DevisId=" + encodeURIComponent("" + devisId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteDevis(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteDevis(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processDeleteDevis(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getLastReference(): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/Devis/GetLastReference";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetLastReference(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetLastReference(<any>response_);
+                } catch (e) {
+                    return <Observable<number>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<number>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetLastReference(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<number>(<any>null);
     }
 }
 
@@ -2961,6 +3298,104 @@ export interface IClientDtoListResultDto {
     items: ClientDto[] | undefined;
 }
 
+export class ClientForAutoCompleteDto implements IClientForAutoCompleteDto {
+    fullName: string | undefined;
+    id: number;
+
+    constructor(data?: IClientForAutoCompleteDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.fullName = _data["fullName"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): ClientForAutoCompleteDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ClientForAutoCompleteDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["fullName"] = this.fullName;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): ClientForAutoCompleteDto {
+        const json = this.toJSON();
+        let result = new ClientForAutoCompleteDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IClientForAutoCompleteDto {
+    fullName: string | undefined;
+    id: number;
+}
+
+export class ClientForAutoCompleteDtoListResultDto implements IClientForAutoCompleteDtoListResultDto {
+    items: ClientForAutoCompleteDto[] | undefined;
+
+    constructor(data?: IClientForAutoCompleteDtoListResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(ClientForAutoCompleteDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ClientForAutoCompleteDtoListResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ClientForAutoCompleteDtoListResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): ClientForAutoCompleteDtoListResultDto {
+        const json = this.toJSON();
+        let result = new ClientForAutoCompleteDtoListResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IClientForAutoCompleteDtoListResultDto {
+    items: ClientForAutoCompleteDto[] | undefined;
+}
+
 export class ChangeUiThemeInput implements IChangeUiThemeInput {
     theme: string;
 
@@ -3088,6 +3523,484 @@ export interface IUserDto {
     lastLoginTime: moment.Moment | undefined;
     creationTime: moment.Moment;
     roleNames: string[] | undefined;
+    id: number;
+}
+
+export enum DevisStatutEnum {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+}
+
+export class DevisItemDto implements IDevisItemDto {
+    description: string | undefined;
+    date: moment.Moment;
+    quantity: number;
+    unit: string | undefined;
+    unitPriceHT: number;
+    tva: number;
+    totalTtc: number;
+
+    constructor(data?: IDevisItemDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.description = _data["description"];
+            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.quantity = _data["quantity"];
+            this.unit = _data["unit"];
+            this.unitPriceHT = _data["unitPriceHT"];
+            this.tva = _data["tva"];
+            this.totalTtc = _data["totalTtc"];
+        }
+    }
+
+    static fromJS(data: any): DevisItemDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new DevisItemDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["description"] = this.description;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["quantity"] = this.quantity;
+        data["unit"] = this.unit;
+        data["unitPriceHT"] = this.unitPriceHT;
+        data["tva"] = this.tva;
+        data["totalTtc"] = this.totalTtc;
+        return data; 
+    }
+
+    clone(): DevisItemDto {
+        const json = this.toJSON();
+        let result = new DevisItemDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IDevisItemDto {
+    description: string | undefined;
+    date: moment.Moment;
+    quantity: number;
+    unit: string | undefined;
+    unitPriceHT: number;
+    tva: number;
+    totalTtc: number;
+}
+
+export class CreateDevisInput implements ICreateDevisInput {
+    reference: number;
+    dateEmission: moment.Moment;
+    echeancePaiement: number;
+    messageIntroduction: string | undefined;
+    piedDePage: string | undefined;
+    remise: number;
+    statut: DevisStatutEnum;
+    devisItems: DevisItemDto[] | undefined;
+    clientId: number;
+
+    constructor(data?: ICreateDevisInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.reference = _data["reference"];
+            this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
+            this.echeancePaiement = _data["echeancePaiement"];
+            this.messageIntroduction = _data["messageIntroduction"];
+            this.piedDePage = _data["piedDePage"];
+            this.remise = _data["remise"];
+            this.statut = _data["statut"];
+            if (Array.isArray(_data["devisItems"])) {
+                this.devisItems = [] as any;
+                for (let item of _data["devisItems"])
+                    this.devisItems.push(DevisItemDto.fromJS(item));
+            }
+            this.clientId = _data["clientId"];
+        }
+    }
+
+    static fromJS(data: any): CreateDevisInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateDevisInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["reference"] = this.reference;
+        data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
+        data["echeancePaiement"] = this.echeancePaiement;
+        data["messageIntroduction"] = this.messageIntroduction;
+        data["piedDePage"] = this.piedDePage;
+        data["remise"] = this.remise;
+        data["statut"] = this.statut;
+        if (Array.isArray(this.devisItems)) {
+            data["devisItems"] = [];
+            for (let item of this.devisItems)
+                data["devisItems"].push(item.toJSON());
+        }
+        data["clientId"] = this.clientId;
+        return data; 
+    }
+
+    clone(): CreateDevisInput {
+        const json = this.toJSON();
+        let result = new CreateDevisInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateDevisInput {
+    reference: number;
+    dateEmission: moment.Moment;
+    echeancePaiement: number;
+    messageIntroduction: string | undefined;
+    piedDePage: string | undefined;
+    remise: number;
+    statut: DevisStatutEnum;
+    devisItems: DevisItemDto[] | undefined;
+    clientId: number;
+}
+
+export class UpdateDevisInput implements IUpdateDevisInput {
+    reference: number;
+    dateEmission: moment.Moment;
+    echeancePaiement: number;
+    messageIntroduction: string | undefined;
+    piedDePage: string | undefined;
+    remise: number;
+    statut: DevisStatutEnum;
+    devisItems: DevisItemDto[] | undefined;
+    clientId: number;
+    id: number;
+
+    constructor(data?: IUpdateDevisInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.reference = _data["reference"];
+            this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
+            this.echeancePaiement = _data["echeancePaiement"];
+            this.messageIntroduction = _data["messageIntroduction"];
+            this.piedDePage = _data["piedDePage"];
+            this.remise = _data["remise"];
+            this.statut = _data["statut"];
+            if (Array.isArray(_data["devisItems"])) {
+                this.devisItems = [] as any;
+                for (let item of _data["devisItems"])
+                    this.devisItems.push(DevisItemDto.fromJS(item));
+            }
+            this.clientId = _data["clientId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): UpdateDevisInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateDevisInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["reference"] = this.reference;
+        data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
+        data["echeancePaiement"] = this.echeancePaiement;
+        data["messageIntroduction"] = this.messageIntroduction;
+        data["piedDePage"] = this.piedDePage;
+        data["remise"] = this.remise;
+        data["statut"] = this.statut;
+        if (Array.isArray(this.devisItems)) {
+            data["devisItems"] = [];
+            for (let item of this.devisItems)
+                data["devisItems"].push(item.toJSON());
+        }
+        data["clientId"] = this.clientId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): UpdateDevisInput {
+        const json = this.toJSON();
+        let result = new UpdateDevisInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdateDevisInput {
+    reference: number;
+    dateEmission: moment.Moment;
+    echeancePaiement: number;
+    messageIntroduction: string | undefined;
+    piedDePage: string | undefined;
+    remise: number;
+    statut: DevisStatutEnum;
+    devisItems: DevisItemDto[] | undefined;
+    clientId: number;
+    id: number;
+}
+
+export class Client implements IClient {
+    reference: number;
+    categorieClient: string | undefined;
+    nom: string | undefined;
+    secteurActivite: string | undefined;
+    ice: string | undefined;
+    raisonSociale: string | undefined;
+    adresse: string | undefined;
+    ville: string | undefined;
+    pays: string | undefined;
+    codePostal: string | undefined;
+    email: string | undefined;
+    telFix: string | undefined;
+    telPortable: string | undefined;
+    siteWeb: string | undefined;
+    deviseFacturation: string | undefined;
+    remisePermanente: number;
+    delaiPaiement: number;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    constructor(data?: IClient) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.reference = _data["reference"];
+            this.categorieClient = _data["categorieClient"];
+            this.nom = _data["nom"];
+            this.secteurActivite = _data["secteurActivite"];
+            this.ice = _data["ice"];
+            this.raisonSociale = _data["raisonSociale"];
+            this.adresse = _data["adresse"];
+            this.ville = _data["ville"];
+            this.pays = _data["pays"];
+            this.codePostal = _data["codePostal"];
+            this.email = _data["email"];
+            this.telFix = _data["telFix"];
+            this.telPortable = _data["telPortable"];
+            this.siteWeb = _data["siteWeb"];
+            this.deviseFacturation = _data["deviseFacturation"];
+            this.remisePermanente = _data["remisePermanente"];
+            this.delaiPaiement = _data["delaiPaiement"];
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): Client {
+        data = typeof data === 'object' ? data : {};
+        let result = new Client();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["reference"] = this.reference;
+        data["categorieClient"] = this.categorieClient;
+        data["nom"] = this.nom;
+        data["secteurActivite"] = this.secteurActivite;
+        data["ice"] = this.ice;
+        data["raisonSociale"] = this.raisonSociale;
+        data["adresse"] = this.adresse;
+        data["ville"] = this.ville;
+        data["pays"] = this.pays;
+        data["codePostal"] = this.codePostal;
+        data["email"] = this.email;
+        data["telFix"] = this.telFix;
+        data["telPortable"] = this.telPortable;
+        data["siteWeb"] = this.siteWeb;
+        data["deviseFacturation"] = this.deviseFacturation;
+        data["remisePermanente"] = this.remisePermanente;
+        data["delaiPaiement"] = this.delaiPaiement;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): Client {
+        const json = this.toJSON();
+        let result = new Client();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IClient {
+    reference: number;
+    categorieClient: string | undefined;
+    nom: string | undefined;
+    secteurActivite: string | undefined;
+    ice: string | undefined;
+    raisonSociale: string | undefined;
+    adresse: string | undefined;
+    ville: string | undefined;
+    pays: string | undefined;
+    codePostal: string | undefined;
+    email: string | undefined;
+    telFix: string | undefined;
+    telPortable: string | undefined;
+    siteWeb: string | undefined;
+    deviseFacturation: string | undefined;
+    remisePermanente: number;
+    delaiPaiement: number;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+}
+
+export class DevisDto implements IDevisDto {
+    reference: number;
+    dateEmission: moment.Moment;
+    echeancePaiement: number;
+    messageIntroduction: string | undefined;
+    piedDePage: string | undefined;
+    remise: number;
+    statut: DevisStatutEnum;
+    devisItems: DevisItemDto[] | undefined;
+    clientId: number;
+    client: Client;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    constructor(data?: IDevisDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.reference = _data["reference"];
+            this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
+            this.echeancePaiement = _data["echeancePaiement"];
+            this.messageIntroduction = _data["messageIntroduction"];
+            this.piedDePage = _data["piedDePage"];
+            this.remise = _data["remise"];
+            this.statut = _data["statut"];
+            if (Array.isArray(_data["devisItems"])) {
+                this.devisItems = [] as any;
+                for (let item of _data["devisItems"])
+                    this.devisItems.push(DevisItemDto.fromJS(item));
+            }
+            this.clientId = _data["clientId"];
+            this.client = _data["client"] ? Client.fromJS(_data["client"]) : <any>undefined;
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): DevisDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new DevisDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["reference"] = this.reference;
+        data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
+        data["echeancePaiement"] = this.echeancePaiement;
+        data["messageIntroduction"] = this.messageIntroduction;
+        data["piedDePage"] = this.piedDePage;
+        data["remise"] = this.remise;
+        data["statut"] = this.statut;
+        if (Array.isArray(this.devisItems)) {
+            data["devisItems"] = [];
+            for (let item of this.devisItems)
+                data["devisItems"].push(item.toJSON());
+        }
+        data["clientId"] = this.clientId;
+        data["client"] = this.client ? this.client.toJSON() : <any>undefined;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): DevisDto {
+        const json = this.toJSON();
+        let result = new DevisDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IDevisDto {
+    reference: number;
+    dateEmission: moment.Moment;
+    echeancePaiement: number;
+    messageIntroduction: string | undefined;
+    piedDePage: string | undefined;
+    remise: number;
+    statut: DevisStatutEnum;
+    devisItems: DevisItemDto[] | undefined;
+    clientId: number;
+    client: Client;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
     id: number;
 }
 
