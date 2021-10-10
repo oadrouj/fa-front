@@ -3527,11 +3527,12 @@ export interface IUserDto {
 }
 
 export enum DevisStatutEnum {
-    _0 = 0,
-    _1 = 1,
-    _2 = 2,
-    _3 = 3,
+    Cree = 0,
+    Valide = 1,
+    Converti = 2,
+    Expire = 3,
 }
+    
 
 export class DevisItemDto implements IDevisItemDto {
     description: string | undefined;
@@ -4001,7 +4002,7 @@ export interface IDevisDto {
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
-    id: number;
+    id: number; 
 }
 
 export class CreateInfosEntrepriseInput implements ICreateInfosEntrepriseInput {

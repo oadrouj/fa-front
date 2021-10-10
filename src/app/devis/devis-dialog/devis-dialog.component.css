@@ -1,3 +1,7 @@
+:host>>>.p-button {
+    border: none !important;
+}
+
 :host>>>.p-dialog-mask {
     z-index: 2040 !important;
 }
@@ -65,10 +69,6 @@
     width: 85%;
 }
 
-:host>>>#newDevis .p-datatable .p-datatable-tbody>tr>td {
-    padding: 6px 0 0;
-}
-
 #newDevis td {
     text-align: center;
 }
@@ -103,18 +103,25 @@
     border-color: #CED0DA;
 }
 
+:host>>>#newDevis .p-datatable .p-datatable-scrollable-body {
+    overflow-y: auto !important;
+}
+
 :host>>>#newDevis .p-datatable .p-datatable-thead>tr>th {
-    font-size: 1.12rem;
+    font-size: 1.3rem;
     font-weight: 400;
 }
 
-:host>>>#newDevis .p-datatable .p-datatable-thead>tr>th,
-:host>>>#newDevis .p-datatable .p-datatable-tbody>tr>td {
-    padding-right: .4rem;
+:host>>>#newDevis .p-datatable .p-datatable-thead>tr>th {
+    padding-right: 0;
+    padding-bottom: 0;
 }
 
-:host>>>#newDevis .p-datatable .p-datatable-thead>tr>th {
-    padding: 1rem .2rem;
+:host>>>#newDevis .p-datatable .p-datatable-tbody>tr>td {
+    padding-left: 6px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-right: 6.4px;
 }
 
 :host>>>#newDevis .p-datatable .p-datatable-thead>tr>th:last-child,
@@ -142,8 +149,12 @@
 
 .new-devis-summary {
     flex-basis: 35%;
-    font-size: 1.3125rem;
+    font-size: 1.3rem;
     font-weight: 400;
+}
+
+.new-devis-summary .grid div {
+    padding: 2px;
 }
 
 :host>>>.p-dialog .p-accordion {
@@ -173,9 +184,4 @@
 :host>>>.p-dialog #new-devis-header .p-dropdown,
 :host>>>.p-dialog #new-devis-header textarea {
     border: 1px solid #CED0DA;
-}
-
-:host>>>.p-dialog-mask,
-html {
-    overflow: hidden;
 }

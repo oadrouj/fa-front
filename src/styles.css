@@ -16,6 +16,7 @@
 
 :root {
     --green-color: #0D6939;
+    --light-green-color: #C3EAD6;
     --orange-color: #EBA20C;
     --light-orange-color: #F2E4C8;
     --bg-color: #F1F6FF;
@@ -63,12 +64,13 @@
     background-color: var(--green-color) !important;
 }
 
-.color-light-green {
-    background-color: #4C9D8A !important;
+.bg-secondary-green {
+    background-color: #58BBA4 !important;
 }
 
 .bg-orange {
     background-color: var(--orange-color) !important;
+    color: #fff !important;
 }
 
 .bg-light-grayorange {

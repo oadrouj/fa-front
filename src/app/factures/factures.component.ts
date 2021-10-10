@@ -1,36 +1,50 @@
 import { Component, OnInit } from '@angular/core';
-import { ConfirmationService, ConfirmEventType, MessageService } from 'primeng/api';
 import { BehaviorSubject, Subject } from 'rxjs';
 import {DevisItem} from '../../shared/models/DevisItem'
 import {DialogStatus} from '../../shared/enums/DialogState.enum'
 import { GlobalEventsService } from '@shared/globalEventsService';
+import { ReferenceService } from '../../shared/services/reference.service'
+import { FakeService } from '@shared/services/fake.service';
+import { ClientForAutoCompleteDto, ClientForAutoCompleteDtoListResultDto, ClientServiceProxy, DevisServiceProxy, DevisStatutEnum } from '@shared/service-proxies/service-proxies';
+import {ReferencePrefix} from '@shared/enums/reference-prefix.enum'
+import * as moment from 'moment';
+import { DateHelper } from '@shared/helpers/DateHelper';
+import { ToastService } from '@shared/services/toast.service';
+
 
 @Component({
   selector: 'app-factures',
   templateUrl: './factures.component.html',
-  providers: [ConfirmationService, MessageService],
   styleUrls: ['./factures.component.css']
 })
 
 export class FacturesComponent implements OnInit {
-  summaryTotalHT: number;
-  summaryTVA: number;
-  summaryTotalTTC: number;
-  montantTTCAllDevis: number = 0;
+ 
+ 
   constructor(
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService,
-    private _globalEventsService: GlobalEventsService
+    private _globalEventsService: GlobalEventsService,
+    private _referenceService: ReferenceService,
+    public _fakeService: FakeService,
+    private _devisServiceProxy: DevisServiceProxy,
+    private _clientServiceProxy: ClientServiceProxy,
+    private _toastService: ToastService,
+
   ) { }
 
   ngOnInit() {
-    this._globalEventsService.announcedThePageChangedColorSubject("#eba20c");
-    this.selectedDevisItem = this.devisList[0]
-    
-    this.emitNotificationSelectedDevisChanged(this.selectedDevisItem)
 
+    this._globalEventsService.announcedThePageChangedColorSubject(`var(--${this.primaryColor}-color`);
+    this._fakeService.getData().subscribe((res: any) => {
+      this.devisList = res
+      this.selectedDevisItem = res[0]
+    })
+
+    this.emitNotificationSelectedDevisChanged(this.selectedDevisItem)
+    
     this.devisList.forEach(
-      (devis: DevisItem) =>{
+      (devis: any) => {
+        devis.reference = this.devisFormatReferenceNumber(devis.reference)
+        console.log(devis.reference);
         devis.contentItems = devis.contentItems.map(
           (item: any) => {
             let total_ht = item.pu * item.quantite;
@@ -54,16 +68,22 @@ export class FacturesComponent implements OnInit {
     this.calculateSummaryTotalHTAndTVA();
   }
 
+  //#region Properties
+  title = 'Facture';
+  primaryColor = 'orange';
+  imageSrc="assets/img/FacturesLogo.png"
+  secondaryColor = ''
+  tableSelectionColor = 'var(--light-orange-color)';
+
   searchText = ''
   selectedClient = ''
-  selectedDate = new Date()
+  selectedDate !: Date
   selectedEcheance = ''
   selectedMontant = ''
   selectedStatut = ''
-  clientSuggestions : string[]
+  clientSuggestions : ClientForAutoCompleteDto[]
   echeanceOptions = [15, 20, 30]
   statutOptions = ['Créé', 'Validé', 'Converti', 'Expiré']
-
   cols = [
     {
       header: 'REFERENCE',
@@ -72,7 +92,7 @@ export class FacturesComponent implements OnInit {
     },
     {
       header: 'CLIENT',
-      field: 'client',
+      field: 'client.nom',
       type: 'text',
     },
     {
@@ -95,11 +115,9 @@ export class FacturesComponent implements OnInit {
       header: 'STATUT',
       field: 'statut',
       type: 'text',
+      format: this.formatStatut
     },
   ]
-
-  Currency = 'MAD'
-
   DevisContentItemsCols = [
     { header: 'DESCRIPTION', field: 'description', type: 'text', colspan: 2 },
     { header: 'DATE', field: 'date', type: 'date', colspan: 0 },
@@ -110,151 +128,84 @@ export class FacturesComponent implements OnInit {
     { header: 'TVA', field: 'tva', type: 'pourcentage' },
     { header: 'TOTAL TTC', field: 'total_ttc', type: 'currency', colspan: 0 },
   ]
-
-  devisList = [
+  devisList : any
+  statusItems = [
     {
-      reference: 'D00004',
-      client: 'Omar Attioui',
-      date_emission: new Date('10/09/2021'),
-      echeance: 15,
-      statut: 'Brouillon',
-      introduction: 'introduction here',
-      pied_page: 'pied page here',
-      remise: 200,
-      contentItems: [
-        {
-          description: 'Consultation1',
-          date: new Date('01/01/2021'),
-          quantite: 8,
-          unite: 'Heures',
-          pu: 100.0,
-          tva: 20,
-          total_ht: 0,
-          total_ttc: 0,
-        },
-        {
-          description: 'Consultation2',
-          date: new Date('01/01/2021'),
-          quantite: 8,
-          unite: 'Heures',
-          pu: 100.0,
-          tva: 20,
-          total_ht: 0,
-          total_ttc: 0,
-        },
-      ],
+      label: 'Accepté', 
+      icon: 'pi pi-check', 
+      command: () => {
+        this.updateApiCall(this.selectedDevisItem.client.id, DevisStatutEnum.Converti, 'Le devis est converti en facture')
+      }
     },
-
     {
-      reference: 'D00002',
-      client: 'Karim',
-      date_emission: new Date('01/01/2021'),
-      echeance: 15,
-      statut: 'Brouillon',
-      introduction: 'introduction here',
-      pied_page: 'pied page here',
-      remise: 0,
-      contentItems: [
-        {
-          description: 'Consultation 2',
-          date: new Date('01/01/2021'),
-          quantite: 8,
-          unite: 'Heures',
-          pu: 100.0,
-          tva: 20,
-          total_ht: 0,
-          total_ttc: 0,
-        },
-      ],
-    },
-
-    {
-      reference: 'D00003',
-      client: 'Chorouk',
-      date_emission: new Date('01/01/2021'),
-      echeance: 15,
-      statut: 'Brouillon',
-      introduction: 'introduction here',
-      pied_page: 'pied page here',
-      remise: 0,
-      contentItems: [
-        {
-          description: 'Consultation 2',
-          date: new Date('01/01/2021'),
-          quantite: 8,
-          unite: 'Heures',
-          pu: 100.0,
-          tva: 20,
-          total_ht: 0,
-          total_ttc: 0,
-        },
-      ],
-    },
-
-    {
-      reference: 'D00005',
-      client: 'Ilyass',
-      date_emission: new Date('01/01/2021'),
-      echeance: 15,
-      statut: 'Brouillon',
-      introduction: 'introduction here',
-      pied_page: 'pied page here',
-      remise: 0,
-      contentItems: [
-        {
-          description: 'Consultation 2',
-          date: new Date('01/01/2021'),
-          quantite: 8,
-          unite: 'Heures',
-          pu: 100.0,
-          tva: 20,
-          total_ht: 0,
-          total_ttc: 0,
-        },
-        
-      ],
+      label: 'Rejeté', 
+      icon: 'pi pi-times', 
+      command: () => {
+        this.updateApiCall(this.selectedDevisItem.client.id, DevisStatutEnum.Converti, 'Le devis est rejeté')
+      }
     },
   ]
-
-  statusItems = []
-
   displayDialog = false
   dialogState !:  DialogStatus
-
   autoCompleteText = ''
   suggestions = []
-
   dateEmission = new Date()
   echeancePayementOptions = [30, 60, 90]
   echeancePayementSelected = this.echeancePayementOptions[0] || ''
-
   selectedDevisItem!: DevisItem
+  summaryTotalHT: number;
+  summaryTVA: number;
+  summaryTotalTTC: number;
+  montantTTCAllDevis: number = 0;
+  Currency = 'MAD'
 
-  loadLazy(event: any) {}
+  //#endregion
 
-  autoCompleteSearch(event: any) {}
+  formatStatut(statut?: DevisStatutEnum){
+      
+    switch(statut){
+      case DevisStatutEnum.Cree: return 'Brouillon';
+      case DevisStatutEnum.Valide: return 'Validé';
+      case DevisStatutEnum.Converti: return 'Convéeti';
+      case DevisStatutEnum.Expire: return 'Expiré';
+    }
+  }
+   getDateEcheance(dateEmission: Date, echeance: number) {
+    return moment(dateEmission).add(echeance, 'days').toDate()
+     
+   }
+  
+  devisFormatReferenceNumber(reference: number) {
+    return this._referenceService.formatReferenceNumber(ReferencePrefix.Devis, reference)
+  }
 
   clientAutoCompleteSearch(event: any) {
-    // this.mylookupservice.getResults(event.query).then(data => {
-      this.clientSuggestions = ['Karim', 'Omar']
-  // });
+      setTimeout(() => {
+        this._clientServiceProxy.getClientForAutoComplete(event.query)
+        .subscribe((res: ClientForAutoCompleteDtoListResultDto) => {
+          this.clientSuggestions = res.items
+      })
+      }, 500)
   }
   
-
+  //#region events
   filterSubject = new Subject<any>();
   emitFilterEvent(filterType: string, value: any){
-    if(filterType == 'filterByInput')
-      this.filterSubject.next({
-        type: 'filterByInput', 
-        value
-      });
-
+    if(filterType == 'filterByInput') {
+      setTimeout(() => {
+        this.filterSubject.next({
+          type: 'filterByInput', 
+          value
+        })
+      }, 500)
+    }
+    
     else if(filterType == 'filterByButton') 
       this.filterSubject.next({
         type: 'filterByButton',
         value: {
           client: this.selectedClient,
-          date: this.selectedDate,
+          date_emission: this.selectedDate,
           echeance: this.selectedEcheance,
           statut: this.selectedStatut,
           montant_ttc: this.selectedMontant
@@ -268,79 +219,67 @@ export class FacturesComponent implements OnInit {
     this.dialogStatusEvent.next(dialogStatus)
   }
 
-  newDevis() {
-    this.displayDialog = true
-    this.emitDialogStatus(DialogStatus.New)
-  }
-  editDevis() {
-    this.displayDialog = true
-    this.dialogState = DialogStatus.Edit
-    this.emitDialogStatus(DialogStatus.Edit)
-  }
-
-  duplicateDevis() {
-    this.selectedDevisItem.reference = 'D00002'
-    this.displayDialog = true
-    this.emitDialogStatus(DialogStatus.Duplicate)
-  }
-
-  eventsSubject = new Subject<DevisItem>()
-
-  emitEventToChild(deviItem: DevisItem) {
-    this.eventsSubject.next(deviItem)
+  rowDeletedSubject = new Subject<DevisItem>()
+  emitRowDeletedEvent(deviItem: DevisItem) {
+    this.rowDeletedSubject.next(deviItem)
   }
 
   notifySelectedDevisChanged = new BehaviorSubject<DevisItem>(null)
   emitNotificationSelectedDevisChanged(deviItem: DevisItem) {
     this.notifySelectedDevisChanged.next(deviItem)
   }
+  //#endregion
+  
+  newDevis() {
+    this.displayDialog = true;
+    this.emitDialogStatus(DialogStatus.New);
+  }
+  
+  editDevis() {
+    this.displayDialog = true
+    this.emitDialogStatus(DialogStatus.Edit)
+  }
+
+  duplicateDevis() {
+    this.displayDialog = true
+    this.emitDialogStatus(DialogStatus.Duplicate)
+  }
 
   deleteDevis() {
-    this.confirmationService.confirm({
-      message: 'Are you sure that you want to proceed?',
-      header: 'Confirmation',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.devisList = this.devisList.filter((devis) => {
-          return devis.reference != this.selectedDevisItem.reference
-        })
-        this.emitEventToChild(this.devisList[0])
-
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Confirmed',
-          detail: 'You have accepted',
-        })
-      },
-      reject: (type: any) => {
-        switch (type) {
-          case ConfirmEventType.REJECT:
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Rejected',
-              detail: 'You have rejected',
-            })
-            break
-          case ConfirmEventType.CANCEL:
-            this.messageService.add({
-              severity: 'warn',
-              summary: 'Cancelled',
-              detail: 'You have cancelled',
-            })
-            break
-        }
-      },
-    })
+    this.devisList = this.devisList.filter((devis) => {
+              return devis.id != this.selectedDevisItem.id
+      })
+     this.emitRowDeletedEvent(this.devisList[0])
+    // this._devisServiceProxy.deleteDevis(this.selectedDevisItem.id)
+    // this._devisServiceProxy.deleteDevis(3).subscribe((res: any) => {
+    //   console.log(res);
+    //   this.confirmDialogService.deleteConfirm({
+    //     acceptCallback: () => {
+    //       this.devisList = this.devisList.filter((devis) => {
+    //         return devis.reference != this.selectedDevisItem.reference
+    //       })
+    //       this.emitEventToChild(this.devisList[0])
+    //       this.toastService.info({ summary: 'Confirmed', detail: 'You have accepted'});
+    //     },
+  
+    //     rejectCallback: (type: any) => {
+    //       switch (type) {
+    //         case ConfirmEventType.REJECT:
+    //           this.toastService.error({ summary: 'Erreur', detail: 'une erreur s\'est produite lors de la suppression'});
+    //           break
+    //         case ConfirmEventType.CANCEL:
+    //           break
+    //       }
+    //     }
+    //   })
+    // })
+    
   }
 
   selectionChange(devisItem: DevisItem) {
     this.selectedDevisItem = devisItem
     this.calculateSummaryTotalHTAndTVA();
     this.emitNotificationSelectedDevisChanged(devisItem);
-  }
-
-  get getDateEcheance() {
-    return new Date()
   }
 
   calculateSummaryTotalHTAndTVA() {
@@ -354,4 +293,14 @@ export class FacturesComponent implements OnInit {
     
   }
  
+  //#region Api Calls
+  updateApiCall(clientId: number, devisStatut: DevisStatutEnum, detail) {
+  //  this._devisServiceProxy.updateByStatus(clientId, devisStatut).subscribe((res) => {
+  //    if(res) {
+  //     this._toastService.info({detail})
+  //     //Update list
+  //    }
+  //  })
+  }
+  //#endregion
 }

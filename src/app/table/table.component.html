@@ -30,7 +30,7 @@
 
                     <ng-container *ngSwitchDefault>
                         <td [colSpan]="colVar.colspan">
-                            {{rowData[colVar.field] }} {{colVar.suffix && ' ' + colVar.suffix}}
+                            {{colVar.format ? colVar.format(colMethod(rowData, colVar.field)) : colMethod(rowData, colVar.field)}} {{colVar.suffix && ' ' + colVar.suffix}}
                         </td>
                     </ng-container>
 

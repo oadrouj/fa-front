@@ -1,3 +1,7 @@
+:host>>>.p-button {
+    border: none;
+}
+
 .main {
     padding-right: .8rem;
     background: #f1f6ff;
@@ -80,7 +84,6 @@ i.pi-search {
 
 .filterBtn {
     max-height: 35px;
-    background-color: var(--orange-color);
     font-size: 1rem;
     padding: 0.5rem .8rem;
 }
@@ -100,7 +103,6 @@ i.pi-search {
 
 :host>>>#devisList .p-datatable .p-datatable-thead>tr>th {
     font-size: 0.85rem;
-    color: #2A95D1;
     padding-right: 0px;
     padding-left: 2px;
     text-align: center;
@@ -118,10 +120,6 @@ i.pi-search {
     font-size: 0.85rem;
     color: #898e99;
     text-align: center;
-}
-
-:host ::ng-deep #devisList .p-datatable .p-datatable-tbody>tr.p-highlight {
-    background: var(--light-orange-color);
 }
 
 
@@ -178,6 +176,15 @@ i.pi-search {
     font-weight: 400;
 }
 
+:host ::ng-deep .p-splitbutton button {
+    border: none;
+    background-color: var(--orange-color);
+}
+
+:host ::ng-deep .p-splitbutton button:hover {
+    background-color: var(--orange-color);
+}
+
 :host>>>.p-splitbutton .p-splitbutton-menubutton {
     width: 1.357rem;
 }
@@ -186,9 +193,7 @@ i.pi-search {
     font-size: 0.8rem;
 }
 
-:host ::ng-deep .p-splitbutton * {
-    background-color: var(--orange-color);
-}
+:host ::ng-deep .p-splitbutton * {}
 
 :host ::ng-deep .p-splitbutton-defaultbutton {
     padding: 8px;

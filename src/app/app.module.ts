@@ -64,6 +64,9 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 import {SkeletonModule} from 'primeng/skeleton';
 
 import { TableComponent } from './table/table.component';
+import { ToastService } from '@shared/services/toast.service';
+import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
+
 
 @NgModule({
   declarations: [
@@ -135,7 +138,7 @@ import { TableComponent } from './table/table.component';
     SkeletonModule,
     
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService, ToastService, ConfirmDialogService],
   entryComponents: [
     // tenants
     CreateTenantDialogComponent,

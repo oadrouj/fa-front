@@ -1,33 +1,49 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core'
 import {
-  FormBuilder,
-  Validators,
-  FormGroup,
-  FormArray,
-} from '@angular/forms'
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core'
+import { FormBuilder, Validators, FormGroup, FormArray } from '@angular/forms'
 import { DialogStatus } from '@shared/enums/DialogState.enum'
 import { DevisContentItem } from '@shared/models/DevisContentItem'
 import { DevisItem } from '@shared/models/DevisItem'
 import { ReferenceService } from '@shared/services/reference.service'
 import { LazyLoadEvent, MessageService } from 'primeng/api'
 import { Observable, Subscription } from 'rxjs'
-
+import { ToastService } from '@shared/services/toast.service'
+import {
+  ClientForAutoCompleteDto,
+  ClientForAutoCompleteDtoListResultDto,
+  ClientServiceProxy,
+  CreateDevisInput,
+  DevisItemDto,
+  DevisServiceProxy,
+  DevisStatutEnum,
+  UpdateDevisInput,
+} from '@shared/service-proxies/service-proxies'
+import * as moment from 'moment'
+import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
+import { DateHelper } from '@shared/helpers/DateHelper'
 @Component({
   selector: 'app-devis-dialog',
   templateUrl: './devis-dialog.component.html',
-  providers: [MessageService],
   styleUrls: ['./devis-dialog.component.css'],
+  providers: [ToastService],
 })
-
 export class DevisDialogComponent implements OnInit {
   constructor(
-    private messageService: MessageService,
     private formBuilder: FormBuilder,
-    private referenceService: ReferenceService,
+    private _referenceService: ReferenceService,
+    private toastService: ToastService,
+    private _devisServiceProxy: DevisServiceProxy,
+    private _clientServiceProxy: ClientServiceProxy,
   ) {}
 
-
   ngOnInit(): void {
+    
     this.initiateFormGroup()
     this.devisOptionsFormGroup = this.initiateDevisOptionsGroup()
     this.eventsSubscription = this.SelectDevisItemEvent.subscribe(
@@ -39,12 +55,14 @@ export class DevisDialogComponent implements OnInit {
     this.eventsSubscription = this.dialogStatusEvent.subscribe(
       (dialogStatus: DialogStatus) => {
         this.initiateSummaryValues()
+        document.body.style.overflow = 'hidden'
+
         switch (dialogStatus) {
           case DialogStatus.New:
-            this.initiateFormGroupForNewDevis();
+            this.getNewReference()
+            this.initiateFormGroupForNewDevis()
             this.dialogTitle = 'Nouveau'
-            this.devisItem = new DevisItem()
-            this.reference = this.getNewReference()
+            this.devisItem = null
             break
 
           case DialogStatus.Edit:
@@ -53,18 +71,22 @@ export class DevisDialogComponent implements OnInit {
             this.devisItem = this.selectedDevisItem
             this.reference = this.selectedDevisItem.reference
             this.setFormGroup()
-            this.devisOptionsFormGroup.get('remise').setValue(this.devisItem.remise)
-            this.calculateSummaryTotalHTAndTTC();
+            this.devisOptionsFormGroup
+              .get('remise')
+              .setValue(this.devisItem.remise)
+            this.calculateSummaryTotalHTAndTTC()
             break
 
           case DialogStatus.Duplicate:
+            this.getNewReference()
             this.initiateFormGroupWithTableControls()
             this.dialogTitle = 'Dupliquer'
             this.devisItem = this.selectedDevisItem
-            this.reference = this.getNewReference()
             this.setFormGroup()
-            this.devisOptionsFormGroup.get('remise').setValue(this.devisItem.remise)
-            this.calculateSummaryTotalHTAndTTC();
+            this.devisOptionsFormGroup
+              .get('remise')
+              .setValue(this.devisItem.remise)
+            this.calculateSummaryTotalHTAndTTC()
             break
           default:
             break
@@ -73,10 +95,14 @@ export class DevisDialogComponent implements OnInit {
     )
   }
 
-  @Input() visible = false
-  @Input() SelectDevisItemEvent = new Observable<DevisItem>()
+  //#region properties
+  title = 'Devis';
+  primaryColor = 'green';
+  secondaryColor = 'orange';
+  @Input() visible = false;
+  @Input() SelectDevisItemEvent = new Observable<DevisItem>();
   @Input() dialogStatusEvent!: Observable<DialogStatus>
-  @Input() clientAutoCompleteSearch: (_) => void
+  @Input() devisFormatReferenceNumber: (number) => string
   @Output() closeDialogEvent = new EventEmitter()
   formGroup!: FormGroup
   tableControl!: FormArray
@@ -84,13 +110,13 @@ export class DevisDialogComponent implements OnInit {
   eventsSubscription!: Subscription
   @ViewChild('frm') frm!: HTMLFormElement
   selectedDevisItem!: DevisItem
+  selectedClientId: number
   devisItem: DevisItem = new DevisItem()
   reference!: string
+  referenceCount!: number
   dialogTitle!: string
   Currency: string = 'MAD'
-  clientSuggestions !: string[]
-  autoCompleteText = ''
-  dateEmission!: Date
+  clientSuggestions!: ClientForAutoCompleteDto[]
   echeancePayementOptions = [30, 60, 90]
   echeancePayementSelected = this.echeancePayementOptions[0] || ''
   summaryTotalHT = 0
@@ -127,7 +153,6 @@ export class DevisDialogComponent implements OnInit {
       type: 'inputNumber',
       inputEvent: (rowIndex) => this.calculateRowTotalHTAndTTC(rowIndex),
     },
-    { header: 'TOTAL HT', field: 'total_ht', type: 'inputNumber' },
     {
       header: 'TVA',
       field: 'tva',
@@ -153,7 +178,10 @@ export class DevisDialogComponent implements OnInit {
     return this.getFromArrayControl.value as DevisContentItem[]
   }
 
-  initiateFormGroup(){
+  //#endregion
+
+  //#region FormGroups
+  initiateFormGroup() {
     this.formGroup = this.formBuilder.group({
       client: ['', Validators.required],
       date_emission: [new Date(), Validators.required],
@@ -180,7 +208,7 @@ export class DevisDialogComponent implements OnInit {
     })
   }
 
-  initiateFormGroupForNewDevis(){
+  initiateFormGroupForNewDevis() {
     this.formGroup = this.formBuilder.group({
       client: ['', Validators.required],
       date_emission: [new Date(), Validators.required],
@@ -211,7 +239,7 @@ export class DevisDialogComponent implements OnInit {
       pu: [0, Validators.required],
       tva: [20, Validators.required],
       total_ht: [0],
-      total_ttc: [0]
+      total_ttc: [0],
     })
   }
 
@@ -229,37 +257,48 @@ export class DevisDialogComponent implements OnInit {
     (this.formGroup.get('tableControl') as FormArray).controls = []
   }
 
-  closeDialog(){
-    this.closeDialogEvent.emit()
-    this.clearTableControl();
-    this.frm.nativeElement.classList.remove('submitted');
+  //#endregion
 
+  closeDialog() {
+    this.closeDialogEvent.emit()
+    this.clearTableControl()
+    this.frm.nativeElement.classList.remove('submitted')
+    document.body.style.overflow = 'auto'
   }
-  loadLazy(event: LazyLoadEvent) {}
 
   getNewReference() {
-    return this.referenceService.getReferenceFromReferenceNumber(10)
+    this._devisServiceProxy.getLastReference().subscribe((res: number) => {
+      this.referenceCount = res + 1; 
+      this.reference =  this.devisFormatReferenceNumber(this.referenceCount)
+    })
+  }
+
+  changeReference(){
+    this.referenceCount++;
+    this.reference =  this.devisFormatReferenceNumber(this.referenceCount)
+
   }
 
   addRow() {
-      this.getFromArrayControl.push(this.initiateTableForm())
-    
+    this.getFromArrayControl.push(this.initiateTableForm())
   }
 
   deleteRow(index: number) {
     const control = this.formGroup.get('tableControl') as FormArray
     control.removeAt(index)
-    this.RecalculateRows();
+    this.RecalculateRows()
   }
 
   autoCompleteSearch(event: any) {}
 
+  //#region Calculations
+
   calculateRowTotalHTAndTTC(rowIndex: number) {
     const row = this.getDevisContentItems[rowIndex]
     const total_ht = row.pu * row.quantite
-    let total_ttc = total_ht;
-    
-    if(this.devisOptionsFormGroup.get('tva').value) {
+    let total_ttc = total_ht
+
+    if (this.devisOptionsFormGroup.get('tva').value) {
       total_ttc = total_ht + (total_ht * row.tva) / 100
     }
 
@@ -270,9 +309,9 @@ export class DevisDialogComponent implements OnInit {
     this.calculateSummaryTotalHTAndTTC()
   }
 
-  RecalculateRows(){
+  RecalculateRows() {
     this.getDevisContentItems.forEach((_, index) => {
-      this.calculateRowTotalHTAndTTC(index);
+      this.calculateRowTotalHTAndTTC(index)
     })
   }
 
@@ -293,10 +332,13 @@ export class DevisDialogComponent implements OnInit {
       this.devisOptionsFormGroup.get('remise').value
   }
 
-  initiateSummaryValues(){
-    this.summaryTVA = 0;
-    this.summaryTotalHT = 0;
-    this.summaryTotalTTC = 0;
+  //#endregion
+
+  //#region Options
+  initiateSummaryValues() {
+    this.summaryTVA = 0
+    this.summaryTotalHT = 0
+    this.summaryTotalTTC = 0
   }
 
   toggleTVAOption(isChecked: boolean) {
@@ -311,8 +353,8 @@ export class DevisDialogComponent implements OnInit {
       })
     }
 
-    this.calculateSummaryTotalHTAndTTC();
-    this.RecalculateRows();
+    this.calculateSummaryTotalHTAndTTC()
+    this.RecalculateRows()
   }
 
   toggleRemiseOption(event: any) {
@@ -327,56 +369,148 @@ export class DevisDialogComponent implements OnInit {
     // this.devisOptions.remise.value = event.value
   }
 
-  warnService(detail: string) {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Attention',
-      detail,
-    })
-  }
+  //#endregion
 
-  errorService(detail: string) {
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Erreur',
-      detail,
-    })
-  }
+  //#region Crud operations
+  createApiCall(devisStatus: DevisStatutEnum) {
+    let formValue = this.formGroup.value
 
-  saveBrouillon(){
-    this.messageService.add({
-      severity: 'info',
+      let createDevisInput = new CreateDevisInput({
+        reference: this.referenceCount,
+        dateEmission:
+          DateHelper.initiateTimeFromDate(formValue.date_emission).getTime() ==
+          DateHelper.initiateTimeFromDate(moment()).getTime()
+            ? moment()
+            : moment(formValue.date_emission).add(1, 'days'),
+        echeancePaiement: formValue.echeance,
+        messageIntroduction: formValue.introduction,
+        piedDePage: formValue.pied_page,
+        remise: formValue.remise,
+        statut: devisStatus,
+        devisItems: formValue.tableControl.map(
+          (devisItem: DevisContentItem) => {
+            return new DevisItemDto({
+              description: devisItem.description,
+              date: moment(devisItem.date).add(1, 'days'),
+              quantity: devisItem.quantite,
+              unit: devisItem.unite,
+              unitPriceHT: devisItem.pu,
+              tva: devisItem.tva,
+              totalTtc: devisItem.total_ttc,
+            })
+          },
+        ),
+        clientId: this.selectedClientId,
+      })
+
+      console.log(createDevisInput)
+      this._devisServiceProxy
+        .createDevis(createDevisInput)
+        .subscribe((res) => console.log(res))
+      this.toastService.info({
+        summary: 'Confirmed',
+        detail: 'Vous avez ajouter ce devis en brouillon',
+      })
+  
+}
+
+  updateApiCall(devisStatus: DevisStatutEnum) {
+    let formValue = this.formGroup.value
+    let updateDevisInput = new UpdateDevisInput({
+      id: 3,
+      reference: this.referenceCount,
+      dateEmission:
+        DateHelper.initiateTimeFromDate(formValue.date_emission).getTime() ==
+        DateHelper.initiateTimeFromDate(moment()).getTime()
+          ? moment()
+          : moment(formValue.date_emission).add(1, 'days'),
+      echeancePaiement: formValue.echeance,
+      messageIntroduction: formValue.introduction,
+      piedDePage: formValue.pied_page,
+      remise: formValue.remise,
+      statut: devisStatus,
+      devisItems: formValue.tableControl.map(
+        (devisItem: DevisContentItem) => {
+          return new DevisItemDto({
+            description: devisItem.description,
+            date: moment(devisItem.date).add(1, 'days'),
+            quantity: devisItem.quantite,
+            unit: devisItem.unite,
+            unitPriceHT: devisItem.pu,
+            tva: devisItem.tva,
+            totalTtc: devisItem.total_ttc,
+          })
+        },
+      ),
+      clientId: this.selectedClientId,
+    })
+
+    this._devisServiceProxy
+      .updateDevis(updateDevisInput)
+      .subscribe((res) => console.log(res))
+    this.toastService.info({
       summary: 'Confirmed',
-      detail: 'You have accepted',
+      detail: 'Vous avez modifier ce devis en brouillon',
     })
+  }
+
+  clientAutoCompleteSearch(event: any) {
+    setTimeout(() => {
+      this._clientServiceProxy.getClientForAutoComplete(event.query)
+      .subscribe((res: ClientForAutoCompleteDtoListResultDto) => {
+        this.clientSuggestions = res.items
+    })
+    }, 500)
+}
+
+  onSelectClientAutoComplete(){
+    this.selectedClientId = this.formGroup.get('client').value['id']
+    console.log(this.selectedClientId)
+  }
+
+  saveBrouillon() {
+    if (this.devisItem == null) {
+      this.createApiCall(DevisStatutEnum.Cree);
+    } else {
+      this.updateApiCall(DevisStatutEnum.Cree);
+    }
   }
 
   validateDevis() {
-    this.frm.nativeElement.classList.add('submitted');
+    this.frm.nativeElement.classList.add('submitted')
     let controlsNames = []
     const conrtolsObj = {
       client: 'Client',
-      introduction: 'Message d\'introduction',
+      introduction: "Message d'introduction",
       pied_page: 'Pied de page',
       tableControl: 'Description',
-
     }
 
-    for(let control in this.formGroup.controls)
-    {
-      if(!this.formGroup.controls[control].valid)
+    for (let control in this.formGroup.controls) {
+      if (!this.formGroup.controls[control].valid)
         controlsNames = controlsNames.concat(conrtolsObj[control])
     }
-    
+
     if (this.formGroup.valid) {
-      console.log(JSON.stringify(this.formGroup.value))
-      
+     
+      if (this.devisItem == null) {
+        this.createApiCall(DevisStatutEnum.Valide);
+      } else {
+        this.updateApiCall(DevisStatutEnum.Valide);
+      }
+
     } else {
-      this.errorService('Veuillez remplir les chemps obligatoires: ' + controlsNames.join(', '))
+      this.toastService.error({
+        detail:
+          'Veuillez remplir les chemps obligatoires: ' +
+          controlsNames.join(', '),
+      })
     }
   }
 
-  previewDevis(){
-
-  }
+  //#endregion
+ 
+  previewDevis() {}
+  
+  
 }
