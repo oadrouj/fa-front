@@ -60,17 +60,14 @@ export class TableComponent implements OnInit {
 
     this.eventsSubscription = this.filterEvent.subscribe((res: any) => {
       if(res.type == 'filterByInput') {
-        
         if(this.isValidDate(res.value))
           this.table.filterGlobal(new Date(res.value), 'equals');
-
         else
           this.table.filterGlobal(res.value, 'contains');
-        
       }
       else {
         for(let item in res.value ) {
-          if(res.value[item] != '') {
+          // if(res.value[item]) {
             if(res.value[item] instanceof Date){
               this.table.filter(res.value[item], item, 'equals');
               console.log(res.value[item], item)
@@ -79,14 +76,10 @@ export class TableComponent implements OnInit {
               this.table.filter(res.value[item], item, 'contains');
 
             console.log(item, res.value[item])
-          }
+          // }
         }
       }
     })
-  }
-
-  log(input) {
-    console.log(input)
   }
 
   colMethod( rowData, field){

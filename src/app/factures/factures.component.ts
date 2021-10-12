@@ -76,14 +76,19 @@ export class FacturesComponent implements OnInit {
   tableSelectionColor = 'var(--light-orange-color)';
 
   searchText = ''
-  selectedClient = ''
+  selectedClient : ClientForAutoCompleteDto
   selectedDate !: Date
   selectedEcheance = ''
   selectedMontant = ''
-  selectedStatut = ''
+  selectedStatut : any
   clientSuggestions : ClientForAutoCompleteDto[]
   echeanceOptions = [15, 20, 30]
-  statutOptions = ['Créé', 'Validé', 'Converti', 'Expiré']
+  statutOptions = [
+    {value: 0, label: 'Créé'},
+    {value: 1, label: 'Validé'},
+    {value: 3, label: 'Converti'},
+    {value: 4, label: 'Rejeté'},
+    {value: 5, label: 'Expiré'} ]
   cols = [
     {
       header: 'REFERENCE',

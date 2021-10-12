@@ -25,12 +25,12 @@
                 </span>
 
                 <div class="flex align-items-center pt-4 filterContainer">
-                    <p-autoComplete [(ngModel)]="selectedClient" placeholder="Client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)" field="fullName"></p-autoComplete>
+                    <p-autoComplete [(ngModel)]="selectedClient" placeholder="Client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)" field="nom"></p-autoComplete>
                     <p-calendar [(ngModel)]="selectedDate" placeholder="Date"></p-calendar>
                     <p-inputNumber [(ngModel)]="selectedEcheance" placeholder="Echéance"></p-inputNumber>
                     <p-inputNumber [(ngModel)]="selectedMontant" placeholder="Montant"></p-inputNumber>
-                    <p-dropdown [options]="statutOptions" [(ngModel)]="selectedStatut" placeholder="Statut" [showClear]="false"></p-dropdown>
-                    <button pButton pRipple (click)="emitFilterEvent('filterByButton', $event.target.value)" class="filterBtn p-button-rounded  ml-2" [ngClass]="'bg-' + primaryColor" label="Filtrer" icon="pi pi-filter"></button>
+                    <p-dropdown [options]="statutOptions" [(ngModel)]="selectedStatut" placeholder="Statut" optionLabel="label" optionValue="value" [showClear]="false"></p-dropdown>
+                    <button pButton pRipple (click)="emitFilterEvent('filterByButton', null)" class="filterBtn p-button-rounded  ml-2" [ngClass]="'bg-' + primaryColor" label="Filtrer" icon="pi pi-filter"></button>
                 </div>
             </div>
 
@@ -47,7 +47,7 @@
         <div class="rightSection md:col-12 p-0">
             <div class="devis-details">
                 <div class="header flex justify-content-between">
-                    <p-splitButton class=" border-radius-6" [label]="formatStatut(selectedDevisItem.statut)" [model]="statusItems"></p-splitButton>
+                    <p-splitButton class=" border-radius-6" [label]="formatStatut(selectedDevisItem.statut)" [model]="getStatusOptions(this.selectedDevisItem.statut)"></p-splitButton>
                     <div class="flex">
                         <button pButton label="Télécharger" class="p-button-text"></button>
                         <button pButton label="Imprimer" class="p-button-text"></button>
@@ -178,5 +178,6 @@
 
 
 <!-- Dialog -->
-<app-devis-dialog [visible]="displayDialog" (closeDialogEvent)="displayDialog = false" [devisFormatReferenceNumber]="devisFormatReferenceNumber" [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()" [dialogStatusEvent]="dialogStatusEvent.asObservable()">
+<app-devis-dialog [visible]="displayDialog" (openDialogEvent)="displayDialog=true" (closeDialogEvent)="displayDialog = false" [devisFormatReferenceNumber]="devisFormatReferenceNumber" [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()"
+    [dialogStatusEvent]="dialogStatusEvent.asObservable()">
 </app-devis-dialog>

@@ -9,7 +9,7 @@ export class FakeService {
 
   data = [
     {
-      id: 1,
+      id: 4,
       reference: 4,
       client: {
         id: 1,
@@ -31,7 +31,7 @@ export class FakeService {
       montant_ttc : 0,
       contentItems: [
         {
-          description: 'Consultation1',
+          description: null,
           date: new Date('01/01/2021'),
           quantite: 8,
           unite: 'Heures',
@@ -40,21 +40,21 @@ export class FakeService {
           total_ht: 0,
           total_ttc: 0,
         },
-        {
-          description: 'Consultation2',
-          date: new Date('01/01/2021'),
-          quantite: 8,
-          unite: 'Heures',
-          pu: 100.0,
-          tva: 20,
-          total_ht: 0,
-          total_ttc: 0,
-        },
+        // {
+        //   description: 'Consultation2',
+        //   date: new Date('01/01/2021'),
+        //   quantite: 8,
+        //   unite: 'Heures',
+        //   pu: 100.0,
+        //   tva: 20,
+        //   total_ht: 0,
+        //   total_ttc: 0,
+        // },
       ],
     },
 
     {
-      id: 2,
+      id: 5,
       reference: 2,
       client: {
         id: 1,
@@ -89,7 +89,7 @@ export class FakeService {
     },
 
     {
-      id: 3,
+      id: 8,
       reference: 3,
       client: {
         id: 1,
@@ -124,7 +124,7 @@ export class FakeService {
     },
 
     {
-      id: 4,
+      id: 7,
       reference: 5,
       client: {
         id: 1,

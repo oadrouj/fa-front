@@ -1,26 +1,29 @@
-import { Component, OnInit } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import {DevisItem} from '../../shared/models/DevisItem'
-import {DialogStatus} from '../../shared/enums/DialogState.enum'
-import { GlobalEventsService } from '@shared/globalEventsService';
+import { Component, OnInit } from '@angular/core'
+import { BehaviorSubject, Subject } from 'rxjs'
+import { DevisItem } from '../../shared/models/DevisItem'
+import { DialogStatus } from '../../shared/enums/DialogState.enum'
+import { GlobalEventsService, ModificationStatusEnum } from '@shared/globalEventsService'
 import { ReferenceService } from '../../shared/services/reference.service'
-import { FakeService } from '@shared/services/fake.service';
-import { ClientForAutoCompleteDto, ClientForAutoCompleteDtoListResultDto, ClientServiceProxy, DevisServiceProxy, DevisStatutEnum } from '@shared/service-proxies/service-proxies';
-import {ReferencePrefix} from '@shared/enums/reference-prefix.enum'
-import * as moment from 'moment';
-import { DateHelper } from '@shared/helpers/DateHelper';
-import { ToastService } from '@shared/services/toast.service';
-
+import { FakeService } from '@shared/services/fake.service'
+import {
+  ClientForAutoCompleteDto,
+  ClientForAutoCompleteDtoListResultDto,
+  ClientServiceProxy,
+  DevisServiceProxy,
+  DevisStatutEnum,
+} from '@shared/service-proxies/service-proxies'
+import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
+import * as moment from 'moment'
+import { DateHelper } from '@shared/helpers/DateHelper'
+import { ToastService } from '@shared/services/toast.service'
+import { Moment } from 'moment'
 
 @Component({
   selector: 'app-devis',
   templateUrl: './devis.component.html',
-  styleUrls: ['./devis.component.css']
+  styleUrls: ['./devis.component.css'],
 })
-
 export class DevisComponent implements OnInit {
- 
- 
   constructor(
     private _globalEventsService: GlobalEventsService,
     private _referenceService: ReferenceService,
@@ -28,12 +31,12 @@ export class DevisComponent implements OnInit {
     private _devisServiceProxy: DevisServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
     private _toastService: ToastService,
-
-  ) { }
+  ) {}
 
   ngOnInit() {
-
-    this._globalEventsService.announcedThePageChangedColorSubject(`var(--${this.primaryColor}-color`);
+    this._globalEventsService.announcedThePageChangedColorSubject(
+      `var(--${this.primaryColor}-color`,
+    )
     this._fakeService.getData().subscribe((res: any) => {
       this.devisList = res
       this.selectedDevisItem = res[0]
@@ -41,49 +44,51 @@ export class DevisComponent implements OnInit {
 
     this.emitNotificationSelectedDevisChanged(this.selectedDevisItem)
     
-    this.devisList.forEach(
-      (devis: any) => {
-        devis.reference = this.devisFormatReferenceNumber(devis.reference)
-        console.log(devis.reference);
-        devis.contentItems = devis.contentItems.map(
-          (item: any) => {
-            let total_ht = item.pu * item.quantite;
-            return {
-               ...item, 
-               total_ttc: total_ht+ (item.tva * total_ht/100),
-               total_ht, 
-            }
-          },
-        )
+    this.devisList.forEach((devis: any) => {
+      devis.reference = this.devisFormatReferenceNumber(devis.reference)
+      console.log(devis.reference)
+      devis.contentItems = devis.contentItems.map((item: any) => {
+        let total_ht = item.pu * item.quantite
+        return {
+          ...item,
+          total_ttc: total_ht + (item.tva * total_ht) / 100,
+          total_ht,
+        }
+      })
 
-        devis.montant_ttc = devis.contentItems
+      devis.montant_ttc =
+        devis.contentItems
           .map((item) => item.total_ttc)
           .reduce((accum, current) => accum + current) - devis.remise
 
-        this.montantTTCAllDevis += devis.montant_ttc;
-        
-        }
-    )
+      this.montantTTCAllDevis += devis.montant_ttc
+    })
 
-    this.calculateSummaryTotalHTAndTVA();
+    this.calculateSummaryTotalHTAndTVA()
   }
 
   //#region Properties
-  title = 'Devis';
-  imageSrc = "assets/img/DevisLogo.png"
-  primaryColor = 'green';
+  title = 'Devis'
+  imageSrc = 'assets/img/DevisLogo.png'
+  primaryColor = 'green'
   secondaryColor = ''
-  tableSelectionColor = 'var(--light-green-color)';
+  tableSelectionColor = 'var(--light-green-color)'
 
-  searchText = ''
-  selectedClient = ''
-  selectedDate !: Date
-  selectedEcheance = ''
-  selectedMontant = ''
-  selectedStatut = ''
-  clientSuggestions : ClientForAutoCompleteDto[]
+  searchText = '' //TODO: rename this variable
+  selectedClient: any
+  selectedDate: Moment
+  selectedEcheance: number
+  selectedMontant: number
+  selectedStatut: DevisStatutEnum
+  clientSuggestions: ClientForAutoCompleteDto[]
   echeanceOptions = [15, 20, 30]
-  statutOptions = ['Créé', 'Validé', 'Converti', 'Expiré']
+  statutOptions = [
+    { value: DevisStatutEnum.Cree, label: 'Créé' },
+    { value: DevisStatutEnum.Valide, label: 'Validé' },
+    { value: DevisStatutEnum.Converti, label: 'Converti' },
+    { value: DevisStatutEnum.Rejete, label: 'Rejeté' },
+    { value: DevisStatutEnum.Expire, label: 'Expiré' },
+  ]
   cols = [
     {
       header: 'REFERENCE',
@@ -115,7 +120,7 @@ export class DevisComponent implements OnInit {
       header: 'STATUT',
       field: 'statut',
       type: 'text',
-      format: this.formatStatut
+      format: this.formatStatut,
     },
   ]
   DevisContentItemsCols = [
@@ -128,92 +133,136 @@ export class DevisComponent implements OnInit {
     { header: 'TVA', field: 'tva', type: 'pourcentage' },
     { header: 'TOTAL TTC', field: 'total_ttc', type: 'currency', colspan: 0 },
   ]
-  devisList : any
+  devisList: any
   statusItems = [
     {
-      label: 'Accepté', 
-      icon: 'pi pi-check', 
+      actualStatus: DevisStatutEnum.Valide,
+      label: 'Convertir',
+      icon: 'pi pi-check',
       command: () => {
-        this.updateApiCall(this.selectedDevisItem.client.id, DevisStatutEnum.Converti, 'Le devis est converti en facture')
-      }
+        
+        this.updateApiCall(
+          this.selectedDevisItem.id,
+          DevisStatutEnum.Converti,
+          'Le devis est converti en facture',
+        )
+      },
     },
     {
-      label: 'Rejeté', 
-      icon: 'pi pi-times', 
+      actualStatus: DevisStatutEnum.Valide,
+      label: 'Rejeter',
+      icon: 'pi pi-times',
       command: () => {
-        this.updateApiCall(this.selectedDevisItem.client.id, DevisStatutEnum.Converti, 'Le devis est rejeté')
-      }
+        this.updateApiCall(
+          this.selectedDevisItem.id,
+          DevisStatutEnum.Rejete,
+          'Le devis est rejeté',
+        )
+      },
+    },
+    {
+      actualStatus: DevisStatutEnum.Cree,
+      label: 'Valider',
+      icon: 'pi pi-check',
+      command: () => {
+        this.emitDialogStatus(DialogStatus.Edit)
+        this._globalEventsService.emitValidateDevisEvent(ModificationStatusEnum.Begin_Modification);
+        // this.updateApiCall(
+        //   this.selectedDevisItem.id,
+        //   DevisStatutEnum.Valide,
+        //   'Le devis est validé',
+        // )
+      },
     },
   ]
+
+  getStatusOptions(actualStatusInput: DevisStatutEnum) {
+    return this.statusItems.filter(
+      (item) => item.actualStatus == actualStatusInput,
+    )
+  }
+
   displayDialog = false
-  dialogState !:  DialogStatus
+  dialogState!: DialogStatus
   autoCompleteText = ''
   suggestions = []
   dateEmission = new Date()
   echeancePayementOptions = [30, 60, 90]
   echeancePayementSelected = this.echeancePayementOptions[0] || ''
   selectedDevisItem!: DevisItem
-  summaryTotalHT: number;
-  summaryTVA: number;
-  summaryTotalTTC: number;
-  montantTTCAllDevis: number = 0;
+  summaryTotalHT: number
+  summaryTVA: number
+  summaryTotalTTC: number
+  montantTTCAllDevis: number = 0
   Currency = 'MAD'
 
   //#endregion
 
-  formatStatut(statut?: DevisStatutEnum){
-      
-    switch(statut){
-      case DevisStatutEnum.Cree: return 'Brouillon';
-      case DevisStatutEnum.Valide: return 'Validé';
-      case DevisStatutEnum.Converti: return 'Convéeti';
-      case DevisStatutEnum.Expire: return 'Expiré';
+  formatStatut(statut?: DevisStatutEnum) {
+    switch (statut) {
+      case DevisStatutEnum.Cree:
+        return 'Brouillon'
+      case DevisStatutEnum.Valide:
+        return 'Validé'
+      case DevisStatutEnum.Converti:
+        return 'Convérti'
+      case DevisStatutEnum.Rejete:
+        return 'Rejeté'
+      case DevisStatutEnum.Expire:
+        return 'Expiré'
+        
     }
   }
-   getDateEcheance(dateEmission: Date, echeance: number) {
+
+  getDateEcheance(dateEmission: Date, echeance: number) {
     return moment(dateEmission).add(echeance, 'days').toDate()
-     
-   }
-  
+  }
+
   devisFormatReferenceNumber(reference: number) {
-    return this._referenceService.formatReferenceNumber(ReferencePrefix.Devis, reference)
+    return this._referenceService.formatReferenceNumber(
+      ReferencePrefix.Devis,
+      reference,
+    )
   }
 
   clientAutoCompleteSearch(event: any) {
-      setTimeout(() => {
-        this._clientServiceProxy.getClientForAutoComplete(event.query)
+    setTimeout(() => {
+      this._clientServiceProxy
+        .getClientForAutoComplete(event.query)
         .subscribe((res: ClientForAutoCompleteDtoListResultDto) => {
           this.clientSuggestions = res.items
-      })
-      }, 500)
+        })
+    }, 500)
   }
-  
+
+  // onSelectClientAutoComplete(){
+  //   this.selectedClientId = this.formGroup.get('client').value['id']
+  // }
+
   //#region events
-  filterSubject = new Subject<any>();
-  emitFilterEvent(filterType: string, value: any){
-    if(filterType == 'filterByInput') {
+  filterSubject = new Subject<any>()
+  emitFilterEvent(filterType: string, value: any) {
+    if (filterType == 'filterByInput') {
       setTimeout(() => {
         this.filterSubject.next({
-          type: 'filterByInput', 
-          value
+          type: 'filterByInput',
+          value,
         })
       }, 500)
-    }
-    
-    else if(filterType == 'filterByButton') 
+    } else if (filterType == 'filterByButton') {
       this.filterSubject.next({
         type: 'filterByButton',
         value: {
-          client: this.selectedClient,
-          date_emission: this.selectedDate,
-          echeance: this.selectedEcheance,
-          statut: this.selectedStatut,
-          montant_ttc: this.selectedMontant
-        }
+          client: (this.selectedClient && this.selectedClient.id) ?? -1,
+          date_emission: this.selectedDate ?? moment.unix(0),
+          echeance: this.selectedEcheance ?? -1,
+          statut: this.selectedStatut ?? -1,
+          montant_ttc: this.selectedMontant ?? -1,
+        },
       })
-    
+    }
   }
-
+  
   dialogStatusEvent = new Subject<DialogStatus>()
   emitDialogStatus(dialogStatus: DialogStatus) {
     this.dialogStatusEvent.next(dialogStatus)
@@ -229,12 +278,12 @@ export class DevisComponent implements OnInit {
     this.notifySelectedDevisChanged.next(deviItem)
   }
   //#endregion
-  
+
   newDevis() {
-    this.displayDialog = true;
-    this.emitDialogStatus(DialogStatus.New);
+    this.displayDialog = true
+    this.emitDialogStatus(DialogStatus.New)
   }
-  
+
   editDevis() {
     this.displayDialog = true
     this.emitDialogStatus(DialogStatus.Edit)
@@ -247,9 +296,9 @@ export class DevisComponent implements OnInit {
 
   deleteDevis() {
     this.devisList = this.devisList.filter((devis) => {
-              return devis.id != this.selectedDevisItem.id
-      })
-     this.emitRowDeletedEvent(this.devisList[0])
+      return devis.id != this.selectedDevisItem.id
+    })
+    this.emitRowDeletedEvent(this.devisList[0])
     // this._devisServiceProxy.deleteDevis(this.selectedDevisItem.id)
     // this._devisServiceProxy.deleteDevis(3).subscribe((res: any) => {
     //   console.log(res);
@@ -261,7 +310,7 @@ export class DevisComponent implements OnInit {
     //       this.emitEventToChild(this.devisList[0])
     //       this.toastService.info({ summary: 'Confirmed', detail: 'You have accepted'});
     //     },
-  
+
     //     rejectCallback: (type: any) => {
     //       switch (type) {
     //         case ConfirmEventType.REJECT:
@@ -273,13 +322,12 @@ export class DevisComponent implements OnInit {
     //     }
     //   })
     // })
-    
   }
 
   selectionChange(devisItem: DevisItem) {
     this.selectedDevisItem = devisItem
-    this.calculateSummaryTotalHTAndTVA();
-    this.emitNotificationSelectedDevisChanged(devisItem);
+    this.calculateSummaryTotalHTAndTVA()
+    this.emitNotificationSelectedDevisChanged(devisItem)
   }
 
   calculateSummaryTotalHTAndTVA() {
@@ -287,20 +335,31 @@ export class DevisComponent implements OnInit {
       .map((item) => item.total_ht)
       .reduce((accum, current) => accum + current)
 
-      this.summaryTVA = this.selectedDevisItem.contentItems
-        .map((item) => (item.total_ht * item.tva) / 100)
-        .reduce((accum, current) => accum + current)
-    
+    this.summaryTVA = this.selectedDevisItem.contentItems
+      .map((item) => (item.total_ht * item.tva) / 100)
+      .reduce((accum, current) => accum + current)
   }
- 
+
   //#region Api Calls
-  updateApiCall(clientId: number, devisStatut: DevisStatutEnum, detail) {
-  //  this._devisServiceProxy.updateByStatus(clientId, devisStatut).subscribe((res) => {
-  //    if(res) {
-  //     this._toastService.info({detail})
-  //     //Update list
-  //    }
-  //  })
+  updateApiCall(devisId: number, devisStatut: DevisStatutEnum, detail) {
+    this._devisServiceProxy
+      .changeDevisStatut(devisId, devisStatut)
+      .subscribe((res) => {
+        if (res) {
+          this._toastService.info({ detail })
+          this.selectedDevisItem = {...this.selectedDevisItem,
+            statut: devisStatut}
+            this.devisList.forEach(item => {
+                item.id == this.selectedDevisItem.id && (
+                  // console.log(item.id)
+                   item.statut = devisStatut
+              )
+            })
+            
+            console.log(this.selectedDevisItem)
+        }
+        //Update list 
+      })
   }
   //#endregion
 }

@@ -2,6 +2,7 @@ export enum DevisStatut {
     Cree,
     Valide,
     Converti,
-    Expire
+    Expire,
+    Rejete
 
 }

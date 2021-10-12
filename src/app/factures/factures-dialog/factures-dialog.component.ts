@@ -74,6 +74,7 @@ export class FacturesDialogComponent implements OnInit {
             this.devisOptionsFormGroup
               .get('remise')
               .setValue(this.devisItem.remise)
+            this.formGroup.get('client').setValue(this.devisItem.client)
             this.calculateSummaryTotalHTAndTTC()
             break
 
