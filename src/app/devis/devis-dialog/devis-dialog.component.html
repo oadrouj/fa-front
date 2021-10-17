@@ -14,7 +14,7 @@
             <div class="w-77 autoCompleteContainer border-bottom  flex justify-content-between align-items-end mt-4 pr-5">
                 <div>
                     <label for="" class="mb-3 block">Client</label>
-                    <p-autoComplete formControlName="client" class="autocomplete" placeholder="Sélectionner un client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)" field="nom">
+                    <p-autoComplete formControlName="client" class="autocomplete" placeholder="Sélectionner un client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)" (change)="onSelectClientAutoComplete()" field="nom">
                     </p-autoComplete>
                 </div>
                 <h2>{{title}}</h2>
@@ -39,7 +39,7 @@
                                     <p>Date d'émission</p>
                                 </div>
                                 <div class="col-7">
-                                    <p-calendar formControlName="date_emission" dateFormat="dd-mm-yy" icon="pi pi-calendar" [showIcon]="true">
+                                    <p-calendar formControlName="dateEmission" dateFormat="dd-mm-yy" icon="pi pi-calendar" [showIcon]="true">
                                     </p-calendar>
                                 </div>
                             </div>
@@ -48,11 +48,11 @@
                                     <p>Echéance de paiement</p>
                                 </div>
                                 <div class="col-7">
-                                    <p-dropdown [options]="echeancePayementOptions" formControlName="echeance" [showClear]="false">
+                                    <p-dropdown [options]="echeancePayementOptions" formControlName="echeancePaiement" [showClear]="false">
                                         {{!!echeancePayementSelected}}
                                         <ng-template pTemplate="selectedItem" *ngIf="echeancePayementSelected != ''" let-option>
                                             <div>
-                                                {{formGroup.get('echeance')!.value}} jours
+                                                {{formGroup.get('echeancePaiement')!.value}} jours
                                             </div>
                                         </ng-template>
                                         <ng-template pTemplate="item" let-option>
@@ -66,17 +66,17 @@
                             <div class="flex flex-column align-items-end">
                                 <div>
                                     <span>Message d'introduction</span>
-                                    <textarea pInputTextArea formControlName="introduction" class="mt-2" cols="40" rows="3"></textarea>
+                                    <textarea pInputTextArea formControlName="messageIntroduction" class="mt-2" cols="40" rows="3"></textarea>
                                 </div>
                                 <div class="mt-3">
                                     <span>Pied de page</span>
-                                    <textarea pInputTextArea formControlName="pied_page" class="mt-2" cols="40" rows="3"></textarea>
+                                    <textarea pInputTextArea formControlName="piedDePage" class="mt-2" cols="40" rows="3"></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div formArrayName="tableControl">
+                    <div formArrayName="devisItems">
                         <p-table #myTable [columns]="cols" [value]="getFromArrayControl.controls" [id]="'newDevis'" [scrollable]="true" [rows]="100" scrollHeight="250px" [virtualRowHeight]="40" [class]="'table'">
                             <ng-template pTemplate="header" let-columns>
                                 <tr>

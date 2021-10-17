@@ -910,7 +910,7 @@ export class DevisServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    createDevis(body: CreateDevisInput | undefined): Observable<boolean> {
+    createDevis(body: CreateDevisInput | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Devis/CreateDevis";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -933,14 +933,14 @@ export class DevisServiceProxy {
                 try {
                     return this.processCreateDevis(<any>response_);
                 } catch (e) {
-                    return <Observable<boolean>><any>_observableThrow(e);
+                    return <Observable<number>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<boolean>><any>_observableThrow(response_);
+                return <Observable<number>><any>_observableThrow(response_);
         }));
     }
 
-    protected processCreateDevis(response: HttpResponseBase): Observable<boolean> {
+    protected processCreateDevis(response: HttpResponseBase): Observable<number> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -959,7 +959,7 @@ export class DevisServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<boolean>(<any>null);
+        return _observableOf<number>(<any>null);
     }
 
     /**
@@ -1078,7 +1078,7 @@ export class DevisServiceProxy {
      * @param devisId (optional) 
      * @return Success
      */
-    deleteDevis(devisId: number | undefined): Observable<void> {
+    deleteDevis(devisId: number | undefined): Observable<boolean> {
         let url_ = this.baseUrl + "/api/services/app/Devis/DeleteDevis?";
         if (devisId === null)
             throw new Error("The parameter 'devisId' cannot be null.");
@@ -1090,6 +1090,7 @@ export class DevisServiceProxy {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "text/plain"
             })
         };
 
@@ -1100,14 +1101,14 @@ export class DevisServiceProxy {
                 try {
                     return this.processDeleteDevis(<any>response_);
                 } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
+                    return <Observable<boolean>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<void>><any>_observableThrow(response_);
+                return <Observable<boolean>><any>_observableThrow(response_);
         }));
     }
 
-    protected processDeleteDevis(response: HttpResponseBase): Observable<void> {
+    protected processDeleteDevis(response: HttpResponseBase): Observable<boolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1116,14 +1117,17 @@ export class DevisServiceProxy {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<void>(<any>null);
+        return _observableOf<boolean>(<any>null);
     }
 
     /**
@@ -1236,6 +1240,84 @@ export class DevisServiceProxy {
             }));
         }
         return _observableOf<boolean>(<any>null);
+    }
+
+    /**
+     * @param first (optional) 
+     * @param rows (optional) 
+     * @param globalFilter (optional) 
+     * @param sortField (optional) 
+     * @param sortOrder (optional) 
+     * @param filtres (optional) 
+     * @return Success
+     */
+    getAllDevis(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres: Filtre[] | null | undefined): Observable<DevisDtoListResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Devis/GetAllDevis?";
+        if (first === null)
+            throw new Error("The parameter 'first' cannot be null.");
+        else if (first !== undefined)
+            url_ += "First=" + encodeURIComponent("" + first) + "&";
+        if (rows === null)
+            throw new Error("The parameter 'rows' cannot be null.");
+        else if (rows !== undefined)
+            url_ += "Rows=" + encodeURIComponent("" + rows) + "&";
+        if (globalFilter !== undefined && globalFilter !== null)
+            url_ += "GlobalFilter=" + encodeURIComponent("" + globalFilter) + "&";
+        if (sortField !== undefined && sortField !== null)
+            url_ += "SortField=" + encodeURIComponent("" + sortField) + "&";
+        if (sortOrder !== undefined && sortOrder !== null)
+            url_ += "SortOrder=" + encodeURIComponent("" + sortOrder) + "&";
+        if (filtres !== undefined && filtres !== null)
+            filtres && filtres.forEach((item, index) => {
+                for (let attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "Filtres[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
+        			}
+            });
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllDevis(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllDevis(<any>response_);
+                } catch (e) {
+                    return <Observable<DevisDtoListResultDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<DevisDtoListResultDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAllDevis(response: HttpResponseBase): Observable<DevisDtoListResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = DevisDtoListResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<DevisDtoListResultDto>(<any>null);
     }
 }
 
@@ -3591,11 +3673,12 @@ export interface IUserDto {
 }
 
 export enum DevisStatutEnum {
-    Cree = 0,
-    Valide = 1,
-    Converti = 2,
-    Rejete = 3,
-    Expire = 4
+    Cree,
+    Valide,
+    Converti,
+    Rejete,
+    Expire,
+    Undefined
 }
 
 export class DevisItemDto implements IDevisItemDto {
@@ -4067,6 +4150,94 @@ export interface IDevisDto {
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
     id: number;
+}
+
+export class Filtre implements IFiltre {
+
+    constructor(data?: IFiltre) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+    }
+
+    static fromJS(data: any): Filtre {
+        data = typeof data === 'object' ? data : {};
+        let result = new Filtre();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        return data; 
+    }
+
+    clone(): Filtre {
+        const json = this.toJSON();
+        let result = new Filtre();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IFiltre {
+}
+
+export class DevisDtoListResultDto implements IDevisDtoListResultDto {
+    items: DevisDto[] | undefined;
+
+    constructor(data?: IDevisDtoListResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(DevisDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): DevisDtoListResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new DevisDtoListResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): DevisDtoListResultDto {
+        const json = this.toJSON();
+        let result = new DevisDtoListResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IDevisDtoListResultDto {
+    items: DevisDto[] | undefined;
 }
 
 export class CreateInfosEntrepriseInput implements ICreateInfosEntrepriseInput {
