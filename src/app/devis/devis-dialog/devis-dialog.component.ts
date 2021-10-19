@@ -22,8 +22,9 @@ import {
   DevisDto,
   DevisItemDto,
   DevisServiceProxy,
-  DevisStatutEnum,
   UpdateDevisInput,
+  DevisStatutEnum
+
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
@@ -60,11 +61,6 @@ export class DevisDialogComponent implements OnInit {
       },
     )
 
-    //TODO: remove this subscription
-    this.validateDevisStatut$.subscribe((res) => {
-      res && this.validateDevis(true)
-    })
-
     this.dialogStatusEvent.subscribe((dialogStatus: DialogStatus) => {
       this.initiateSummaryValues()
       this.visible && (document.body.style.overflow = 'hidden')
@@ -83,8 +79,8 @@ export class DevisDialogComponent implements OnInit {
           this.devisItem = this.selectedDevisItem
           this.referenceCount = this.selectedDevisItem.reference
           this.reference = this._referenceService.formatReferenceNumber(
-            ReferencePrefix.Devis,
             this.selectedDevisItem.reference,
+            ReferencePrefix.Devis,
           )
           this.setFormGroup()
           this.devisOptionsFormGroup
@@ -123,8 +119,6 @@ export class DevisDialogComponent implements OnInit {
   @Input() visible = false
   @Input() SelectDevisItemEvent = new Observable<DevisItem>()
   @Input() dialogStatusEvent!: Observable<DialogStatus>
-  @Input() validateDevisStatutEvent: any
-  @Input() validateDevisStatut$ = new Observable<ModificationStatusEnum>()
   @Input() devisFormatReferenceNumber: (number) => string
   @Output() openDialogEvent = new EventEmitter()
   @Output() closeDialogEvent = new EventEmitter()
@@ -134,7 +128,7 @@ export class DevisDialogComponent implements OnInit {
   devisOptionsFormGroup!: FormGroup
   eventsSubscription!: Subscription
   @ViewChild('frm') frm!: HTMLFormElement
-  selectedDevisItem!: DevisItem
+  selectedDevisItem!: any
   selectedClientId: number
   devisItem: any
   reference!: string
@@ -253,7 +247,7 @@ export class DevisDialogComponent implements OnInit {
     console.log(devisItems)
     this.formGroup.setValue({
       client: this.devisItem.client,
-      dateEmission: this.devisItem.dateEmission.toDate(),
+      dateEmission: this.devisItem.dateEmission,
       echeancePaiement: this.devisItem.echeancePaiement,
       messageIntroduction: this.devisItem.messageIntroduction,
       piedDePage: this.devisItem.piedDePage,
@@ -405,7 +399,7 @@ export class DevisDialogComponent implements OnInit {
     let formValue = this.formGroup.value
 
     let createDevisInput = new CreateDevisInput({
-      reference: this.referenceCount,
+      reference: this.referenceCount, 
       dateEmission:
         DateHelper.initiateTimeFromDate(formValue.dateEmission).getTime() ==
         DateHelper.initiateTimeFromDate(moment()).getTime()
@@ -419,7 +413,10 @@ export class DevisDialogComponent implements OnInit {
       devisItems: formValue.devisItems.map((devisItem: DevisContentItem) => {
         return new DevisItemDto({
           description: devisItem.description,
-          date: moment(devisItem.date).add(1, 'days'),
+          date: DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
+          DateHelper.initiateTimeFromDate(moment()).getTime()
+            ? moment()
+            : moment(devisItem.date).add(1, 'days'),
           quantity: devisItem.quantity,
           unit: devisItem.unit,
           unitPriceHT: devisItem.unitPriceHT,
@@ -455,14 +452,12 @@ export class DevisDialogComponent implements OnInit {
 
   updateApiCall(devisStatus: DevisStatutEnum) {
     let formValue = this.formGroup.value
+    console.log( this.selectedDevisItem.dateEmission)
     let updateDevisInput = new UpdateDevisInput({
       id: this.devisItem.id,
       reference: this.referenceCount,
-      dateEmission:
-        DateHelper.initiateTimeFromDate(formValue.dateEmission).getTime() ==
-        DateHelper.initiateTimeFromDate(moment()).getTime()
-          ? moment()
-          : moment(formValue.dateEmission).add(1, 'days'),
+      dateEmission: this.selectedDevisItem.dateEmission != formValue.dateEmission ?
+       moment(formValue.dateEmission).add(1, 'days') : moment(formValue.dateEmission),
       echeancePaiement: +formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
@@ -471,7 +466,10 @@ export class DevisDialogComponent implements OnInit {
       devisItems: formValue.devisItems.map((devisItem: DevisContentItem) => {
         return new DevisItemDto({
           description: devisItem.description,
-          date: moment(devisItem.date).add(1, 'days'),
+          date:  DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
+          DateHelper.initiateTimeFromDate(moment()).getTime()
+            ? moment()
+            : moment(devisItem.date).add(1, 'days'),
           quantity: devisItem.quantity,
           unit: devisItem.unit,
           unitPriceHT: devisItem.unitPriceHT,
@@ -602,8 +600,6 @@ export class DevisDialogComponent implements OnInit {
         result: { ...this.selectedDevisItem, statut: DevisStatutEnum.Valide },
       })),
     )
-    //
-    // this.globalEventsService.emitValidateDevisEvent(ModificationStatusEnum.Done_Modification)
   }
 
   updateByStatusApi(

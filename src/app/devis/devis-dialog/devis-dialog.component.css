@@ -185,3 +185,7 @@
 :host>>>.p-dialog #new-devis-header textarea {
     border: 1px solid #CED0DA;
 }
+
+:host>>>.p-dialog .p-datepicker {
+    top: -210px !important;
+}

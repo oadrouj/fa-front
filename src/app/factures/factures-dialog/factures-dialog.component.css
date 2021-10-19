@@ -1,3 +1,7 @@
+:host>>>.p-button {
+    border: none !important;
+}
+
 :host>>>.p-dialog-mask {
     z-index: 2040 !important;
 }
@@ -180,4 +184,8 @@
 :host>>>.p-dialog #new-devis-header .p-dropdown,
 :host>>>.p-dialog #new-devis-header textarea {
     border: 1px solid #CED0DA;
+}
+
+:host>>>.p-dialog .p-datepicker {
+    top: -210px !important;
 }

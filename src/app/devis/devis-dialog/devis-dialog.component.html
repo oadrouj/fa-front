@@ -1,5 +1,5 @@
 <p-toast [style]="{marginTop: 'marginTop'}" [baseZIndex]="2500" styleClass="styleClass"></p-toast>
-<p-dialog [(visible)]="visible" [style]="{'width': '100vw'}" [closable]="false">
+<p-dialog #dialog [(visible)]="visible" [style]="{'width': '100vw'}" [closable]="false">
     <ng-template pTemplate="header">
         <button pButton icon="pi pi-times" class="closeButton" (click)="closeDialog()"></button>
         <h2>{{dialogTitle}} {{title | lowercase}}</h2>
@@ -31,7 +31,7 @@
                                     <span>{{reference}}</span>
                                 </div>
                                 <div class="col text-center">
-                                    <button pButton label="Changer" (click)="changeReference()" class="color-green p-button-text"></button>
+                                    <button pButton label="Changer" (click)="changeReference()" class="p-button-text" [ngClass]="'color-' + primaryColor"></button>
                                 </div>
                             </div>
                             <div class="grid align-items-center">
@@ -141,12 +141,12 @@
                                     <div class="new-devis-summary text-right">
                                         <div class="grid my-1">
                                             <div class="col-7 color-gray"><span>TOTAL HT</span></div>
-                                            <div class="col-5 color-green"><span>{{summaryTotalHT | number:'1.2-2' }}
+                                            <div class="col-5" [ngClass]="'color-' + primaryColor"><span>{{summaryTotalHT | number:'1.2-2' }}
                                                     {{' ' + Currency}}</span></div>
                                         </div>
                                         <div class="grid my-1">
                                             <div class="col-7 color-gray"><span>REMISE</span></div>
-                                            <div class="col-5 color-green">
+                                            <div class="col-5 " [ngClass]="'color-' + primaryColor">
                                                 <span>
                                                     {{devisOptionsFormGroup.get('remise').value | number:'1.2-2' }}{{' ' + Currency}}
                                                 </span>
@@ -154,7 +154,7 @@
                                         </div>
                                         <div class="grid my-1">
                                             <div class="col-7 color-gray"><span>TVA</span></div>
-                                            <div class="col-5 color-green">
+                                            <div class="col-5 " [ngClass]="'color-' + primaryColor">
                                                 <span>
                                                     {{summaryTVA | number:'1.2-2' }} {{' ' + Currency}}
                                                 </span>
@@ -163,7 +163,7 @@
                                         <hr>
                                         <div class="grid">
                                             <div class="col-7 color-gray"><span>TOTAL ESTIME TTC</span></div>
-                                            <div class="col-5 color-green">
+                                            <div class="col-5" [ngClass]="'color-' + primaryColor">
                                                 <span>
                                                     {{summaryTotalTTC | number:'1.2-2' }} {{' ' + Currency}}
                                                 </span>
@@ -177,7 +177,7 @@
                 </div>
                 <div class="w-23" [formGroup]="devisOptionsFormGroup">
                     <p-accordion #acrd class="shadow-2">
-                        <div class="py-3 px-4 bg-white color-green">Options</div>
+                        <div class="py-3 px-4 bg-white " [ngClass]="'color-' + primaryColor">Options</div>
                         <p-accordionTab header="Remise" [selected]="false">
                             <p-toggleButton #tglBtn onLabel="Désactiver" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check" (onChange)="toggleRemiseOption($event)"></p-toggleButton>
                             <input pInputText *ngIf="tglBtn.checked" formControlName="remise" (input)="remiseValueChanged()" pKeyFilter="money" class="mt-2" />

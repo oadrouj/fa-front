@@ -8,7 +8,7 @@ export class ReferenceService {
 
 constructor() { }
 // const Prefex
-formatReferenceNumber(prefix: ReferencePrefix, number: number){
+formatReferenceNumber(number: number, prefix?: ReferencePrefix){
   let reference = number + "";
   while (reference.length < 5) reference = "0" + reference;
   return number == undefined || number == 0 ? "..." : prefix + reference;

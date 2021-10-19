@@ -1,9 +1,10 @@
-export enum DevisStatut {
+export enum DevisStatutEnum {
     Cree,
     Valide,
     Converti,
+    Rejete,
     Expire,
-    Rejete
+    Undefined
 
 }
 

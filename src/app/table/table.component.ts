@@ -6,7 +6,7 @@ import { DevisServiceProxy } from '@shared/service-proxies/service-proxies';
 import { ReferenceService } from '@shared/services/reference.service';
 import { FilterMatchMode, FilterService, LazyLoadEvent } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { Subscription, Observable } from 'rxjs';
+import { Subscription, Observable, zip, of } from 'rxjs';
 
 let test = 'purple';
 
@@ -21,7 +21,6 @@ export class TableComponent implements OnInit {
  static highlightColor: string = "";
   @Input() highlightColorInput : string;
   @Input() cols: any
-  @Input() tableData: any
   @Input() currency!: string
   @Input() styleClass!: string
   @Input() styleId!: string
@@ -31,11 +30,15 @@ export class TableComponent implements OnInit {
   @Input() rowDeletedEvent!: Observable<any>;
   @Input() filterEvent!: Observable<any>;
   @Input() SelectDevisItemEvent !: Observable<DevisItem>
+  @Input() getListDevisApi$: (event, data) => Observable<any>
   @ViewChild('tbl') table: Table
 
-  private eventsSubscription!: Subscription;
+  tableData: any
+  eventsSubscription!: Subscription;
   selectedItem!: any
   defaultRowToBeSelected : any
+  selectedDevis: any;
+  montantTotalAllDevis = 0;
   
   @HostBinding('style')
   get style() {
@@ -46,59 +49,26 @@ export class TableComponent implements OnInit {
 
   constructor(
     private sanitizer: DomSanitizer,
-    private _referenceService: ReferenceService,
-    private _devisServiceProxy: DevisServiceProxy,
+    public _referenceService: ReferenceService,
+    private _devisServiceProxy: DevisServiceProxy
   ) {}
 
   ngOnInit(): void {
     
-    
-    // this._devisServiceProxy
-    // .getAllDevis(0, 100, '', '', '', null)
-    // .subscribe((res) => {
-    //   this.tableData = [...res.items]
-    //   this.tableData.forEach((devis: any) => {
-    //     devis.devisItems = devis.devisItems.map((item: any) => {
-    //       let total_ht = item.unitPriceHT * item.quantity
-    //       return {
-    //         ...item,
-    //         totalTtc: total_ht + (item.tva * total_ht) / 100,
-    //       }
-    //     })
-    //     devis.montantTtc = devis.devisItems.map((item) => item.totalTtc)
-    //         .reduce((accum, current) => accum + current) - devis.remise
-        
-    //     // this.montantTTCAllDevis += devis.montantTtc
-    //   })
-      
-    //   this.tableData = this.tableData.map((item) => ({
-    //     ...item,
-    //     reference: this._referenceService.formatReferenceNumber(ReferencePrefix.Devis, item.reference),
-    //   }))
-
-    //   // this.calculateSummaryTotalHTAndTVA()
-    //   // this.emitNotificationSelectedDevisChanged({
-    //   //   ...this.devisList[0],
-    //   //   reference: this.devisList[0].reference
-    //   // })
-    // })
-    this.tableData = Array.from({length: 1000})
 
     this.eventsSubscription = this.SelectDevisItemEvent.subscribe(
       (devisItem: any) => {
         this.defaultRowToBeSelected = {
           ...devisItem,
-          reference: this._referenceService.formatReferenceNumber(ReferencePrefix.Devis, devisItem.reference),
-          rowId: 0
+          rowId: 0,
+          
         }
-        console.log('selected: ',  this.defaultRowToBeSelected)
       }
     ) 
 
     this.eventsSubscription = this.rowDeletedEvent.subscribe((res: any) =>  {
+      console.log(res)
       if(res && res.id) {
-        let index = this.tableData.findIndex((item: any) => item.id == res.id )
-        this.defaultRowToBeSelected = {...this.tableData[index], rowId: 0};
         this.selectionChange.emit({type: 'delete', result: res});
       
       }
@@ -133,7 +103,6 @@ export class TableComponent implements OnInit {
     else {
       return rowData[field]
     }
-   
   }
 
   isValidDate(dateString: string){
@@ -141,45 +110,24 @@ export class TableComponent implements OnInit {
   }
 
   onRowSelect(event: any) {
-    this.selectionChange.emit({type: 'selectionChanged', result: event.data.id})
-   
+    console.log(event.data)
+    this.selectionChange.emit({type: 'selectionChanged', result: event.data})
   }
-
+  
   loadTableLazy(event: LazyLoadEvent) {
       console.log(event);
-      // this.tableData && (this.tableData = [...this.tableData]);
-
-      this._devisServiceProxy
-      .getAllDevis(event.first, event.rows, '', '', '', null)
-      .subscribe((res) => {
-        Array.prototype.splice(this.tableData,event.first, event.rows, ...res.items);
-        this.tableData = [...res.items]
+      this.getListDevisApi$(event, this.tableData)
+        .subscribe((res) => {
+        this.tableData = Array.from({length: res.length})
+        this.tableData.splice(event.first, event.rows, ...res.items);
         this.tableData = [...this.tableData]
-        this.tableData.forEach((devis: any) => {
-          devis.devisItems = devis.devisItems.map((item: any) => {
-            let total_ht = item.unitPriceHT * item.quantity
-            return {
-              ...item,
-              totalTtc: total_ht + (item.tva * total_ht) / 100,
-            }
-          })
-          devis.montantTtc = devis.devisItems.map((item) => item.totalTtc)
-              .reduce((accum, current) => accum + current) - devis.remise
-          
-          // this.montantTTCAllDevis += devis.montantTtc
-        })
-        
-        this.tableData = this.tableData.map((item) => ({
-          ...item,
-          reference: this._referenceService.formatReferenceNumber(ReferencePrefix.Devis, item.reference),
-        }))
-
-        // this.calculateSummaryTotalHTAndTVA()
-        // this.emitNotificationSelectedDevisChanged({
-        //   ...this.devisList[0],
-        //   reference: this.devisList[0].reference
-        // })
-      })
-      
+        this.selectedDevis = this.tableData[0]
+        this.montantTotalAllDevis = res.montantTotalAllDevis
+        console.log(res.montantTotalAllDevis)
+        this.selectionChange.emit({type: 'selectionChanged', result: res.items[0]})
+      }) 
+     
     }
+    
 }
+ 

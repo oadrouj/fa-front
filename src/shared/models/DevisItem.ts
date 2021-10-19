@@ -1,4 +1,4 @@
-import { DevisStatutEnum } from "@shared/service-proxies/service-proxies"
+import {DevisStatutEnum} from '@shared/enums/DevisStatut.enum'
 import { DevisContentItem } from "./DevisContentItem"
 import { Client } from './Client'
 
