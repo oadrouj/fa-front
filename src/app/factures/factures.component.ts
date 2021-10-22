@@ -507,4 +507,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy  {
       }
     })
   }
+
+  
 }

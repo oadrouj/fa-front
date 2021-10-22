@@ -28,7 +28,8 @@ import {
   UpdateFactureInput,
   FactureStatutEnum,
   FactureServiceProxy,
-  FactureItemDto
+  FactureItemDto,
+  DevisStatutEnum
 
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
@@ -59,6 +60,7 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit, OnDestroy
     public globalEventsService: GlobalEventsService,
     private _convertDevisToFactureService: ConvertDevisToFactureService,
     private _router: Router,
+    private _devisServiceProxy: DevisServiceProxy,
    
   ) {}
     test = false;
@@ -593,10 +595,17 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   saveBrouillon() {
-    if (this.devisItem.isConverted || this.devisItem == null) {
+    if (this.devisItem.isConverted) {
       this.createApiCall(FactureStatutEnum.Cree)
       this._router.navigate(['/app/Factures'])
-    } else {
+      this.updateConvertedDevisStatus()
+      return;
+  }
+    if(this.devisItem == null) {
+      this.createApiCall(FactureStatutEnum.Cree)
+      return;
+    }
+     else {
       this.updateApiCall(FactureStatutEnum.Cree)
     }
   }
@@ -620,13 +629,19 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit, OnDestroy
     if (this.formGroup.valid) {
       if (isDevisStatusUpdate) {
         returnValue = this.validateStatusApi()
-
       } else {
-        if (this.devisItem == null || this.devisItem.isConverted) {
+        if (this.devisItem.isConverted) {
           this.createApiCall(FactureStatutEnum.Valide)
           this._router.navigate(['/app/Factures'])
-          
-        } else {
+          this.updateConvertedDevisStatus()
+          return;
+        } 
+
+        else if(this.devisItem == null) {
+          this.createApiCall(FactureStatutEnum.Valide)
+          return;
+        }
+        else {
           this.updateApiCall(FactureStatutEnum.Valide)
         }
       }
@@ -667,4 +682,18 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit, OnDestroy
   ) {
     return this._factureServiceProxy.changeFactureStatut(devisId, devisStatut)
   }
+
+  updateConvertedDevisStatus(){
+    this._devisServiceProxy
+    .changeDevisStatut(this.selectedDevisItem.id, DevisStatutEnum.Converti)
+    .subscribe((res) => {
+      if (res) { 
+        this.selectedDevisItem = {
+          ...this.selectedDevisItem,
+          statut:  DevisStatutEnum.Converti,
+        }
+      }
+    })
+  }
+  
 }
