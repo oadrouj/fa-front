@@ -35,7 +35,7 @@
             </div>
 
             <app-table #dt1 [cols]="cols" [currency]="Currency" [styleClass]="'table'" (selectionChange)="selectionChange($event)" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [rowDeletedEvent]="rowDeletedSubject.asObservable()" [filterEvent]="filterSubject.asObservable()"
-                [getListDevisApi$]="getListDevisApi$" [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()" [globalFilterFields]="['reference','client','dateEmission','echeancePaiement', 'montantTtc','statut']">
+                [getListDevisApi$]="getListDevisApi$" [SelectItemEvent]="notifySelectedDevisChanged.asObservable()" [globalFilterFields]="['reference','client','dateEmission','echeancePaiement', 'montantTtc','statut']">
             </app-table>
 
             <div class="devisTotal flex justify-content-between align-items-center w-100">
@@ -49,7 +49,7 @@
                 <div class="header flex justify-content-between">
                     <p-splitButton class=" border-radius-6" [label]="formatStatut(selectedDevisItem && selectedDevisItem.statut)" [model]="getStatusOptions()"> </p-splitButton>
                     <div class="flex">
-                        <button pButton label="Télécharger" class="p-button-text"></button>
+                        <button pButton label="Télécharger" (click)="downloadFacture()" class="p-button-text"></button>
                         <button pButton label="Imprimer" class="p-button-text"></button>
                         <button pButton label="Dupliquer" class="p-button-text" (click)="duplicateDevis()"></button>
                         <button pButton label="Modifier" class="p-button-text" (click)="editDevis()"></button>
@@ -62,7 +62,7 @@
                             <img src="assets/img/logo.png" alt="">
                         </div>
                         <div class="col-7 text-right">
-                            <h1>{{title}} {{selectedDevisItem && devisFormatReferenceNumber(selectedDevisItem.reference)}}</h1>
+                            <h1>{{title}} {{selectedDevisItem && factureFormatReferenceNumber(selectedDevisItem.reference)}}</h1>
                             <p class="date my-2">Date d'émission: {{selectedDevisItem && selectedDevisItem.dateEmission | date:'shortDate'}}
                             </p>
                             <p class="date my-1">
@@ -88,7 +88,7 @@
 
                 </div>
 
-                <p-table [columns]="DevisContentItemsCols" [value]="selectedDevisItem && selectedDevisItem.devisItems">
+                <p-table [columns]="DevisContentItemsCols" [value]="selectedDevisItem && selectedDevisItem.factureItems">
                     <ng-template pTemplate="header" let-yourColumnArrayVaraible>
                         <tr>
                             <ng-container *ngFor="let colVar of yourColumnArrayVaraible">
@@ -181,6 +181,6 @@
 
 
 <!-- Dialog -->
-<app-factures-dialog #devisDialog [visible]="displayDialog" (openDialogEvent)="displayDialog=true" (closeDialogEvent)="displayDialog = false" (crudOperationEvent)="crudOperationTreatment($event)" [devisFormatReferenceNumber]="devisFormatReferenceNumber"
+<app-factures-dialog #devisDialog [visible]="displayDialog" (openDialogEvent)="displayDialog=true" (closeDialogEvent)="displayDialog = false" (crudOperationEvent)="crudOperationTreatment($event)" [factureFormatReferenceNumber]="factureFormatReferenceNumber"
     [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()" [dialogStatusEvent]="dialogStatusEvent.asObservable()">
 </app-factures-dialog>

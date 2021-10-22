@@ -13,7 +13,7 @@ import {
   ClientForAutoCompleteDtoListResultDto,
   ClientServiceProxy,
   DevisServiceProxy,
-  DevisStatutEnum
+  DevisStatutEnum,
 } from '@shared/service-proxies/service-proxies'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
 import * as moment from 'moment'
@@ -25,13 +25,12 @@ import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 import { ConfirmEventType } from 'primeng/api'
 import { map } from 'rxjs/operators'
 import { TableComponent } from '@app/table/table.component'
-
+import { ConvertDevisToFactureService } from '@shared/services/ConvertDevisToFacture.service'
 
 @Component({
   selector: 'app-devis',
   templateUrl: './devis.component.html',
-  styleUrls: ['./devis.component.css']
-
+  styleUrls: ['./devis.component.css'],
 })
 export class DevisComponent implements OnInit, AfterViewInit {
   constructor(
@@ -42,23 +41,16 @@ export class DevisComponent implements OnInit, AfterViewInit {
     private _toastService: ToastService,
     private _confirmDialogService: ConfirmDialogService,
     public globalEventsService: GlobalEventsService,
+    private _convertDevisToFactureService: ConvertDevisToFactureService,
   ) {}
 
   ngOnInit() {
     this.globalEventsService.announcedThePageChangedColorSubject(
       `var(--${this.primaryColor}-color`,
     )
-
-  
   }
 
-  ngAfterViewInit(){
-    // this.tableChild.montantTotalAllDevis.subscribe(res => {
-    //   console.log(res)
-    //   this.montantTotalAllDevis = res
-    // })
-    
-  }
+  ngAfterViewInit() {}
 
   //#region Properties
   @ViewChild(DevisDialogComponent, { static: false })
@@ -90,18 +82,22 @@ export class DevisComponent implements OnInit, AfterViewInit {
       header: 'REFERENCE',
       field: 'reference',
       type: 'text',
-      format:(number) => this._referenceService.formatReferenceNumber(number, ReferencePrefix.Devis)
+      format: (number) =>
+        this._referenceService.formatReferenceNumber(
+          number,
+          ReferencePrefix.Devis,
+        ),
     },
     {
       header: 'CLIENT',
       field: 'client.nom',
-      type: 'text', 
+      type: 'text',
     },
     {
       header: 'DATE D’EMISSION',
       field: 'dateEmission',
       type: 'date',
-      format: (date) => date._i ? new Date(date._i) : new Date(date._d)
+      format: (date) => (date._i ? new Date(date._i) : new Date(date._d)),
     },
     {
       header: 'ECHEANCE',
@@ -137,11 +133,14 @@ export class DevisComponent implements OnInit, AfterViewInit {
       label: 'Convertir',
       icon: 'pi pi-check',
       command: () => {
-        this.updateApiCall(
-          this.selectedDevisItem.id,
-          DevisStatutEnum.Converti,
-          'Le devis est converti en facture',
-        )
+        this.showFactureDialog()
+        this.emitNotificationSelectedDevisChanged({
+          ...this.selectedDevisItem,
+          factureItems: this.selectedDevisItem.factureItems,
+          dateEmission : this.selectedDevisItem.dateEmission ?
+            new Date( this.selectedDevisItem.dateEmission._i) : new Date( this.selectedDevisItem.dateEmission._d)
+        })
+        this.emitDialogStatus(DialogStatus.New, 'facture', true)
       },
     },
     {
@@ -161,7 +160,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       label: 'Valider',
       icon: 'pi pi-check',
       command: () => {
-        this.emitDialogStatus(DialogStatus.Edit)
+        this.emitDialogStatus(DialogStatus.Edit, 'devis')
         this.child.validateDevis(true).subscribe((res) => {
           if (res.success) {
             this._toastService.info({ detail: 'Le devis est devient valide' })
@@ -260,9 +259,21 @@ export class DevisComponent implements OnInit, AfterViewInit {
     }
   }
 
-  dialogStatusEvent = new Subject<DialogStatus>()
-  emitDialogStatus(dialogStatus: DialogStatus) {
-    this.dialogStatusEvent.next(dialogStatus)
+  dialogStatusEvent = new Subject<{
+    statut: DialogStatus
+    dialogComponent
+    isConvertedDevis
+  }>()
+  emitDialogStatus(
+    dialogStatus: DialogStatus,
+    dialogComponent,
+    isConvertedDevis?,
+  ) {
+    this.dialogStatusEvent.next({
+      statut: dialogStatus,
+      dialogComponent,
+      isConvertedDevis,
+    })
   }
 
   rowDeletedSubject = new Subject<DevisItem>()
@@ -271,24 +282,24 @@ export class DevisComponent implements OnInit, AfterViewInit {
   }
 
   notifySelectedDevisChanged = new Subject<DevisItem>()
-  emitNotificationSelectedDevisChanged(deviItem: DevisItem) {
-    this.notifySelectedDevisChanged.next(deviItem)
+  emitNotificationSelectedDevisChanged(devisItem: DevisItem) {
+    this.notifySelectedDevisChanged.next(devisItem)
   }
   //#endregion
 
   newDevis() {
     this.displayDialog = true
-    this.emitDialogStatus(DialogStatus.New)
+    this.emitDialogStatus(DialogStatus.New, 'devis')
   }
 
   editDevis() {
     this.displayDialog = true
-    this.emitDialogStatus(DialogStatus.Edit)
+    this.emitDialogStatus(DialogStatus.Edit, 'devis')
   }
 
   duplicateDevis() {
     this.displayDialog = true
-    this.emitDialogStatus(DialogStatus.Duplicate)
+    this.emitDialogStatus(DialogStatus.Duplicate, 'devis')
   }
 
   deleteDevis() {
@@ -298,12 +309,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
           .deleteDevis(this.selectedDevisItem.id)
           .subscribe((res) => {
             if (res) {
-              this.tableChild.tableData =  this.tableChild.tableData.filter(
-                (devis) => !devis || (devis.id != this.selectedDevisItem.id) 
-                
+              this.tableChild.tableData = this.tableChild.tableData.filter(
+                (devis) => !devis || devis.id != this.selectedDevisItem.id,
               )
               this.montantTotalAllDevis -= this.selectedDevisItem.montantTtc
-              this.emitRowDeletedEvent( this.tableChild.tableData[0])
+              this.emitRowDeletedEvent(this.tableChild.tableData[0])
               this._toastService.info({
                 summary: 'Confirmed',
                 detail: 'You have accepted',
@@ -328,129 +338,167 @@ export class DevisComponent implements OnInit, AfterViewInit {
   }
 
   selectionChange(selectionEventObject) {
-    console.log(selectionEventObject)
     if (selectionEventObject.type == 'selectionChanged') {
       this.selectedDevisItem = selectionEventObject.result
-      
     } else if (selectionEventObject.type == 'delete') {
       this.selectedDevisItem = selectionEventObject.result
     }
     this.calculateSummaryTotalHTAndTVA()
     this.emitNotificationSelectedDevisChanged({
       ...this.selectedDevisItem,
-          
-          dateEmission : this.selectedDevisItem.dateEmission ?
-            new Date( this.selectedDevisItem.dateEmission._i) : new Date( this.selectedDevisItem.dateEmission._d)
+      dateEmission: this.selectedDevisItem.dateEmission
+        ? new Date(this.selectedDevisItem.dateEmission._i)
+        : new Date(this.selectedDevisItem.dateEmission._d),
     })
     this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis
   }
 
   calculateSummaryTotalHTAndTVA() {
-    if(this.selectedDevisItem){
+    if (this.selectedDevisItem) {
       this.summaryTotalHT = (this.selectedDevisItem as any).devisItems
-      .map((item) => item.unitPriceHT * item.quantity)
-      .reduce((accum, current) => accum + current)
-    this.summaryTVA = this.selectedDevisItem.devisItems
-      .map((item) => ((item.unitPriceHT * item.quantity) * item.tva) / 100)
-      .reduce((accum, current) => accum + current)
+        .map((item) => item.unitPriceHT * item.quantity)
+        .reduce((accum, current) => accum + current)
+      this.summaryTVA = this.selectedDevisItem.devisItems
+        .map((item) => (item.unitPriceHT * item.quantity * item.tva) / 100)
+        .reduce((accum, current) => accum + current)
     }
   }
 
   crudOperationTreatment(event) {
     if (event.crudOperation == 'create') {
       let newDevis = {
-        ...event.result, 
-        remise: 0
+        ...event.result,
+        remise: 0,
       }
       newDevis.devisItems = newDevis.devisItems.map((item: any) => {
-          let total_ht = item.unitPriceHT * item.quantity
-          return {
-            ...item,
-            totalTtc: total_ht + (item.tva * total_ht) / 100,
-          }
-        })
-        newDevis.montantTtc = newDevis.devisItems.map((item) => item.totalTtc)
-            .reduce((accum, current) => accum + current) - newDevis.remise
-        this.montantTotalAllDevis += newDevis.montantTtc
-   
-      this.tableChild.tableData = [...this.tableChild.tableData ,{...newDevis}]
-      this.tableChild.tableData.sort((a, b) => a.reference < b.reference ? 1 : -1)
-     
-      this.selectedDevisItem.devisItems.forEach(devisItem => devisItem.date = devisItem.date.toDate())
-      this.selectedDevisItem = {
-        ...newDevis, 
-      }
-      this.emitNotificationSelectedDevisChanged({
-        ...newDevis
-      })
-
-      
-    }
-    else if (event.crudOperation == 'update') {
-      console.log(this.selectedDevisItem.dateEmission)
-      this.selectedDevisItem = { 
-        ...event.result,
-        
-       }
-       
-      //Calculate total montant
-      this.selectedDevisItem.devisItems =  this.selectedDevisItem.devisItems.map((item: any) => {
         let total_ht = item.unitPriceHT * item.quantity
         return {
           ...item,
           totalTtc: total_ht + (item.tva * total_ht) / 100,
         }
       })
+      newDevis.montantTtc =
+        newDevis.devisItems
+          .map((item) => item.totalTtc)
+          .reduce((accum, current) => accum + current) - newDevis.remise
+      this.montantTotalAllDevis += newDevis.montantTtc
 
-      this.selectedDevisItem.montantTtc =  this.selectedDevisItem.devisItems.map((item) => item.totalTtc)
-          .reduce((accum, current) => accum + current) -  this.selectedDevisItem.remise
+      this.tableChild.tableData = [
+        ...this.tableChild.tableData,
+        { ...newDevis },
+      ]
+      this.tableChild.tableData.sort((a, b) =>
+        a.reference < b.reference ? 1 : -1,
+      )
 
-      this.selectedDevisItem = {...this.selectedDevisItem, dateEmission: this.selectedDevisItem.dateEmission.toDate() }
-      this.child.selectedDevisItem = { ...this.selectedDevisItem  }
-      let index = this.tableChild.tableData.findIndex(item =>  item.id == this.selectedDevisItem.id)
-      this.tableChild.tableData[index] = { ...this.selectedDevisItem, dateEmission: moment(this.selectedDevisItem.dateEmission) }
-      this.tableChild.tableData = [... this.tableChild.tableData]
-      
+      this.selectedDevisItem.devisItems.forEach(
+        (devisItem) => (devisItem.date = devisItem.date.toDate()),
+      )
+      this.selectedDevisItem = {
+        ...newDevis,
+        dateEmission: newDevis.dateEmission.toDate(),
+      }
+      this.emitNotificationSelectedDevisChanged({
+        ...this.selectedDevisItem,
+      })
+    } else if (event.crudOperation == 'update') {
+      this.selectedDevisItem = {
+        ...event.result,
+      }
+
+      //Calculate total montant
+      this.selectedDevisItem.devisItems = this.selectedDevisItem.devisItems.map(
+        (item: any) => {
+          let total_ht = item.unitPriceHT * item.quantity
+          return {
+            ...item,
+            totalTtc: total_ht + (item.tva * total_ht) / 100,
+          }
+        },
+      )
+
+      this.selectedDevisItem.montantTtc =
+        this.selectedDevisItem.devisItems
+          .map((item) => item.totalTtc)
+          .reduce((accum, current) => accum + current) -
+        this.selectedDevisItem.remise
+
+      this.selectedDevisItem = {
+        ...this.selectedDevisItem,
+        dateEmission: this.selectedDevisItem.dateEmission.toDate(),
+      }
+      this.child.selectedDevisItem = { ...this.selectedDevisItem }
+      let index = this.tableChild.tableData.findIndex(
+        (item) => item.id == this.selectedDevisItem.id,
+      )
+      this.tableChild.tableData[index] = {
+        ...this.selectedDevisItem,
+        dateEmission: moment(this.selectedDevisItem.dateEmission),
+      }
+      this.tableChild.tableData = [...this.tableChild.tableData]
     }
 
     this.calculateSummaryTotalHTAndTVA()
   }
 
   //#region Api Calls
-  getListDevisApi$(event, data){
+  getListDevisApi$(event, data) {
     return zip(
-      this._devisServiceProxy
-        .getAllDevisTotalRecords(0, 0, event.globalFilter, '', '', null), 
-      this._devisServiceProxy
-        .getAllDevis(event.first , event.rows, event.globalFilter, '', '', null),
-      this._devisServiceProxy
-       .getAllDevisMontantTotal(event.first , event.rows, event.globalFilter, '', '', null)
-    ).pipe(map(([length, res, montantTotalAllDevis]: any) => {
-      data = [...res.items]
-      data.forEach((devis: any) => {
-        devis.devisItems = devis.devisItems.map((item: any) => {
-          let total_ht = item.unitPriceHT * item.quantity
-          return {
-            ...item,
-            totalTtc: total_ht + (item.tva * total_ht) / 100,
-          }
+      this._devisServiceProxy.getAllDevisTotalRecords(
+        0,
+        0,
+        event.globalFilter,
+        '',
+        '',
+        null,
+      ),
+      this._devisServiceProxy.getAllDevis(
+        event.first,
+        event.rows,
+        event.globalFilter,
+        event.sortField,
+        event.sortOrder,
+        null,
+      ),
+      this._devisServiceProxy.getAllDevisMontantTotal(
+        event.first,
+        event.rows,
+        event.globalFilter,
+        '',
+        '',
+        null,
+      ),
+    ).pipe(
+      map(([length, res, montantTotalAllDevis]: any) => {
+        data = [...res.items]
+        data.forEach((devis: any) => {
+          devis.devisItems = devis.devisItems.map((item: any) => {
+            let total_ht = item.unitPriceHT * item.quantity
+            return {
+              ...item,
+              totalTtc: total_ht + (item.tva * total_ht) / 100,
+            }
+          })
+          devis.statut = moment().isAfter(
+            (devis.dateEmission as Moment).add(devis.echeancePaiement, 'days'),
+          )
+            ? DevisStatutEnum.Expire
+            : devis.statut
+
+          devis.montantTtc =
+            devis.devisItems
+              .map((item) => item.totalTtc)
+              .reduce((accum, current) => accum + current) - devis.remise
         })
-        devis.statut = moment().isAfter((devis.dateEmission as Moment).add(devis.echeancePaiement, 'days')) 
-          ? DevisStatutEnum.Expire : devis.statut
-        
-        devis.montantTtc = devis.devisItems.map((item) => item.totalTtc)
-            .reduce((accum, current) => accum + current) - devis.remise
-        
-      })
-      return {items: data, length, montantTotalAllDevis}
-      
-    }))
+        return { items: data, length, montantTotalAllDevis }
+      }),
+    )
   }
   updateApiCall(devisId: number, devisStatut: DevisStatutEnum, detail) {
     this._devisServiceProxy
       .changeDevisStatut(devisId, devisStatut)
       .subscribe((res) => {
-        if (res) { 
+        if (res) {
           this._toastService.info({ detail })
           this.selectedDevisItem = {
             ...this.selectedDevisItem,
@@ -462,6 +510,91 @@ export class DevisComponent implements OnInit, AfterViewInit {
         }
         //Update list
       })
+  }
+  //#endregion
+
+  //#region FactureDialog
+
+  dialogComponentShown = false
+
+  showFactureDialog() {
+    this.dialogComponentShown = true
+  }
+
+  factureFormatReferenceNumber(reference: number) {
+    return this._referenceService.formatReferenceNumber(
+      reference,
+      ReferencePrefix.Facture,
+    )
+  }
+
+  factureCrudOperationTreatment(event) {
+    if (event.crudOperation == 'create') {
+      let newDevis = {
+        ...event.result,
+        remise: 0,
+      }
+      newDevis.factureItems = newDevis.factureItems.map((item: any) => {
+        let total_ht = item.unitPriceHT * item.quantity
+        return {
+          ...item,
+          totalTtc: total_ht + (item.tva * total_ht) / 100,
+        }
+      })
+      newDevis.montantTtc =
+        newDevis.factureItems
+          .map((item) => item.totalTtc)
+          .reduce((accum, current) => accum + current) - newDevis.remise
+      this.montantTotalAllDevis += newDevis.montantTtc
+
+      // this.tableChild.tableData = [...this.tableChild.tableData ,{...newDevis}]
+      // this.tableChild.tableData.sort((a, b) => a.reference < b.reference ? 1 : -1)
+
+      // this.selectedDevisItem = {
+      //   ...newDevis,
+      //   dateEmission: newDevis.dateEmission.toDate()
+      // }
+      // this.emitNotificationSelectedDevisChanged({
+      //   ...this.selectedDevisItem
+      // })
+    } else if (event.crudOperation == 'update') {
+      this.selectedDevisItem = {
+        ...event.result,
+      }
+
+      //Calculate total montant
+      this.selectedDevisItem.factureItems = this.selectedDevisItem.factureItems.map(
+        (item: any) => {
+          let total_ht = item.unitPriceHT * item.quantity
+          return {
+            ...item,
+            totalTtc: total_ht + (item.tva * total_ht) / 100,
+          }
+        },
+      )
+
+      this.selectedDevisItem.montantTtc =
+        this.selectedDevisItem.factureItems
+          .map((item) => item.totalTtc)
+          .reduce((accum, current) => accum + current) -
+        this.selectedDevisItem.remise
+
+      this.selectedDevisItem = {
+        ...this.selectedDevisItem,
+        dateEmission: (this.selectedDevisItem.dateEmission as Moment).toDate(),
+      }
+      this.child.selectedDevisItem = { ...this.selectedDevisItem }
+      let index = this.tableChild.tableData.findIndex(
+        (item) => item.id == this.selectedDevisItem.id,
+      )
+      this.tableChild.tableData[index] = {
+        ...this.selectedDevisItem,
+        dateEmission: moment(this.selectedDevisItem.dateEmission),
+      }
+      this.tableChild.tableData = [...this.tableChild.tableData]
+    }
+
+    this.calculateSummaryTotalHTAndTVA()
   }
   //#endregion
 }

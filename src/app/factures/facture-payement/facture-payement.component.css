@@ -1,0 +1,57 @@
+
+
+form {
+    padding: 0 1.5rem 2rem 1.5rem;
+}
+
+:host>>>form .p-dropdown,
+:host>>>form .p-inputtext,
+:host>>>form .p-calendar {
+    width: 200px !important;
+}
+
+ .custom-dialog-header {
+    border-bottom: 0 none;
+    background: #ffffff;
+    color: #495057;
+    padding: 1.5rem;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    background: var(--orange-color);
+    color: #fff;
+    font-size: 1.2rem;
+    height: 58px;
+    align-items: center;
+    display: flex;
+    flex-shrink: 0;
+    justify-content: space-between;
+}
+
+.custom-dialog-header .custom-dialog-title {
+    font-weight: 600;
+    font-size: 1.45rem;
+}
+
+.custom-dialog-header .p-dialog-header-icons {
+    align-items: center;
+    display: flex;
+}
+
+.custom-dialog-header .p-dialog-header-icon {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    color: #fff;
+}
+
+form a {
+    background: #4C9D8A;
+    color: #fff;
+    text-align: center;
+    padding: 9px 20px;
+    border: none;
+    
+}
+

@@ -56,55 +56,55 @@ export class DevisDialogComponent implements OnInit {
 
     this.eventsSubscription = this.SelectDevisItemEvent.subscribe(
       (devisItem: DevisItem) => {
-        console.log(devisItem)
         this.selectedDevisItem = devisItem
       },
     )
 
-    this.dialogStatusEvent.subscribe((dialogStatus: DialogStatus) => {
-      this.initiateSummaryValues()
-      this.visible && (document.body.style.overflow = 'hidden')
-
-      switch (dialogStatus) {
-        case DialogStatus.New:
-          this.getNewReference()
-          this.initiateFormGroupForNewDevis()
-          this.dialogTitle = 'Nouveau'
-          this.devisItem = null
-          break
-
-        case DialogStatus.Edit:
-          this.initiateFormGroupWithTableControls()
-          this.dialogTitle = 'Modifier'
-          this.devisItem = this.selectedDevisItem
-          this.referenceCount = this.selectedDevisItem.reference
-          this.reference = this._referenceService.formatReferenceNumber(
-            this.selectedDevisItem.reference,
-            ReferencePrefix.Devis,
-          )
-          this.setFormGroup()
-          this.devisOptionsFormGroup
-            .get('remise')
-            .setValue(this.devisItem.remise)
-          this.calculateSummaryTotalHTAndTTC()
-          this.formGroup.get('client').setValue(this.devisItem.client)
-          console.log(this.formGroup.value)
-          break
-
-        case DialogStatus.Duplicate:
-          this.getNewReference()
-          this.initiateFormGroupWithTableControls()
-          this.dialogTitle = 'Dupliquer'
-          this.devisItem = this.selectedDevisItem
-          this.setFormGroup()
-          this.devisOptionsFormGroup
-            .get('remise')
-            .setValue(this.devisItem.remise)
-          this.calculateSummaryTotalHTAndTTC()
-          break
-
-        default:
-          break
+    this.dialogStatusEvent.subscribe(({statut, dialogComponent }) => {
+      if(dialogComponent == "devis"){
+        this.initiateSummaryValues()
+        this.visible && (document.body.style.overflow = 'hidden')
+  
+        switch (statut) {
+          case DialogStatus.New:
+            this.getNewReference()
+            this.initiateFormGroupForNewDevis()
+            this.dialogTitle = 'Nouveau'
+            this.devisItem = null
+            break
+  
+          case DialogStatus.Edit:
+            this.initiateFormGroupWithTableControls()
+            this.dialogTitle = 'Modifier'
+            this.devisItem = this.selectedDevisItem
+            this.referenceCount = this.selectedDevisItem.reference
+            this.reference = this._referenceService.formatReferenceNumber(
+              this.selectedDevisItem.reference,
+              ReferencePrefix.Devis,
+            )
+            this.setFormGroup()
+            this.devisOptionsFormGroup
+              .get('remise')
+              .setValue(this.devisItem.remise)
+            this.calculateSummaryTotalHTAndTTC()
+            this.formGroup.get('client').setValue(this.devisItem.client)
+            break
+  
+          case DialogStatus.Duplicate:
+            this.getNewReference()
+            this.initiateFormGroupWithTableControls()
+            this.dialogTitle = 'Dupliquer'
+            this.devisItem = this.selectedDevisItem
+            this.setFormGroup()
+            this.devisOptionsFormGroup
+              .get('remise')
+              .setValue(this.devisItem.remise)
+            this.calculateSummaryTotalHTAndTTC()
+            break
+  
+          default:
+            break
+        }
       }
     })
   }
@@ -118,7 +118,7 @@ export class DevisDialogComponent implements OnInit {
   secondaryColor = 'orange'
   @Input() visible = false
   @Input() SelectDevisItemEvent = new Observable<DevisItem>()
-  @Input() dialogStatusEvent!: Observable<DialogStatus>
+  @Input() dialogStatusEvent!: Observable<{statut: DialogStatus, dialogComponent }>
   @Input() devisFormatReferenceNumber: (number) => string
   @Output() openDialogEvent = new EventEmitter()
   @Output() closeDialogEvent = new EventEmitter()
@@ -244,7 +244,6 @@ export class DevisDialogComponent implements OnInit {
       date: item.date.toDate(),
     }))
 
-    console.log(devisItems)
     this.formGroup.setValue({
       client: this.devisItem.client,
       dateEmission: this.devisItem.dateEmission,
@@ -254,7 +253,6 @@ export class DevisDialogComponent implements OnInit {
       devisItems: devisItems,
     })
 
-    console.log(this.formGroup.value)
   }
 
   initiateTableForm() {
@@ -302,7 +300,6 @@ export class DevisDialogComponent implements OnInit {
   changeReference() {
     this.referenceCount++
     this.reference = this.devisFormatReferenceNumber(this.referenceCount)
-    console.log(this.referenceCount)
   }
 
   addRow() {
@@ -452,7 +449,6 @@ export class DevisDialogComponent implements OnInit {
 
   updateApiCall(devisStatus: DevisStatutEnum) {
     let formValue = this.formGroup.value
-    console.log( this.selectedDevisItem.dateEmission)
     let updateDevisInput = new UpdateDevisInput({
       id: this.devisItem.id,
       reference: this.referenceCount,
@@ -479,7 +475,6 @@ export class DevisDialogComponent implements OnInit {
       }),
       clientId: formValue.client.id,
     })
-    console.log(updateDevisInput)
     this._devisServiceProxy.updateDevis(updateDevisInput).subscribe((res) => {
       if (res) {
         if (this.selectedDevisItem.client.id != formValue.client.id) {
@@ -518,7 +513,6 @@ export class DevisDialogComponent implements OnInit {
       detail: 'Vous avez modifier ce devis en brouillon',
     })
 
-    console.log(updateDevisInput)
   }
 
   clientAutoCompleteSearch(event: any) {
@@ -527,14 +521,12 @@ export class DevisDialogComponent implements OnInit {
         .getClientForAutoComplete(event.query)
         .subscribe((res: ClientForAutoCompleteDtoListResultDto) => {
           this.clientSuggestions = res.items
-          console.log(res)
         })
     }, 500)
   }
 
   onSelectClientAutoComplete() {
     this.selectedClientId = this.formGroup.get('client').value['id']
-    console.log(this.formGroup.get('client').value)
   }
 
   saveBrouillon() {

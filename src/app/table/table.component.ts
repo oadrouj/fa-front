@@ -2,13 +2,12 @@ import { Component, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild 
 import { DomSanitizer } from '@angular/platform-browser';
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum';
 import { DevisItem } from '@shared/models/DevisItem';
-import { DevisServiceProxy } from '@shared/service-proxies/service-proxies';
+import { DevisServiceProxy, FactureServiceProxy } from '@shared/service-proxies/service-proxies';
 import { ReferenceService } from '@shared/services/reference.service';
 import { FilterMatchMode, FilterService, LazyLoadEvent } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { Subscription, Observable, zip, of } from 'rxjs';
 
-let test = 'purple';
 
 @Component({
   selector: 'app-table',
@@ -29,7 +28,7 @@ export class TableComponent implements OnInit {
   @Output() selectionChange = new EventEmitter<any>()
   @Input() rowDeletedEvent!: Observable<any>;
   @Input() filterEvent!: Observable<any>;
-  @Input() SelectDevisItemEvent !: Observable<DevisItem>
+  @Input() SelectItemEvent !: Observable<any>
   @Input() getListDevisApi$: (event, data) => Observable<any>
   @ViewChild('tbl') table: Table
 
@@ -50,13 +49,14 @@ export class TableComponent implements OnInit {
   constructor(
     private sanitizer: DomSanitizer,
     public _referenceService: ReferenceService,
-    private _devisServiceProxy: DevisServiceProxy
+    private _devisServiceProxy: DevisServiceProxy,
+    private _factureServiceProxy: FactureServiceProxy,
   ) {}
 
   ngOnInit(): void {
     
 
-    this.eventsSubscription = this.SelectDevisItemEvent.subscribe(
+    this.eventsSubscription = this.SelectItemEvent.subscribe(
       (devisItem: any) => {
         this.defaultRowToBeSelected = {
           ...devisItem,
@@ -67,7 +67,6 @@ export class TableComponent implements OnInit {
     ) 
 
     this.eventsSubscription = this.rowDeletedEvent.subscribe((res: any) =>  {
-      console.log(res)
       if(res && res.id) {
         this.selectionChange.emit({type: 'delete', result: res});
       
@@ -85,7 +84,6 @@ export class TableComponent implements OnInit {
         for(let item in res.value ) {
             if(res.value[item] instanceof Date){
               this.table.filter(res.value[item], item, 'equals');
-              console.log(res.value[item], item)
             }
             else
               this.table.filter(res.value[item], item, 'contains');
@@ -110,7 +108,6 @@ export class TableComponent implements OnInit {
   }
 
   onRowSelect(event: any) {
-    console.log(event.data)
     this.selectionChange.emit({type: 'selectionChanged', result: event.data})
   }
   
@@ -123,7 +120,6 @@ export class TableComponent implements OnInit {
         this.tableData = [...this.tableData]
         this.selectedDevis = this.tableData[0]
         this.montantTotalAllDevis = res.montantTotalAllDevis
-        console.log(res.montantTotalAllDevis)
         this.selectionChange.emit({type: 'selectionChanged', result: res.items[0]})
       }) 
      

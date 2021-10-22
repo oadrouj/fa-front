@@ -1,11 +1,12 @@
+
+import { Moment } from "moment"
+
 export class FactureContentItem {
     description!: string
-    date!: Date
-    quantite!: number
-    unite!: string
-    pu!: number 
+    date!: Moment
+    quantity!: number
+    unit!: string
+    unitPriceHT!: number 
     tva!: number
-    total_ttc!: number
-    total_ht!: number
+    totalTtc!: number
 }
-

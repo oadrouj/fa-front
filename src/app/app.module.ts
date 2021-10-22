@@ -66,6 +66,8 @@ import {SkeletonModule} from 'primeng/skeleton';
 import { TableComponent } from './table/table.component';
 import { ToastService } from '@shared/services/toast.service';
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
+import {DynamicDialogModule} from 'primeng/dynamicdialog';
+import { FacturePayementComponent } from './factures/facture-payement/facture-payement.component';
 
 
 @NgModule({
@@ -103,6 +105,7 @@ import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
     FacturesDialogComponent,
     DevisDialogComponent,
     TableComponent,
+    FacturePayementComponent,
 
   ],
   imports: [
@@ -136,6 +139,7 @@ import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
     AccordionModule,
     ToggleButtonModule,
     SkeletonModule,
+    DynamicDialogModule,
     
   ],
   providers: [MessageService, ConfirmationService, ToastService, ConfirmDialogService],

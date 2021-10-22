@@ -1,7 +1,9 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   Output,
   ViewChild,
@@ -10,6 +12,7 @@ import { FormBuilder, Validators, FormGroup, FormArray } from '@angular/forms'
 import { DialogStatus } from '@shared/enums/DialogState.enum'
 import { DevisContentItem } from '@shared/models/DevisContentItem'
 import { DevisItem } from '@shared/models/DevisItem'
+import { FactureContentItem } from '@shared/models/FactureContentItem'
 import { ReferenceService } from '@shared/services/reference.service'
 import { LazyLoadEvent, MessageService } from 'primeng/api'
 import { BehaviorSubject, Observable, of, Subscription } from 'rxjs'
@@ -18,12 +21,14 @@ import {
   ClientForAutoCompleteDto,
   ClientForAutoCompleteDtoListResultDto,
   ClientServiceProxy,
-  CreateDevisInput,
+  CreateFactureInput,
   DevisDto,
   DevisItemDto,
   DevisServiceProxy,
-  UpdateDevisInput,
-  DevisStatutEnum
+  UpdateFactureInput,
+  FactureStatutEnum,
+  FactureServiceProxy,
+  FactureItemDto
 
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
@@ -34,6 +39,9 @@ import {
   ModificationStatusEnum,
 } from '@shared/globalEventsService'
 import { map } from 'rxjs/operators'
+import { ConvertDevisToFactureService } from '@shared/services/ConvertDevisToFacture.service'
+import { Router } from '@angular/router'
+
 @Component({
   selector: 'app-factures-dialog',
   templateUrl: './factures-dialog.component.html',
@@ -41,86 +49,138 @@ import { map } from 'rxjs/operators'
   providers: [ToastService],
 })
 
-export class FacturesDialogComponent implements OnInit {
+export class FacturesDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private _referenceService: ReferenceService,
     private toastService: ToastService,
-    private _devisServiceProxy: DevisServiceProxy,
+    private _factureServiceProxy: FactureServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
     public globalEventsService: GlobalEventsService,
+    private _convertDevisToFactureService: ConvertDevisToFactureService,
+    private _router: Router,
+   
   ) {}
-
-  ngOnInit(): void {
+    test = false;
+  ngOnInit() {
     this.initiateFormGroup()
     this.devisOptionsFormGroup = this.initiateDevisOptionsGroup()
 
+        // this.initiateFormGroupWithTableControls()
+        // this.initiateSummaryValues()
+        // this.dialogTitle = 'Nouveau'
+        // this.getNewReference()
+        // this.devisItem = {...res}
+        // this.setFormGroup()
+        // this.devisOptionsFormGroup
+        //   .get('remise')
+        //   .setValue(this.devisItem.remise)
+        // this.calculateSummaryTotalHTAndTTC()
+        // this.formGroup.get('client').setValue(this.devisItem.client)
+      
+   
+  
+
     this.eventsSubscription = this.SelectDevisItemEvent.subscribe(
-      (devisItem: DevisItem) => {
-        console.log(devisItem)
-        this.selectedDevisItem = devisItem
-      },
+      (devisItem: any) => {
+        this.selectedDevisItem = {
+          ...devisItem
+        }
+          // dateEmission: this.selectedDevisItem.dateEmission.toDate()}
+        
+      }
     )
 
-    this.dialogStatusEvent.subscribe((dialogStatus: DialogStatus) => {
-      this.initiateSummaryValues()
-      this.visible && (document.body.style.overflow = 'hidden')
+    this.dialogStatusEvent.subscribe(({statut, dialogComponent, isConvertedDevis }) => {
+      if(dialogComponent == "facture"){
+        this.visibleSelf = this.visible;
+        this.initiateSummaryValues()
+        this.visible && (document.body.style.overflow = 'hidden')
+  
+        switch (statut) {
+          case DialogStatus.New:
+            if(isConvertedDevis){
+              this.getNewReference()
+              this.initiateFormGroupForNewDevis()
+              this.dialogTitle = 'Nouveau'
+              this.devisItem = {
+                ...this.selectedDevisItem,
+                factureItems: this.selectedDevisItem.devisItems,
+                isConverted: true
+              }
 
-      switch (dialogStatus) {
-        case DialogStatus.New:
-          this.getNewReference()
-          this.initiateFormGroupForNewDevis()
-          this.dialogTitle = 'Nouveau'
-          this.devisItem = null
-          break
-
-        case DialogStatus.Edit:
-          this.initiateFormGroupWithTableControls()
-          this.dialogTitle = 'Modifier'
-          this.devisItem = this.selectedDevisItem
-          this.referenceCount = this.selectedDevisItem.reference
-          this.reference = this._referenceService.formatReferenceNumber(
-            this.selectedDevisItem.reference,
-            ReferencePrefix.Devis,
-          )
-          this.setFormGroup()
-          this.devisOptionsFormGroup
-            .get('remise')
-            .setValue(this.devisItem.remise)
-          this.calculateSummaryTotalHTAndTTC()
-          this.formGroup.get('client').setValue(this.devisItem.client)
-          console.log(this.formGroup.value)
-          break
-
-        case DialogStatus.Duplicate:
-          this.getNewReference()
-          this.initiateFormGroupWithTableControls()
-          this.dialogTitle = 'Dupliquer'
-          this.devisItem = this.selectedDevisItem
-          this.setFormGroup()
-          this.devisOptionsFormGroup
-            .get('remise')
-            .setValue(this.devisItem.remise)
-          this.calculateSummaryTotalHTAndTTC()
-          break
-
-        default:
-          break
+              this.setFormGroup()
+              this.devisOptionsFormGroup
+                .get('remise')
+                .setValue(this.devisItem.remise)
+              this.calculateSummaryTotalHTAndTTC()
+              this.formGroup.get('client').setValue(this.devisItem.client)
+              // this.devisItem = null
+            }
+            
+            else{
+              this.getNewReference()
+              this.initiateFormGroupForNewDevis()
+              this.dialogTitle = 'Nouveau'
+              this.devisItem = null
+            }
+           
+            break
+  
+          case DialogStatus.Edit:
+            this.initiateFormGroupWithTableControls()
+            this.dialogTitle = 'Modifier'
+            this.devisItem = this.selectedDevisItem
+            this.referenceCount = this.selectedDevisItem.reference
+            this.reference = this._referenceService.formatReferenceNumber(
+              this.selectedDevisItem.reference,
+              ReferencePrefix.Facture,
+            )
+            this.setFormGroup()
+            this.devisOptionsFormGroup
+              .get('remise')
+              .setValue(this.devisItem.remise)
+            this.calculateSummaryTotalHTAndTTC()
+            this.formGroup.get('client').setValue(this.devisItem.client)
+            break
+  
+          case DialogStatus.Duplicate:
+            this.getNewReference()
+            this.initiateFormGroupWithTableControls()
+            this.dialogTitle = 'Dupliquer'
+            this.devisItem = this.selectedDevisItem
+            this.setFormGroup()
+            this.devisOptionsFormGroup
+              .get('remise')
+              .setValue(this.devisItem.remise)
+            this.calculateSummaryTotalHTAndTTC()
+            break
+  
+          default:
+            break
+        }
       }
     })
+
+    
   }
 
+  ngAfterViewInit(){
+   
+  }
+  ngOnDestroy(): void {
+    
+  }
   //#region properties
-  validateDevisSubject = new BehaviorSubject<ModificationStatusEnum>(
-    ModificationStatusEnum.No_Modification,
-  )
+
   title = 'Facture'
   primaryColor = 'orange'
   secondaryColor = 'secondary-green'
   @Input() visible = false
-  @Input() SelectDevisItemEvent = new Observable<DevisItem>()
-  @Input() dialogStatusEvent!: Observable<DialogStatus>
-  @Input() devisFormatReferenceNumber: (number) => string
+  visibleSelf
+  @Input() SelectDevisItemEvent = new Observable<any>()
+  @Input() dialogStatusEvent!: Observable<{statut: DialogStatus, dialogComponent, isConvertedDevis }>
+  @Input() factureFormatReferenceNumber: (number) => string
   @Output() openDialogEvent = new EventEmitter()
   @Output() closeDialogEvent = new EventEmitter()
   @Output() crudOperationEvent = new EventEmitter()
@@ -190,12 +250,12 @@ export class FacturesDialogComponent implements OnInit {
   ]
 
   get getFromArrayControl() {
-    const control = this.formGroup.get('devisItems') as FormArray
+    const control = this.formGroup.get('factureItems') as FormArray
     return control
   }
 
-  get getDevisContentItems() {
-    return this.getFromArrayControl.value as DevisContentItem[]
+  get getFactureContentItems() {
+    return this.getFromArrayControl.value as FactureContentItem[]
   }
 
   //#endregion
@@ -208,13 +268,13 @@ export class FacturesDialogComponent implements OnInit {
       echeancePaiement: ['30', Validators.required],
       messageIntroduction: ['', Validators.required],
       piedDePage: ['', Validators.required],
-      devisItems: this.formBuilder.array([]),
+      factureItems: this.formBuilder.array([]),
     })
   }
 
   initiateFormGroupWithTableControls() {
     const length = this.selectedDevisItem
-      ? this.selectedDevisItem.devisItems.length
+      ? this.selectedDevisItem.factureItems.length
       : 1
     this.formGroup = this.formBuilder.group({
       client: ['', Validators.required],
@@ -222,7 +282,7 @@ export class FacturesDialogComponent implements OnInit {
       echeancePaiement: ['30', Validators.required],
       messageIntroduction: ['', Validators.required],
       piedDePage: ['', Validators.required],
-      devisItems: this.formBuilder.array(
+      factureItems: this.formBuilder.array(
         Array.from({ length }).fill(this.initiateTableForm()),
       ),
     })
@@ -235,27 +295,25 @@ export class FacturesDialogComponent implements OnInit {
       echeancePaiement: ['30', Validators.required],
       messageIntroduction: ['', Validators.required],
       piedDePage: ['', Validators.required],
-      devisItems: this.formBuilder.array([this.initiateTableForm()]),
+      factureItems: this.formBuilder.array([this.initiateTableForm()]),
     })
   }
 
   setFormGroup() {
-    let devisItems = this.devisItem.devisItems.map((item: any) => ({
+    let factureItems = this.devisItem.factureItems.map((item: any) => ({
       ...item,
       date: item.date.toDate(),
     }))
 
-    console.log(devisItems)
     this.formGroup.setValue({
       client: this.devisItem.client,
       dateEmission: this.devisItem.dateEmission,
       echeancePaiement: this.devisItem.echeancePaiement,
       messageIntroduction: this.devisItem.messageIntroduction,
       piedDePage: this.devisItem.piedDePage,
-      devisItems: devisItems,
+      factureItems: factureItems,
     })
 
-    console.log(this.formGroup.value)
   }
 
   initiateTableForm() {
@@ -281,7 +339,7 @@ export class FacturesDialogComponent implements OnInit {
   }
 
   private clearTableControl() {
-    ;(this.formGroup.get('devisItems') as FormArray).controls = []
+    ;(this.formGroup.get('factureItems') as FormArray).controls = []
   }
 
   //#endregion
@@ -294,16 +352,15 @@ export class FacturesDialogComponent implements OnInit {
   }
 
   getNewReference() {
-    this._devisServiceProxy.getLastReference().subscribe((res: number) => {
+    this._factureServiceProxy.getLastReference().subscribe((res: number) => {
       this.referenceCount = res + 1
-      this.reference = this.devisFormatReferenceNumber(this.referenceCount)
+      this.reference = this.factureFormatReferenceNumber(this.referenceCount)
     })
   }
 
   changeReference() {
     this.referenceCount++
-    this.reference = this.devisFormatReferenceNumber(this.referenceCount)
-    console.log(this.referenceCount)
+    this.reference = this.factureFormatReferenceNumber(this.referenceCount)
   }
 
   addRow() {
@@ -311,7 +368,7 @@ export class FacturesDialogComponent implements OnInit {
   }
 
   deleteRow(index: number) {
-    const control = this.formGroup.get('devisItems') as FormArray
+    const control = this.formGroup.get('factureItems') as FormArray
     control.removeAt(index)
     this.RecalculateRows()
   }
@@ -321,7 +378,7 @@ export class FacturesDialogComponent implements OnInit {
   //#region Calculations
 
   calculateRowTotalHTAndTTC(rowIndex: number) {
-    const row = this.getDevisContentItems[rowIndex]
+    const row = this.getFactureContentItems[rowIndex]
     const total_ht = row.unitPriceHT * row.quantity
     let total_ttc = total_ht
 
@@ -336,17 +393,17 @@ export class FacturesDialogComponent implements OnInit {
   }
 
   RecalculateRows() {
-    this.getDevisContentItems.forEach((_, index) => {
+    this.getFactureContentItems.forEach((_, index) => {
       this.calculateRowTotalHTAndTTC(index)
     })
   }
 
   calculateSummaryTotalHTAndTTC() {
-    this.summaryTotalHT = this.getDevisContentItems
+    this.summaryTotalHT = this.getFactureContentItems
       .map((item) => (item.unitPriceHT * item.quantity))
       .reduce((accum, current) => accum + current)
     if (this.devisOptionsFormGroup.get('tva').value)
-      this.summaryTVA = this.getDevisContentItems
+      this.summaryTVA = this.getFactureContentItems
         .map((item) => ((item.unitPriceHT * item.quantity) * item.tva) / 100)
         .reduce((accum, current) => accum + current)
     else this.summaryTVA = 0
@@ -396,10 +453,10 @@ export class FacturesDialogComponent implements OnInit {
   //#endregion
 
   //#region Crud operations
-  createApiCall(devisStatus: DevisStatutEnum) {
+  createApiCall(devisStatus: FactureStatutEnum) {
     let formValue = this.formGroup.value
 
-    let createDevisInput = new CreateDevisInput({
+    let createDevisInput = new CreateFactureInput({
       reference: this.referenceCount, 
       dateEmission:
         DateHelper.initiateTimeFromDate(formValue.dateEmission).getTime() ==
@@ -411,8 +468,8 @@ export class FacturesDialogComponent implements OnInit {
       piedDePage: formValue.piedDePage,
       remise: formValue.remise,
       statut: devisStatus,
-      devisItems: formValue.devisItems.map((devisItem: DevisContentItem) => {
-        return new DevisItemDto({
+      factureItems: formValue.factureItems.map((devisItem: FactureContentItem) => {
+        return new FactureItemDto({
           description: devisItem.description,
           date: DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
           DateHelper.initiateTimeFromDate(moment()).getTime()
@@ -428,7 +485,7 @@ export class FacturesDialogComponent implements OnInit {
       clientId: formValue.client.id,
     })
 
-    this._devisServiceProxy.createDevis(createDevisInput).subscribe((id) => {
+    this._factureServiceProxy.createFacture(createDevisInput).subscribe((id) => {
       if (id) {
         this._clientServiceProxy
           .getByIdClient(formValue.client.id)
@@ -447,25 +504,25 @@ export class FacturesDialogComponent implements OnInit {
     })
     this.toastService.info({
       summary: 'Confirmed',
-      detail: 'Vous avez ajouter ce devis en brouillon',
+      detail: 'Vous avez ajouter cette facture en brouillon',
     })
   }
 
-  updateApiCall(devisStatus: DevisStatutEnum) {
+  updateApiCall(devisStatus: FactureStatutEnum) {
     let formValue = this.formGroup.value
-    console.log( this.selectedDevisItem.dateEmission)
-    let updateDevisInput = new UpdateDevisInput({
+    let updateDevisInput = new UpdateFactureInput({
       id: this.devisItem.id,
       reference: this.referenceCount,
       dateEmission: this.selectedDevisItem.dateEmission != formValue.dateEmission ?
        moment(formValue.dateEmission).add(1, 'days') : moment(formValue.dateEmission),
+       
       echeancePaiement: +formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
       remise: formValue.remise ?? this.selectedDevisItem.remise,
       statut: devisStatus,
-      devisItems: formValue.devisItems.map((devisItem: DevisContentItem) => {
-        return new DevisItemDto({
+      factureItems: formValue.factureItems.map((devisItem: FactureContentItem) => {
+        return new FactureItemDto({
           description: devisItem.description,
           date:  DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
           DateHelper.initiateTimeFromDate(moment()).getTime()
@@ -480,8 +537,7 @@ export class FacturesDialogComponent implements OnInit {
       }),
       clientId: formValue.client.id,
     })
-    console.log(updateDevisInput)
-    this._devisServiceProxy.updateDevis(updateDevisInput).subscribe((res) => {
+    this._factureServiceProxy.updateFacture(updateDevisInput).subscribe((res) => {
       if (res) {
         if (this.selectedDevisItem.client.id != formValue.client.id) {
           this._clientServiceProxy
@@ -495,6 +551,7 @@ export class FacturesDialogComponent implements OnInit {
                   reference: 
                     updateDevisInput.reference,
                   client: res,
+                
 
                 },
               })
@@ -516,10 +573,9 @@ export class FacturesDialogComponent implements OnInit {
     })
     this.toastService.info({
       summary: 'Confirmed',
-      detail: 'Vous avez modifier ce devis en brouillon',
+      detail: 'Vous avez modifier cette facture en brouillon',
     })
 
-    console.log(updateDevisInput)
   }
 
   clientAutoCompleteSearch(event: any) {
@@ -528,21 +584,20 @@ export class FacturesDialogComponent implements OnInit {
         .getClientForAutoComplete(event.query)
         .subscribe((res: ClientForAutoCompleteDtoListResultDto) => {
           this.clientSuggestions = res.items
-          console.log(res)
         })
     }, 500)
   }
 
   onSelectClientAutoComplete() {
     this.selectedClientId = this.formGroup.get('client').value['id']
-    console.log(this.formGroup.get('client').value)
   }
 
   saveBrouillon() {
-    if (this.devisItem == null) {
-      this.createApiCall(DevisStatutEnum.Cree)
+    if (this.devisItem.isConverted || this.devisItem == null) {
+      this.createApiCall(FactureStatutEnum.Cree)
+      this._router.navigate(['/app/Factures'])
     } else {
-      this.updateApiCall(DevisStatutEnum.Cree)
+      this.updateApiCall(FactureStatutEnum.Cree)
     }
   }
 
@@ -554,7 +609,7 @@ export class FacturesDialogComponent implements OnInit {
       client: 'Client',
       messageIntroduction: "Message d'introduction",
       piedDePage: 'Pied de page',
-      devisItems: 'Description',
+      factureItems: 'Description',
     }
 
     for (let control in this.formGroup.controls) {
@@ -566,12 +621,13 @@ export class FacturesDialogComponent implements OnInit {
       if (isDevisStatusUpdate) {
         returnValue = this.validateStatusApi()
 
-        // this.validateDevisStatutEvent()
       } else {
-        if (this.devisItem == null) {
-          this.createApiCall(DevisStatutEnum.Valide)
+        if (this.devisItem == null || this.devisItem.isConverted) {
+          this.createApiCall(FactureStatutEnum.Valide)
+          this._router.navigate(['/app/Factures'])
+          
         } else {
-          this.updateApiCall(DevisStatutEnum.Valide)
+          this.updateApiCall(FactureStatutEnum.Valide)
         }
       }
     } else {
@@ -593,22 +649,22 @@ export class FacturesDialogComponent implements OnInit {
   validateStatusApi(): Observable<any> {
     return this.updateByStatusApi(
       this.devisItem.id,
-      DevisStatutEnum.Valide,
-      'Le devis est validé',
+      FactureStatutEnum.Valide,
+      'La facture est validé',
     ).pipe(
       map((success) => ({
         success,
-        result: { ...this.selectedDevisItem, statut: DevisStatutEnum.Valide },
+        result: { ...this.selectedDevisItem, statut: FactureStatutEnum.Valide },
       })),
     )
   }
 
   updateByStatusApi(
     devisId: number,
-    devisStatut: DevisStatutEnum,
+    devisStatut: FactureStatutEnum,
     detail,
     callback?,
   ) {
-    return this._devisServiceProxy.changeDevisStatut(devisId, devisStatut)
+    return this._factureServiceProxy.changeFactureStatut(devisId, devisStatut)
   }
 }

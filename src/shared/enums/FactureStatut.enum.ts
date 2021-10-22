@@ -1,8 +1,8 @@
-export enum FactureStatut {
+export enum FactureStatutEnum {
     Cree,
     Valide,
-    Regle_Partiellemt,
+    ReglePartiellemt,
     Regle,
-    Paiement_Attente,
-    Paiement_Retard
+    PaiementAttente,
+    PaiementRetard
 }

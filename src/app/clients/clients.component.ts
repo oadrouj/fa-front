@@ -92,12 +92,9 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
     this.countries = csc.getAllCountries();
     this.initialiseForm();
 
-    console.log(document.body.offsetHeight);
     var height = Math.max(document.body.offsetHeight, 770);
-    console.log(height);
 
     this.scrollHeight = (height - 356).toString() + "px";
-    console.log(this.scrollHeight);
   }
 
   sortField: string;
@@ -117,7 +114,6 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
 
   loadClientsLazy(event: LazyLoadEvent) {
     //simulate remote connection with a timeout
-    console.log("onlazy");
     setTimeout(() => {
       // //load data of required page
       // let loadedCars = this.cars.slice(event.first, (event.first + event.rows));
