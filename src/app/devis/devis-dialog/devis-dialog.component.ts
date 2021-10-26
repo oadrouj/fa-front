@@ -23,8 +23,7 @@ import {
   DevisItemDto,
   DevisServiceProxy,
   UpdateDevisInput,
-  DevisStatutEnum
-
+  DevisStatutEnum,
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
@@ -60,11 +59,11 @@ export class DevisDialogComponent implements OnInit {
       },
     )
 
-    this.dialogStatusEvent.subscribe(({statut, dialogComponent }) => {
-      if(dialogComponent == "devis"){
+    this.dialogStatusEvent.subscribe(({ statut, dialogComponent }) => {
+      if (dialogComponent == 'devis') {
         this.initiateSummaryValues()
         this.visible && (document.body.style.overflow = 'hidden')
-  
+
         switch (statut) {
           case DialogStatus.New:
             this.getNewReference()
@@ -72,7 +71,7 @@ export class DevisDialogComponent implements OnInit {
             this.dialogTitle = 'Nouveau'
             this.devisItem = null
             break
-  
+
           case DialogStatus.Edit:
             this.initiateFormGroupWithTableControls()
             this.dialogTitle = 'Modifier'
@@ -86,10 +85,16 @@ export class DevisDialogComponent implements OnInit {
             this.devisOptionsFormGroup
               .get('remise')
               .setValue(this.devisItem.remise)
+
+            if (this.devisItem.remise)
+              this.devisOptionsFormGroup
+                .get('remiseBtnIsChecked')
+                .setValue(true)
+                
             this.calculateSummaryTotalHTAndTTC()
             this.formGroup.get('client').setValue(this.devisItem.client)
             break
-  
+
           case DialogStatus.Duplicate:
             this.getNewReference()
             this.initiateFormGroupWithTableControls()
@@ -99,9 +104,14 @@ export class DevisDialogComponent implements OnInit {
             this.devisOptionsFormGroup
               .get('remise')
               .setValue(this.devisItem.remise)
+
+            if (this.devisItem.remise)
+              this.devisOptionsFormGroup
+                .get('remiseBtnIsChecked')
+                .setValue(true)
             this.calculateSummaryTotalHTAndTTC()
             break
-  
+
           default:
             break
         }
@@ -118,7 +128,10 @@ export class DevisDialogComponent implements OnInit {
   secondaryColor = 'orange'
   @Input() visible = false
   @Input() SelectDevisItemEvent = new Observable<DevisItem>()
-  @Input() dialogStatusEvent!: Observable<{statut: DialogStatus, dialogComponent }>
+  @Input() dialogStatusEvent!: Observable<{
+    statut: DialogStatus
+    dialogComponent
+  }>
   @Input() devisFormatReferenceNumber: (number) => string
   @Output() openDialogEvent = new EventEmitter()
   @Output() closeDialogEvent = new EventEmitter()
@@ -184,6 +197,7 @@ export class DevisDialogComponent implements OnInit {
       field: 'totalTtc',
       type: 'inputNumber',
       colspan: 2,
+      disabled: true,
     },
     { header: '', field: 'delete', type: 'button', label: '', icon: 'trash' },
   ]
@@ -212,18 +226,14 @@ export class DevisDialogComponent implements OnInit {
   }
 
   initiateFormGroupWithTableControls() {
-    const length = this.selectedDevisItem
-      ? this.selectedDevisItem.devisItems.length
-      : 1
+  
     this.formGroup = this.formBuilder.group({
       client: ['', Validators.required],
       dateEmission: [new Date(), Validators.required],
       echeancePaiement: ['30', Validators.required],
       messageIntroduction: ['', Validators.required],
       piedDePage: ['', Validators.required],
-      devisItems: this.formBuilder.array(
-        Array.from({ length }).fill(this.initiateTableForm()),
-      ),
+      devisItems: this.formBuilder.array([]),
     })
   }
 
@@ -239,11 +249,14 @@ export class DevisDialogComponent implements OnInit {
   }
 
   setFormGroup() {
-    let devisItems = this.devisItem.devisItems.map((item: any) => ({
-      ...item,
-      date: item.date.toDate(),
-    }))
-
+    let devisItems = this.devisItem.devisItems.map((item: any) => {
+      this.getFromArrayControl.push(this.initiateTableForm())
+      return {
+        ...item,
+        date: item.date.toDate(),
+      }
+    })
+    console.log(  this.getFromArrayControl.controls.length)
     this.formGroup.setValue({
       client: this.devisItem.client,
       dateEmission: this.devisItem.dateEmission,
@@ -252,7 +265,6 @@ export class DevisDialogComponent implements OnInit {
       piedDePage: this.devisItem.piedDePage,
       devisItems: devisItems,
     })
-
   }
 
   initiateTableForm() {
@@ -271,7 +283,7 @@ export class DevisDialogComponent implements OnInit {
     const remise = this.selectedDevisItem ? this.selectedDevisItem.remise : 0
     return this.formBuilder.group({
       remise: [remise],
-      // remiseState: [false],
+      remiseBtnIsChecked: [false],
       devise: [this.devisOptions.devise.list[0]],
       tva: [true],
     })
@@ -288,6 +300,7 @@ export class DevisDialogComponent implements OnInit {
     this.clearTableControl()
     this.frm.nativeElement.classList.remove('submitted')
     document.body.style.overflow = 'auto'
+    this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(false)
   }
 
   getNewReference() {
@@ -309,26 +322,32 @@ export class DevisDialogComponent implements OnInit {
   deleteRow(index: number) {
     const control = this.formGroup.get('devisItems') as FormArray
     control.removeAt(index)
-    this.RecalculateRows()
+    this.calculateSummaryTotalHTAndTTC()
+  
   }
 
   autoCompleteSearch(event: any) {}
 
   //#region Calculations
 
-  calculateRowTotalHTAndTTC(rowIndex: number) {
-    const row = this.getDevisContentItems[rowIndex]
-    const total_ht = row.unitPriceHT * row.quantity
-    let total_ttc = total_ht
-
-    if (this.devisOptionsFormGroup.get('tva').value) {
-      total_ttc = total_ht + (total_ht * row.tva) / 100
-    }
-
+   calculateRowTotalHTAndTTC(rowIndex: number, value?, field?) {
     this.getFromArrayControl.controls[rowIndex].patchValue({
-      totalTtc: total_ttc,
+      [field]: value.value,
     })
-    this.calculateSummaryTotalHTAndTTC()
+
+      const row = this.getDevisContentItems[rowIndex]
+      const total_ht = row.unitPriceHT * row.quantity
+      let total_ttc = total_ht
+
+      if (this.devisOptionsFormGroup.get('tva').value) {
+        total_ttc = total_ht + (total_ht * row.tva) / 100
+      }
+
+      this.getFromArrayControl.controls[rowIndex].patchValue({
+        totalTtc: total_ttc,
+      })
+
+      this.calculateSummaryTotalHTAndTTC()
   }
 
   RecalculateRows() {
@@ -339,11 +358,11 @@ export class DevisDialogComponent implements OnInit {
 
   calculateSummaryTotalHTAndTTC() {
     this.summaryTotalHT = this.getDevisContentItems
-      .map((item) => (item.unitPriceHT * item.quantity))
+      .map((item) => item.unitPriceHT * item.quantity)
       .reduce((accum, current) => accum + current)
     if (this.devisOptionsFormGroup.get('tva').value)
       this.summaryTVA = this.getDevisContentItems
-        .map((item) => ((item.unitPriceHT * item.quantity) * item.tva) / 100)
+        .map((item) => (item.unitPriceHT * item.quantity * item.tva) / 100)
         .reduce((accum, current) => accum + current)
     else this.summaryTVA = 0
     this.summaryTotalTTC =
@@ -378,8 +397,10 @@ export class DevisDialogComponent implements OnInit {
   }
 
   toggleRemiseOption(event: any) {
-    this.devisOptions.remise.checked = event.checked
-    if (!event.checked) this.devisOptionsFormGroup.get('remise').setValue(0)
+    this.devisOptions.remise.checked =
+      event.checked ?? this.devisItem.remise > 0
+    if (!this.devisOptions.remise.checked)
+      this.devisOptionsFormGroup.get('remise').setValue(0)
 
     this.calculateSummaryTotalHTAndTTC()
   }
@@ -396,7 +417,7 @@ export class DevisDialogComponent implements OnInit {
     let formValue = this.formGroup.value
 
     let createDevisInput = new CreateDevisInput({
-      reference: this.referenceCount, 
+      reference: this.referenceCount,
       dateEmission:
         DateHelper.initiateTimeFromDate(formValue.dateEmission).getTime() ==
         DateHelper.initiateTimeFromDate(moment()).getTime()
@@ -405,18 +426,19 @@ export class DevisDialogComponent implements OnInit {
       echeancePaiement: formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
-      remise: formValue.remise,
+      remise: this.devisOptionsFormGroup.get('remise').value,
       statut: devisStatus,
       devisItems: formValue.devisItems.map((devisItem: DevisContentItem) => {
         return new DevisItemDto({
           description: devisItem.description,
-          date: DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
-          DateHelper.initiateTimeFromDate(moment()).getTime()
-            ? moment()
-            : moment(devisItem.date).add(1, 'days'),
-          quantity: devisItem.quantity,
+          date:
+            DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
+            DateHelper.initiateTimeFromDate(moment()).getTime()
+              ? moment()
+              : moment(devisItem.date).add(1, 'days'),
+          quantity: devisItem.quantity ?? 0,
           unit: devisItem.unit,
-          unitPriceHT: devisItem.unitPriceHT,
+          unitPriceHT: devisItem.unitPriceHT ?? 0,
           tva: devisItem.tva,
           totalTtc: devisItem.totalTtc,
         })
@@ -452,23 +474,26 @@ export class DevisDialogComponent implements OnInit {
     let updateDevisInput = new UpdateDevisInput({
       id: this.devisItem.id,
       reference: this.referenceCount,
-      dateEmission: this.selectedDevisItem.dateEmission != formValue.dateEmission ?
-       moment(formValue.dateEmission).add(1, 'days') : moment(formValue.dateEmission),
+      dateEmission:
+        this.selectedDevisItem.dateEmission != formValue.dateEmission
+          ? moment(formValue.dateEmission).add(1, 'days')
+          : moment(formValue.dateEmission),
       echeancePaiement: +formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
-      remise: formValue.remise ?? this.selectedDevisItem.remise,
+      remise: this.devisOptionsFormGroup.get('remise').value,
       statut: devisStatus,
       devisItems: formValue.devisItems.map((devisItem: DevisContentItem) => {
         return new DevisItemDto({
           description: devisItem.description,
-          date:  DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
-          DateHelper.initiateTimeFromDate(moment()).getTime()
-            ? moment()
-            : moment(devisItem.date).add(1, 'days'),
-          quantity: devisItem.quantity,
+          date:
+            DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
+            DateHelper.initiateTimeFromDate(moment()).getTime()
+              ? moment()
+              : moment(devisItem.date).add(1, 'days'),
+          quantity: devisItem.quantity ?? 0,
           unit: devisItem.unit,
-          unitPriceHT: devisItem.unitPriceHT,
+          unitPriceHT: devisItem.unitPriceHT ?? 0,
           tva: devisItem.tva,
           totalTtc: devisItem.totalTtc,
         })
@@ -486,24 +511,21 @@ export class DevisDialogComponent implements OnInit {
                 result: {
                   ...this.selectedDevisItem,
                   ...updateDevisInput,
-                  reference: 
-                    updateDevisInput.reference,
+                  reference: updateDevisInput.reference,
                   client: res,
-
                 },
               })
             })
         } else {
-              this.crudOperationEvent.emit({
-                crudOperation: 'update',
-                result: {
-                  ...this.selectedDevisItem,
-                  ...updateDevisInput,
-                  reference: 
-                    updateDevisInput.reference,
-                  client: this.selectedDevisItem.client,
-                },
-              })
+          this.crudOperationEvent.emit({
+            crudOperation: 'update',
+            result: {
+              ...this.selectedDevisItem,
+              ...updateDevisInput,
+              reference: updateDevisInput.reference,
+              client: this.selectedDevisItem.client,
+            },
+          })
         }
         this.closeDialogEvent.emit()
       }
@@ -512,7 +534,6 @@ export class DevisDialogComponent implements OnInit {
       summary: 'Confirmed',
       detail: 'Vous avez modifier ce devis en brouillon',
     })
-
   }
 
   clientAutoCompleteSearch(event: any) {
@@ -557,7 +578,6 @@ export class DevisDialogComponent implements OnInit {
       if (isDevisStatusUpdate) {
         returnValue = this.validateStatusApi()
 
-        // this.validateDevisStatutEvent()
       } else {
         if (this.devisItem == null) {
           this.createApiCall(DevisStatutEnum.Valide)
@@ -579,7 +599,48 @@ export class DevisDialogComponent implements OnInit {
 
   //#endregion
 
-  previewDevis() {}
+  preview() {
+    let formValue = this.formGroup.value;
+    console.log(formValue)
+    let devisItems = formValue.devisItems.map(
+      (devisItem: DevisContentItem) => {
+        return new DevisItemDto({
+          description: devisItem.description,
+          date:
+            DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
+            DateHelper.initiateTimeFromDate(moment()).getTime()
+              ? moment()
+              : moment(devisItem.date).add(1, 'days'),
+          quantity: devisItem.quantity ?? 0,
+          unit: devisItem.unit,
+          unitPriceHT: devisItem.unitPriceHT ?? 0,
+          tva: devisItem.tva,
+          totalTtc: devisItem.totalTtc,
+        })
+      },
+    )
+    let dateEmission =  DateHelper.initiateTimeFromDate(formValue.dateEmission).getTime() ==
+    DateHelper.initiateTimeFromDate(moment()).getTime()
+      ? moment()
+      : moment(formValue.dateEmission).add(1, 'days')
+    
+    
+    this._devisServiceProxy.getByteDataDevisReport(
+      this.referenceCount,
+      dateEmission,
+      formValue.echeancePaiement,
+      formValue.messageIntroduction,
+      formValue.piedDePage,
+      this.devisOptionsFormGroup.get('remise').value,
+      this.selectedDevisItem.statut,
+      devisItems,
+      formValue.client.id,
+    ).subscribe(res => {
+      var win = window.open();
+      win.document.write('<iframe src="data:application/pdf;base64,' + res + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+  
+    })
+  }
 
   validateStatusApi(): Observable<any> {
     return this.updateByStatusApi(

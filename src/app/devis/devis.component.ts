@@ -26,6 +26,7 @@ import { ConfirmEventType } from 'primeng/api'
 import { map } from 'rxjs/operators'
 import { TableComponent } from '@app/table/table.component'
 import { ConvertDevisToFactureService } from '@shared/services/ConvertDevisToFacture.service'
+import * as printJS from 'print-js'
 
 @Component({
   selector: 'app-devis',
@@ -597,4 +598,29 @@ export class DevisComponent implements OnInit, AfterViewInit {
     this.calculateSummaryTotalHTAndTVA()
   }
   //#endregion
+
+   downloadDevis() {
+ 
+    this._devisServiceProxy.getByIdDevisReport(this.selectedDevisItem.id).subscribe(res => {
+      const linkSource = `data:application/pdf;base64,${res}`;
+      const downloadLink = document.createElement("a");
+      const fileName = "Devis.pdf";
+  
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+    })
+  }
+
+    print(){
+    this._devisServiceProxy.getByIdDevisReport(this.selectedDevisItem.id).subscribe(res => {
+      printJS({
+        printable: res,
+        type: "pdf",
+        base64: true
+      })
+    })
+  }
+
+
 }

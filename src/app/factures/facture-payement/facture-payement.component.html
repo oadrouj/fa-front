@@ -1,4 +1,4 @@
-<div>
+<div #container>
     <div class="custom-dialog-header">
         <span class="custom-dialog-title">Paiement du facture</span>
         <div class="p-dialog-header-icons">
@@ -10,7 +10,7 @@
     <form [formGroup]="formGroup" class="mt-5">
         <div class="grid ">
             <div class="col-6"><span>Référence</span></div>
-            <div class="col-6"><input pInputText formControlName="reference"></div>
+            <div class="col-6"><input pInputText formControlName="reference" readonly="true"></div>
         </div>
         <div class="grid ">
             <div class="col-6"><span>Montant</span></div>
@@ -21,13 +21,13 @@
         <div class="grid">
             <div class="col-6"><span>Date de paiement</span></div>
             <div class="col-6">
-                <p-calendar formControlName="datePaiement"></p-calendar>
+                <p-calendar formControlName="datePaiement" [appendTo]="container"></p-calendar>
             </div>
         </div>
         <div class="grid ">
             <div class="col-6"><span>Mode de paiement</span></div>
             <div class="col-6">
-                <p-dropdown formControlName="modePaiement" [options]="payementOptions"></p-dropdown>
+                <p-dropdown formControlName="modePaiement" [appendTo]="container" [options]="payementOptions" optionLabel="label" optionValue="value"></p-dropdown>
             </div>
         </div>
         <div class="grid mt-3">

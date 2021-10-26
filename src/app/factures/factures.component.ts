@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import {
+  AfterViewInit,
+  Component,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core'
 import { BehaviorSubject, Subject, zip } from 'rxjs'
 import { DevisItem } from '../../shared/models/DevisItem'
 import { DialogStatus } from '../../shared/enums/DialogState.enum'
@@ -13,8 +19,10 @@ import {
   ClientForAutoCompleteDtoListResultDto,
   ClientServiceProxy,
   DevisServiceProxy,
-  FactureStatutEnum,
   FactureServiceProxy,
+  FactureInfosPaiementDto,
+  ModePaiementEnum,
+  FactureStatutEnum,
 } from '@shared/service-proxies/service-proxies'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
 import * as moment from 'moment'
@@ -27,19 +35,18 @@ import { ConfirmEventType } from 'primeng/api'
 import { map } from 'rxjs/operators'
 import { TableComponent } from '@app/table/table.component'
 import { ConvertDevisToFactureService } from '@shared/services/ConvertDevisToFacture.service'
-import {DialogService, DynamicDialogRef} from 'primeng/dynamicdialog';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog'
 import { FacturePayementComponent } from './facture-payement/facture-payement.component'
 import { AppConsts } from '@shared/AppConsts'
-
+import * as printJS from 'print-js'
 
 @Component({
   selector: 'app-factures',
   templateUrl: './factures.component.html',
   styleUrls: ['./factures.component.css'],
-  providers: [DialogService]
-
+  providers: [DialogService],
 })
-export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy  {
+export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private _referenceService: ReferenceService,
     public _fakeService: FakeService,
@@ -56,16 +63,14 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy  {
     this.globalEventsService.announcedThePageChangedColorSubject(
       `var(--${this.primaryColor}-color`,
     )
-    
+
+  console.log('enum', FactureStatutEnum.Cree)
   }
 
-  ngAfterViewInit(){
-   
-  }
+  ngAfterViewInit() {}
 
-  ngOnDestroy(){
-    if(this.ref)
-      this.ref.close();
+  ngOnDestroy() {
+    if (this.ref) this.ref.close()
   }
 
   //#region Properties
@@ -99,18 +104,22 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy  {
       header: 'REFERENCE',
       field: 'reference',
       type: 'text',
-      format:(number) => this._referenceService.formatReferenceNumber(number, ReferencePrefix.Facture)
+      format: (number) =>
+        this._referenceService.formatReferenceNumber(
+          number,
+          ReferencePrefix.Facture,
+        ),
     },
     {
       header: 'CLIENT',
       field: 'client.nom',
-      type: 'text', 
+      type: 'text',
     },
     {
       header: 'DATE D’EMISSION',
       field: 'dateEmission',
       type: 'date',
-      format: (date) => date._i ? new Date(date._i) : new Date(date._d)
+      format: (date) => (date._i ? new Date(date._i) : new Date(date._d)),
     },
     {
       header: 'ECHEANCE',
@@ -131,7 +140,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy  {
     },
   ]
   DevisContentItemsCols = [
-    { header: 'DESCRIPTION', field: 'description', type: 'text', colspan: 2 },
+    { header: 'DESCRIPTION', field: 'description', type: 'text', colspan: 0 },
     { header: 'DATE', field: 'date', type: 'date', colspan: 0 },
     { header: 'quantity', field: 'quantity', type: 'text' },
     { header: 'UNITE', field: 'unit', type: 'text' },
@@ -141,19 +150,23 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy  {
   ]
   statusItems = [
     {
+      actualStatus: FactureStatutEnum.ReglePartiellemt,
+      label: 'Régler',
+      icon: 'pi pi-check',
+      command: () => {
+        this.showFacturePayementDialog(true)
+      },
+    },
+    {
       actualStatus: FactureStatutEnum.PaiementAttente,
       label: 'Régler',
       icon: 'pi pi-check',
       command: () => {
-        // this.updateApiCall(
-        //   this.selectedDevisItem.id,
-        //   FactureStatutEnum.Regle,
-        //   'La facture est réglée',
-        // )
+
         this.showFacturePayementDialog()
       },
     },
-   
+
     {
       actualStatus: FactureStatutEnum.Cree,
       label: 'Valider',
@@ -188,7 +201,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy  {
   summaryTotalTTC: number
   montantTotalAllDevis = 0
   Currency = 'MAD'
-  ref: DynamicDialogRef;
+  ref: DynamicDialogRef
 
   //#endregion
 
@@ -211,7 +224,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy  {
         return 'Paiement en attente'
       case FactureStatutEnum.PaiementRetard:
         return 'Paiement en'
-      default :
+      default:
         return ''
     }
   }
@@ -261,9 +274,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy  {
     }
   }
 
-  dialogStatusEvent = new Subject<{statut: DialogStatus, dialogComponent}>()
+  dialogStatusEvent = new Subject<{ statut: DialogStatus; dialogComponent }>()
   emitDialogStatus(dialogStatus: DialogStatus, dialogComponent) {
-    this.dialogStatusEvent.next({statut: dialogStatus, dialogComponent})
+    this.dialogStatusEvent.next({ statut: dialogStatus, dialogComponent })
   }
 
   rowDeletedSubject = new Subject<any>()
@@ -299,12 +312,11 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy  {
           .deleteFacture(this.selectedDevisItem.id)
           .subscribe((res) => {
             if (res) {
-              this.tableChild.tableData =  this.tableChild.tableData.filter(
-                (devis) => !devis || (devis.id != this.selectedDevisItem.id) 
-                
+              this.tableChild.tableData = this.tableChild.tableData.filter(
+                (devis) => !devis || devis.id != this.selectedDevisItem.id,
               )
               this.montantTotalAllDevis -= this.selectedDevisItem.montantTtc
-              this.emitRowDeletedEvent( this.tableChild.tableData[0])
+              this.emitRowDeletedEvent(this.tableChild.tableData[0])
               this._toastService.info({
                 summary: 'Confirmed',
                 detail: 'You have accepted',
@@ -328,135 +340,177 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy  {
     })
   }
 
-  downloadFacture(){
-    window.open(AppConsts.remoteServiceBaseUrl + "/FileLoader/GetFacture/0", "_blank");
-    
-  }
-
   selectionChange(selectionEventObject) {
     if (selectionEventObject.type == 'selectionChanged') {
       this.selectedDevisItem = selectionEventObject.result
-      
     } else if (selectionEventObject.type == 'delete') {
       this.selectedDevisItem = selectionEventObject.result
     }
     this.calculateSummaryTotalHTAndTVA()
     this.emitNotificationSelectedDevisChanged({
       ...this.selectedDevisItem,
-          
-          dateEmission : this.selectedDevisItem.dateEmission ?
-            new Date( this.selectedDevisItem.dateEmission._i) : new Date( this.selectedDevisItem.dateEmission._d)
+
+      dateEmission: this.selectedDevisItem.dateEmission
+        ? new Date(this.selectedDevisItem.dateEmission._i)
+        : new Date(this.selectedDevisItem.dateEmission._d),
     })
     this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis
   }
 
   calculateSummaryTotalHTAndTVA() {
-    if(this.selectedDevisItem){
+    if (this.selectedDevisItem) {
       this.summaryTotalHT = (this.selectedDevisItem as any).factureItems
-      .map((item) => item.unitPriceHT * item.quantity)
-      .reduce((accum, current) => accum + current)
-    this.summaryTVA = this.selectedDevisItem.factureItems
-      .map((item) => ((item.unitPriceHT * item.quantity) * item.tva) / 100)
-      .reduce((accum, current) => accum + current)
+        .map((item) => item.unitPriceHT * item.quantity)
+        .reduce((accum, current) => accum + current)
+      this.summaryTVA = this.selectedDevisItem.factureItems
+        .map((item) => (item.unitPriceHT * item.quantity * item.tva) / 100)
+        .reduce((accum, current) => accum + current)
     }
   }
 
   crudOperationTreatment(event) {
+    let statut = event.result.statut == FactureStatutEnum.Valide
+        ? FactureStatutEnum.PaiementAttente : event.result.statut
     if (event.crudOperation == 'create') {
       let newDevis = {
-        ...event.result, 
-        remise: 0
+        ...event.result,
+        remise: 0,
+        statut
       }
       newDevis.factureItems = newDevis.factureItems.map((item: any) => {
-          let total_ht = item.unitPriceHT * item.quantity
-          return {
-            ...item,
-            totalTtc: total_ht + (item.tva * total_ht) / 100,
-          }
-        })
-        newDevis.montantTtc = newDevis.factureItems.map((item) => item.totalTtc)
-            .reduce((accum, current) => accum + current) - newDevis.remise
-        this.montantTotalAllDevis += newDevis.montantTtc
-   
-      this.tableChild.tableData = [...this.tableChild.tableData ,{...newDevis}]
-      this.tableChild.tableData.sort((a, b) => a.reference < b.reference ? 1 : -1)
-        
-      this.selectedDevisItem = {
-        ...newDevis,
-        dateEmission: newDevis.dateEmission.toDate()
-      }
-      this.emitNotificationSelectedDevisChanged({
-        ...this.selectedDevisItem
-      })
-
-    }
-
-    else if (event.crudOperation == 'update') {
-      this.selectedDevisItem = { 
-        ...event.result,
-        
-       }
-       
-      //Calculate total montant
-      this.selectedDevisItem.factureItems =  this.selectedDevisItem.factureItems.map((item: any) => {
         let total_ht = item.unitPriceHT * item.quantity
         return {
           ...item,
           totalTtc: total_ht + (item.tva * total_ht) / 100,
         }
       })
+      newDevis.montantTtc =
+        newDevis.factureItems
+          .map((item) => item.totalTtc)
+          .reduce((accum, current) => accum + current) - newDevis.remise
+      this.montantTotalAllDevis += newDevis.montantTtc
 
-      this.selectedDevisItem.montantTtc =  this.selectedDevisItem.factureItems.map((item) => item.totalTtc)
-          .reduce((accum, current) => accum + current) -  this.selectedDevisItem.remise
+      this.tableChild.tableData = [
+        ...this.tableChild.tableData,
+        { ...newDevis },
+      ]
+      this.tableChild.tableData.sort((a, b) =>
+        a.reference < b.reference ? 1 : -1,
+      )
 
-      this.selectedDevisItem = {...this.selectedDevisItem, dateEmission: (this.selectedDevisItem.dateEmission as Moment).toDate() }
-      this.child.selectedDevisItem = { ...this.selectedDevisItem  }
-      let index = this.tableChild.tableData.findIndex(item =>  item.id == this.selectedDevisItem.id)
-      this.tableChild.tableData[index] = { ...this.selectedDevisItem, dateEmission: moment(this.selectedDevisItem.dateEmission) }
-      this.tableChild.tableData = [... this.tableChild.tableData]
-      
+      this.selectedDevisItem = {
+        ...newDevis,
+        dateEmission: newDevis.dateEmission.toDate(),
+      }
+      this.emitNotificationSelectedDevisChanged({
+        ...this.selectedDevisItem,
+      })
+    } else if (event.crudOperation == 'update') {
+      this.selectedDevisItem = {
+        ...event.result,
+        statut
+      }
+
+      //Calculate total montant
+      this.selectedDevisItem.factureItems = this.selectedDevisItem.factureItems.map(
+        (item: any) => {
+          let total_ht = item.unitPriceHT * item.quantity
+          return {
+            ...item,
+            totalTtc: total_ht + (item.tva * total_ht) / 100,
+          }
+        },
+      )
+
+      this.selectedDevisItem.montantTtc =
+        this.selectedDevisItem.factureItems
+          .map((item) => item.totalTtc)
+          .reduce((accum, current) => accum + current) -
+        this.selectedDevisItem.remise
+
+      this.selectedDevisItem = {
+        ...this.selectedDevisItem,
+        dateEmission: (this.selectedDevisItem.dateEmission as Moment).toDate(),
+      }
+      this.child.selectedDevisItem = { ...this.selectedDevisItem }
+      let index = this.tableChild.tableData.findIndex(
+        (item) => item.id == this.selectedDevisItem.id,
+      )
+      this.tableChild.tableData[index] = {
+        ...this.selectedDevisItem,
+        dateEmission: moment(this.selectedDevisItem.dateEmission),
+      }
+      this.tableChild.tableData = [...this.tableChild.tableData]
     }
 
     this.calculateSummaryTotalHTAndTVA()
   }
 
   //#region Api Calls
-  getListDevisApi$(event, data){
+  getListDevisApi$(event, data) {
     return zip(
-      this._factureServiceProxy
-        .getAllFactureTotalRecords(0, 0, event.globalFilter, '', '', null), 
-      this._factureServiceProxy
-        .getAllFacture(event.first , event.rows, event.globalFilter, event.sortField, event.sortOrder, null),
-      this._factureServiceProxy
-       .getAllFactureMontantTotal(event.first , event.rows, event.globalFilter, '', '', null)
-    ).pipe(map(([length, res, montantTotalAllDevis]: any) => {
-      data = [...res.items]
-      data.forEach((devis: any) => {
-        devis.factureItems = devis.factureItems.map((item: any) => {
-          let total_ht = item.unitPriceHT * item.quantity
-          return {
-            ...item,
-            totalTtc: total_ht + (item.tva * total_ht) / 100,
-          }
-        })
+      this._factureServiceProxy.getAllFactureTotalRecords(
+        0,
+        0,
+        event.globalFilter,
+        '',
+        '',
+        null,
+      ),
+      this._factureServiceProxy.getAllFacture(
+        event.first,
+        event.rows,
+        event.globalFilter,
+        event.sortField,
+        event.sortOrder,
+        null,
+      ),
+      this._factureServiceProxy.getAllFactureMontantTotal(
+        event.first,
+        event.rows,
+        event.globalFilter,
+        '',
+        '',
+        null,
+      ),
+    ).pipe(
+      map(([length, res, montantTotalAllDevis]: any) => {
+        data = [...res.items]
+        data.forEach((devis: any) => {
+          devis.factureItems = devis.factureItems.map((item: any) => {
+            let total_ht = item.unitPriceHT * item.quantity
+            return {
+              ...item,
+              totalTtc: total_ht + (item.tva * total_ht) / 100,
+            }
+          })
 
-        devis.statut = devis.statut == FactureStatutEnum.Valide && 
-          moment().isAfter((devis.dateEmission as Moment).add(devis.echeancePaiement, 'days')) 
-          ? FactureStatutEnum.PaiementRetard : FactureStatutEnum.PaiementAttente
-        
-        devis.montantTtc = devis.factureItems.map((item) => item.totalTtc)
-            .reduce((accum, current) => accum + current) - devis.remise
-        
-      })
-      return {items: data, length, montantTotalAllDevis}
-      
-    }))
+          devis.statut =
+            devis.statut == FactureStatutEnum.Valide
+              ? moment().isAfter(
+                  (devis.dateEmission as Moment).add(
+                    devis.echeancePaiement,
+                    'days',
+                  ),
+                )
+                ? FactureStatutEnum.PaiementRetard
+                : FactureStatutEnum.PaiementAttente
+              : devis.statut
+
+          devis.montantTtc =
+            devis.factureItems
+              .map((item) => item.totalTtc)
+              .reduce((accum, current) => accum + current) - devis.remise
+        })
+        return { items: data, length, montantTotalAllDevis }
+      }),
+    )
   }
   updateApiCall(devisId: number, devisStatut: FactureStatutEnum, detail) {
     this._factureServiceProxy
       .changeFactureStatut(devisId, devisStatut)
       .subscribe((res) => {
-        if (res) { 
+        if (res) {
           this._toastService.info({ detail })
           this.selectedDevisItem = {
             ...this.selectedDevisItem,
@@ -471,42 +525,143 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy  {
   }
   //#endregion
 
-  getSelectedItemMontantTtc(){
-    return this.selectedDevisItem.factureItems.map((item) => item.totalTtc)
-    .reduce((accum, current) => accum + current) - this.selectedDevisItem.remise
+  getSelectedItemMontantTtc() {
+    return (
+      this.selectedDevisItem.factureItems
+        .map((item) => item.totalTtc)
+        .reduce((accum, current) => accum + current) -
+      this.selectedDevisItem.remise
+    )
   }
 
-  showFacturePayementDialog(){
+  showFacturePayementDialog(isPartiallySettled = false) {
     this.ref = this.dialogService.open(FacturePayementComponent, {
       data: {
-        reference: this.selectedDevisItem.reference
+        reference: this.selectedDevisItem.reference,
       },
       header: 'Réler le payement',
       width: '35%',
       showHeader: false,
       contentStyle: {
-        "height": "380px", 
-        "overflow": "auto", 
-        "padding": "0",
-        "border-radius": "20px"
+        height: '380px',
+        overflow: 'auto',
+        padding: '0',
+        borderRadius: '20px',
       },
-      baseZIndex: 10000
-    });
+      baseZIndex: 10000,
+    })
 
     this.ref.onClose.subscribe((result) => {
-      if(result){
-        if(result.montant == this.selectedDevisItem.montantTtc) {
-          this._toastService.info({detail: 'La facture est réglée'})
-          //Api call (id: this.selectedFactureItem.id, statut)
-        }
-        else if(result.montant <= this.selectedDevisItem.montantTtc) {
-          this._toastService.info({detail: 'La facture est partiellement réglée'})
-          //Api call (id: this.selectedFactureItem.id, statut)
-        }
-        //if result.montant >= this.selectedDevisItem.montantTtc
+      let previousAmount = 0;
+      if(isPartiallySettled){
+        this._factureServiceProxy.getByFactureIdFactureInfosPaiement(this.selectedDevisItem.id)
+          .toPromise().then(res =>  {
+            previousAmount = res.montantPaye
+        console.log(res.montantPaye)
+          })
       }
+      if (result) {
+
+        let factureInfosPaiementDto = new FactureInfosPaiementDto({
+          datePaiement: moment(result.datePaiement),
+          montantPaye: result.montant,
+          modePaiement: result.modePaiement,
+          factureId: this.selectedDevisItem.id,
+          id: 0,
+        })
+
+        if(result.montant == 0){
+          this._factureServiceProxy.changeFactureStatut(
+            this.selectedDevisItem.id,
+            FactureStatutEnum.Valide,
+          ).subscribe(res => {
+            console.log(res)
+            this.viewUpdateSelectedItemStatut(FactureStatutEnum.PaiementAttente)
+          })
+        }
+
+        else if (result.montant == (this.selectedDevisItem.montantTtc + previousAmount)) {
+          this._factureServiceProxy
+            .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
+            .subscribe((res) => {
+              if (res) {
+                this._toastService.info({ detail: 'La facture est réglée' })
+              }
+            })
+
+          this._factureServiceProxy.changeFactureStatut(
+            this.selectedDevisItem.id,
+            FactureStatutEnum.Regle,
+          ).subscribe(res => {
+            if(res){
+              this.viewUpdateSelectedItemStatut(FactureStatutEnum.Regle)
+            }
+          })
+        }
+
+        else if (result.montant <= (this.selectedDevisItem.montantTtc + previousAmount)) {
+          this._factureServiceProxy
+            .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
+            .subscribe((res) => {
+              if (res) {
+                this._toastService.info({
+                  detail: 'La facture est partiellement réglée',
+                })
+              }
+            })
+          this._factureServiceProxy.changeFactureStatut(
+            this.selectedDevisItem.id,
+            FactureStatutEnum.ReglePartiellemt,
+          ).subscribe(res => {
+            if(res){
+              this.viewUpdateSelectedItemStatut(FactureStatutEnum.ReglePartiellemt)
+            }
+          })
+        }
+      
+      }
+
     })
   }
 
+  print(){
+    this._factureServiceProxy.getByIdFactureReport(this.selectedDevisItem.id).subscribe(res => {
+      printJS({
+        printable: res,
+        type: "pdf",
+        base64: true
+      })
+    })
+  }
+
+  downloadFacture() {
+    // window.open(
+    //   AppConsts.remoteServiceBaseUrl + '/FileLoader/GetFacture/0',
+    //   '_blank',
+    // )
+    this._factureServiceProxy.getByIdFactureReport(this.selectedDevisItem.id).subscribe(res => {
+      const linkSource = `data:application/pdf;base64,${res}`;
+      const downloadLink = document.createElement("a");
+      const fileName = "facture_template.pdf";
   
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+    })
+
+  }
+
+  viewUpdateSelectedItemStatut(statut: any){
+    this.selectedDevisItem = {
+      ...this.selectedDevisItem, 
+      dateEmission: moment(this.selectedDevisItem.dateEmission),
+      statut: statut
+    }
+    let index = this.tableChild.tableData.filter(item => item).findIndex(
+      (item) => item.id == this.selectedDevisItem.id,
+    )
+    this.tableChild.tableData[index] = {...this.selectedDevisItem}
+    this.tableChild.tableData = [...this.tableChild.tableData]
+  }
+
 }

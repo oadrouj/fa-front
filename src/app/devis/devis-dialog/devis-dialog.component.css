@@ -186,6 +186,6 @@
     border: 1px solid #CED0DA;
 }
 
-:host>>>.p-dialog .p-datepicker {
+:host>>>.p-dialog #new-devis-header .p-datepicker {
     top: -210px !important;
 }

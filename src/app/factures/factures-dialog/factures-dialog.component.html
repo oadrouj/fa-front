@@ -6,7 +6,7 @@
         <div class="flex">
             <button pButton label="Enregistrer le brouillon" [ngClass]="'bg-' + secondaryColor" (click)="saveBrouillon()" class="color-white border-none mx-2" [ngClass]="'bg-' + secondaryColor"></button>
             <button pButton label="Valider" class="mx-2 bg-turquoise" (click)="validateDevis()"></button>
-            <button pButton label="Aperçu" class="bg-purple mx-2" (click)="previewDevis()"></button>
+            <button pButton label="Aperçu" class="bg-purple mx-2" (click)="preview()"></button>
         </div>
     </ng-template>
     <form #frm [formGroup]="formGroup">
@@ -99,15 +99,15 @@
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'inputNumber'">
                                                 <td [colSpan]="col.colspan" class="w-20">
-                                                    <p-inputNumber *ngIf="!col.inputEvent" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="' ' + Currency">
-                                                    </p-inputNumber>
-                                                    <p-inputNumber *ngIf="col.inputEvent" (onInput)="col.inputEvent(i)" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix">
+                                                    <!-- <p-inputNumber *ngIf="!col.inputEvent" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="' ' + Currency">
+                                                    </p-inputNumber> -->
+                                                    <p-inputNumber (onInput)="calculateRowTotalHTAndTTC(i, $event, col.field)" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix">
                                                     </p-inputNumber>
                                                 </td>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'dropdown'">
                                                 <td [colSpan]="col.colspan" class="w-20">
-                                                    <p-dropdown [options]="col.options" [formControlName]="col.field" [disabled]="col.disabled" [appendTo]="myTable" (onChange)="col.changeEvent(i)">
+                                                    <p-dropdown [options]="col.options" [formControlName]="col.field" [disabled]="col.disabled" [appendTo]="myTable" (onChange)="calculateRowTotalHTAndTTC(i, $event, col.field)">
                                                         <ng-template pTemplate="selectedItem">
                                                             <div class="" *ngIf="group.get(col.field).value">
                                                                 {{group.get(col.field).value}}
@@ -180,7 +180,7 @@
                     <p-accordion #acrd class="shadow-2">
                         <div class="py-3 px-4 bg-white " [ngClass]="'color-' + primaryColor">Options</div>
                         <p-accordionTab header="Remise" [selected]="false">
-                            <p-toggleButton #tglBtn onLabel="Désactiver" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check" (onChange)="toggleRemiseOption($event)"></p-toggleButton>
+                            <p-toggleButton #tglBtn formControlName="remiseBtnIsChecked" onLabel="Désactiver" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check" (onChange)="toggleRemiseOption($event)"></p-toggleButton>
                             <input pInputText *ngIf="tglBtn.checked" formControlName="remise" (input)="remiseValueChanged()" pKeyFilter="money" class="mt-2" />
                         </p-accordionTab>
                         <p-accordionTab header="TVA">

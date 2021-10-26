@@ -6,7 +6,7 @@
         <div class="flex">
             <button pButton label="Enregistrer le brouillon" [ngClass]="'bg-' + secondaryColor" (click)="saveBrouillon()" class="bg-orange color-white border-none mx-2"></button>
             <button pButton label="Valider" class="mx-2 bg-turquoise" (click)="validateDevis()"></button>
-            <button pButton label="Aperçu" class="bg-purple mx-2" (click)="previewDevis()"></button>
+            <button pButton label="Aperçu" class="bg-purple mx-2" (click)="preview()"></button>
         </div>
     </ng-template>
     <form #frm [formGroup]="formGroup">
@@ -99,9 +99,9 @@
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'inputNumber'">
                                                 <td [colSpan]="col.colspan" class="w-20">
-                                                    <p-inputNumber *ngIf="!col.inputEvent" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="' ' + Currency">
-                                                    </p-inputNumber>
-                                                    <p-inputNumber *ngIf="col.inputEvent" (onInput)="col.inputEvent(i)" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix">
+                                                    <!-- <p-inputNumber *ngIf="!col.inputEvent" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="' ' + Currency">
+                                                    </p-inputNumber> -->
+                                                    <p-inputNumber (onInput)="calculateRowTotalHTAndTTC(i, $event, col.field)" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix">
                                                     </p-inputNumber>
                                                 </td>
                                             </ng-container>
@@ -141,7 +141,8 @@
                                     <div class="new-devis-summary text-right">
                                         <div class="grid my-1">
                                             <div class="col-7 color-gray"><span>TOTAL HT</span></div>
-                                            <div class="col-5" [ngClass]="'color-' + primaryColor"><span>{{summaryTotalHT | number:'1.2-2' }}
+                                            <div class="col-5" [ngClass]="'color-' + primaryColor">
+                                                <span>{{summaryTotalHT | number:'1.2-2' }}
                                                     {{' ' + Currency}}</span></div>
                                         </div>
                                         <div class="grid my-1">
@@ -179,7 +180,7 @@
                     <p-accordion #acrd class="shadow-2">
                         <div class="py-3 px-4 bg-white " [ngClass]="'color-' + primaryColor">Options</div>
                         <p-accordionTab header="Remise" [selected]="false">
-                            <p-toggleButton #tglBtn onLabel="Désactiver" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check" (onChange)="toggleRemiseOption($event)"></p-toggleButton>
+                            <p-toggleButton #tglBtn formControlName="remiseBtnIsChecked" onLabel="Désactiver" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check" (onChange)="toggleRemiseOption($event)"></p-toggleButton>
                             <input pInputText *ngIf="tglBtn.checked" formControlName="remise" (input)="remiseValueChanged()" pKeyFilter="money" class="mt-2" />
                         </p-accordionTab>
                         <p-accordionTab header="TVA">

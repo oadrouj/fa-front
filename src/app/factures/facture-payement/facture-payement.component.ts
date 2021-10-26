@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum';
+import { ModePaiementEnum } from '@shared/service-proxies/service-proxies';
 import { ReferenceService } from '@shared/services/reference.service';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
@@ -12,7 +13,12 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 export class FacturePayementComponent implements OnInit {
 
   formGroup: FormGroup 
-  payementOptions = ["Carte bancaire", "Espèces", "chèque"]
+  payementOptions = [
+    { value: ModePaiementEnum.Cheque, label: 'Chèque' },
+    { value: ModePaiementEnum.Effet, label: 'Effet' },
+    { value: ModePaiementEnum.Liquide, label: 'Liquide' },
+    { value: ModePaiementEnum.Virement, label: 'Virement' },
+  ]
   constructor(
     public ref: DynamicDialogRef,
     public config: DynamicDialogConfig,
@@ -34,7 +40,7 @@ export class FacturePayementComponent implements OnInit {
     return this.formGroup = this._formBuider.group({
       datePaiement: [new Date(), Validators.required],
       montant: [0, Validators.required],
-      modePaiement: [''],
+      modePaiement: [0],
       reference: ['']
     })
   }

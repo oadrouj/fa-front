@@ -49,8 +49,8 @@
                 <div class="header flex justify-content-between">
                     <p-splitButton class=" border-radius-6" [label]="formatStatut(selectedDevisItem && selectedDevisItem.statut)" [model]="getStatusOptions()"> </p-splitButton>
                     <div class="flex">
-                        <button pButton label="Télécharger" class="p-button-text"></button>
-                        <button pButton label="Imprimer" class="p-button-text"></button>
+                        <button pButton label="Télécharger" class="p-button-text" (click)="downloadDevis()"></button>
+                        <button pButton label="Imprimer" class="p-button-text" (click)="print()"></button>
                         <button pButton label="Dupliquer" class="p-button-text" (click)="duplicateDevis()"></button>
                         <button pButton label="Modifier" class="p-button-text" (click)="editDevis()"></button>
                         <button pButton label="Supprimer" class="p-button-text" (click)="deleteDevis()"></button>
