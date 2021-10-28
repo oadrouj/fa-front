@@ -38,9 +38,9 @@ export class FacturePayementComponent implements OnInit {
 
   initiateForm(){
     return this.formGroup = this._formBuider.group({
-      datePaiement: [new Date(), Validators.required],
-      montant: [0, Validators.required],
-      modePaiement: [0],
+      datePaiement: [this.config.data.datePaiement, Validators.required],
+      montant: [this.config.data.montantPaye , Validators.required],
+      modePaiement: [this.config.data.modePaiement],
       reference: ['']
     })
   }

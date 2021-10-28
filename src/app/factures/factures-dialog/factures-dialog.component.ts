@@ -109,7 +109,6 @@ export class FacturesDialogComponent
                   .setValue(this.devisItem.remise)
                 this.calculateSummaryTotalHTAndTTC()
                 this.formGroup.get('client').setValue(this.devisItem.client)
-                // this.devisItem = null
               } else {
                 this.getNewReference()
                 this.initiateFormGroupForNewDevis()

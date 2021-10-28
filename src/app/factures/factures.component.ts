@@ -153,17 +153,17 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       actualStatus: FactureStatutEnum.ReglePartiellemt,
       label: 'Régler',
       icon: 'pi pi-check',
-      command: () => {
-        this.showFacturePayementDialog(true)
+      command: async() => {
+        await this.showFacturePayementDialog(true)
       },
     },
     {
       actualStatus: FactureStatutEnum.PaiementAttente,
       label: 'Régler',
       icon: 'pi pi-check',
-      command: () => {
+      command: async() => {
 
-        this.showFacturePayementDialog()
+        await this.showFacturePayementDialog()
       },
     },
 
@@ -223,7 +223,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       case FactureStatutEnum.PaiementAttente:
         return 'Paiement en attente'
       case FactureStatutEnum.PaiementRetard:
-        return 'Paiement en'
+        return 'Paiement en retard'
       default:
         return ''
     }
@@ -534,10 +534,28 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     )
   }
 
-  showFacturePayementDialog(isPartiallySettled = false) {
+  async showFacturePayementDialog(isPartiallySettled = false) {
+    let facturePayementInfo: FactureInfosPaiementDto = new FactureInfosPaiementDto({
+      factureId: this.selectedDevisItem.id,
+      id: 0,
+      montantPaye: 0,
+      datePaiement: moment(),
+      modePaiement: ModePaiementEnum.Cheque
+    }
+     
+    )
+
+      if(isPartiallySettled){
+        facturePayementInfo = await this._factureServiceProxy.getByFactureIdFactureInfosPaiement(this.selectedDevisItem.id)
+          .toPromise()
+      }
+
     this.ref = this.dialogService.open(FacturePayementComponent, {
       data: {
         reference: this.selectedDevisItem.reference,
+        montantPaye: facturePayementInfo.montantPaye,
+        modePaiement: facturePayementInfo.modePaiement,
+        datePaiement: facturePayementInfo.datePaiement.toDate()
       },
       header: 'Réler le payement',
       width: '35%',
@@ -552,14 +570,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     })
 
     this.ref.onClose.subscribe((result) => {
-      let previousAmount = 0;
-      if(isPartiallySettled){
-        this._factureServiceProxy.getByFactureIdFactureInfosPaiement(this.selectedDevisItem.id)
-          .toPromise().then(res =>  {
-            previousAmount = res.montantPaye
-        console.log(res.montantPaye)
-          })
-      }
+      
       if (result) {
 
         let factureInfosPaiementDto = new FactureInfosPaiementDto({
@@ -567,7 +578,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
           montantPaye: result.montant,
           modePaiement: result.modePaiement,
           factureId: this.selectedDevisItem.id,
-          id: 0,
+          id: facturePayementInfo.id,
         })
 
         if(result.montant == 0){
@@ -578,9 +589,13 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
             console.log(res)
             this.viewUpdateSelectedItemStatut(FactureStatutEnum.PaiementAttente)
           })
+          this._factureServiceProxy.deleteByFactureIdFactureInfosPaiement(this.selectedDevisItem.id)
+            .subscribe(res => {
+
+            })
         }
 
-        else if (result.montant == (this.selectedDevisItem.montantTtc + previousAmount)) {
+        else if (result.montant >= this.selectedDevisItem.montantTtc ) {
           this._factureServiceProxy
             .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
             .subscribe((res) => {
@@ -599,7 +614,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
           })
         }
 
-        else if (result.montant <= (this.selectedDevisItem.montantTtc + previousAmount)) {
+        else if (result.montant <= this.selectedDevisItem.montantTtc ) {
           this._factureServiceProxy
             .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
             .subscribe((res) => {
