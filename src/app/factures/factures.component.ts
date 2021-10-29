@@ -264,11 +264,11 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.filterSubject.next({
         type: 'filterByButton',
         value: {
-          client: (this.selectedClient && this.selectedClient.id) ?? -1,
-          dateEmission: this.selectedDate ?? moment.unix(0),
-          echeancePaiement: this.selectedEcheance ?? -1,
-          statut: this.selectedStatut ?? -1,
-          montantTtc: this.selectedMontant ?? -1,
+          client: (this.selectedClient && this.selectedClient.id),
+          dateEmission: this.selectedDate,
+          echeancePaiement: this.selectedEcheance,
+          statut: this.selectedStatut,
+          montantTtc: this.selectedMontant,
         },
       })
     }
@@ -353,6 +353,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       dateEmission: this.selectedDevisItem.dateEmission
         ? new Date(this.selectedDevisItem.dateEmission._i)
         : new Date(this.selectedDevisItem.dateEmission._d),
+      
     })
     this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis
   }
@@ -370,7 +371,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   crudOperationTreatment(event) {
     let statut = event.result.statut == FactureStatutEnum.Valide
-        ? FactureStatutEnum.PaiementAttente : event.result.statut
+        ? this.parseStatutForStatutValide(event.result.dateEmission, event.result.echeancePaiement)
+        : event.result.statut
+
     if (event.crudOperation == 'create') {
       let newDevis = {
         ...event.result,
@@ -448,6 +451,12 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //#region Api Calls
   getListDevisApi$(event, data) {
+    let clientFilter = event.filters.client && event.filters.client.value
+    let dateEmissionFilter = event.filters.dateEmission && event.filters.dateEmission.value
+    let echeancePaiementFilter = event.filters.echeancePaiemen && event.filters.echeancePaiemen.value
+    let montantTtcFilter = event.filters.montantTtc && event.filters.montantTtc.value
+    let statutFilter = event.filters.statut && event.filters.statut.value
+
     return zip(
       this._factureServiceProxy.getAllFactureTotalRecords(
         0,
@@ -455,7 +464,11 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         event.globalFilter,
         '',
         '',
-        null,
+        clientFilter,
+        dateEmissionFilter,
+        echeancePaiementFilter,
+        montantTtcFilter,
+        statutFilter,
       ),
       this._factureServiceProxy.getAllFacture(
         event.first,
@@ -463,7 +476,11 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         event.globalFilter,
         event.sortField,
         event.sortOrder,
-        null,
+        clientFilter,
+        dateEmissionFilter,
+        echeancePaiementFilter,
+        montantTtcFilter,
+        statutFilter,
       ),
       this._factureServiceProxy.getAllFactureMontantTotal(
         event.first,
@@ -471,12 +488,16 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         event.globalFilter,
         '',
         '',
-        null,
+        clientFilter,
+        dateEmissionFilter,
+        echeancePaiementFilter,
+        montantTtcFilter,
+        statutFilter,
       ),
     ).pipe(
       map(([length, res, montantTotalAllDevis]: any) => {
         data = [...res.items]
-        data.forEach((devis: any) => {
+        data.forEach((devis: any) => { 
           devis.factureItems = devis.factureItems.map((item: any) => {
             let total_ht = item.unitPriceHT * item.quantity
             return {
@@ -485,8 +506,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           })
 
-          devis.statut =
-            devis.statut == FactureStatutEnum.Valide
+          devis.statut = 
+            devis.statut ==  
+            FactureStatutEnum.Valide
               ? moment().isAfter(
                   (devis.dateEmission as Moment).add(
                     devis.echeancePaiement,
@@ -496,6 +518,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
                 ? FactureStatutEnum.PaiementRetard
                 : FactureStatutEnum.PaiementAttente
               : devis.statut
+              // devis.statut == FactureStatutEnum.Valide ? 
+              // this.parseStatutForStatutValide(devis.dateEmission, devis.echeancePaiement) : devis.statut
+
 
           devis.montantTtc =
             devis.factureItems
@@ -572,7 +597,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.ref.onClose.subscribe((result) => {
       
       if (result) {
-
         let factureInfosPaiementDto = new FactureInfosPaiementDto({
           datePaiement: moment(result.datePaiement),
           montantPaye: result.montant,
@@ -677,6 +701,17 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     )
     this.tableChild.tableData[index] = {...this.selectedDevisItem}
     this.tableChild.tableData = [...this.tableChild.tableData]
+  }
+
+  parseStatutForStatutValide(dateEmission: Moment, echeancePaiement: number){
+    return moment().isAfter(
+        (moment(dateEmission)).add(
+          echeancePaiement,
+          'days',
+        ),
+      )
+      ? FactureStatutEnum.PaiementRetard
+      : FactureStatutEnum.PaiementAttente 
   }
 
 }

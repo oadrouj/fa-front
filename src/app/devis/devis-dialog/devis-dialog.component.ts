@@ -76,7 +76,7 @@ export class DevisDialogComponent implements OnInit {
             this.initiateFormGroupWithTableControls()
             this.dialogTitle = 'Modifier'
             this.devisItem = this.selectedDevisItem
-            this.referenceCount = this.selectedDevisItem.reference
+            // this.referenceCount = this.selectedDevisItem.reference
             this.reference = this._referenceService.formatReferenceNumber(
               this.selectedDevisItem.reference,
               ReferencePrefix.Devis,
@@ -145,7 +145,7 @@ export class DevisDialogComponent implements OnInit {
   selectedClientId: number
   devisItem: any
   reference!: string
-  referenceCount!: number
+  referenceCount: number = 0
   dialogTitle!: string
   Currency: string = 'MAD'
   clientSuggestions!: ClientForAutoCompleteDto[]
@@ -311,6 +311,9 @@ export class DevisDialogComponent implements OnInit {
   }
 
   changeReference() {
+    if( this.dialogTitle == 'Modifier' && !this.referenceCount ){
+      this.getNewReference()
+    }
     this.referenceCount++
     this.reference = this.devisFormatReferenceNumber(this.referenceCount)
   }
@@ -418,11 +421,7 @@ export class DevisDialogComponent implements OnInit {
 
     let createDevisInput = new CreateDevisInput({
       reference: this.referenceCount,
-      dateEmission:
-        DateHelper.initiateTimeFromDate(formValue.dateEmission).getTime() ==
-        DateHelper.initiateTimeFromDate(moment()).getTime()
-          ? moment()
-          : moment(formValue.dateEmission).add(1, 'days'),
+      dateEmission:  this.getExactDate(formValue.dateEmission, new Date()),
       echeancePaiement: formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
@@ -431,11 +430,7 @@ export class DevisDialogComponent implements OnInit {
       devisItems: formValue.devisItems.map((devisItem: DevisContentItem) => {
         return new DevisItemDto({
           description: devisItem.description,
-          date:
-            DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
-            DateHelper.initiateTimeFromDate(moment()).getTime()
-              ? moment()
-              : moment(devisItem.date).add(1, 'days'),
+          date: this.getExactDate(devisItem.date, new Date()),
           quantity: devisItem.quantity ?? 0,
           unit: devisItem.unit,
           unitPriceHT: devisItem.unitPriceHT ?? 0,
@@ -457,6 +452,7 @@ export class DevisDialogComponent implements OnInit {
                 ...createDevisInput,
                 id,
                 client: res,
+                dateEmission: this.getExactDate(createDevisInput.dateEmission, this.selectedDevisItem.dateEmission, 'subtract')
               },
             })
           })
@@ -473,7 +469,7 @@ export class DevisDialogComponent implements OnInit {
     let formValue = this.formGroup.value
     let updateDevisInput = new UpdateDevisInput({
       id: this.devisItem.id,
-      reference: this.referenceCount,
+      reference: this.referenceCount || this.selectedDevisItem.reference,
       dateEmission:
         this.selectedDevisItem.dateEmission != formValue.dateEmission
           ? moment(formValue.dateEmission).add(1, 'days')
@@ -486,11 +482,7 @@ export class DevisDialogComponent implements OnInit {
       devisItems: formValue.devisItems.map((devisItem: DevisContentItem) => {
         return new DevisItemDto({
           description: devisItem.description,
-          date:
-            DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
-            DateHelper.initiateTimeFromDate(moment()).getTime()
-              ? moment()
-              : moment(devisItem.date).add(1, 'days'),
+          date: this.getExactDate(devisItem.date, new Date()),
           quantity: devisItem.quantity ?? 0,
           unit: devisItem.unit,
           unitPriceHT: devisItem.unitPriceHT ?? 0,
@@ -513,6 +505,7 @@ export class DevisDialogComponent implements OnInit {
                   ...updateDevisInput,
                   reference: updateDevisInput.reference,
                   client: res,
+                  dateEmission: this.getExactDate(updateDevisInput.dateEmission, this.selectedDevisItem.dateEmission, 'subtract')
                 },
               })
             })
@@ -524,6 +517,7 @@ export class DevisDialogComponent implements OnInit {
               ...updateDevisInput,
               reference: updateDevisInput.reference,
               client: this.selectedDevisItem.client,
+              dateEmission: this.getExactDate(updateDevisInput.dateEmission, this.selectedDevisItem.dateEmission, 'subtract')
             },
           })
         }
@@ -606,11 +600,7 @@ export class DevisDialogComponent implements OnInit {
       (devisItem: DevisContentItem) => {
         return new DevisItemDto({
           description: devisItem.description,
-          date:
-            DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
-            DateHelper.initiateTimeFromDate(moment()).getTime()
-              ? moment()
-              : moment(devisItem.date).add(1, 'days'),
+          date: this.getExactDate(devisItem.date, new Date()),
           quantity: devisItem.quantity ?? 0,
           unit: devisItem.unit,
           unitPriceHT: devisItem.unitPriceHT ?? 0,
@@ -619,11 +609,7 @@ export class DevisDialogComponent implements OnInit {
         })
       },
     )
-    let dateEmission =  DateHelper.initiateTimeFromDate(formValue.dateEmission).getTime() ==
-    DateHelper.initiateTimeFromDate(moment()).getTime()
-      ? moment()
-      : moment(formValue.dateEmission).add(1, 'days')
-    
+    let dateEmission =  this.getExactDate(formValue.dateEmission, new Date())
     
     this._devisServiceProxy.getByteDataDevisReport(
       this.referenceCount,
@@ -662,5 +648,12 @@ export class DevisDialogComponent implements OnInit {
     callback?,
   ) {
     return this._devisServiceProxy.changeDevisStatut(devisId, devisStatut)
+  }
+
+  getExactDate(date1, date2, offset = "add" ){
+    return DateHelper.initiateTimeFromDate(date1).getTime() ==
+                  DateHelper.initiateTimeFromDate(moment(date2)).getTime()
+                    ? moment(date2)
+                    : ( offset == "add" ? moment(date1).add(1, 'days') : moment(date1).subtract(1, 'days'))
   }
 }

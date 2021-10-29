@@ -121,7 +121,7 @@ export class FacturesDialogComponent
               this.initiateFormGroupWithTableControls()
               this.dialogTitle = 'Modifier'
               this.devisItem = this.selectedDevisItem
-              this.referenceCount = this.selectedDevisItem.reference
+              // this.referenceCount = this.selectedDevisItem.reference
               this.reference = this._referenceService.formatReferenceNumber(
                 this.selectedDevisItem.reference,
                 ReferencePrefix.Facture,
@@ -194,7 +194,7 @@ export class FacturesDialogComponent
   selectedClientId: number
   devisItem: any
   reference!: string
-  referenceCount!: number
+  referenceCount: number = 0
   dialogTitle!: string
   Currency: string = 'MAD'
   clientSuggestions!: ClientForAutoCompleteDto[]
@@ -360,6 +360,9 @@ export class FacturesDialogComponent
   }
 
   changeReference() {
+    if( this.dialogTitle == 'Modifier' && !this.referenceCount ){
+      this.getNewReference()
+    }
     this.referenceCount++
     this.reference = this.factureFormatReferenceNumber(this.referenceCount)
   }
@@ -472,11 +475,7 @@ export class FacturesDialogComponent
 
     let createDevisInput = new CreateFactureInput({
       reference: this.referenceCount,
-      dateEmission:
-        DateHelper.initiateTimeFromDate(formValue.dateEmission).getTime() ==
-        DateHelper.initiateTimeFromDate(moment()).getTime()
-          ? moment()
-          : moment(formValue.dateEmission).add(1, 'days'),
+      dateEmission:  this.getExactDate(formValue.dateEmission, new Date()),
       echeancePaiement: formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
@@ -486,11 +485,7 @@ export class FacturesDialogComponent
         (devisItem: FactureContentItem) => {
           return new FactureItemDto({
             description: devisItem.description,
-            date:
-              DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
-              DateHelper.initiateTimeFromDate(moment()).getTime()
-                ? moment()
-                : moment(devisItem.date).add(1, 'days'),
+            date:  this.getExactDate(devisItem.date, new Date()),
             quantity: devisItem.quantity ?? 0,
             unit: devisItem.unit,
             unitPriceHT: devisItem.unitPriceHT ?? 0,
@@ -515,6 +510,7 @@ export class FacturesDialogComponent
                   ...createDevisInput,
                   id,
                   client: res,
+                  dateEmission: this.getExactDate(createDevisInput.dateEmission, this.selectedDevisItem.dateEmission, 'subtract')
                 },
               })
             })
@@ -531,7 +527,7 @@ export class FacturesDialogComponent
     let formValue = this.formGroup.value
     let updateDevisInput = new UpdateFactureInput({
       id: this.devisItem.id,
-      reference: this.referenceCount,
+      reference: this.referenceCount || this.selectedDevisItem.reference,
       dateEmission:
         this.selectedDevisItem.dateEmission != formValue.dateEmission
           ? moment(formValue.dateEmission).add(1, 'days')
@@ -546,11 +542,7 @@ export class FacturesDialogComponent
         (devisItem: FactureContentItem) => {
           return new FactureItemDto({
             description: devisItem.description,
-            date:
-              DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
-              DateHelper.initiateTimeFromDate(moment()).getTime()
-                ? moment()
-                : moment(devisItem.date).add(1, 'days'),
+            date: this.getExactDate(devisItem.date, new Date()),
             quantity: devisItem.quantity ?? 0,
             unit: devisItem.unit,
             unitPriceHT: devisItem.unitPriceHT ?? 0,
@@ -575,7 +567,8 @@ export class FacturesDialogComponent
                     ...this.selectedDevisItem,
                     ...updateDevisInput,
                     reference: updateDevisInput.reference,
-                    client: res,
+                    dateEmission: this.getExactDate(updateDevisInput.dateEmission, this.selectedDevisItem.dateEmission, 'subtract')
+                   
                   },
                 })
               })
@@ -587,6 +580,7 @@ export class FacturesDialogComponent
                 ...updateDevisInput,
                 reference: updateDevisInput.reference,
                 client: this.selectedDevisItem.client,
+                dateEmission: this.getExactDate(updateDevisInput.dateEmission, this.selectedDevisItem.dateEmission, 'subtract')
               },
             })
           }
@@ -728,11 +722,7 @@ export class FacturesDialogComponent
       (devisItem: FactureContentItem) => {
         return new FactureItemDto({
           description: devisItem.description,
-          date:
-            DateHelper.initiateTimeFromDate(devisItem.date).getTime() ==
-            DateHelper.initiateTimeFromDate(moment()).getTime()
-              ? moment()
-              : moment(devisItem.date).add(1, 'days'),
+          date: this.getExactDate(devisItem.date, new Date()),
           quantity: devisItem.quantity ?? 0,
           unit: devisItem.unit,
           unitPriceHT: devisItem.unitPriceHT ?? 0,
@@ -741,12 +731,7 @@ export class FacturesDialogComponent
         })
       },
     )
-    let dateEmission =  DateHelper.initiateTimeFromDate(formValue.dateEmission).getTime() ==
-    DateHelper.initiateTimeFromDate(moment()).getTime()
-      ? moment()
-      : moment(formValue.dateEmission).add(1, 'days')
-    
-      console.log(factureItems, dateEmission)
+    let dateEmission = this.getExactDate(formValue.dateEmission, new Date())
     
     this._factureServiceProxy.getByteDataFactureReport(
       this.referenceCount,
@@ -762,9 +747,17 @@ export class FacturesDialogComponent
       console.log(res)
       // window.open("data:application/pdf;base64," + res);
       var win = window.open();
-      win.document.write('<iframe src="data:application/pdf;base64,' + res + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+      win.document.write('<iframe src="data:application/pdf;base64,' + res + 
+        '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
   
     })
+  }
+
+  getExactDate(date1, date2, offset = "add" ){
+    return DateHelper.initiateTimeFromDate(date1).getTime() ==
+                  DateHelper.initiateTimeFromDate(moment(date2)).getTime()
+                    ? moment(date2)
+                    : ( offset == "add" ? moment(date1).add(1, 'days') : moment(date1).subtract(1, 'days'))
   }
 
 }
