@@ -138,8 +138,9 @@ export class DevisComponent implements OnInit, AfterViewInit {
         this.emitNotificationSelectedDevisChanged({
           ...this.selectedDevisItem,
           factureItems: this.selectedDevisItem.factureItems,
-          dateEmission : this.selectedDevisItem.dateEmission ?
-            new Date( this.selectedDevisItem.dateEmission._i) : new Date( this.selectedDevisItem.dateEmission._d)
+          dateEmission : this.selectedDevisItem.dateEmission instanceof Date 
+          ? this.selectedDevisItem.dateEmission
+          : moment(this.selectedDevisItem.dateEmission).add(1, 'days').toDate()
         })
         this.emitDialogStatus(DialogStatus.New, 'facture', true)
       },
@@ -475,7 +476,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
         montantTtcFilter,
         statutFilter,
       ),
-      this._devisServiceProxy.getAllDevisMontantTotal(
+      this._devisServiceProxy.getAllDevisMontantTotal( 
         event.first,
         event.rows,
         event.globalFilter,

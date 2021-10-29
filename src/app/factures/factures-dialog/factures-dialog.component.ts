@@ -94,8 +94,9 @@ export class FacturesDialogComponent
           switch (statut) {
             case DialogStatus.New:
               if (isConvertedDevis) {
+                
                 this.getNewReference()
-                this.initiateFormGroupForNewDevis()
+                this.initiateFormGroupWithTableControls()
                 this.dialogTitle = 'Nouveau'
                 this.devisItem = {
                   ...this.selectedDevisItem,
