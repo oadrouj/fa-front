@@ -1248,10 +1248,14 @@ export class DevisServiceProxy {
      * @param globalFilter (optional) 
      * @param sortField (optional) 
      * @param sortOrder (optional) 
-     * @param filtres (optional) 
+     * @param filtres_Client (optional) 
+     * @param filtres_DateEmission (optional) 
+     * @param filtres_EcheancePaiement (optional) 
+     * @param filtres_MontantTtc (optional) 
+     * @param filtres_Statut (optional) 
      * @return Success
      */
-    getAllDevis(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres: Filtre[] | null | undefined): Observable<DevisDtoListResultDto> {
+    getAllDevis(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: FactureStatutEnum | undefined): Observable<DevisDtoListResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Devis/GetAllDevis?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -1267,13 +1271,24 @@ export class DevisServiceProxy {
             url_ += "SortField=" + encodeURIComponent("" + sortField) + "&";
         if (sortOrder !== undefined && sortOrder !== null)
             url_ += "SortOrder=" + encodeURIComponent("" + sortOrder) + "&";
-        if (filtres !== undefined && filtres !== null)
-            filtres && filtres.forEach((item, index) => {
-                for (let attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "Filtres[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-        			}
-            });
+        if (filtres_Client === null)
+            throw new Error("The parameter 'filtres_Client' cannot be null.");
+        else if (filtres_Client !== undefined)
+            url_ += "Filtres.Client=" + encodeURIComponent("" + filtres_Client) + "&";
+        if (filtres_DateEmission !== undefined && filtres_DateEmission !== null)
+            filtres_DateEmission && filtres_DateEmission.forEach(item_ => { url_ += "Filtres.DateEmission=" + encodeURIComponent(item_ ? "" + item_.toJSON() : "null") + "&"; });
+        if (filtres_EcheancePaiement === null)
+            throw new Error("The parameter 'filtres_EcheancePaiement' cannot be null.");
+        else if (filtres_EcheancePaiement !== undefined)
+            url_ += "Filtres.EcheancePaiement=" + encodeURIComponent("" + filtres_EcheancePaiement) + "&";
+        if (filtres_MontantTtc === null)
+            throw new Error("The parameter 'filtres_MontantTtc' cannot be null.");
+        else if (filtres_MontantTtc !== undefined)
+            url_ += "Filtres.MontantTtc=" + encodeURIComponent("" + filtres_MontantTtc) + "&";
+        if (filtres_Statut === null)
+            throw new Error("The parameter 'filtres_Statut' cannot be null.");
+        else if (filtres_Statut !== undefined)
+            url_ += "Filtres.Statut=" + encodeURIComponent("" + filtres_Statut) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1326,10 +1341,14 @@ export class DevisServiceProxy {
      * @param globalFilter (optional) 
      * @param sortField (optional) 
      * @param sortOrder (optional) 
-     * @param filtres (optional) 
+     * @param filtres_Client (optional) 
+     * @param filtres_DateEmission (optional) 
+     * @param filtres_EcheancePaiement (optional) 
+     * @param filtres_MontantTtc (optional) 
+     * @param filtres_Statut (optional) 
      * @return Success
      */
-    getAllDevisTotalRecords(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres: Filtre[] | null | undefined): Observable<number> {
+    getAllDevisTotalRecords(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: FactureStatutEnum | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Devis/GetAllDevisTotalRecords?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -1345,13 +1364,24 @@ export class DevisServiceProxy {
             url_ += "SortField=" + encodeURIComponent("" + sortField) + "&";
         if (sortOrder !== undefined && sortOrder !== null)
             url_ += "SortOrder=" + encodeURIComponent("" + sortOrder) + "&";
-        if (filtres !== undefined && filtres !== null)
-            filtres && filtres.forEach((item, index) => {
-                for (let attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "Filtres[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-        			}
-            });
+        if (filtres_Client === null)
+            throw new Error("The parameter 'filtres_Client' cannot be null.");
+        else if (filtres_Client !== undefined)
+            url_ += "Filtres.Client=" + encodeURIComponent("" + filtres_Client) + "&";
+        if (filtres_DateEmission !== undefined && filtres_DateEmission !== null)
+            filtres_DateEmission && filtres_DateEmission.forEach(item_ => { url_ += "Filtres.DateEmission=" + encodeURIComponent(item_ ? "" + item_.toJSON() : "null") + "&"; });
+        if (filtres_EcheancePaiement === null)
+            throw new Error("The parameter 'filtres_EcheancePaiement' cannot be null.");
+        else if (filtres_EcheancePaiement !== undefined)
+            url_ += "Filtres.EcheancePaiement=" + encodeURIComponent("" + filtres_EcheancePaiement) + "&";
+        if (filtres_MontantTtc === null)
+            throw new Error("The parameter 'filtres_MontantTtc' cannot be null.");
+        else if (filtres_MontantTtc !== undefined)
+            url_ += "Filtres.MontantTtc=" + encodeURIComponent("" + filtres_MontantTtc) + "&";
+        if (filtres_Statut === null)
+            throw new Error("The parameter 'filtres_Statut' cannot be null.");
+        else if (filtres_Statut !== undefined)
+            url_ += "Filtres.Statut=" + encodeURIComponent("" + filtres_Statut) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1404,10 +1434,14 @@ export class DevisServiceProxy {
      * @param globalFilter (optional) 
      * @param sortField (optional) 
      * @param sortOrder (optional) 
-     * @param filtres (optional) 
+     * @param filtres_Client (optional) 
+     * @param filtres_DateEmission (optional) 
+     * @param filtres_EcheancePaiement (optional) 
+     * @param filtres_MontantTtc (optional) 
+     * @param filtres_Statut (optional) 
      * @return Success
      */
-    getAllDevisMontantTotal(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres: Filtre[] | null | undefined): Observable<number> {
+    getAllDevisMontantTotal(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: FactureStatutEnum | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Devis/GetAllDevisMontantTotal?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -1423,13 +1457,24 @@ export class DevisServiceProxy {
             url_ += "SortField=" + encodeURIComponent("" + sortField) + "&";
         if (sortOrder !== undefined && sortOrder !== null)
             url_ += "SortOrder=" + encodeURIComponent("" + sortOrder) + "&";
-        if (filtres !== undefined && filtres !== null)
-            filtres && filtres.forEach((item, index) => {
-                for (let attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "Filtres[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-        			}
-            });
+        if (filtres_Client === null)
+            throw new Error("The parameter 'filtres_Client' cannot be null.");
+        else if (filtres_Client !== undefined)
+            url_ += "Filtres.Client=" + encodeURIComponent("" + filtres_Client) + "&";
+        if (filtres_DateEmission !== undefined && filtres_DateEmission !== null)
+            filtres_DateEmission && filtres_DateEmission.forEach(item_ => { url_ += "Filtres.DateEmission=" + encodeURIComponent(item_ ? "" + item_.toJSON() : "null") + "&"; });
+        if (filtres_EcheancePaiement === null)
+            throw new Error("The parameter 'filtres_EcheancePaiement' cannot be null.");
+        else if (filtres_EcheancePaiement !== undefined)
+            url_ += "Filtres.EcheancePaiement=" + encodeURIComponent("" + filtres_EcheancePaiement) + "&";
+        if (filtres_MontantTtc === null)
+            throw new Error("The parameter 'filtres_MontantTtc' cannot be null.");
+        else if (filtres_MontantTtc !== undefined)
+            url_ += "Filtres.MontantTtc=" + encodeURIComponent("" + filtres_MontantTtc) + "&";
+        if (filtres_Statut === null)
+            throw new Error("The parameter 'filtres_Statut' cannot be null.");
+        else if (filtres_Statut !== undefined)
+            url_ += "Filtres.Statut=" + encodeURIComponent("" + filtres_Statut) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1544,8 +1589,8 @@ export class DevisServiceProxy {
      * @param clientId (optional) 
      * @return Success
      */
-    getDevisReport(reference: number | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined): Observable<string> {
-        let url_ = this.baseUrl + "/api/services/app/Devis/GetDevisReport?";
+    getByteDataDevisReport(reference: number | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/Devis/GetByteDataDevisReport?";
         if (reference === null)
             throw new Error("The parameter 'reference' cannot be null.");
         else if (reference !== undefined)
@@ -1571,12 +1616,18 @@ export class DevisServiceProxy {
         else if (statut !== undefined)
             url_ += "Statut=" + encodeURIComponent("" + statut) + "&";
         if (devisItems !== undefined && devisItems !== null)
-            devisItems && devisItems.forEach((item, index) => {
-                for (let attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-        			}
-            });
+        devisItems && devisItems.forEach((item, index) => {
+            for (let attr in item){
+                if (item.hasOwnProperty(attr)) {
+                    if(attr != "date")
+                        url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
+                    else
+                        url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
+            
+                }
+                }
+        });
+
         if (clientId === null)
             throw new Error("The parameter 'clientId' cannot be null.");
         else if (clientId !== undefined)
@@ -1592,11 +1643,11 @@ export class DevisServiceProxy {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetDevisReport(response_);
+            return this.processGetByteDataDevisReport(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetDevisReport(<any>response_);
+                    return this.processGetByteDataDevisReport(<any>response_);
                 } catch (e) {
                     return <Observable<string>><any>_observableThrow(e);
                 }
@@ -1605,7 +1656,7 @@ export class DevisServiceProxy {
         }));
     }
 
-    protected processGetDevisReport(response: HttpResponseBase): Observable<string> {
+    protected processGetByteDataDevisReport(response: HttpResponseBase): Observable<string> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1981,10 +2032,14 @@ export class FactureServiceProxy {
      * @param globalFilter (optional) 
      * @param sortField (optional) 
      * @param sortOrder (optional) 
-     * @param filtres (optional) 
+     * @param filtres_Client (optional) 
+     * @param filtres_DateEmission (optional) 
+     * @param filtres_EcheancePaiement (optional) 
+     * @param filtres_MontantTtc (optional) 
+     * @param filtres_Statut (optional) 
      * @return Success
      */
-    getAllFacture(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres: Filtre[] | null | undefined): Observable<FactureDtoListResultDto> {
+    getAllFacture(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: FactureStatutEnum | undefined): Observable<FactureDtoListResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Facture/GetAllFacture?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -2000,13 +2055,24 @@ export class FactureServiceProxy {
             url_ += "SortField=" + encodeURIComponent("" + sortField) + "&";
         if (sortOrder !== undefined && sortOrder !== null)
             url_ += "SortOrder=" + encodeURIComponent("" + sortOrder) + "&";
-        if (filtres !== undefined && filtres !== null)
-            filtres && filtres.forEach((item, index) => {
-                for (let attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "Filtres[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-        			}
-            });
+        if (filtres_Client === null)
+            throw new Error("The parameter 'filtres_Client' cannot be null.");
+        else if (filtres_Client !== undefined)
+            url_ += "Filtres.Client=" + encodeURIComponent("" + filtres_Client) + "&";
+        if (filtres_DateEmission !== undefined && filtres_DateEmission !== null)
+            filtres_DateEmission && filtres_DateEmission.forEach(item_ => { url_ += "Filtres.DateEmission=" + encodeURIComponent(item_ ? "" + item_.toJSON() : "null") + "&"; });
+        if (filtres_EcheancePaiement === null)
+            throw new Error("The parameter 'filtres_EcheancePaiement' cannot be null.");
+        else if (filtres_EcheancePaiement !== undefined)
+            url_ += "Filtres.EcheancePaiement=" + encodeURIComponent("" + filtres_EcheancePaiement) + "&";
+        if (filtres_MontantTtc === null)
+            throw new Error("The parameter 'filtres_MontantTtc' cannot be null.");
+        else if (filtres_MontantTtc !== undefined)
+            url_ += "Filtres.MontantTtc=" + encodeURIComponent("" + filtres_MontantTtc) + "&";
+        if (filtres_Statut === null)
+            throw new Error("The parameter 'filtres_Statut' cannot be null.");
+        else if (filtres_Statut !== undefined)
+            url_ += "Filtres.Statut=" + encodeURIComponent("" + filtres_Statut) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -2059,10 +2125,14 @@ export class FactureServiceProxy {
      * @param globalFilter (optional) 
      * @param sortField (optional) 
      * @param sortOrder (optional) 
-     * @param filtres (optional) 
+     * @param filtres_Client (optional) 
+     * @param filtres_DateEmission (optional) 
+     * @param filtres_EcheancePaiement (optional) 
+     * @param filtres_MontantTtc (optional) 
+     * @param filtres_Statut (optional) 
      * @return Success
      */
-    getAllFactureTotalRecords(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres: Filtre[] | null | undefined): Observable<number> {
+    getAllFactureTotalRecords(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: FactureStatutEnum | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Facture/GetAllFactureTotalRecords?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -2078,13 +2148,24 @@ export class FactureServiceProxy {
             url_ += "SortField=" + encodeURIComponent("" + sortField) + "&";
         if (sortOrder !== undefined && sortOrder !== null)
             url_ += "SortOrder=" + encodeURIComponent("" + sortOrder) + "&";
-        if (filtres !== undefined && filtres !== null)
-            filtres && filtres.forEach((item, index) => {
-                for (let attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "Filtres[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-        			}
-            });
+        if (filtres_Client === null)
+            throw new Error("The parameter 'filtres_Client' cannot be null.");
+        else if (filtres_Client !== undefined)
+            url_ += "Filtres.Client=" + encodeURIComponent("" + filtres_Client) + "&";
+        if (filtres_DateEmission !== undefined && filtres_DateEmission !== null)
+            filtres_DateEmission && filtres_DateEmission.forEach(item_ => { url_ += "Filtres.DateEmission=" + encodeURIComponent(item_ ? "" + item_.toJSON() : "null") + "&"; });
+        if (filtres_EcheancePaiement === null)
+            throw new Error("The parameter 'filtres_EcheancePaiement' cannot be null.");
+        else if (filtres_EcheancePaiement !== undefined)
+            url_ += "Filtres.EcheancePaiement=" + encodeURIComponent("" + filtres_EcheancePaiement) + "&";
+        if (filtres_MontantTtc === null)
+            throw new Error("The parameter 'filtres_MontantTtc' cannot be null.");
+        else if (filtres_MontantTtc !== undefined)
+            url_ += "Filtres.MontantTtc=" + encodeURIComponent("" + filtres_MontantTtc) + "&";
+        if (filtres_Statut === null)
+            throw new Error("The parameter 'filtres_Statut' cannot be null.");
+        else if (filtres_Statut !== undefined)
+            url_ += "Filtres.Statut=" + encodeURIComponent("" + filtres_Statut) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -2137,10 +2218,14 @@ export class FactureServiceProxy {
      * @param globalFilter (optional) 
      * @param sortField (optional) 
      * @param sortOrder (optional) 
-     * @param filtres (optional) 
+     * @param filtres_Client (optional) 
+     * @param filtres_DateEmission (optional) 
+     * @param filtres_EcheancePaiement (optional) 
+     * @param filtres_MontantTtc (optional) 
+     * @param filtres_Statut (optional) 
      * @return Success
      */
-    getAllFactureMontantTotal(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres: Filtre[] | null | undefined): Observable<number> {
+    getAllFactureMontantTotal(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: FactureStatutEnum | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Facture/GetAllFactureMontantTotal?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -2156,13 +2241,24 @@ export class FactureServiceProxy {
             url_ += "SortField=" + encodeURIComponent("" + sortField) + "&";
         if (sortOrder !== undefined && sortOrder !== null)
             url_ += "SortOrder=" + encodeURIComponent("" + sortOrder) + "&";
-        if (filtres !== undefined && filtres !== null)
-            filtres && filtres.forEach((item, index) => {
-                for (let attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "Filtres[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-        			}
-            });
+        if (filtres_Client === null)
+            throw new Error("The parameter 'filtres_Client' cannot be null.");
+        else if (filtres_Client !== undefined)
+            url_ += "Filtres.Client=" + encodeURIComponent("" + filtres_Client) + "&";
+        if (filtres_DateEmission !== undefined && filtres_DateEmission !== null)
+            filtres_DateEmission && filtres_DateEmission.forEach(item_ => { url_ += "Filtres.DateEmission=" + encodeURIComponent(item_ ? "" + item_.toJSON() : "null") + "&"; });
+        if (filtres_EcheancePaiement === null)
+            throw new Error("The parameter 'filtres_EcheancePaiement' cannot be null.");
+        else if (filtres_EcheancePaiement !== undefined)
+            url_ += "Filtres.EcheancePaiement=" + encodeURIComponent("" + filtres_EcheancePaiement) + "&";
+        if (filtres_MontantTtc === null)
+            throw new Error("The parameter 'filtres_MontantTtc' cannot be null.");
+        else if (filtres_MontantTtc !== undefined)
+            url_ += "Filtres.MontantTtc=" + encodeURIComponent("" + filtres_MontantTtc) + "&";
+        if (filtres_Statut === null)
+            throw new Error("The parameter 'filtres_Statut' cannot be null.");
+        else if (filtres_Statut !== undefined)
+            url_ += "Filtres.Statut=" + encodeURIComponent("" + filtres_Statut) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -2476,62 +2572,6 @@ export class FactureServiceProxy {
             }));
         }
         return _observableOf<FactureInfosPaiementDto>(<any>null);
-    }
-
-    /**
-     * @param factureId (optional) 
-     * @return Success
-     */
-    getTotalAmountFacturePayement(factureId: number | undefined): Observable<number> {
-        let url_ = this.baseUrl + "/api/services/app/Facture/GetTotalAmountFacturePayement?";
-        if (factureId === null)
-            throw new Error("The parameter 'factureId' cannot be null.");
-        else if (factureId !== undefined)
-            url_ += "factureId=" + encodeURIComponent("" + factureId) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetTotalAmountFacturePayement(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetTotalAmountFacturePayement(<any>response_);
-                } catch (e) {
-                    return <Observable<number>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<number>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetTotalAmountFacturePayement(response: HttpResponseBase): Observable<number> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 !== undefined ? resultData200 : <any>null;
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<number>(<any>null);
     }
 
     /**
@@ -2978,18 +3018,12 @@ export class ReportGeneratorServiceProxy {
         else if (statut !== undefined)
             url_ += "Statut=" + encodeURIComponent("" + statut) + "&";
         if (devisItems !== undefined && devisItems !== null)
-        devisItems && devisItems.forEach((item, index) => {
-            for (let attr in item){
-                if (item.hasOwnProperty(attr)) {
-                    if(attr != "date")
-                        url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-                    else
-                        url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
-            
-                }
-                }
-        });
-
+            devisItems && devisItems.forEach((item, index) => {
+                for (let attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
+        			}
+            });
         if (clientId === null)
             throw new Error("The parameter 'clientId' cannot be null.");
         else if (clientId !== undefined)
@@ -5820,41 +5854,13 @@ export interface IDevisDto {
     id: number;
 }
 
-export class Filtre implements IFiltre {
-
-    constructor(data?: IFiltre) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-    }
-
-    static fromJS(data: any): Filtre {
-        data = typeof data === 'object' ? data : {};
-        let result = new Filtre();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        return data; 
-    }
-
-    clone(): Filtre {
-        const json = this.toJSON();
-        let result = new Filtre();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IFiltre {
+export enum FactureStatutEnum {
+    Cree = 0,
+    Valide = 1,
+    ReglePartiellemt = 2,
+    Regle = 3,
+    PaiementAttente = 4,
+    PaiementRetard = 5,
 }
 
 export class DevisDtoListResultDto implements IDevisDtoListResultDto {
@@ -5906,16 +5912,6 @@ export class DevisDtoListResultDto implements IDevisDtoListResultDto {
 
 export interface IDevisDtoListResultDto {
     items: DevisDto[] | undefined;
-}
-
-export enum FactureStatutEnum {
-    Cree = 0,
-    Valide = 1,
-    ReglePartiellemt = 2,
-    Regle = 3,
-    PaiementAttente = 4,
-    PaiementRetard = 5,
-
 }
 
 export class FactureItemDto implements IFactureItemDto {

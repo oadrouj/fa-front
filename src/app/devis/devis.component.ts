@@ -444,6 +444,12 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
   //#region Api Calls
   getListDevisApi$(event, data) {
+    let clientFilter = event.filters.client && event.filters.client.value
+    let dateEmissionFilter = event.filters.dateEmission && event.filters.dateEmission.value
+    let echeancePaiementFilter = event.filters.echeancePaiemen && event.filters.echeancePaiemen.value
+    let montantTtcFilter = event.filters.montantTtc && event.filters.montantTtc.value
+    let statutFilter = event.filters.statut && event.filters.statut.value
+
     return zip(
       this._devisServiceProxy.getAllDevisTotalRecords(
         0,
@@ -451,7 +457,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
         event.globalFilter,
         '',
         '',
-        null,
+        clientFilter,
+        dateEmissionFilter,
+        echeancePaiementFilter,
+        montantTtcFilter,
+        statutFilter,
       ),
       this._devisServiceProxy.getAllDevis(
         event.first,
@@ -459,7 +469,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
         event.globalFilter,
         event.sortField,
         event.sortOrder,
-        null,
+        clientFilter,
+        dateEmissionFilter,
+        echeancePaiementFilter,
+        montantTtcFilter,
+        statutFilter,
       ),
       this._devisServiceProxy.getAllDevisMontantTotal(
         event.first,
@@ -467,7 +481,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
         event.globalFilter,
         '',
         '',
-        null,
+        clientFilter,
+        dateEmissionFilter,
+        echeancePaiementFilter,
+        montantTtcFilter,
+        statutFilter,
       ),
     ).pipe(
       map(([length, res, montantTotalAllDevis]: any) => {
@@ -600,7 +618,6 @@ export class DevisComponent implements OnInit, AfterViewInit {
   //#endregion
 
    downloadDevis() {
- 
     this._devisServiceProxy.getByIdDevisReport(this.selectedDevisItem.id).subscribe(res => {
       const linkSource = `data:application/pdf;base64,${res}`;
       const downloadLink = document.createElement("a");
@@ -621,6 +638,5 @@ export class DevisComponent implements OnInit, AfterViewInit {
       })
     })
   }
-
 
 }
