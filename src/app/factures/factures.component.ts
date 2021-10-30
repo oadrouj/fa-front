@@ -346,13 +346,13 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (selectionEventObject.type == 'delete') {
       this.selectedDevisItem = selectionEventObject.result
     }
+    console.log(this.selectedDevisItem.dateEmission.format())
     this.calculateSummaryTotalHTAndTVA()
     this.emitNotificationSelectedDevisChanged({
       ...this.selectedDevisItem,
-
-      dateEmission: this.selectedDevisItem.dateEmission
-        ? new Date(this.selectedDevisItem.dateEmission._i)
-        : new Date(this.selectedDevisItem.dateEmission._d),
+      dateEmission: new Date(this.selectedDevisItem.dateEmission._i)
+        // ? new Date(this.selectedDevisItem.dateEmission._i)
+        // : new Date(this.selectedDevisItem.dateEmission._d),
       
     })
     this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis
@@ -497,6 +497,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     ).pipe(
       map(([length, res, montantTotalAllDevis]: any) => {
         data = [...res.items]
+        console.log(data)
         data.forEach((devis: any) => { 
           devis.factureItems = devis.factureItems.map((item: any) => {
             let total_ht = item.unitPriceHT * item.quantity
@@ -510,7 +511,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
             devis.statut ==  
             FactureStatutEnum.Valide
               ? moment().isAfter(
-                  (devis.dateEmission as Moment).add(
+                  (moment(devis.dateEmission)).add(
                     devis.echeancePaiement,
                     'days',
                   ),
@@ -531,6 +532,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       }),
     )
   }
+
   updateApiCall(devisId: number, devisStatut: FactureStatutEnum, detail) {
     this._factureServiceProxy
       .changeFactureStatut(devisId, devisStatut)
