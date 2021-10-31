@@ -90,7 +90,7 @@ export class DevisDialogComponent implements OnInit {
               this.devisOptionsFormGroup
                 .get('remiseBtnIsChecked')
                 .setValue(true)
-                
+
             this.calculateSummaryTotalHTAndTTC()
             this.formGroup.get('client').setValue(this.devisItem.client)
             break
@@ -226,7 +226,6 @@ export class DevisDialogComponent implements OnInit {
   }
 
   initiateFormGroupWithTableControls() {
-  
     this.formGroup = this.formBuilder.group({
       client: ['', Validators.required],
       dateEmission: [new Date(), Validators.required],
@@ -256,7 +255,7 @@ export class DevisDialogComponent implements OnInit {
         date: item.date.toDate(),
       }
     })
-    console.log(  this.getFromArrayControl.controls.length)
+    console.log(this.getFromArrayControl.controls.length)
     this.formGroup.setValue({
       client: this.devisItem.client,
       dateEmission: this.devisItem.dateEmission,
@@ -311,7 +310,7 @@ export class DevisDialogComponent implements OnInit {
   }
 
   changeReference() {
-    if( this.dialogTitle == 'Modifier' && !this.referenceCount ){
+    if (this.dialogTitle == 'Modifier' && !this.referenceCount) {
       this.getNewReference()
     }
     this.referenceCount++
@@ -326,31 +325,30 @@ export class DevisDialogComponent implements OnInit {
     const control = this.formGroup.get('devisItems') as FormArray
     control.removeAt(index)
     this.calculateSummaryTotalHTAndTTC()
-  
   }
 
   autoCompleteSearch(event: any) {}
 
   //#region Calculations
 
-   calculateRowTotalHTAndTTC(rowIndex: number, value?, field?) {
+  calculateRowTotalHTAndTTC(rowIndex: number, value?, field?) {
     this.getFromArrayControl.controls[rowIndex].patchValue({
       [field]: value.value,
     })
 
-      const row = this.getDevisContentItems[rowIndex]
-      const total_ht = row.unitPriceHT * row.quantity
-      let total_ttc = total_ht
+    const row = this.getDevisContentItems[rowIndex]
+    const total_ht = row.unitPriceHT * row.quantity
+    let total_ttc = total_ht
 
-      if (this.devisOptionsFormGroup.get('tva').value) {
-        total_ttc = total_ht + (total_ht * row.tva) / 100
-      }
+    if (this.devisOptionsFormGroup.get('tva').value) {
+      total_ttc = total_ht + (total_ht * row.tva) / 100
+    }
 
-      this.getFromArrayControl.controls[rowIndex].patchValue({
-        totalTtc: total_ttc,
-      })
+    this.getFromArrayControl.controls[rowIndex].patchValue({
+      totalTtc: total_ttc,
+    })
 
-      this.calculateSummaryTotalHTAndTTC()
+    this.calculateSummaryTotalHTAndTTC()
   }
 
   RecalculateRows() {
@@ -421,7 +419,7 @@ export class DevisDialogComponent implements OnInit {
 
     let createDevisInput = new CreateDevisInput({
       reference: this.referenceCount,
-      dateEmission:  this.getExactDate(formValue.dateEmission, new Date()),
+      dateEmission: this.getExactDate(formValue.dateEmission, new Date()),
       echeancePaiement: formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
@@ -452,7 +450,11 @@ export class DevisDialogComponent implements OnInit {
                 ...createDevisInput,
                 id,
                 client: res,
-                dateEmission: this.getExactDate(createDevisInput.dateEmission, this.selectedDevisItem && this.selectedDevisItem.dateEmission, 'subtract')
+                dateEmission: this.getExactDate(
+                  createDevisInput.dateEmission,
+                  this.selectedDevisItem && this.selectedDevisItem.dateEmission,
+                  'subtract',
+                ),
               },
             })
           })
@@ -494,10 +496,10 @@ export class DevisDialogComponent implements OnInit {
     })
     this._devisServiceProxy.updateDevis(updateDevisInput).subscribe((res) => {
       if (res) {
-        if (this.selectedDevisItem.client.id != formValue.client.id) {
-          this._clientServiceProxy
-            .getByIdClient(formValue.client.id)
-            .subscribe((res) => {
+        this._clientServiceProxy
+          .getByIdClient(formValue.client.id)
+          .subscribe((res) => {
+            if (this.selectedDevisItem.client.id != formValue.client.id) {
               this.crudOperationEvent.emit({
                 crudOperation: 'update',
                 result: {
@@ -505,25 +507,34 @@ export class DevisDialogComponent implements OnInit {
                   ...updateDevisInput,
                   reference: updateDevisInput.reference,
                   client: res,
-                  dateEmission: this.getExactDate(updateDevisInput.dateEmission, this.selectedDevisItem.dateEmission, 'subtract')
+                  dateEmission: this.getExactDate(
+                    updateDevisInput.dateEmission,
+                    this.selectedDevisItem.dateEmission,
+                    'subtract',
+                  ),
                 },
               })
-            })
-        } else {
-          this.crudOperationEvent.emit({
-            crudOperation: 'update',
-            result: {
-              ...this.selectedDevisItem,
-              ...updateDevisInput,
-              reference: updateDevisInput.reference,
-              client: this.selectedDevisItem.client,
-              dateEmission: this.getExactDate(updateDevisInput.dateEmission, this.selectedDevisItem.dateEmission, 'subtract')
-            },
+            } else {
+              this.crudOperationEvent.emit({
+                crudOperation: 'update',
+                result: {
+                  ...this.selectedDevisItem,
+                  ...updateDevisInput,
+                  reference: updateDevisInput.reference,
+                  client: res,
+                  dateEmission: this.getExactDate(
+                    updateDevisInput.dateEmission,
+                    this.selectedDevisItem.dateEmission,
+                    'subtract',
+                  ),
+                },
+              })
+            }
+            this.closeDialogEvent.emit()
           })
-        }
-        this.closeDialogEvent.emit()
       }
     })
+
     this.toastService.info({
       summary: 'Confirmed',
       detail: 'Vous avez modifier ce devis en brouillon',
@@ -571,7 +582,6 @@ export class DevisDialogComponent implements OnInit {
     if (this.formGroup.valid) {
       if (isDevisStatusUpdate) {
         returnValue = this.validateStatusApi()
-
       } else {
         if (this.devisItem == null) {
           this.createApiCall(DevisStatutEnum.Valide)
@@ -594,38 +604,41 @@ export class DevisDialogComponent implements OnInit {
   //#endregion
 
   preview() {
-    let formValue = this.formGroup.value;
+    let formValue = this.formGroup.value
     console.log(formValue)
-    let devisItems = formValue.devisItems.map(
-      (devisItem: DevisContentItem) => {
-        return new DevisItemDto({
-          description: devisItem.description,
-          date: this.getExactDate(devisItem.date, new Date()),
-          quantity: devisItem.quantity ?? 0,
-          unit: devisItem.unit,
-          unitPriceHT: devisItem.unitPriceHT ?? 0,
-          tva: devisItem.tva,
-          totalTtc: devisItem.totalTtc,
-        })
-      },
-    )
-    let dateEmission =  this.getExactDate(formValue.dateEmission, new Date())
-    
-    this._devisServiceProxy.getByteDataDevisReport(
-      this.referenceCount,
-      dateEmission,
-      formValue.echeancePaiement,
-      formValue.messageIntroduction,
-      formValue.piedDePage,
-      this.devisOptionsFormGroup.get('remise').value,
-      this.selectedDevisItem.statut,
-      devisItems,
-      formValue.client.id,
-    ).subscribe(res => {
-      var win = window.open();
-      win.document.write('<iframe src="data:application/pdf;base64,' + res + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
-  
+    let devisItems = formValue.devisItems.map((devisItem: DevisContentItem) => {
+      return new DevisItemDto({
+        description: devisItem.description,
+        date: this.getExactDate(devisItem.date, new Date()),
+        quantity: devisItem.quantity ?? 0,
+        unit: devisItem.unit,
+        unitPriceHT: devisItem.unitPriceHT ?? 0,
+        tva: devisItem.tva,
+        totalTtc: devisItem.totalTtc,
+      })
     })
+    let dateEmission = this.getExactDate(formValue.dateEmission, new Date())
+
+    this._devisServiceProxy
+      .getByteDataDevisReport(
+        this.referenceCount,
+        dateEmission,
+        formValue.echeancePaiement,
+        formValue.messageIntroduction,
+        formValue.piedDePage,
+        this.devisOptionsFormGroup.get('remise').value,
+        this.selectedDevisItem.statut,
+        devisItems,
+        formValue.client.id,
+      )
+      .subscribe((res) => {
+        var win = window.open()
+        win.document.write(
+          '<iframe src="data:application/pdf;base64,' +
+            res +
+            '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>',
+        )
+      })
   }
 
   validateStatusApi(): Observable<any> {
@@ -650,18 +663,19 @@ export class DevisDialogComponent implements OnInit {
     return this._devisServiceProxy.changeDevisStatut(devisId, devisStatut)
   }
 
-  getExactDate(date1, date2, offset = "add" ){
-    return date2 ? (
-                  DateHelper.initiateTimeFromDate(date1).getTime() ==
-                  DateHelper.initiateTimeFromDate(moment(date2)).getTime()
-                    ? moment(date2)
-                    : ( offset == "add" ? moment(date1).add(1, 'days') : moment(date1).subtract(1, 'days'))
-                 ): (
-                  DateHelper.initiateTimeFromDate(date1).getTime() ==
-                  DateHelper.initiateTimeFromDate(moment()).getTime()
-                    ? moment()
-                    : ( offset == "add" ? moment(date1).add(1, 'days') : moment(date1).subtract(1, 'days'))
- 
-                 )
+  getExactDate(date1, date2, offset = 'add') {
+    return date2
+      ? DateHelper.initiateTimeFromDate(date1).getTime() ==
+        DateHelper.initiateTimeFromDate(moment(date2)).getTime()
+        ? moment(date2)
+        : offset == 'add'
+        ? moment(date1).add(1, 'days')
+        : moment(date1).subtract(1, 'days')
+      : DateHelper.initiateTimeFromDate(date1).getTime() ==
+        DateHelper.initiateTimeFromDate(moment()).getTime()
+      ? moment()
+      : offset == 'add'
+      ? moment(date1).add(1, 'days')
+      : moment(date1).subtract(1, 'days')
   }
 }
