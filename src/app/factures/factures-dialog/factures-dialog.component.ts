@@ -67,8 +67,7 @@ export class FacturesDialogComponent
     public globalEventsService: GlobalEventsService,
     private _convertDevisToFactureService: ConvertDevisToFactureService,
     private _router: Router,
-    private _devisServiceProxy: DevisServiceProxy,
-    // private _reportGeneratorServiceProxy: ReportGeneratorServiceProxy
+    private _devisServiceProxy: DevisServiceProxy, // private _reportGeneratorServiceProxy: ReportGeneratorServiceProxy
   ) {}
   test = false
   ngOnInit() {
@@ -79,6 +78,7 @@ export class FacturesDialogComponent
       (devisItem: any) => {
         this.selectedDevisItem = {
           ...devisItem,
+          client: devisItem.client,
         }
         // dateEmission: this.selectedDevisItem.dateEmission.toDate()}
       },
@@ -94,7 +94,6 @@ export class FacturesDialogComponent
           switch (statut) {
             case DialogStatus.New:
               if (isConvertedDevis) {
-                
                 this.getNewReference()
                 this.initiateFormGroupWithTableControls()
                 this.dialogTitle = 'Nouveau'
@@ -276,14 +275,13 @@ export class FacturesDialogComponent
   }
 
   initiateFormGroupWithTableControls() {
-   
     this.formGroup = this.formBuilder.group({
       client: ['', Validators.required],
       dateEmission: [new Date(), Validators.required],
       echeancePaiement: ['30', Validators.required],
       messageIntroduction: ['', Validators.required],
       piedDePage: ['', Validators.required],
-      factureItems:  this.formBuilder.array([]),
+      factureItems: this.formBuilder.array([]),
     })
   }
 
@@ -361,7 +359,7 @@ export class FacturesDialogComponent
   }
 
   changeReference() {
-    if( this.dialogTitle == 'Modifier' && !this.referenceCount ){
+    if (this.dialogTitle == 'Modifier' && !this.referenceCount) {
       this.getNewReference()
     }
     this.referenceCount++
@@ -387,19 +385,19 @@ export class FacturesDialogComponent
       [field]: value.value,
     })
 
-      const row = this.getFactureContentItems[rowIndex]
-      const total_ht = row.unitPriceHT * row.quantity
-      let total_ttc = total_ht
+    const row = this.getFactureContentItems[rowIndex]
+    const total_ht = row.unitPriceHT * row.quantity
+    let total_ttc = total_ht
 
-      if (this.devisOptionsFormGroup.get('tva').value) {
-        total_ttc = total_ht + (total_ht * row.tva) / 100
-      }
+    if (this.devisOptionsFormGroup.get('tva').value) {
+      total_ttc = total_ht + (total_ht * row.tva) / 100
+    }
 
-      this.getFromArrayControl.controls[rowIndex].patchValue({
-        totalTtc: total_ttc,
-      })
+    this.getFromArrayControl.controls[rowIndex].patchValue({
+      totalTtc: total_ttc,
+    })
 
-      this.calculateSummaryTotalHTAndTTC()
+    this.calculateSummaryTotalHTAndTTC()
   }
 
   RecalculateRows() {
@@ -476,7 +474,7 @@ export class FacturesDialogComponent
 
     let createDevisInput = new CreateFactureInput({
       reference: this.referenceCount,
-      dateEmission:  this.getExactDate(formValue.dateEmission, new Date()),
+      dateEmission: this.getExactDate(formValue.dateEmission, new Date()),
       echeancePaiement: formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
@@ -486,7 +484,7 @@ export class FacturesDialogComponent
         (devisItem: FactureContentItem) => {
           return new FactureItemDto({
             description: devisItem.description,
-            date:  this.getExactDate(devisItem.date, new Date()),
+            date: this.getExactDate(devisItem.date, new Date()),
             quantity: devisItem.quantity ?? 0,
             unit: devisItem.unit,
             unitPriceHT: devisItem.unitPriceHT ?? 0,
@@ -511,7 +509,12 @@ export class FacturesDialogComponent
                   ...createDevisInput,
                   id,
                   client: res,
-                  dateEmission: this.getExactDate(createDevisInput.dateEmission, this.selectedDevisItem.dateEmission, 'subtract')
+                  dateEmission: this.getExactDate(
+                    createDevisInput.dateEmission,
+                    this.selectedDevisItem &&
+                      this.selectedDevisItem.dateEmission,
+                    'subtract',
+                  ),
                 },
               })
             })
@@ -558,36 +561,50 @@ export class FacturesDialogComponent
       .updateFacture(updateDevisInput)
       .subscribe((res) => {
         if (res) {
-          if (this.selectedDevisItem.client.id != formValue.client.id) {
-            this._clientServiceProxy
-              .getByIdClient(formValue.client.id)
-              .subscribe((res) => {
+          console.log(
+            'test',
+            this.selectedDevisItem.client.id,
+            formValue.client.id,
+          )
+          this._clientServiceProxy
+            .getByIdClient(formValue.client.id)
+            .subscribe((res) => {
+              if (this.selectedDevisItem.client.id != formValue.client.id) {
                 this.crudOperationEvent.emit({
                   crudOperation: 'update',
                   result: {
                     ...this.selectedDevisItem,
                     ...updateDevisInput,
                     reference: updateDevisInput.reference,
-                    dateEmission: this.getExactDate(updateDevisInput.dateEmission, this.selectedDevisItem.dateEmission, 'subtract')
-                   
+                    client: res,
+                    dateEmission: this.getExactDate(
+                      updateDevisInput.dateEmission,
+                      this.selectedDevisItem.dateEmission,
+                      'subtract',
+                    ),
                   },
                 })
-              })
-          } else {
-            this.crudOperationEvent.emit({
-              crudOperation: 'update',
-              result: {
-                ...this.selectedDevisItem,
-                ...updateDevisInput,
-                reference: updateDevisInput.reference,
-                client: this.selectedDevisItem.client,
-                dateEmission: this.getExactDate(updateDevisInput.dateEmission, this.selectedDevisItem.dateEmission, 'subtract')
-              },
+              } else {
+                this.crudOperationEvent.emit({
+                  crudOperation: 'update',
+                  result: {
+                    ...this.selectedDevisItem,
+                    ...updateDevisInput,
+                    reference: updateDevisInput.reference,
+                    client: res,
+                    dateEmission: this.getExactDate(
+                      updateDevisInput.dateEmission,
+                      this.selectedDevisItem.dateEmission,
+                      'subtract',
+                    ),
+                  },
+                })
+              }
+              this.closeDialogEvent.emit()
             })
-          }
-          this.closeDialogEvent.emit()
         }
       })
+
     this.toastService.info({
       summary: 'Confirmed',
       detail: 'Vous avez modifier cette facture en brouillon',
@@ -717,7 +734,7 @@ export class FacturesDialogComponent
   }
 
   preview() {
-    let formValue = this.formGroup.value;
+    let formValue = this.formGroup.value
     console.log(formValue)
     let factureItems = formValue.factureItems.map(
       (devisItem: FactureContentItem) => {
@@ -733,32 +750,44 @@ export class FacturesDialogComponent
       },
     )
     let dateEmission = this.getExactDate(formValue.dateEmission, new Date())
-    
-    this._factureServiceProxy.getByteDataFactureReport(
-      this.referenceCount,
-      dateEmission,
-      formValue.echeancePaiement,
-      formValue.messageIntroduction,
-      formValue.piedDePage,
-      this.devisOptionsFormGroup.get('remise').value,
-      this.selectedDevisItem.statut,
-      factureItems,
-      formValue.client.id,
-    ).subscribe(res => {
-      console.log(res)
-      // window.open("data:application/pdf;base64," + res);
-      var win = window.open();
-      win.document.write('<iframe src="data:application/pdf;base64,' + res + 
-        '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
-  
-    })
+
+    this._factureServiceProxy
+      .getByteDataFactureReport(
+        this.referenceCount,
+        dateEmission,
+        formValue.echeancePaiement,
+        formValue.messageIntroduction,
+        formValue.piedDePage,
+        this.devisOptionsFormGroup.get('remise').value,
+        this.selectedDevisItem.statut,
+        factureItems,
+        formValue.client.id,
+      )
+      .subscribe((res) => {
+        console.log(res)
+        // window.open("data:application/pdf;base64," + res);
+        var win = window.open()
+        win.document.write(
+          '<iframe src="data:application/pdf;base64,' +
+            res +
+            '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>',
+        )
+      })
   }
 
-  getExactDate(date1, date2, offset = "add" ){
-    return DateHelper.initiateTimeFromDate(date1).getTime() ==
-                  DateHelper.initiateTimeFromDate(moment(date2)).getTime()
-                    ? moment(date2)
-                    : ( offset == "add" ? moment(date1).add(1, 'days') : moment(date1).subtract(1, 'days'))
+  getExactDate(date1, date2, offset = 'add') {
+    return date2
+      ? DateHelper.initiateTimeFromDate(date1).getTime() ==
+        DateHelper.initiateTimeFromDate(moment(date2)).getTime()
+        ? moment(date2)
+        : offset == 'add'
+        ? moment(date1).add(1, 'days')
+        : moment(date1).subtract(1, 'days')
+      : DateHelper.initiateTimeFromDate(date1).getTime() ==
+        DateHelper.initiateTimeFromDate(moment()).getTime()
+      ? moment()
+      : offset == 'add'
+      ? moment(date1).add(1, 'days')
+      : moment(date1).subtract(1, 'days')
   }
-
 }

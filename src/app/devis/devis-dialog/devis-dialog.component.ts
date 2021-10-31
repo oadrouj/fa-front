@@ -452,7 +452,7 @@ export class DevisDialogComponent implements OnInit {
                 ...createDevisInput,
                 id,
                 client: res,
-                dateEmission: this.getExactDate(createDevisInput.dateEmission, this.selectedDevisItem.dateEmission, 'subtract')
+                dateEmission: this.getExactDate(createDevisInput.dateEmission, this.selectedDevisItem && this.selectedDevisItem.dateEmission, 'subtract')
               },
             })
           })
@@ -651,9 +651,17 @@ export class DevisDialogComponent implements OnInit {
   }
 
   getExactDate(date1, date2, offset = "add" ){
-    return DateHelper.initiateTimeFromDate(date1).getTime() ==
+    return date2 ? (
+                  DateHelper.initiateTimeFromDate(date1).getTime() ==
                   DateHelper.initiateTimeFromDate(moment(date2)).getTime()
                     ? moment(date2)
                     : ( offset == "add" ? moment(date1).add(1, 'days') : moment(date1).subtract(1, 'days'))
+                 ): (
+                  DateHelper.initiateTimeFromDate(date1).getTime() ==
+                  DateHelper.initiateTimeFromDate(moment()).getTime()
+                    ? moment()
+                    : ( offset == "add" ? moment(date1).add(1, 'days') : moment(date1).subtract(1, 'days'))
+ 
+                 )
   }
 }

@@ -134,14 +134,14 @@ export class DevisComponent implements OnInit, AfterViewInit {
       label: 'Convertir',
       icon: 'pi pi-check',
       command: () => {
+        console.log('selected', this.selectedDevisItem)
         this.showFactureDialog()
         this.emitNotificationSelectedDevisChanged({
           ...this.selectedDevisItem,
           factureItems: this.selectedDevisItem.factureItems,
-          dateEmission : this.selectedDevisItem.dateEmission
-          // this.selectedDevisItem.dateEmission instanceof Date 
-          // ? this.selectedDevisItem.dateEmission
-          // : moment(this.selectedDevisItem.dateEmission).add(1, 'days').toDate()
+          dateEmission : this.selectedDevisItem.dateEmission instanceof Date 
+            ? this.selectedDevisItem.dateEmission
+          : moment(this.selectedDevisItem.dateEmission).toDate()
         })
         this.emitDialogStatus(DialogStatus.New, 'facture', true)
       },
@@ -347,6 +347,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       this.selectedDevisItem = selectionEventObject.result
     }
     this.calculateSummaryTotalHTAndTVA()
+    console.log( this.selectedDevisItem.client)
     this.emitNotificationSelectedDevisChanged({
       ...this.selectedDevisItem,
       dateEmission: this.selectedDevisItem.dateEmission
@@ -369,9 +370,14 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
   crudOperationTreatment(event) {
     if (event.crudOperation == 'create') {
+
       let newDevis = {
         ...event.result,
         remise: 0,
+        client: {
+          ...event.result.client,
+          nom: event.result.client.nom ? event.result.client.nom : event.result.client.raisonSociale
+          },
       }
       newDevis.devisItems = newDevis.devisItems.map((item: any) => {
         let total_ht = item.unitPriceHT * item.quantity
@@ -394,12 +400,13 @@ export class DevisComponent implements OnInit, AfterViewInit {
         a.reference < b.reference ? 1 : -1,
       )
 
-      this.selectedDevisItem.devisItems.forEach(
+      this.selectedDevisItem && this.selectedDevisItem.devisItems.forEach(
         (devisItem) => (devisItem.date = devisItem.date.toDate()),
       )
       this.selectedDevisItem = {
         ...newDevis,
         dateEmission: newDevis.dateEmission.toDate(),
+       
       }
       this.emitNotificationSelectedDevisChanged({
         ...this.selectedDevisItem,
@@ -407,6 +414,10 @@ export class DevisComponent implements OnInit, AfterViewInit {
     } else if (event.crudOperation == 'update') {
       this.selectedDevisItem = {
         ...event.result,
+        client: {
+          ...this.selectedDevisItem.client,
+          nom: event.result.client.nom ? event.result.client.nom : event.result.client.raisonSociale
+          },
       }
 
       //Calculate total montant
@@ -493,6 +504,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       map(([length, res, montantTotalAllDevis]: any) => {
         data = [...res.items]
         data.forEach((devis: any) => {
+          devis.client.nom = !devis.client.nom ? devis.client.raisonSociale : devis.client.nom
           devis.devisItems = devis.devisItems.map((item: any) => {
             let total_ht = item.unitPriceHT * item.quantity
             return {

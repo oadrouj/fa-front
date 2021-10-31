@@ -378,7 +378,12 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       let newDevis = {
         ...event.result,
         remise: 0,
-        statut
+        statut,
+        client: {
+          ...event.result.client,
+          nom: event.result.client.nom ? event.result.client.nom : event.result.client.raisonSociale
+          },
+      
       }
       newDevis.factureItems = newDevis.factureItems.map((item: any) => {
         let total_ht = item.unitPriceHT * item.quantity
@@ -411,8 +416,13 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (event.crudOperation == 'update') {
       this.selectedDevisItem = {
         ...event.result,
-        statut
+        statut,
+          client: {
+            ...this.selectedDevisItem.client,
+            nom: event.result.client.nom ? event.result.client.nom : event.result.client.raisonSociale
+            },
       }
+      console.log('res', event.result)
 
       //Calculate total montant
       this.selectedDevisItem.factureItems = this.selectedDevisItem.factureItems.map(
@@ -499,6 +509,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         data = [...res.items]
         console.log(data)
         data.forEach((devis: any) => { 
+          devis.client.nom = !devis.client.nom ? devis.client.raisonSociale : devis.client.nom
           devis.factureItems = devis.factureItems.map((item: any) => {
             let total_ht = item.unitPriceHT * item.quantity
             return {

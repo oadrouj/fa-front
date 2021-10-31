@@ -87,6 +87,9 @@
     padding-top: 4px;
 }
 
+
+/*#########################################################*/
+
 :host>>>#tableClients .p-datatable .p-datatable-thead>tr>th {
     font-size: 0.85rem;
     color: #2A95D1;
@@ -97,7 +100,7 @@
     background-color: transparent;
 }
 
-:host>>>.p-datatable .p-datatable-scrollable-header {
+:host>>>#tableClients .p-datatable .p-datatable-scrollable-header {
     background: transparent;
 }
 
