@@ -2,7 +2,7 @@ import { Component, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild 
 import { DomSanitizer } from '@angular/platform-browser';
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum';
 import { DevisItem } from '@shared/models/DevisItem';
-import { DevisServiceProxy, FactureServiceProxy } from '@shared/service-proxies/service-proxies';
+import { ClientServiceProxy, DevisServiceProxy, FactureServiceProxy } from '@shared/service-proxies/service-proxies';
 import { ReferenceService } from '@shared/services/reference.service';
 import { FilterMatchMode, FilterService, LazyLoadEvent } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -29,7 +29,7 @@ export class TableComponent implements OnInit {
   @Input() rowDeletedEvent!: Observable<any>;
   @Input() filterEvent!: Observable<any>;
   @Input() SelectItemEvent !: Observable<any>
-  @Input() getListDevisApi$: (event, data) => Observable<any>
+  @Input() getListApi$: (event, data) => Observable<any>
   @ViewChild('tbl') table: Table
 
   tableData: any
@@ -51,6 +51,7 @@ export class TableComponent implements OnInit {
     public _referenceService: ReferenceService,
     private _devisServiceProxy: DevisServiceProxy,
     private _factureServiceProxy: FactureServiceProxy,
+    private _clientServiceProxy: ClientServiceProxy,
   ) {}
 
   ngOnInit(): void {
@@ -113,7 +114,7 @@ export class TableComponent implements OnInit {
   
   loadTableLazy(event: LazyLoadEvent) {
       console.log(event);
-      this.getListDevisApi$(event, this.tableData)
+      this.getListApi$(event, this.tableData)
         .subscribe((res) => {
         this.tableData = Array.from({length: res.length})
         this.tableData.splice(event.first, event.rows, ...res.items);

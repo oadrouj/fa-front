@@ -463,7 +463,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   getListDevisApi$(event, data) {
     let clientFilter = event.filters.client && event.filters.client.value
     let dateEmissionFilter = event.filters.dateEmission && event.filters.dateEmission.value
-    let echeancePaiementFilter = event.filters.echeancePaiemen && event.filters.echeancePaiemen.value
+    let echeancePaiementFilter = event.filters.echeancePaiement && event.filters.echeancePaiement.value
     let montantTtcFilter = event.filters.montantTtc && event.filters.montantTtc.value
     let statutFilter = event.filters.statut && event.filters.statut.value
 
@@ -514,7 +514,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
             let total_ht = item.unitPriceHT * item.quantity
             return {
               ...item,
-              totalTtc: total_ht + (item.tva * total_ht) / 100,
+              // totalTtc: total_ht + (item.tva * total_ht) / 100,
             }
           })
 

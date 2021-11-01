@@ -24,6 +24,10 @@ toast(severity: string, summary: string, detail: string){
   })
 }
  
+success({summary, detail}: ToastArgs){
+  this.toast('success', summary, detail)
+}
+
 info({summary, detail}: ToastArgs){
   this.toast('info', summary, detail)
 }

@@ -252,11 +252,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
       this.filterSubject.next({
         type: 'filterByButton',
         value: {
-          client: (this.selectedClient && this.selectedClient.id) ?? -1,
-          dateEmission: this.selectedDate ?? moment.unix(0),
-          echeancePaiement: this.selectedEcheance ?? -1,
-          statut: this.selectedStatut ?? -1,
-          montantTtc: this.selectedMontant ?? -1,
+          client: this.selectedClient && this.selectedClient.id,
+          dateEmission: this.selectedDate,
+          echeancePaiement: this.selectedEcheance,
+          statut: this.selectedStatut,
+          montantTtc: this.selectedMontant,
         },
       })
     }
@@ -509,7 +509,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
             let total_ht = item.unitPriceHT * item.quantity
             return {
               ...item,
-              totalTtc: total_ht + (item.tva * total_ht) / 100,
+              // totalTtc: total_ht + (item.tva * total_ht) / 100,
             }
           })
           devis.statut = moment().isAfter(

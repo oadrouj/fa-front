@@ -28,14 +28,14 @@
                     <p-autoComplete [(ngModel)]="selectedClient" placeholder="Client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)" field="nom"></p-autoComplete>
                     <p-calendar [(ngModel)]="selectedDate" selectionMode="range" placeholder="Date"></p-calendar>
                     <p-inputNumber [(ngModel)]="selectedEcheance" placeholder="Echéance"></p-inputNumber>
-                    <p-inputNumber [(ngModel)]="selectedMontant" placeholder="Montant"></p-inputNumber>
+                    <p-inputNumber [(ngModel)]="selectedMontant" placeholder="Montant" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
                     <p-dropdown [options]="statutOptions" [(ngModel)]="selectedStatut" placeholder="Statut" optionLabel="label" optionValue="value" [showClear]="false"></p-dropdown>
                     <button pButton pRipple (click)="emitFilterEvent('filterByButton', null)" class="filterBtn p-button-rounded  ml-2" [ngClass]="'bg-' + primaryColor" label="Filtrer" icon="pi pi-filter"></button>
                 </div>
             </div>
 
             <app-table #dt1 [cols]="cols" [currency]="Currency" [styleClass]="'table'" (selectionChange)="selectionChange($event)" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [rowDeletedEvent]="rowDeletedSubject.asObservable()" [filterEvent]="filterSubject.asObservable()"
-                [getListDevisApi$]="getListDevisApi$" [SelectItemEvent]="notifySelectedDevisChanged.asObservable()" [globalFilterFields]="['reference','client','dateEmission','echeancePaiement', 'montantTtc','statut']">
+                [getListApi$]="getListDevisApi$" [SelectItemEvent]="notifySelectedDevisChanged.asObservable()" [globalFilterFields]="['reference','client','dateEmission','echeancePaiement', 'montantTtc','statut']">
             </app-table>
 
             <div class="devisTotal flex justify-content-between align-items-center w-100">
