@@ -129,7 +129,6 @@ export class ClientsComponent extends AppComponentBase
     this._globalEventsService.announcedThePageChangedColorSubject('#2A95D1')
 
     this.categories = [
-      { name: 'Catégorie', code: '0' },
       { name: 'Particulier', code: 'PRTC' },
       { name: 'Professionnel', code: 'PRFS' },
     ]
@@ -139,7 +138,6 @@ export class ClientsComponent extends AppComponentBase
     ]
     this.formClient.categorieClient = 'PRFS'
     this.types = [
-      { name: 'Type', code: '0' },
       { name: 'Client', code: 'CLNT' },
       { name: 'Prospect', code: 'PRSP' },
     ]
@@ -391,7 +389,7 @@ export class ClientsComponent extends AppComponentBase
                 ...result,
                 nom: result.categorieClient == 'PRFS' && (result.nom = result.raisonSociale),
               } as any
-              
+
               this.tableChild.tableData = [
                 ...this.tableChild.tableData,
                 { ...result },

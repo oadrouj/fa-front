@@ -21,9 +21,9 @@
                 </div>
                 <div class="col-7" id="filtreRightBlock">
                     <p-button class="content" label="Filtrer" (click)="emitFilterEvent('filterByButton', null)" icon="pi pi-filter" iconPos="left"></p-button>
-                    <p-dropdown class="content" [options]="types" [(ngModel)]="selectedType" optionLabel="name" optionValue="code">
+                    <p-dropdown class="content" [options]="types" placeholder="Type" [(ngModel)]="selectedType" optionLabel="name" optionValue="code">
                     </p-dropdown>
-                    <p-dropdown class="content" [options]="categories" [(ngModel)]="selectedCategory" optionLabel="name" optionValue="code">
+                    <p-dropdown class="content" [options]="categories" placeholder="Catégorie" [(ngModel)]="selectedCategory" optionLabel="name" optionValue="code">
                     </p-dropdown>
                 </div>
             </div>
