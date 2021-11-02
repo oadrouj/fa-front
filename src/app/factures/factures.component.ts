@@ -64,10 +64,14 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       `var(--${this.primaryColor}-color`,
     )
 
-  console.log('enum', FactureStatutEnum.Cree)
   }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() {
+    if (window.history.state.clientId) {
+      console.log(window.history.state.clientId);
+      this.newDevis(window.history.state.clientId);
+    }
+  }
 
   ngOnDestroy() {
     if (this.ref) this.ref.close()
@@ -83,7 +87,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   primaryColor = 'orange'
   secondaryColor = ''
   tableSelectionColor = 'var(--light-orange-color)'
-  searchText = '' //TODO: rename this variable
+  searchText = ''
   selectedClient: any
   selectedDate: Moment[]
   selectedEcheance: number
@@ -290,8 +294,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   //#endregion
 
-  newDevis() {
+  newDevis(clientId) {
     this.displayDialog = true
+    clientId && (this.child.selectedClientId = clientId)
     this.emitDialogStatus(DialogStatus.New, 'facture')
   }
 
@@ -358,6 +363,11 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis
   }
 
+  onDialogClose(){
+    this.displayDialog = false
+    document.body.style.overflow = 'auto'
+  }
+  
   calculateSummaryTotalHTAndTVA() {
     if (this.selectedDevisItem) {
       this.summaryTotalHT = (this.selectedDevisItem as any).factureItems
@@ -422,7 +432,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
             nom: event.result.client.nom ? event.result.client.nom : event.result.client.raisonSociale
             },
       }
-      console.log('res', event.result)
 
       //Calculate total montant
       this.selectedDevisItem.factureItems = this.selectedDevisItem.factureItems.map(
@@ -443,7 +452,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
 
       this.selectedDevisItem = {
         ...this.selectedDevisItem,
-        dateEmission: (this.selectedDevisItem.dateEmission as Moment).toDate(),
+        dateEmission: (moment(this.selectedDevisItem.dateEmission)).toDate(),
       }
       this.child.selectedDevisItem = { ...this.selectedDevisItem }
       let index = this.tableChild.tableData.findIndex(

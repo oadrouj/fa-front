@@ -21,7 +21,7 @@
 
                     <ng-container *ngSwitchCase="'currency'">
                         <td [colSpan]="colVar.colspan" mode="decimal">
-                            {{rowData[colVar.field] | number:'1.2-2' }} {{' ' + currency}}
+                            {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + currency}}
                         </td>
                     </ng-container>
 

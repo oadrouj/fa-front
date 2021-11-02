@@ -49,7 +49,7 @@ import {
 import { map } from 'rxjs/operators'
 import { ConvertDevisToFactureService } from '@shared/services/ConvertDevisToFacture.service'
 import { Router } from '@angular/router'
-
+import { ValidationHelper } from '@shared/helpers/ValidationHelper'
 @Component({
   selector: 'app-factures-dialog',
   templateUrl: './factures-dialog.component.html',
@@ -65,9 +65,8 @@ export class FacturesDialogComponent
     private _factureServiceProxy: FactureServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
     public globalEventsService: GlobalEventsService,
-    private _convertDevisToFactureService: ConvertDevisToFactureService,
     private _router: Router,
-    private _devisServiceProxy: DevisServiceProxy, // private _reportGeneratorServiceProxy: ReportGeneratorServiceProxy
+    private _devisServiceProxy: DevisServiceProxy, 
   ) {}
   test = false
   ngOnInit() {
@@ -86,11 +85,11 @@ export class FacturesDialogComponent
 
     this.dialogStatusEvent.subscribe(
       ({ statut, dialogComponent, isConvertedDevis }) => {
+        document.body.style.overflow = 'hidden'
+
         if (dialogComponent == 'facture') {
-          this.visibleSelf = this.visible
           this.initiateSummaryValues()
           this.visible && (document.body.style.overflow = 'hidden')
-
           switch (statut) {
             case DialogStatus.New:
               if (isConvertedDevis) {
@@ -113,6 +112,13 @@ export class FacturesDialogComponent
                 this.getNewReference()
                 this.initiateFormGroupForNewDevis()
                 this.dialogTitle = 'Nouveau'
+                this.selectedClientId && (
+                  this._clientServiceProxy.getByIdClient(this.selectedClientId)
+                    .subscribe(res => {
+                      let nom = res.nom || res.raisonSociale
+                    this.formGroup.get('client').setValue({...res, nom})
+                    })
+                  )
                 this.devisItem = null
               }
               break
@@ -346,7 +352,7 @@ export class FacturesDialogComponent
   closeDialog() {
     this.closeDialogEvent.emit()
     this.clearTableControl()
-    this.frm.nativeElement.classList.remove('submitted')
+    this.disableValidationClass()
     document.body.style.overflow = 'auto'
     this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(false)
   }
@@ -515,10 +521,16 @@ export class FacturesDialogComponent
                       this.selectedDevisItem.dateEmission,
                     'subtract',
                   ),
+                  factureItems: createDevisInput.factureItems.map(item => ({
+                    ...item,
+                    date: this.getExactDate(item.date, new Date(), 'subtract')
+                  }))
+                   
                 },
               })
             })
           this.closeDialogEvent.emit()
+          this.disableValidationClass()
         }
       })
     this.toastService.info({
@@ -582,6 +594,10 @@ export class FacturesDialogComponent
                       this.selectedDevisItem.dateEmission,
                       'subtract',
                     ),
+                    factureItems: updateDevisInput.factureItems.map(item => ({
+                      ...item,
+                      date: this.getExactDate(item.date, new Date(), 'subtract')
+                    }))
                   },
                 })
               } else {
@@ -597,10 +613,15 @@ export class FacturesDialogComponent
                       this.selectedDevisItem.dateEmission,
                       'subtract',
                     ),
+                    factureItems: updateDevisInput.factureItems.map(item => ({
+                      ...item,
+                      date: this.getExactDate(item.date, new Date(), 'subtract')
+                    }))
                   },
                 })
               }
               this.closeDialogEvent.emit()
+              this.disableValidationClass()
             })
         }
       })
@@ -632,7 +653,7 @@ export class FacturesDialogComponent
     // this.formGroup.get('client').validator = Validators.required
     // this.frm.nativeElement.classList.add('submitted')
     if (this.formGroup.get('client').valid) {
-      if (this.devisItem == null) {
+      if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer'){
         this.createApiCall(FactureStatutEnum.Cree)
         return
       }
@@ -654,7 +675,7 @@ export class FacturesDialogComponent
 
   validateDevis(isDevisStatusUpdate = false) {
     let returnValue = of({ success: false, result: null })
-    this.frm.nativeElement.classList.add('submitted')
+    this.enableValidationClass()
     let controlsNames = []
     const conrtolsObj = {
       client: 'Client',
@@ -672,7 +693,7 @@ export class FacturesDialogComponent
       if (isDevisStatusUpdate) {
         returnValue = this.validateStatusApi()
       } else {
-        if (this.devisItem == null) {
+        if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer'){
           this.createApiCall(FactureStatutEnum.Valide)
           return
         } else if (this.devisItem && this.devisItem.isConverted) {
@@ -764,7 +785,6 @@ export class FacturesDialogComponent
         formValue.client.id,
       )
       .subscribe((res) => {
-        console.log(res)
         // window.open("data:application/pdf;base64," + res);
         var win = window.open()
         win.document.write(
@@ -777,8 +797,8 @@ export class FacturesDialogComponent
 
   getExactDate(date1, date2, offset = 'add') {
     return date2
-      ? DateHelper.initiateTimeFromDate(date1).getTime() ==
-        DateHelper.initiateTimeFromDate(moment(date2)).getTime()
+      ? DateHelper.initiateTimeFromDate(date1).getTime()
+        == DateHelper.initiateTimeFromDate(moment(date2)).getTime()
         ? moment(date2)
         : offset == 'add'
         ? moment(date1).add(1, 'days')
@@ -790,4 +810,7 @@ export class FacturesDialogComponent
       ? moment(date1).add(1, 'days')
       : moment(date1).subtract(1, 'days')
   }
+
+  enableValidationClass = () => ValidationHelper.enableCssValidationClass(this.frm)
+  disableValidationClass = () => ValidationHelper.disableCssValidationClass(this.frm)
 }

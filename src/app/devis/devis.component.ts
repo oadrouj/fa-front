@@ -49,9 +49,15 @@ export class DevisComponent implements OnInit, AfterViewInit {
     this.globalEventsService.announcedThePageChangedColorSubject(
       `var(--${this.primaryColor}-color`,
     )
+    
   }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() {
+    if (window.history.state.clientId) {
+      console.log(window.history.state.clientId);
+      this.newDevis(window.history.state.clientId);
+    }
+  }
 
   //#region Properties
   @ViewChild(DevisDialogComponent, { static: false })
@@ -63,7 +69,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
   primaryColor = 'green'
   secondaryColor = ''
   tableSelectionColor = 'var(--light-green-color)'
-  searchText = '' //TODO: rename this variable
+  searchText = ''
   selectedClient: any
   selectedDate: Moment[]
   selectedEcheance: number
@@ -290,8 +296,9 @@ export class DevisComponent implements OnInit, AfterViewInit {
   }
   //#endregion
 
-  newDevis() {
+  newDevis(clientId?) {
     this.displayDialog = true
+    clientId && (this.child.selectedClientId = clientId)
     this.emitDialogStatus(DialogStatus.New, 'devis')
   }
 
@@ -357,6 +364,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
     this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis
   }
 
+  onDialogClose(){
+    this.displayDialog = false
+    document.body.style.overflow = 'auto'
+  }
+  
   calculateSummaryTotalHTAndTVA() {
     if (this.selectedDevisItem) {
       this.summaryTotalHT = (this.selectedDevisItem as any).devisItems

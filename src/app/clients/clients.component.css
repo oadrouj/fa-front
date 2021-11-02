@@ -148,17 +148,15 @@
 }
 
 #headerApercu {
-    min-height: 17.5vh;
-    max-height: 17.5vh;
+    /* min-height: 17.5vh;
+    max-height: 17.5vh; */
     border-bottom: 1px solid #d8d8d8;
     position: relative;
+    padding: 20px;
 }
 
 #headerApercu div {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
+    text-align: end;
 }
 
 :host>>>#headerApercu .p-button {

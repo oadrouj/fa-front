@@ -181,8 +181,8 @@
 
 
 <!-- Dialog -->
-<app-devis-dialog #devisDialog [visible]="displayDialog" (openDialogEvent)="displayDialog=true" (closeDialogEvent)="displayDialog = false" (crudOperationEvent)="crudOperationTreatment($event)" [devisFormatReferenceNumber]="devisFormatReferenceNumber"
-    [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()" [dialogStatusEvent]="dialogStatusEvent.asObservable()">
+<app-devis-dialog #devisDialog [visible]="displayDialog" (openDialogEvent)="displayDialog=true" (closeDialogEvent)="onDialogClose()" (crudOperationEvent)="crudOperationTreatment($event)" [devisFormatReferenceNumber]="devisFormatReferenceNumber" [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()"
+    [dialogStatusEvent]="dialogStatusEvent.asObservable()">
 </app-devis-dialog>
 
 

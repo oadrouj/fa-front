@@ -15,11 +15,12 @@
                 <div class="col-5" id="filtreLeftBlock">
                     <span class="p-input-icon-left shadow-1">
                         <i class="pi pi-search"></i>
-                        <input type="text" pInputText placeholder="Recherchez ici" [(ngModel)]="champsRecherche" />
+                        <input type="text" pInputText placeholder="Recherchez ici" [(ngModel)]="champsRecherche"
+                            (input)="emitFilterEvent('filterByInput', $event.target.value)" />
                     </span>
                 </div>
                 <div class="col-7" id="filtreRightBlock">
-                    <p-button class="content" label="Filtrer" icon="pi pi-filter" iconPos="left" (click)="chargerListeClients()"></p-button>
+                    <p-button class="content" label="Filtrer" (click)="emitFilterEvent('filterByButton', null)" icon="pi pi-filter" iconPos="left"></p-button>
                     <p-dropdown class="content" [options]="types" [(ngModel)]="selectedType" optionLabel="name" optionValue="code">
                     </p-dropdown>
                     <p-dropdown class="content" [options]="categories" [(ngModel)]="selectedCategory" optionLabel="name" optionValue="code">
@@ -28,8 +29,13 @@
             </div>
         </div>
 
-        <p-table id="tableClients" [value]="clients" [rows]="5" selectionMode="single" [(selection)]="client" dataKey="id" (onRowSelect)="onRowSelect($event)" (onSort)="customSort($event)" [customSort]="true" [lazy]="true" [scrollable]="true" [virtualScroll]="true"
-            [virtualRowHeight]="54" [totalRecords]="300" (onLazyLoad)="loadClientsLazy($event)">
+        <app-table #dt1 [cols]="cols" [currency]="Currency" [styleClass]="'table'" (selectionChange)="selectionChange($event)" [styleId]="'tableClients'" [highlightColorInput]="tableSelectionColor" [rowDeletedEvent]="rowDeletedSubject.asObservable()" [filterEvent]="filterSubject.asObservable()"
+            [getListApi$]="chargerListeClients" [SelectItemEvent]="notifySelectedDevisChanged.asObservable()" [globalFilterFields]="['categorie','type']">
+        </app-table>
+
+        <!-- <p-table id="tableClients" [value]="clients" [rows]="5" selectionMode="single" [(selection)]="client" dataKey="id" 
+            (onRowSelect)="onRowSelect($event)" (onSort)="customSort($event)" [customSort]="true" [lazy]="true" [scrollable]="true" 
+            [virtualScroll]="true" [virtualRowHeight]="54" [totalRecords]="300" >
             <ng-template pTemplate="header">
                 <tr>
                     <th pSortableColumn="reference">RéFERENCE
@@ -58,7 +64,7 @@
                     <td>0 MAD</td>
                 </tr>
             </ng-template>
-        </p-table>
+        </p-table> -->
         <div id="footerTable" class="grid mx-2">
             <div id="totalTTC">Total TTC</div>
             <div id="totalEnAttente">0 MAD</div>
@@ -69,21 +75,22 @@
         <div id="apercu" class="shadow-4">
             <div id="headerApercu">
                 <div>
-                    <p-button label="Nouvelle Facture" styleClass="p-button-link"></p-button>
-                    <p-button label="Nouveau Devis" styleClass="p-button-link"></p-button>
+                    <p-button label="Nouvelle Facture" (click)="newFacture()" styleClass="p-button-link"></p-button>
+                    <p-button label="Nouveau Devis" (click)="newDevis()" styleClass="p-button-link"></p-button>
                     <p-button label="Modifier" styleClass="p-button-link" (click)="showDialogModifier()"></p-button>
-                    <p-button label="Supprimer" styleClass="p-button-link" (click)="confirmerSuppression()"></p-button>
+                    <p-button label="Supprimer" styleClass="p-button-link" (click)="supprimerClient()"></p-button>
                 </div>
             </div>
             <div id="rappelClient">
                 <div class="pl-4">
                     <span id="nomClientApercu">
-                        {{replaceIfIsNullOrEmpty(isClientProfetionnel ? clientApercu.raisonSociale : clientApercu.nom)}}
+                        {{replaceIfIsNullOrEmpty(isClientProfetionnel ? client.raisonSociale : client.nom)}}
                     </span><br>
                     <span id="referenceClientApercu">
-                        {{getReferenceFromReferenceNumber(clientApercu.reference)}}
+                        {{getReferenceFromReferenceNumber(client.reference)}}
                     </span><br>
-                    <span id="categorieClientApercu">Prospect - {{replaceIfIsNullOrEmpty(isClientProfetionnel ? "Profetionnel" : "Particulier")}}</span>
+                    <span id="categorieClientApercu">Prospect -
+                        {{replaceIfIsNullOrEmpty(isClientProfetionnel ? "Profetionnel" : "Particulier")}}</span>
                 </div>
             </div>
             <div id="ongletsClient">
@@ -92,43 +99,43 @@
                         <table>
                             <tr *ngIf="isClientProfetionnel">
                                 <td>Raison sociale</td>
-                                <td>{{replaceIfIsNullOrEmpty(clientApercu.raisonSociale)}}</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.raisonSociale)}}</td>
                             </tr>
                             <tr *ngIf="isClientProfetionnel">
                                 <td>ICE</td>
-                                <td>{{replaceIfIsNullOrEmpty(clientApercu.ice)}}</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.ice)}}</td>
                             </tr>
                             <tr *ngIf="!isClientProfetionnel">
                                 <td>NOM</td>
-                                <td>{{replaceIfIsNullOrEmpty(clientApercu.nom)}}</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.nom)}}</td>
                             </tr>
                             <tr *ngIf="isClientProfetionnel">
                                 <td>Secteur d’activité</td>
-                                <td>{{replaceIfIsNullOrEmpty(clientApercu.secteurActivite)}}</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.secteurActivite)}}</td>
                             </tr>
                             <tr>
                                 <td>Téléphone fixe</td>
-                                <td>{{replaceIfIsNullOrEmpty(clientApercu.telFix)}}</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.telFix)}}</td>
                             </tr>
                             <tr>
                                 <td>Téléphone portable</td>
-                                <td>{{replaceIfIsNullOrEmpty(clientApercu.telPortable)}}</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.telPortable)}}</td>
                             </tr>
                             <tr>
                                 <td>E-mail</td>
-                                <td>{{replaceIfIsNullOrEmpty(clientApercu.email)}}</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.email)}}</td>
                             </tr>
                             <tr>
                                 <td>Site Web</td>
-                                <td>{{replaceIfIsNullOrEmpty(clientApercu.siteWeb)}}</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.siteWeb)}}</td>
                             </tr>
                             <tr>
                                 <td>Adresse</td>
-                                <td>{{replaceIfIsNullOrEmpty(clientApercu.adresse)}}</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.adresse)}}</td>
                             </tr>
                             <tr>
                                 <td>Ville</td>
-                                <td>{{replaceIfIsNullOrEmpty(clientApercu.ville)}}</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.ville)}}</td>
                             </tr>
                             <tr>
                                 <td>Pays</td>
@@ -136,19 +143,19 @@
                             </tr>
                             <tr>
                                 <td>Code postal</td>
-                                <td>{{replaceIfIsNullOrEmpty(clientApercu.codePostal)}}</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.codePostal)}}</td>
                             </tr>
                             <tr>
                                 <td>Devise de facturation</td>
-                                <td>{{replaceIfIsNullOrEmpty(clientApercu.deviseFacturation)}}</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.deviseFacturation)}}</td>
                             </tr>
                             <tr>
                                 <td>Remise</td>
-                                <td>{{clientApercu.remisePermanente}} %</td>
+                                <td>{{client.remisePermanente}} %</td>
                             </tr>
                             <tr>
                                 <td>Délai de paiement</td>
-                                <td>{{clientApercu.delaiPaiement}} Jours</td>
+                                <td>{{client.delaiPaiement}} Jours</td>
                             </tr>
                         </table>
                     </p-tabPanel>

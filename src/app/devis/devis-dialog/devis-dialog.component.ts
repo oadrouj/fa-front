@@ -33,6 +33,7 @@ import {
   ModificationStatusEnum,
 } from '@shared/globalEventsService'
 import { map } from 'rxjs/operators'
+import { ValidationHelper } from '@shared/helpers/ValidationHelper'
 @Component({
   selector: 'app-devis-dialog',
   templateUrl: './devis-dialog.component.html',
@@ -60,6 +61,7 @@ export class DevisDialogComponent implements OnInit {
     )
 
     this.dialogStatusEvent.subscribe(({ statut, dialogComponent }) => {
+      document.body.style.overflow = 'hidden'
       if (dialogComponent == 'devis') {
         this.initiateSummaryValues()
         this.visible && (document.body.style.overflow = 'hidden')
@@ -69,6 +71,14 @@ export class DevisDialogComponent implements OnInit {
             this.getNewReference()
             this.initiateFormGroupForNewDevis()
             this.dialogTitle = 'Nouveau'
+            this.calculateSummaryTotalHTAndTTC()
+            this.selectedClientId && (
+              this._clientServiceProxy.getByIdClient(this.selectedClientId)
+                .subscribe(res => {
+                  let nom = res.nom || res.raisonSociale
+                this.formGroup.get('client').setValue({...res, nom})
+                })
+              )
             this.devisItem = null
             break
 
@@ -297,7 +307,7 @@ export class DevisDialogComponent implements OnInit {
   closeDialog() {
     this.closeDialogEvent.emit()
     this.clearTableControl()
-    this.frm.nativeElement.classList.remove('submitted')
+    this.disableValidationClass()
     document.body.style.overflow = 'auto'
     this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(false)
   }
@@ -455,10 +465,15 @@ export class DevisDialogComponent implements OnInit {
                   this.selectedDevisItem && this.selectedDevisItem.dateEmission,
                   'subtract',
                 ),
+                devisItems: createDevisInput.devisItems.map(item => ({
+                  ...item,
+                  date: this.getExactDate(item.date, new Date(), 'subtract')
+                }))
               },
             })
           })
         this.closeDialogEvent.emit()
+        this.disableValidationClass()
       }
     })
     this.toastService.info({
@@ -512,6 +527,10 @@ export class DevisDialogComponent implements OnInit {
                     this.selectedDevisItem.dateEmission,
                     'subtract',
                   ),
+                  devisItems: updateDevisInput.devisItems.map(item => ({
+                    ...item,
+                    date: this.getExactDate(item.date, new Date(), 'subtract')
+                  }))
                 },
               })
             } else {
@@ -527,10 +546,15 @@ export class DevisDialogComponent implements OnInit {
                     this.selectedDevisItem.dateEmission,
                     'subtract',
                   ),
+                  devisItems: updateDevisInput.devisItems.map(item => ({
+                    ...item,
+                    date: this.getExactDate(item.date, new Date(), 'subtract')
+                  }))
                 },
               })
             }
             this.closeDialogEvent.emit()
+            this.disableValidationClass()
           })
       }
     })
@@ -556,7 +580,7 @@ export class DevisDialogComponent implements OnInit {
   }
 
   saveBrouillon() {
-    if (this.devisItem == null) {
+    if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer'){
       this.createApiCall(DevisStatutEnum.Cree)
     } else {
       this.updateApiCall(DevisStatutEnum.Cree)
@@ -565,7 +589,7 @@ export class DevisDialogComponent implements OnInit {
 
   validateDevis(isDevisStatusUpdate = false) {
     let returnValue = of({ success: false, result: null })
-    this.frm.nativeElement.classList.add('submitted')
+    this.enableValidationClass()
     let controlsNames = []
     const conrtolsObj = {
       client: 'Client',
@@ -583,7 +607,7 @@ export class DevisDialogComponent implements OnInit {
       if (isDevisStatusUpdate) {
         returnValue = this.validateStatusApi()
       } else {
-        if (this.devisItem == null) {
+        if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
           this.createApiCall(DevisStatutEnum.Valide)
         } else {
           this.updateApiCall(DevisStatutEnum.Valide)
@@ -591,6 +615,7 @@ export class DevisDialogComponent implements OnInit {
       }
     } else {
       !this.visible && this.openDialogEvent.emit()
+      
       this.toastService.error({
         detail:
           'Veuillez remplir les chemps obligatoires: ' +
@@ -678,4 +703,8 @@ export class DevisDialogComponent implements OnInit {
       ? moment(date1).add(1, 'days')
       : moment(date1).subtract(1, 'days')
   }
+
+  enableValidationClass = () => ValidationHelper.enableCssValidationClass(this.frm)
+
+  disableValidationClass = () => ValidationHelper.disableCssValidationClass(this.frm)
 }
