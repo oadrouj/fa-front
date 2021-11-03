@@ -294,7 +294,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   //#endregion
 
-  newDevis(clientId) {
+  newDevis(clientId?) {
     this.displayDialog = true
     clientId && (this.child.selectedClientId = clientId)
     this.emitDialogStatus(DialogStatus.New, 'facture')
