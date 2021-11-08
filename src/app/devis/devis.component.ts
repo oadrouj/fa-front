@@ -358,7 +358,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
     } else if (selectionEventObject.type == 'delete') {
       this.selectedDevisItem = selectionEventObject.result
     }
-    this.calculateSummaryTotalHTAndTVA()
+    this.calculateSummaryTotalHTAndTVA();
     this.emitNotificationSelectedDevisChanged({
       ...this.selectedDevisItem,
       dateEmission: new Date(this.selectedDevisItem.dateEmission._i)
@@ -510,9 +510,10 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
   //#region Api Calls
   getListDevisApi$(event, data) {
+    console.log(event.filters.echeancePaiement)
     let clientFilter = event.filters.client && event.filters.client.value
     let dateEmissionFilter = event.filters.dateEmission && event.filters.dateEmission.value
-    let echeancePaiementFilter = event.filters.echeancePaiemen && event.filters.echeancePaiemen.value
+    let echeancePaiementFilter = event.filters.echeancePaiement && event.filters.echeancePaiement.value
     let montantTtcFilter = event.filters.montantTtc && event.filters.montantTtc.value
     let statutFilter = event.filters.statut && event.filters.statut.value
 

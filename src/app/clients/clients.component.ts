@@ -253,6 +253,8 @@ export class ClientsComponent extends AppComponentBase
     this.emitNotificationSelectedDevisChanged({
       ...this.client,
     })
+    if(this.client == null)
+      this.client = new ClientDto()
     this.isClientProfetionnel = this.client.categorieClient == 'PRFS'
   }
 
