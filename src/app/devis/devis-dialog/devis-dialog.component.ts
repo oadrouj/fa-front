@@ -804,15 +804,32 @@ export class DevisDialogComponent implements OnInit {
     })
     let dateEmission = this.getExactDate(formValue.dateEmission, new Date())
 
+    let reference, referencePrefix
+    if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
+      reference = this.manuelReference
+        ? +this.formGroup.get('reference').value.substring(1)
+        : this.referenceCount
+      referencePrefix = this.manuelReference
+        ? this.formGroup.get('reference').value[0]
+        : 'D'
+    } else {
+      reference = this.manuelReference
+        ? +this.formGroup.get('reference').value.substring(1)
+        : this.selectedDevisItem.reference
+      referencePrefix = this.manuelReference
+        ? this.formGroup.get('reference').value[0]
+        : this.selectedDevisItem.referencePrefix
+    }
     this._devisServiceProxy
       .getByteDataDevisReport(
-        this.referenceCount,
+        reference,
+        referencePrefix,
         dateEmission,
         formValue.echeancePaiement,
         formValue.messageIntroduction,
         formValue.piedDePage,
         this.devisOptionsFormGroup.get('remise').value,
-        this.selectedDevisItem.statut,
+        this.selectedDevisItem ? this.selectedDevisItem.statut : undefined,
         devisItems,
         formValue.client.id,
       )
