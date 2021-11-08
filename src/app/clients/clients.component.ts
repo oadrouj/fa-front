@@ -125,8 +125,12 @@ export class ClientsComponent extends AppComponentBase
   }
 
   scrollHeight: string = '0px'
+  favIcon: HTMLLinkElement = document.querySelector('#favIcon');
+  
   ngOnInit(): void {
     this._globalEventsService.announcedThePageChangedColorSubject('#2A95D1')
+    
+    this.favIcon.href = "../../assets/img/ClientsTitreIcon.png"
 
     this.categories = [
       { name: 'Particulier', code: 'PRTC' },

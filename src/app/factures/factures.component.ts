@@ -48,6 +48,8 @@ import * as printJS from 'print-js'
 })
 export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   remiseAmount: number
+  favIcon: HTMLLinkElement = document.querySelector('#favIcon');
+
   constructor(
     private _referenceService: ReferenceService,
     public _fakeService: FakeService,
@@ -64,6 +66,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.globalEventsService.announcedThePageChangedColorSubject(
       `var(--${this.primaryColor}-color`,
     )
+    
+    this.favIcon.href = "assets/img/FacturesLogo.png"
+    
   }
 
   ngAfterViewInit() {

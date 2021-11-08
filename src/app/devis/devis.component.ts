@@ -46,11 +46,13 @@ export class DevisComponent implements OnInit, AfterViewInit {
     private _convertDevisToFactureService: ConvertDevisToFactureService,
   ) {}
 
+  favIcon: HTMLLinkElement = document.querySelector('#favIcon');
   ngOnInit() {
     this.globalEventsService.announcedThePageChangedColorSubject(
       `var(--${this.primaryColor}-color`,
     )
     
+    this.favIcon.href = "assets/img/DevisLogo.png"
   }
 
   ngAfterViewInit() {
