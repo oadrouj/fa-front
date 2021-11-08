@@ -62,7 +62,7 @@
                             <img src="assets/img/logo.png" alt="">
                         </div>
                         <div class="col-7 text-right">
-                            <h1>{{title}} {{selectedDevisItem && devisFormatReferenceNumber(selectedDevisItem.reference)}}</h1>
+                            <h1>{{title}} {{selectedDevisItem && devisFormatReferenceNumber(selectedDevisItem.reference, selectedDevisItem.referencePrefix)}}</h1>
                             <p class="date my-2">Date d'émission: {{selectedDevisItem && selectedDevisItem.dateEmission | date:'shortDate'}}
                             </p>
                             <p class="date my-1">
@@ -147,7 +147,7 @@
                                 <span>REMISE</span>
                             </div>
                             <div class="col-5">
-                                <span>{{selectedDevisItem && this.selectedDevisItem.remise | number:'1.2-2' }}
+                                <span>{{selectedDevisItem &&  this.remiseAmount | number:'1.2-2' }}
                                     {{' ' + Currency}}</span>
                             </div>
                         </div>

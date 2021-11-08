@@ -27,11 +27,22 @@
                                 <div class="col-5">
                                     <span>Numéro de {{title | lowercase}} </span>
                                 </div>
-                                <div class="col ">
-                                    <span>{{reference}}</span>
-                                </div>
+                                <ng-container *ngIf="!manuelReference; else elseTemplate">
+                                    <div class="col">
+                                        <span>{{reference}}</span>
+                                    </div>
+                                </ng-container>
+                                <ng-template #elseTemplate>
+                                    <div class="col">
+                                        <input pInputText type="text" formControlName="reference" />
+                                    </div>
+                                </ng-template>
+
+
+
                                 <div class="col text-center">
-                                    <button pButton label="Changer" (click)="changeReference()" class="p-button-text" [ngClass]="'color-' + primaryColor"></button>
+                                    <button pButton label="Changer" (click)="changeReference()" class="p-button-text" [ngClass]="'color-' + primaryColor">
+                                    </button>
                                 </div>
                             </div>
                             <div class="grid align-items-center">
@@ -149,7 +160,7 @@
                                             <div class="col-7 color-gray"><span>REMISE</span></div>
                                             <div class="col-5 " [ngClass]="'color-' + primaryColor">
                                                 <span>
-                                                    {{devisOptionsFormGroup.get('remise').value | number:'1.2-2' }}{{' ' + Currency}}
+                                                    {{remiseAmount || 0 | number:'1.2-2' }}{{' ' + Currency}}
                                                 </span>
                                             </div>
                                         </div>
@@ -166,7 +177,7 @@
                                             <div class="col-7 color-gray"><span>TOTAL ESTIME TTC</span></div>
                                             <div class="col-5" [ngClass]="'color-' + primaryColor">
                                                 <span>
-                                                    {{summaryTotalTTC | number:'1.2-2' }} {{' ' + Currency}}
+                                                    {{summaryTotalTTC || 0 | number:'1.2-2' }} {{' ' + Currency}}
                                                 </span>
                                             </div>
                                         </div>
@@ -181,7 +192,8 @@
                         <div class="py-3 px-4 bg-white " [ngClass]="'color-' + primaryColor">Options</div>
                         <p-accordionTab header="Remise" [selected]="false">
                             <p-toggleButton #tglBtn formControlName="remiseBtnIsChecked" onLabel="Désactiver" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check" (onChange)="toggleRemiseOption($event)"></p-toggleButton>
-                            <input pInputText *ngIf="tglBtn.checked" formControlName="remise" (input)="remiseValueChanged()" pKeyFilter="money" class="mt-2" />
+                            <p-inputNumber *ngIf="tglBtn.checked" formControlName="remise" (onInput)="remiseAmountChanged($event.value)" suffix="%" class="mt-2">
+                            </p-inputNumber>
                         </p-accordionTab>
                         <p-accordionTab header="TVA">
                             <p-toggleButton onLabel="Désactiver" formControlName="tva" (onChange)="toggleTVAOption($event.checked)" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check"></p-toggleButton>

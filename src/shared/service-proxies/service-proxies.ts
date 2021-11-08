@@ -374,27 +374,35 @@ export class ClientServiceProxy {
     }
 
     /**
-     * @param champsRecherche (optional) 
-     * @param clientCategory (optional) 
-     * @param clientType (optional) 
+     * @param first (optional) 
+     * @param rows (optional) 
+     * @param globalFilter (optional) 
      * @param sortField (optional) 
      * @param sortOrder (optional) 
+     * @param clientFilter_Category (optional) 
+     * @param clientFilter_Type (optional) 
      * @return Success
      */
-    getAllClients(champsRecherche: string | null | undefined, clientCategory: string | null | undefined, clientType: string | null | undefined, sortField: string | null | undefined, sortOrder: number | undefined): Observable<ClientDtoListResultDto> {
+    getAllClients(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, clientFilter_Category: string | null | undefined, clientFilter_Type: string | null | undefined): Observable<ClientDtoListResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Client/GetAllClients?";
-        if (champsRecherche !== undefined && champsRecherche !== null)
-            url_ += "ChampsRecherche=" + encodeURIComponent("" + champsRecherche) + "&";
-        if (clientCategory !== undefined && clientCategory !== null)
-            url_ += "ClientCategory=" + encodeURIComponent("" + clientCategory) + "&";
-        if (clientType !== undefined && clientType !== null)
-            url_ += "ClientType=" + encodeURIComponent("" + clientType) + "&";
+        if (first === null)
+            throw new Error("The parameter 'first' cannot be null.");
+        else if (first !== undefined)
+            url_ += "First=" + encodeURIComponent("" + first) + "&";
+        if (rows === null)
+            throw new Error("The parameter 'rows' cannot be null.");
+        else if (rows !== undefined)
+            url_ += "Rows=" + encodeURIComponent("" + rows) + "&";
+        if (globalFilter !== undefined && globalFilter !== null)
+            url_ += "GlobalFilter=" + encodeURIComponent("" + globalFilter) + "&";
         if (sortField !== undefined && sortField !== null)
             url_ += "SortField=" + encodeURIComponent("" + sortField) + "&";
-        if (sortOrder === null)
-            throw new Error("The parameter 'sortOrder' cannot be null.");
-        else if (sortOrder !== undefined)
+        if (sortOrder !== undefined && sortOrder !== null)
             url_ += "SortOrder=" + encodeURIComponent("" + sortOrder) + "&";
+        if (clientFilter_Category !== undefined && clientFilter_Category !== null)
+            url_ += "ClientFilter.Category=" + encodeURIComponent("" + clientFilter_Category) + "&";
+        if (clientFilter_Type !== undefined && clientFilter_Type !== null)
+            url_ += "ClientFilter.Type=" + encodeURIComponent("" + clientFilter_Type) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1255,7 +1263,7 @@ export class DevisServiceProxy {
      * @param filtres_Statut (optional) 
      * @return Success
      */
-    getAllDevis(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: FactureStatutEnum | undefined): Observable<DevisDtoListResultDto> {
+    getAllDevis(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: number | undefined): Observable<DevisDtoListResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Devis/GetAllDevis?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -1348,7 +1356,7 @@ export class DevisServiceProxy {
      * @param filtres_Statut (optional) 
      * @return Success
      */
-    getAllDevisTotalRecords(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: FactureStatutEnum | undefined): Observable<number> {
+    getAllDevisTotalRecords(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: number | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Devis/GetAllDevisTotalRecords?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -1441,7 +1449,7 @@ export class DevisServiceProxy {
      * @param filtres_Statut (optional) 
      * @return Success
      */
-    getAllDevisMontantTotal(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: FactureStatutEnum | undefined): Observable<number> {
+    getAllDevisMontantTotal(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: number | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Devis/GetAllDevisMontantTotal?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -1579,6 +1587,7 @@ export class DevisServiceProxy {
 
     /**
      * @param reference (optional) 
+     * @param referencePrefix (optional) 
      * @param dateEmission (optional) 
      * @param echeancePaiement (optional) 
      * @param messageIntroduction (optional) 
@@ -1589,12 +1598,14 @@ export class DevisServiceProxy {
      * @param clientId (optional) 
      * @return Success
      */
-    getByteDataDevisReport(reference: number | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined): Observable<string> {
+    getByteDataDevisReport(reference: number | undefined, referencePrefix: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Devis/GetByteDataDevisReport?";
         if (reference === null)
             throw new Error("The parameter 'reference' cannot be null.");
         else if (reference !== undefined)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
+        if (referencePrefix !== undefined && referencePrefix !== null)
+            url_ += "ReferencePrefix=" + encodeURIComponent("" + referencePrefix) + "&";
         if (dateEmission === null)
             throw new Error("The parameter 'dateEmission' cannot be null.");
         else if (dateEmission !== undefined)
@@ -1620,9 +1631,9 @@ export class DevisServiceProxy {
             for (let attr in item){
                 if (item.hasOwnProperty(attr)) {
                     if(attr != "date")
-                        url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
+                        url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
                     else
-                        url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
+                        url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
             
                 }
                 }
@@ -1676,6 +1687,67 @@ export class DevisServiceProxy {
             }));
         }
         return _observableOf<string>(<any>null);
+    }
+
+    /**
+     * @param referencePrefix (optional) 
+     * @param reference (optional) 
+     * @return Success
+     */
+    checkIfReferenceIsExist(referencePrefix: string | undefined, reference: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Devis/CheckIfReferenceIsExist?";
+        if (referencePrefix === null)
+            throw new Error("The parameter 'referencePrefix' cannot be null.");
+        else if (referencePrefix !== undefined)
+            url_ += "referencePrefix=" + encodeURIComponent("" + referencePrefix) + "&";
+        if (reference === null)
+            throw new Error("The parameter 'reference' cannot be null.");
+        else if (reference !== undefined)
+            url_ += "reference=" + encodeURIComponent("" + reference) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCheckIfReferenceIsExist(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCheckIfReferenceIsExist(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCheckIfReferenceIsExist(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
     }
 }
 
@@ -2039,7 +2111,7 @@ export class FactureServiceProxy {
      * @param filtres_Statut (optional) 
      * @return Success
      */
-    getAllFacture(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: FactureStatutEnum | undefined): Observable<FactureDtoListResultDto> {
+    getAllFacture(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: number | undefined): Observable<FactureDtoListResultDto> {
         let url_ = this.baseUrl + "/api/services/app/Facture/GetAllFacture?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -2132,7 +2204,7 @@ export class FactureServiceProxy {
      * @param filtres_Statut (optional) 
      * @return Success
      */
-    getAllFactureTotalRecords(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: FactureStatutEnum | undefined): Observable<number> {
+    getAllFactureTotalRecords(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: number | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Facture/GetAllFactureTotalRecords?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -2225,7 +2297,7 @@ export class FactureServiceProxy {
      * @param filtres_Statut (optional) 
      * @return Success
      */
-    getAllFactureMontantTotal(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: FactureStatutEnum | undefined): Observable<number> {
+    getAllFactureMontantTotal(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_Client: number | undefined, filtres_DateEmission: moment.Moment[] | null | undefined, filtres_EcheancePaiement: number | undefined, filtres_MontantTtc: number | undefined, filtres_Statut: number | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/Facture/GetAllFactureMontantTotal?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -2363,6 +2435,7 @@ export class FactureServiceProxy {
 
     /**
      * @param reference (optional) 
+     * @param referencePrefix (optional) 
      * @param dateEmission (optional) 
      * @param echeancePaiement (optional) 
      * @param messageIntroduction (optional) 
@@ -2373,12 +2446,14 @@ export class FactureServiceProxy {
      * @param clientId (optional) 
      * @return Success
      */
-    getByteDataFactureReport(reference: number | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined): Observable<string> {
+    getByteDataFactureReport(reference: number | undefined, referencePrefix: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Facture/GetByteDataFactureReport?";
         if (reference === null)
             throw new Error("The parameter 'reference' cannot be null.");
         else if (reference !== undefined)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
+        if (referencePrefix !== undefined && referencePrefix !== null)
+            url_ += "ReferencePrefix=" + encodeURIComponent("" + referencePrefix) + "&";
         if (dateEmission === null)
             throw new Error("The parameter 'dateEmission' cannot be null.");
         else if (dateEmission !== undefined)
@@ -2629,6 +2704,67 @@ export class FactureServiceProxy {
         }
         return _observableOf<boolean>(<any>null);
     }
+
+    /**
+     * @param referencePrefix (optional) 
+     * @param reference (optional) 
+     * @return Success
+     */
+    checkIfReferenceIsExist(referencePrefix: string | undefined, reference: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Facture/CheckIfReferenceIsExist?";
+        if (referencePrefix === null)
+            throw new Error("The parameter 'referencePrefix' cannot be null.");
+        else if (referencePrefix !== undefined)
+            url_ += "referencePrefix=" + encodeURIComponent("" + referencePrefix) + "&";
+        if (reference === null)
+            throw new Error("The parameter 'reference' cannot be null.");
+        else if (reference !== undefined)
+            url_ += "reference=" + encodeURIComponent("" + reference) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCheckIfReferenceIsExist(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCheckIfReferenceIsExist(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCheckIfReferenceIsExist(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
+    }
 }
 
 @Injectable()
@@ -2764,6 +2900,7 @@ export class ReportGeneratorServiceProxy {
 
     /**
      * @param reference (optional) 
+     * @param referencePrefix (optional) 
      * @param dateEmission (optional) 
      * @param echeancePaiement (optional) 
      * @param messageIntroduction (optional) 
@@ -2801,12 +2938,14 @@ export class ReportGeneratorServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    getByteDataFacture(reference: number | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItem[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
+    getByteDataFacture(reference: number | undefined, referencePrefix: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/ReportGenerator/GetByteDataFacture?";
         if (reference === null)
             throw new Error("The parameter 'reference' cannot be null.");
         else if (reference !== undefined)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
+        if (referencePrefix !== undefined && referencePrefix !== null)
+            url_ += "ReferencePrefix=" + encodeURIComponent("" + referencePrefix) + "&";
         if (dateEmission === null)
             throw new Error("The parameter 'dateEmission' cannot be null.");
         else if (dateEmission !== undefined)
@@ -2954,6 +3093,7 @@ export class ReportGeneratorServiceProxy {
 
     /**
      * @param reference (optional) 
+     * @param referencePrefix (optional) 
      * @param dateEmission (optional) 
      * @param echeancePaiement (optional) 
      * @param messageIntroduction (optional) 
@@ -2991,12 +3131,14 @@ export class ReportGeneratorServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    getByteDataDevis(reference: number | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItem[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
+    getByteDataDevis(reference: number | undefined, referencePrefix: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/ReportGenerator/GetByteDataDevis?";
         if (reference === null)
             throw new Error("The parameter 'reference' cannot be null.");
         else if (reference !== undefined)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
+        if (referencePrefix !== undefined && referencePrefix !== null)
+            url_ += "ReferencePrefix=" + encodeURIComponent("" + referencePrefix) + "&";
         if (dateEmission === null)
             throw new Error("The parameter 'dateEmission' cannot be null.");
         else if (dateEmission !== undefined)
@@ -5380,7 +5522,7 @@ export enum DevisStatutEnum {
     Converti = 2,
     Rejete = 3,
     Expire = 4,
-    Undefined = 5
+    Undefined = -1
 }
 
 export class DevisItemDto implements IDevisItemDto {
@@ -5452,6 +5594,7 @@ export interface IDevisItemDto {
 
 export class CreateDevisInput implements ICreateDevisInput {
     reference: number;
+    referencePrefix: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -5473,6 +5616,7 @@ export class CreateDevisInput implements ICreateDevisInput {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
+            this.referencePrefix = _data["referencePrefix"];
             this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
             this.echeancePaiement = _data["echeancePaiement"];
             this.messageIntroduction = _data["messageIntroduction"];
@@ -5498,6 +5642,7 @@ export class CreateDevisInput implements ICreateDevisInput {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
+        data["referencePrefix"] = this.referencePrefix;
         data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
         data["echeancePaiement"] = this.echeancePaiement;
         data["messageIntroduction"] = this.messageIntroduction;
@@ -5523,6 +5668,7 @@ export class CreateDevisInput implements ICreateDevisInput {
 
 export interface ICreateDevisInput {
     reference: number;
+    referencePrefix: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -5535,6 +5681,7 @@ export interface ICreateDevisInput {
 
 export class UpdateDevisInput implements IUpdateDevisInput {
     reference: number;
+    referencePrefix: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -5557,6 +5704,7 @@ export class UpdateDevisInput implements IUpdateDevisInput {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
+            this.referencePrefix = _data["referencePrefix"];
             this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
             this.echeancePaiement = _data["echeancePaiement"];
             this.messageIntroduction = _data["messageIntroduction"];
@@ -5583,6 +5731,7 @@ export class UpdateDevisInput implements IUpdateDevisInput {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
+        data["referencePrefix"] = this.referencePrefix;
         data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
         data["echeancePaiement"] = this.echeancePaiement;
         data["messageIntroduction"] = this.messageIntroduction;
@@ -5609,6 +5758,7 @@ export class UpdateDevisInput implements IUpdateDevisInput {
 
 export interface IUpdateDevisInput {
     reference: number;
+    referencePrefix: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -5617,138 +5767,12 @@ export interface IUpdateDevisInput {
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
-    id: number;
-}
-
-export class Client implements IClient {
-    reference: number;
-    categorieClient: string | undefined;
-    nom: string | undefined;
-    secteurActivite: string | undefined;
-    ice: string | undefined;
-    raisonSociale: string | undefined;
-    adresse: string | undefined;
-    ville: string | undefined;
-    pays: string | undefined;
-    codePostal: string | undefined;
-    email: string | undefined;
-    telFix: string | undefined;
-    telPortable: string | undefined;
-    siteWeb: string | undefined;
-    deviseFacturation: string | undefined;
-    remisePermanente: number;
-    delaiPaiement: number;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-
-    constructor(data?: IClient) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.reference = _data["reference"];
-            this.categorieClient = _data["categorieClient"];
-            this.nom = _data["nom"];
-            this.secteurActivite = _data["secteurActivite"];
-            this.ice = _data["ice"];
-            this.raisonSociale = _data["raisonSociale"];
-            this.adresse = _data["adresse"];
-            this.ville = _data["ville"];
-            this.pays = _data["pays"];
-            this.codePostal = _data["codePostal"];
-            this.email = _data["email"];
-            this.telFix = _data["telFix"];
-            this.telPortable = _data["telPortable"];
-            this.siteWeb = _data["siteWeb"];
-            this.deviseFacturation = _data["deviseFacturation"];
-            this.remisePermanente = _data["remisePermanente"];
-            this.delaiPaiement = _data["delaiPaiement"];
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): Client {
-        data = typeof data === 'object' ? data : {};
-        let result = new Client();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["reference"] = this.reference;
-        data["categorieClient"] = this.categorieClient;
-        data["nom"] = this.nom;
-        data["secteurActivite"] = this.secteurActivite;
-        data["ice"] = this.ice;
-        data["raisonSociale"] = this.raisonSociale;
-        data["adresse"] = this.adresse;
-        data["ville"] = this.ville;
-        data["pays"] = this.pays;
-        data["codePostal"] = this.codePostal;
-        data["email"] = this.email;
-        data["telFix"] = this.telFix;
-        data["telPortable"] = this.telPortable;
-        data["siteWeb"] = this.siteWeb;
-        data["deviseFacturation"] = this.deviseFacturation;
-        data["remisePermanente"] = this.remisePermanente;
-        data["delaiPaiement"] = this.delaiPaiement;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): Client {
-        const json = this.toJSON();
-        let result = new Client();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IClient {
-    reference: number;
-    categorieClient: string | undefined;
-    nom: string | undefined;
-    secteurActivite: string | undefined;
-    ice: string | undefined;
-    raisonSociale: string | undefined;
-    adresse: string | undefined;
-    ville: string | undefined;
-    pays: string | undefined;
-    codePostal: string | undefined;
-    email: string | undefined;
-    telFix: string | undefined;
-    telPortable: string | undefined;
-    siteWeb: string | undefined;
-    deviseFacturation: string | undefined;
-    remisePermanente: number;
-    delaiPaiement: number;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
     id: number;
 }
 
 export class DevisDto implements IDevisDto {
     reference: number;
+    referencePrefix: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -5757,7 +5781,7 @@ export class DevisDto implements IDevisDto {
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
-    client: Client;
+    client: ClientDto;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
@@ -5776,6 +5800,7 @@ export class DevisDto implements IDevisDto {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
+            this.referencePrefix = _data["referencePrefix"];
             this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
             this.echeancePaiement = _data["echeancePaiement"];
             this.messageIntroduction = _data["messageIntroduction"];
@@ -5788,7 +5813,7 @@ export class DevisDto implements IDevisDto {
                     this.devisItems.push(DevisItemDto.fromJS(item));
             }
             this.clientId = _data["clientId"];
-            this.client = _data["client"] ? Client.fromJS(_data["client"]) : <any>undefined;
+            this.client = _data["client"] ? ClientDto.fromJS(_data["client"]) : <any>undefined;
             this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
             this.lastModifierUserId = _data["lastModifierUserId"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
@@ -5807,6 +5832,7 @@ export class DevisDto implements IDevisDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
+        data["referencePrefix"] = this.referencePrefix;
         data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
         data["echeancePaiement"] = this.echeancePaiement;
         data["messageIntroduction"] = this.messageIntroduction;
@@ -5838,6 +5864,7 @@ export class DevisDto implements IDevisDto {
 
 export interface IDevisDto {
     reference: number;
+    referencePrefix: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -5846,21 +5873,12 @@ export interface IDevisDto {
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
-    client: Client;
+    client: ClientDto;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
     id: number;
-}
-
-export enum FactureStatutEnum {
-    Cree = 0,
-    Valide = 1,
-    ReglePartiellemt = 2,
-    Regle = 3,
-    PaiementAttente = 4,
-    PaiementRetard = 5,
 }
 
 export class DevisDtoListResultDto implements IDevisDtoListResultDto {
@@ -5912,6 +5930,16 @@ export class DevisDtoListResultDto implements IDevisDtoListResultDto {
 
 export interface IDevisDtoListResultDto {
     items: DevisDto[] | undefined;
+}
+
+export enum FactureStatutEnum {
+    Cree = 0,
+    Valide = 1,
+    ReglePartiellemt = 2,
+    Regle = 3,
+    PaiementAttente = 4,
+    PaiementRetard = 5,
+    undefined = -1
 }
 
 export class FactureItemDto implements IFactureItemDto {
@@ -5983,6 +6011,7 @@ export interface IFactureItemDto {
 
 export class CreateFactureInput implements ICreateFactureInput {
     reference: number;
+    referencePrefix: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -6004,6 +6033,7 @@ export class CreateFactureInput implements ICreateFactureInput {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
+            this.referencePrefix = _data["referencePrefix"];
             this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
             this.echeancePaiement = _data["echeancePaiement"];
             this.messageIntroduction = _data["messageIntroduction"];
@@ -6029,6 +6059,7 @@ export class CreateFactureInput implements ICreateFactureInput {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
+        data["referencePrefix"] = this.referencePrefix;
         data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
         data["echeancePaiement"] = this.echeancePaiement;
         data["messageIntroduction"] = this.messageIntroduction;
@@ -6054,6 +6085,7 @@ export class CreateFactureInput implements ICreateFactureInput {
 
 export interface ICreateFactureInput {
     reference: number;
+    referencePrefix: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -6066,6 +6098,7 @@ export interface ICreateFactureInput {
 
 export class UpdateFactureInput implements IUpdateFactureInput {
     reference: number;
+    referencePrefix: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -6088,6 +6121,7 @@ export class UpdateFactureInput implements IUpdateFactureInput {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
+            this.referencePrefix = _data["referencePrefix"];
             this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
             this.echeancePaiement = _data["echeancePaiement"];
             this.messageIntroduction = _data["messageIntroduction"];
@@ -6114,6 +6148,7 @@ export class UpdateFactureInput implements IUpdateFactureInput {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
+        data["referencePrefix"] = this.referencePrefix;
         data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
         data["echeancePaiement"] = this.echeancePaiement;
         data["messageIntroduction"] = this.messageIntroduction;
@@ -6140,6 +6175,7 @@ export class UpdateFactureInput implements IUpdateFactureInput {
 
 export interface IUpdateFactureInput {
     reference: number;
+    referencePrefix: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -6153,6 +6189,7 @@ export interface IUpdateFactureInput {
 
 export class FactureDto implements IFactureDto {
     reference: number;
+    referencePrefix: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -6161,7 +6198,7 @@ export class FactureDto implements IFactureDto {
     statut: FactureStatutEnum;
     factureItems: FactureItemDto[] | undefined;
     clientId: number;
-    client: Client;
+    client: ClientDto;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
@@ -6180,6 +6217,7 @@ export class FactureDto implements IFactureDto {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
+            this.referencePrefix = _data["referencePrefix"];
             this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
             this.echeancePaiement = _data["echeancePaiement"];
             this.messageIntroduction = _data["messageIntroduction"];
@@ -6192,7 +6230,7 @@ export class FactureDto implements IFactureDto {
                     this.factureItems.push(FactureItemDto.fromJS(item));
             }
             this.clientId = _data["clientId"];
-            this.client = _data["client"] ? Client.fromJS(_data["client"]) : <any>undefined;
+            this.client = _data["client"] ? ClientDto.fromJS(_data["client"]) : <any>undefined;
             this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
             this.lastModifierUserId = _data["lastModifierUserId"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
@@ -6211,6 +6249,7 @@ export class FactureDto implements IFactureDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
+        data["referencePrefix"] = this.referencePrefix;
         data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
         data["echeancePaiement"] = this.echeancePaiement;
         data["messageIntroduction"] = this.messageIntroduction;
@@ -6242,6 +6281,7 @@ export class FactureDto implements IFactureDto {
 
 export interface IFactureDto {
     reference: number;
+    referencePrefix: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -6250,7 +6290,7 @@ export interface IFactureDto {
     statut: FactureStatutEnum;
     factureItems: FactureItemDto[] | undefined;
     clientId: number;
-    client: Client;
+    client: ClientDto;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
@@ -6570,378 +6610,6 @@ export interface IInfosEntrepriseDto {
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
-    id: number;
-}
-
-export class Facture implements IFacture {
-    reference: number;
-    dateEmission: moment.Moment;
-    echeancePaiement: number;
-    messageIntroduction: string | undefined;
-    piedDePage: string | undefined;
-    remise: number;
-    statut: FactureStatutEnum;
-    factureItems: FactureItem[] | undefined;
-    clientId: number;
-    client: Client;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-
-    constructor(data?: IFacture) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.reference = _data["reference"];
-            this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
-            this.echeancePaiement = _data["echeancePaiement"];
-            this.messageIntroduction = _data["messageIntroduction"];
-            this.piedDePage = _data["piedDePage"];
-            this.remise = _data["remise"];
-            this.statut = _data["statut"];
-            if (Array.isArray(_data["factureItems"])) {
-                this.factureItems = [] as any;
-                for (let item of _data["factureItems"])
-                    this.factureItems.push(FactureItem.fromJS(item));
-            }
-            this.clientId = _data["clientId"];
-            this.client = _data["client"] ? Client.fromJS(_data["client"]) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): Facture {
-        data = typeof data === 'object' ? data : {};
-        let result = new Facture();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["reference"] = this.reference;
-        data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
-        data["echeancePaiement"] = this.echeancePaiement;
-        data["messageIntroduction"] = this.messageIntroduction;
-        data["piedDePage"] = this.piedDePage;
-        data["remise"] = this.remise;
-        data["statut"] = this.statut;
-        if (Array.isArray(this.factureItems)) {
-            data["factureItems"] = [];
-            for (let item of this.factureItems)
-                data["factureItems"].push(item.toJSON());
-        }
-        data["clientId"] = this.clientId;
-        data["client"] = this.client ? this.client.toJSON() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): Facture {
-        const json = this.toJSON();
-        let result = new Facture();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IFacture {
-    reference: number;
-    dateEmission: moment.Moment;
-    echeancePaiement: number;
-    messageIntroduction: string | undefined;
-    piedDePage: string | undefined;
-    remise: number;
-    statut: FactureStatutEnum;
-    factureItems: FactureItem[] | undefined;
-    clientId: number;
-    client: Client;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-}
-
-export class FactureItem implements IFactureItem {
-    description: string | undefined;
-    date: moment.Moment;
-    quantity: number;
-    unit: string | undefined;
-    unitPriceHT: number;
-    tva: number;
-    totalTtc: number;
-    factureId: number;
-    facture: Facture;
-    id: number;
-
-    constructor(data?: IFactureItem) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.description = _data["description"];
-            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
-            this.quantity = _data["quantity"];
-            this.unit = _data["unit"];
-            this.unitPriceHT = _data["unitPriceHT"];
-            this.tva = _data["tva"];
-            this.totalTtc = _data["totalTtc"];
-            this.factureId = _data["factureId"];
-            this.facture = _data["facture"] ? Facture.fromJS(_data["facture"]) : <any>undefined;
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): FactureItem {
-        data = typeof data === 'object' ? data : {};
-        let result = new FactureItem();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["description"] = this.description;
-        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
-        data["quantity"] = this.quantity;
-        data["unit"] = this.unit;
-        data["unitPriceHT"] = this.unitPriceHT;
-        data["tva"] = this.tva;
-        data["totalTtc"] = this.totalTtc;
-        data["factureId"] = this.factureId;
-        data["facture"] = this.facture ? this.facture.toJSON() : <any>undefined;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): FactureItem {
-        const json = this.toJSON();
-        let result = new FactureItem();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IFactureItem {
-    description: string | undefined;
-    date: moment.Moment;
-    quantity: number;
-    unit: string | undefined;
-    unitPriceHT: number;
-    tva: number;
-    totalTtc: number;
-    factureId: number;
-    facture: Facture;
-    id: number;
-}
-
-export class Devis implements IDevis {
-    reference: number;
-    dateEmission: moment.Moment;
-    echeancePaiement: number;
-    messageIntroduction: string | undefined;
-    piedDePage: string | undefined;
-    remise: number;
-    statut: DevisStatutEnum;
-    devisItems: DevisItem[] | undefined;
-    clientId: number;
-    client: Client;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-
-    constructor(data?: IDevis) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.reference = _data["reference"];
-            this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
-            this.echeancePaiement = _data["echeancePaiement"];
-            this.messageIntroduction = _data["messageIntroduction"];
-            this.piedDePage = _data["piedDePage"];
-            this.remise = _data["remise"];
-            this.statut = _data["statut"];
-            if (Array.isArray(_data["devisItems"])) {
-                this.devisItems = [] as any;
-                for (let item of _data["devisItems"])
-                    this.devisItems.push(DevisItem.fromJS(item));
-            }
-            this.clientId = _data["clientId"];
-            this.client = _data["client"] ? Client.fromJS(_data["client"]) : <any>undefined;
-            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
-            this.lastModifierUserId = _data["lastModifierUserId"];
-            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
-            this.creatorUserId = _data["creatorUserId"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): Devis {
-        data = typeof data === 'object' ? data : {};
-        let result = new Devis();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["reference"] = this.reference;
-        data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
-        data["echeancePaiement"] = this.echeancePaiement;
-        data["messageIntroduction"] = this.messageIntroduction;
-        data["piedDePage"] = this.piedDePage;
-        data["remise"] = this.remise;
-        data["statut"] = this.statut;
-        if (Array.isArray(this.devisItems)) {
-            data["devisItems"] = [];
-            for (let item of this.devisItems)
-                data["devisItems"].push(item.toJSON());
-        }
-        data["clientId"] = this.clientId;
-        data["client"] = this.client ? this.client.toJSON() : <any>undefined;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        data["lastModifierUserId"] = this.lastModifierUserId;
-        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
-        data["creatorUserId"] = this.creatorUserId;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): Devis {
-        const json = this.toJSON();
-        let result = new Devis();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IDevis {
-    reference: number;
-    dateEmission: moment.Moment;
-    echeancePaiement: number;
-    messageIntroduction: string | undefined;
-    piedDePage: string | undefined;
-    remise: number;
-    statut: DevisStatutEnum;
-    devisItems: DevisItem[] | undefined;
-    clientId: number;
-    client: Client;
-    lastModificationTime: moment.Moment | undefined;
-    lastModifierUserId: number | undefined;
-    creationTime: moment.Moment;
-    creatorUserId: number | undefined;
-    id: number;
-}
-
-export class DevisItem implements IDevisItem {
-    description: string | undefined;
-    date: moment.Moment;
-    quantity: number;
-    unit: string | undefined;
-    unitPriceHT: number;
-    tva: number;
-    totalTtc: number;
-    devisId: number;
-    devis: Devis;
-    id: number;
-
-    constructor(data?: IDevisItem) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.description = _data["description"];
-            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
-            this.quantity = _data["quantity"];
-            this.unit = _data["unit"];
-            this.unitPriceHT = _data["unitPriceHT"];
-            this.tva = _data["tva"];
-            this.totalTtc = _data["totalTtc"];
-            this.devisId = _data["devisId"];
-            this.devis = _data["devis"] ? Devis.fromJS(_data["devis"]) : <any>undefined;
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): DevisItem {
-        data = typeof data === 'object' ? data : {};
-        let result = new DevisItem();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["description"] = this.description;
-        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
-        data["quantity"] = this.quantity;
-        data["unit"] = this.unit;
-        data["unitPriceHT"] = this.unitPriceHT;
-        data["tva"] = this.tva;
-        data["totalTtc"] = this.totalTtc;
-        data["devisId"] = this.devisId;
-        data["devis"] = this.devis ? this.devis.toJSON() : <any>undefined;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): DevisItem {
-        const json = this.toJSON();
-        let result = new DevisItem();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IDevisItem {
-    description: string | undefined;
-    date: moment.Moment;
-    quantity: number;
-    unit: string | undefined;
-    unitPriceHT: number;
-    tva: number;
-    totalTtc: number;
-    devisId: number;
-    devis: Devis;
     id: number;
 }
 

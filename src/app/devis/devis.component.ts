@@ -34,6 +34,7 @@ import * as printJS from 'print-js'
   styleUrls: ['./devis.component.css'],
 })
 export class DevisComponent implements OnInit, AfterViewInit {
+  remiseAmount: number
   constructor(
     private _referenceService: ReferenceService,
     public _fakeService: FakeService,
@@ -89,11 +90,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
       header: 'REFERENCE',
       field: 'reference',
       type: 'text',
-      format: (number) =>
-        this._referenceService.formatReferenceNumber(
-          number,
-          ReferencePrefix.Devis,
-        ),
+      format: (number, customPrefix) =>
+      this._referenceService.formatReferenceNumber(
+        number,
+        customPrefix ? customPrefix : ReferencePrefix.Devis,
+      ),
     },
     {
       header: 'CLIENT',
@@ -172,7 +173,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
         this.emitDialogStatus(DialogStatus.Edit, 'devis')
         this.child.validateDevis(true).subscribe((res) => {
           if (res.success) {
-            this._toastService.info({ detail: 'Le devis est devient valide' })
+            this._toastService.success({ detail: 'Le devis est devient valide' })
             this.selectedDevisItem = {
               ...this.selectedDevisItem,
               statut: res.result.statut,
@@ -227,11 +228,12 @@ export class DevisComponent implements OnInit, AfterViewInit {
     return moment(dateEmission).add(echeance, 'days').toDate()
   }
 
-  devisFormatReferenceNumber(reference: number) {
-    return this._referenceService.formatReferenceNumber(
+  devisFormatReferenceNumber(reference: number, customPrefix ) {
+    return  this._referenceService.formatReferenceNumber(
       reference,
-      ReferencePrefix.Devis,
+      customPrefix ? customPrefix : ReferencePrefix.Devis,
     )
+    
   }
 
   clientAutoCompleteSearch(event: any) {
@@ -322,11 +324,13 @@ export class DevisComponent implements OnInit, AfterViewInit {
               this.tableChild.tableData = this.tableChild.tableData.filter(
                 (devis) => !devis || devis.id != this.selectedDevisItem.id,
               )
-              this.montantTotalAllDevis -= this.selectedDevisItem.montantTtc
+              this.calculateTotalMonatant();
+
+              // this.montantTotalAllDevis -= this.selectedDevisItem.montantTtc
               this.emitRowDeletedEvent(this.tableChild.tableData[0])
               this._toastService.info({
-                summary: 'Confirmed',
-                detail: 'You have accepted',
+                summary: 'Opération réussie',
+                detail:  'Le devis est supprimé avec succès',
               })
             }
           })
@@ -337,7 +341,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
           case ConfirmEventType.REJECT:
             this._toastService.error({
               summary: 'Erreur',
-              detail: "une erreur s'est produite lors de la suppression",
+              detail: "Une erreur s'est produite lors de la suppression",
             })
             break
           case ConfirmEventType.CANCEL:
@@ -347,6 +351,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
     })
   }
 
+  firstTimeCharged = true
   selectionChange(selectionEventObject) {
     if (selectionEventObject.type == 'selectionChanged') {
       this.selectedDevisItem = selectionEventObject.result
@@ -354,19 +359,21 @@ export class DevisComponent implements OnInit, AfterViewInit {
       this.selectedDevisItem = selectionEventObject.result
     }
     this.calculateSummaryTotalHTAndTVA()
-    console.log( this.selectedDevisItem.client)
     this.emitNotificationSelectedDevisChanged({
       ...this.selectedDevisItem,
-      dateEmission: this.selectedDevisItem.dateEmission
-        ? new Date(this.selectedDevisItem.dateEmission._i)
-        : new Date(this.selectedDevisItem.dateEmission._d),
+      dateEmission: new Date(this.selectedDevisItem.dateEmission._i)
+        // ? new Date(this.selectedDevisItem.dateEmission._i)
+        // : new Date(this.selectedDevisItem.dateEmission._d),
     })
-    this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis
-  }
+    this.firstTimeCharged && (this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis);
+    this.firstTimeCharged = false
+    // this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis
+  } 
 
   onDialogClose(){
     this.displayDialog = false
     document.body.style.overflow = 'auto'
+    this.calculateTotalMonatant();
   }
   
   calculateSummaryTotalHTAndTVA() {
@@ -377,7 +384,31 @@ export class DevisComponent implements OnInit, AfterViewInit {
       this.summaryTVA = this.selectedDevisItem.devisItems
         .map((item) => (item.unitPriceHT * item.quantity * item.tva) / 100)
         .reduce((accum, current) => accum + current)
+      
+      this.remiseAmount = this.calculateRemise( this.selectedDevisItem.remise, this.summaryTotalHT)
+
     }
+  }
+  calculateTotalMonatant() {
+    this.montantTotalAllDevis = 0;
+    this.tableChild.tableData.forEach((item) => {
+      if(item) {
+        let totalHt =  item.devisItems 
+        .map((item) => item.unitPriceHT * item.quantity)
+        .reduce((accum, current) => accum + current)
+
+        this.montantTotalAllDevis += item.devisItems
+        .map((item) => item.totalTtc)
+        .reduce((accum, current) => accum + current) -
+            item.remise * totalHt / 100
+            }
+    })
+
+
+  }
+
+  calculateRemise(remise, totalHT) {
+    return totalHT * remise /100;
   }
 
   crudOperationTreatment(event) {
@@ -385,7 +416,6 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
       let newDevis = {
         ...event.result,
-        remise: 0,
         client: {
           ...event.result.client,
           nom: event.result.client.nom ? event.result.client.nom : event.result.client.raisonSociale
@@ -398,10 +428,17 @@ export class DevisComponent implements OnInit, AfterViewInit {
           totalTtc: total_ht + (item.tva * total_ht) / 100,
         }
       })
+
+      let remiseAmount = 
+      (newDevis.devisItems
+        .map((item) => item.unitPriceHT * item.quantity)
+        .reduce((accum, current) => accum + current) * newDevis.remise) /100
+      
+
       newDevis.montantTtc =
         newDevis.devisItems
           .map((item) => item.totalTtc)
-          .reduce((accum, current) => accum + current) - newDevis.remise
+          .reduce((accum, current) => accum + current) - remiseAmount
       this.montantTotalAllDevis += newDevis.montantTtc
 
       this.tableChild.tableData = [
@@ -443,11 +480,15 @@ export class DevisComponent implements OnInit, AfterViewInit {
         },
       )
 
+      let remiseAmount = 
+      (this.selectedDevisItem.devisItems
+        .map((item) => item.unitPriceHT * item.quantity)
+        .reduce((accum, current) => accum + current) * this.selectedDevisItem.remise) /100
+        
       this.selectedDevisItem.montantTtc =
         this.selectedDevisItem.devisItems
           .map((item) => item.totalTtc)
-          .reduce((accum, current) => accum + current) -
-        this.selectedDevisItem.remise
+          .reduce((accum, current) => accum + current) - remiseAmount
 
       this.selectedDevisItem = {
         ...this.selectedDevisItem,
@@ -518,7 +559,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
         data.forEach((devis: any) => {
           devis.client.nom = !devis.client.nom ? devis.client.raisonSociale : devis.client.nom
           devis.devisItems = devis.devisItems.map((item: any) => {
-            let total_ht = item.unitPriceHT * item.quantity
+            let totalHt = item.unitPriceHT * item.quantity
             return {
               ...item,
               // totalTtc: total_ht + (item.tva * total_ht) / 100,
@@ -530,10 +571,17 @@ export class DevisComponent implements OnInit, AfterViewInit {
             ? DevisStatutEnum.Expire
             : devis.statut
 
-          devis.montantTtc =
+          let montantTtc =
             devis.devisItems
               .map((item) => item.totalTtc)
-              .reduce((accum, current) => accum + current) - devis.remise
+              .reduce((accum, current) => accum + current)
+          let montantHt =
+              devis.devisItems
+                .map((item) => item.unitPriceHT * item.quantity)
+                .reduce((accum, current) => accum + current)
+
+          devis.montantTtc = montantTtc - ( montantHt * devis.remise / 100)
+          
         })
         return { items: data, length, montantTotalAllDevis }
       }),
@@ -586,10 +634,17 @@ export class DevisComponent implements OnInit, AfterViewInit {
           totalTtc: total_ht + (item.tva * total_ht) / 100,
         }
       })
+
+      let remiseAmount = 
+      (newDevis.factureItems
+        .map((item) => item.unitPriceHT * item.quantity)
+        .reduce((accum, current) => accum + current) * newDevis.remise) /100
+        
       newDevis.montantTtc =
         newDevis.factureItems
           .map((item) => item.totalTtc)
-          .reduce((accum, current) => accum + current) - newDevis.remise
+          .reduce((accum, current) => accum + current) - remiseAmount
+ 
       this.montantTotalAllDevis += newDevis.montantTtc
 
       // this.tableChild.tableData = [...this.tableChild.tableData ,{...newDevis}]
@@ -617,12 +672,16 @@ export class DevisComponent implements OnInit, AfterViewInit {
           }
         },
       )
-
+        
+      let remiseAmount = 
+      (this.selectedDevisItem.factureItems
+        .map((item) => item.unitPriceHT * item.quantity)
+        .reduce((accum, current) => accum + current) * this.selectedDevisItem.remise) /100
+        
       this.selectedDevisItem.montantTtc =
         this.selectedDevisItem.factureItems
           .map((item) => item.totalTtc)
-          .reduce((accum, current) => accum + current) -
-        this.selectedDevisItem.remise
+          .reduce((accum, current) => accum + current) - remiseAmount
 
       this.selectedDevisItem = {
         ...this.selectedDevisItem,

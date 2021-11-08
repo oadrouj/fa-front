@@ -58,6 +58,7 @@ import { ValidationHelper } from '@shared/helpers/ValidationHelper'
 })
 export class FacturesDialogComponent
   implements OnInit, AfterViewInit, OnDestroy {
+  remiseValue: number
   constructor(
     private formBuilder: FormBuilder,
     private _referenceService: ReferenceService,
@@ -66,7 +67,7 @@ export class FacturesDialogComponent
     private _clientServiceProxy: ClientServiceProxy,
     public globalEventsService: GlobalEventsService,
     private _router: Router,
-    private _devisServiceProxy: DevisServiceProxy, 
+    private _devisServiceProxy: DevisServiceProxy,
   ) {}
   test = false
   ngOnInit() {
@@ -79,6 +80,7 @@ export class FacturesDialogComponent
           ...devisItem,
           client: devisItem.client,
         }
+        this.clearTableControl()
         // dateEmission: this.selectedDevisItem.dateEmission.toDate()}
       },
     )
@@ -86,7 +88,7 @@ export class FacturesDialogComponent
     this.dialogStatusEvent.subscribe(
       ({ statut, dialogComponent, isConvertedDevis }) => {
         document.body.style.overflow = 'hidden'
-
+        this.manuelReference = false
         if (dialogComponent == 'facture') {
           this.initiateSummaryValues()
           this.visible && (document.body.style.overflow = 'hidden')
@@ -96,29 +98,40 @@ export class FacturesDialogComponent
                 this.getNewReference()
                 this.initiateFormGroupWithTableControls()
                 this.dialogTitle = 'Nouveau'
-                this.devisItem = {
+                this.selectedDevisItem = {
                   ...this.selectedDevisItem,
                   factureItems: this.selectedDevisItem.devisItems,
                   isConverted: true,
                 }
+                this.devisItem = this.selectedDevisItem
 
                 this.setFormGroup()
                 this.devisOptionsFormGroup
                   .get('remise')
                   .setValue(this.devisItem.remise)
+                this.remiseValue = this.devisItem.remise
+
+                let tvaIsDesactivated = this.devisItem.factureItems.every(
+                  (item) => item.tva == 0,
+                )
+                this.devisOptionsFormGroup
+                  .get('tva')
+                  .setValue(!tvaIsDesactivated)
+                tvaIsDesactivated && this.toggleTVAOption(false)
+
                 this.calculateSummaryTotalHTAndTTC()
                 this.formGroup.get('client').setValue(this.devisItem.client)
               } else {
                 this.getNewReference()
                 this.initiateFormGroupForNewDevis()
                 this.dialogTitle = 'Nouveau'
-                this.selectedClientId && (
-                  this._clientServiceProxy.getByIdClient(this.selectedClientId)
-                    .subscribe(res => {
+                this.selectedClientId &&
+                  this._clientServiceProxy
+                    .getByIdClient(this.selectedClientId)
+                    .subscribe((res) => {
                       let nom = res.nom || res.raisonSociale
-                    this.formGroup.get('client').setValue({...res, nom})
+                      this.formGroup.get('client').setValue({ ...res, nom })
                     })
-                  )
                 this.devisItem = null
               }
               break
@@ -128,20 +141,30 @@ export class FacturesDialogComponent
               this.dialogTitle = 'Modifier'
               this.devisItem = this.selectedDevisItem
               // this.referenceCount = this.selectedDevisItem.reference
+
               this.reference = this._referenceService.formatReferenceNumber(
                 this.selectedDevisItem.reference,
-                ReferencePrefix.Facture,
+                this.selectedDevisItem.referencePrefix
+                  ? this.selectedDevisItem.referencePrefix
+                  : ReferencePrefix.Facture,
               )
               this.setFormGroup()
               this.devisOptionsFormGroup
                 .get('remise')
                 .setValue(this.devisItem.remise)
 
+              this.remiseValue = this.devisItem.remise
+
               if (this.devisItem.remise)
                 this.devisOptionsFormGroup
                   .get('remiseBtnIsChecked')
                   .setValue(true)
 
+              let tvaIsDesactivated = this.selectedDevisItem.factureItems.every(
+                (item) => item.tva == 0,
+              )
+              this.devisOptionsFormGroup.get('tva').setValue(!tvaIsDesactivated)
+              tvaIsDesactivated && this.toggleTVAOption(false)
               this.calculateSummaryTotalHTAndTTC()
               this.formGroup.get('client').setValue(this.devisItem.client)
               break
@@ -156,10 +179,19 @@ export class FacturesDialogComponent
                 .get('remise')
                 .setValue(this.devisItem.remise)
 
+              this.remiseValue = this.devisItem.remise
+              this.remiseValue = this.selectedDevisItem.remise
+
               if (this.devisItem.remise)
                 this.devisOptionsFormGroup
                   .get('remiseBtnIsChecked')
                   .setValue(true)
+
+              tvaIsDesactivated = this.selectedDevisItem.factureItems.every(
+                (item) => item.tva == 0,
+              )
+              this.devisOptionsFormGroup.get('tva').setValue(!tvaIsDesactivated)
+              tvaIsDesactivated && this.toggleTVAOption(false)
 
               this.calculateSummaryTotalHTAndTTC()
               break
@@ -209,6 +241,9 @@ export class FacturesDialogComponent
   summaryTotalHT = 0
   summaryTotalTTC = 0
   summaryTVA = 0
+  tvaIsDesactivated: any
+  manuelReference: boolean
+  remiseAmount: number
   devisOptions = {
     remise: { checked: false },
     tva: { checked: true },
@@ -232,7 +267,7 @@ export class FacturesDialogComponent
       header: 'UNITE',
       field: 'unit',
       type: 'dropdown',
-      options: ['Heures', 'Jours'],
+      options: ['h', 'j'],
     },
     {
       header: 'PU HT',
@@ -245,7 +280,7 @@ export class FacturesDialogComponent
       field: 'tva',
       type: 'dropdown',
       options: [10, 20, 30, 40],
-      changeEvent: (rowIndex) => this.calculateRowTotalHTAndTTC(rowIndex),
+      changeEvent: (rowIndex) => this.changeTVA(rowIndex),
     },
     {
       header: 'TOTAL TTC',
@@ -303,11 +338,12 @@ export class FacturesDialogComponent
   }
 
   setFormGroup() {
-    let factureItems = this.devisItem.factureItems.map((item: any) => {
+    let factureItems = this.selectedDevisItem.factureItems.map((item: any) => {
       this.getFromArrayControl.push(this.initiateTableForm())
       return {
         ...item,
         date: item.date.toDate(),
+        tva: !item.tva ? 20 : item.tva,
       }
     })
 
@@ -326,7 +362,7 @@ export class FacturesDialogComponent
       description: ['', Validators.required],
       date: [new Date(), Validators.required],
       quantity: [1, Validators.required],
-      unit: ['Heures', Validators.required],
+      unit: ['h', Validators.required],
       unitPriceHT: [0, Validators.required],
       tva: [20, Validators.required],
       totalTtc: [0],
@@ -365,11 +401,20 @@ export class FacturesDialogComponent
   }
 
   changeReference() {
-    if (this.dialogTitle == 'Modifier' && !this.referenceCount) {
-      this.getNewReference()
-    }
-    this.referenceCount++
-    this.reference = this.factureFormatReferenceNumber(this.referenceCount)
+    this.manuelReference = true
+    this.formGroup.addControl(
+      'reference',
+      new FormControl('', [
+        Validators.required,
+        Validators.pattern('[a-zA-Z][0-9]{5}'),
+      ]),
+    )
+
+    // if (this.dialogTitle == 'Modifier' && !this.referenceCount) {
+    //   this.getNewReference()
+    // }
+    // this.referenceCount++
+    // this.reference = this.factureFormatReferenceNumber(this.referenceCount)
   }
 
   addRow() {
@@ -406,15 +451,23 @@ export class FacturesDialogComponent
     this.calculateSummaryTotalHTAndTTC()
   }
 
-  RecalculateRows() {
-    this.getFactureContentItems.forEach((row, index) => {
-      // this.calculateRowTotalHTAndTTC(index)
-      const total_ht = row.unitPriceHT * row.quantity
-      let total_ttc = total_ht
+  changeTVA(rowIndex: number) {
+    const row = this.getFactureContentItems[rowIndex]
+    const totalHT = row.unitPriceHT * row.quantity
+    let totalTTC = this.devisOptionsFormGroup.get('tva').value
+      ? totalHT + (totalHT * row.tva) / 100
+      : totalHT
 
-      if (this.devisOptionsFormGroup.get('tva').value) {
-        total_ttc = total_ht + (total_ht * row.tva) / 100
-      }
+    this.getFromArrayControl.controls[rowIndex].patchValue({
+      totalTtc: totalTTC,
+    })
+
+    this.calculateSummaryTotalHTAndTTC()
+  }
+
+  RecalculateRows() {
+    this.getFactureContentItems.forEach((_, index) => {
+      this.changeTVA(index)
     })
   }
 
@@ -427,10 +480,22 @@ export class FacturesDialogComponent
         .map((item) => (item.unitPriceHT * item.quantity * item.tva) / 100)
         .reduce((accum, current) => accum + current)
     else this.summaryTVA = 0
+    this.remiseAmount = this.calculateRemise(
+      this.remiseValue,
+      this.summaryTotalHT,
+    )
     this.summaryTotalTTC =
-      this.summaryTotalHT +
-      this.summaryTVA -
-      this.devisOptionsFormGroup.get('remise').value
+      this.summaryTotalHT + this.summaryTVA - (this.remiseAmount || 0)
+  }
+
+  remiseAmountChanged(value: number) {
+    this.remiseValue = value
+    this.remiseAmount = this.calculateRemise(value, this.summaryTotalHT)
+    this.calculateSummaryTotalHTAndTTC()
+  }
+
+  calculateRemise(remise, totalHT) {
+    return (totalHT * remise) / 100
   }
 
   //#endregion
@@ -461,15 +526,11 @@ export class FacturesDialogComponent
   toggleRemiseOption(event?: any) {
     this.devisOptions.remise.checked =
       event.checked ?? this.devisItem.remise > 0
-    if (!this.devisOptions.remise.checked)
+    if (!this.devisOptions.remise.checked) {
       this.devisOptionsFormGroup.get('remise').setValue(0)
-
+      this.remiseValue = 0
+    }
     this.calculateSummaryTotalHTAndTTC()
-  }
-
-  remiseValueChanged(event) {
-    this.calculateSummaryTotalHTAndTTC()
-    // this.devisOptions.remise.value = event.value
   }
 
   //#endregion
@@ -479,12 +540,17 @@ export class FacturesDialogComponent
     let formValue = this.formGroup.value
 
     let createDevisInput = new CreateFactureInput({
-      reference: this.referenceCount,
+      reference: this.manuelReference
+        ? +this.formGroup.get('reference').value.substring(1)
+        : this.referenceCount,
+      referencePrefix: this.manuelReference
+        ? this.formGroup.get('reference').value[0]
+        : 'F',
       dateEmission: this.getExactDate(formValue.dateEmission, new Date()),
       echeancePaiement: formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
-      remise: this.devisOptionsFormGroup.get('remise').value,
+      remise: this.devisOptionsFormGroup.get('remise').value ?? 0,
       statut: devisStatus,
       factureItems: formValue.factureItems.map(
         (devisItem: FactureContentItem) => {
@@ -494,7 +560,7 @@ export class FacturesDialogComponent
             quantity: devisItem.quantity ?? 0,
             unit: devisItem.unit,
             unitPriceHT: devisItem.unitPriceHT ?? 0,
-            tva: devisItem.tva,
+            tva: devisItem.tva || 0,
             totalTtc: devisItem.totalTtc,
           })
         },
@@ -521,11 +587,10 @@ export class FacturesDialogComponent
                       this.selectedDevisItem.dateEmission,
                     'subtract',
                   ),
-                  factureItems: createDevisInput.factureItems.map(item => ({
+                  factureItems: createDevisInput.factureItems.map((item) => ({
                     ...item,
-                    date: this.getExactDate(item.date, new Date(), 'subtract')
-                  }))
-                   
+                    date: this.getExactDate(item.date, new Date(), 'subtract'),
+                  })),
                 },
               })
             })
@@ -534,7 +599,7 @@ export class FacturesDialogComponent
         }
       })
     this.toastService.info({
-      summary: 'Confirmed',
+      summary: 'Opértion réussie',
       detail: 'Vous avez ajouter cette facture en brouillon',
     })
   }
@@ -543,7 +608,12 @@ export class FacturesDialogComponent
     let formValue = this.formGroup.value
     let updateDevisInput = new UpdateFactureInput({
       id: this.devisItem.id,
-      reference: this.referenceCount || this.selectedDevisItem.reference,
+      reference: this.manuelReference
+        ? +this.formGroup.get('reference').value.substring(1)
+        : this.selectedDevisItem.reference,
+      referencePrefix: this.manuelReference
+        ? this.formGroup.get('reference').value[0]
+        : this.selectedDevisItem.referencePrefix,
       dateEmission:
         this.selectedDevisItem.dateEmission != formValue.dateEmission
           ? moment(formValue.dateEmission).add(1, 'days')
@@ -562,7 +632,7 @@ export class FacturesDialogComponent
             quantity: devisItem.quantity ?? 0,
             unit: devisItem.unit,
             unitPriceHT: devisItem.unitPriceHT ?? 0,
-            tva: devisItem.tva,
+            tva: devisItem.tva || 0,
             totalTtc: devisItem.totalTtc,
           })
         },
@@ -587,17 +657,20 @@ export class FacturesDialogComponent
                   result: {
                     ...this.selectedDevisItem,
                     ...updateDevisInput,
-                    reference: updateDevisInput.reference,
                     client: res,
                     dateEmission: this.getExactDate(
                       updateDevisInput.dateEmission,
                       this.selectedDevisItem.dateEmission,
                       'subtract',
                     ),
-                    factureItems: updateDevisInput.factureItems.map(item => ({
+                    factureItems: updateDevisInput.factureItems.map((item) => ({
                       ...item,
-                      date: this.getExactDate(item.date, new Date(), 'subtract')
-                    }))
+                      date: this.getExactDate(
+                        item.date,
+                        new Date(),
+                        'subtract',
+                      ),
+                    })),
                   },
                 })
               } else {
@@ -613,10 +686,14 @@ export class FacturesDialogComponent
                       this.selectedDevisItem.dateEmission,
                       'subtract',
                     ),
-                    factureItems: updateDevisInput.factureItems.map(item => ({
+                    factureItems: updateDevisInput.factureItems.map((item) => ({
                       ...item,
-                      date: this.getExactDate(item.date, new Date(), 'subtract')
-                    }))
+                      date: this.getExactDate(
+                        item.date,
+                        new Date(),
+                        'subtract',
+                      ),
+                    })),
                   },
                 })
               }
@@ -627,7 +704,7 @@ export class FacturesDialogComponent
       })
 
     this.toastService.info({
-      summary: 'Confirmed',
+      summary: 'Opértion réussie',
       detail: 'Vous avez modifier cette facture en brouillon',
     })
   }
@@ -652,25 +729,64 @@ export class FacturesDialogComponent
     // this.formGroup.updateValueAndValidity();
     // this.formGroup.get('client').validator = Validators.required
     // this.frm.nativeElement.classList.add('submitted')
+
     if (this.formGroup.get('client').valid) {
-      if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer'){
-        this.createApiCall(FactureStatutEnum.Cree)
-        return
+      let reference, referencePrefix
+      if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
+        reference = this.manuelReference
+          ? +this.formGroup.get('reference').value.substring(1)
+          : this.referenceCount
+        referencePrefix = this.manuelReference
+          ? this.formGroup.get('reference').value[0]
+          : 'F'
+      } else {
+        reference = this.manuelReference
+          ? +this.formGroup.get('reference').value.substring(1)
+          : this.selectedDevisItem.reference
+        referencePrefix = this.manuelReference
+          ? this.formGroup.get('reference').value[0]
+          : this.selectedDevisItem.referencePrefix
       }
 
-      if (this.devisItem != null && this.devisItem.isConverted) {
-        this.createApiCall(FactureStatutEnum.Cree)
-        this._router.navigate(['/app/Factures'])
-        this.updateConvertedDevisStatus()
-        return
-      } else {
-        this.updateApiCall(FactureStatutEnum.Cree)
-      }
+      this._factureServiceProxy
+        .checkIfReferenceIsExist(referencePrefix, reference)
+        .subscribe((res) => {
+          if (!res || this.dialogTitle == 'Modifier' &&
+          (reference == this.selectedDevisItem.reference &&
+          referencePrefix == this.selectedDevisItem.referencePrefix)
+          ) {
+            if (this.devisItem && this.devisItem.isConverted) {
+              this.createApiCall(FactureStatutEnum.Cree)
+              this._router.navigate(['/app/Factures'])
+              this.updateConvertedDevisStatus()
+              document.body.style.overflow = 'auto'
+              return
+            }
+
+            if (
+              this.dialogTitle == 'Nouveau' ||
+              this.dialogTitle == 'Dupliquer'
+            ) {
+              this.createApiCall(FactureStatutEnum.Cree)
+              return
+            }
+
+            if (this.dialogTitle == 'Modifier') {
+              this.updateApiCall(FactureStatutEnum.Cree)
+            }
+          } else {
+            this.toastService.error({
+              detail: 'Cette référence est déjà existe',
+            })
+          }
+        })
     } else {
       this.toastService.error({
         detail: 'Veuillez remplir le chemps client: ',
       })
     }
+    
+    
   }
 
   validateDevis(isDevisStatusUpdate = false) {
@@ -689,23 +805,62 @@ export class FacturesDialogComponent
         controlsNames = controlsNames.concat(conrtolsObj[control])
     }
 
-    if (this.formGroup.valid) {
-      if (isDevisStatusUpdate) {
-        returnValue = this.validateStatusApi()
+    if(this.formGroup.valid) {
+      let reference, referencePrefix
+      if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
+        reference = this.manuelReference
+          ? +this.formGroup.get('reference').value.substring(1)
+          : this.referenceCount
+        referencePrefix = this.manuelReference
+          ? this.formGroup.get('reference').value[0]
+          : 'F'
       } else {
-        if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer'){
-          this.createApiCall(FactureStatutEnum.Valide)
-          return
-        } else if (this.devisItem && this.devisItem.isConverted) {
-          this.createApiCall(FactureStatutEnum.Valide)
-          this._router.navigate(['/app/Factures'])
-          this.updateConvertedDevisStatus()
-          return
-        } else {
-          this.updateApiCall(FactureStatutEnum.Valide)
-        }
+        reference = this.manuelReference
+          ? +this.formGroup.get('reference').value.substring(1)
+          : this.selectedDevisItem.reference
+        referencePrefix = this.manuelReference
+          ? this.formGroup.get('reference').value[0]
+          : this.selectedDevisItem.referencePrefix
       }
-    } else {
+  
+      this._factureServiceProxy
+        .checkIfReferenceIsExist(referencePrefix, reference)
+        .subscribe((res) => {
+          if (!res || this.dialogTitle == 'Modifier' &&
+            (reference == this.selectedDevisItem.reference &&
+            referencePrefix == this.selectedDevisItem.referencePrefix)
+        ) {
+              if (isDevisStatusUpdate) {
+                returnValue = this.validateStatusApi()
+              } else {
+                if (this.devisItem && this.devisItem.isConverted) {
+                  this.createApiCall(FactureStatutEnum.Valide)
+                  this._router.navigate(['/app/Factures'])
+                  this.updateConvertedDevisStatus()
+                  document.body.style.overflow = 'auto'
+                  return
+                }
+  
+                if (
+                  this.dialogTitle == 'Nouveau' ||
+                  this.dialogTitle == 'Dupliquer'
+                ) {
+                  this.createApiCall(FactureStatutEnum.Valide)
+                  return
+                }
+  
+                if (this.dialogTitle == 'Modifier') {
+                  this.updateApiCall(FactureStatutEnum.Valide)
+                }
+            } 
+          } else {
+            this.toastService.error({
+              detail: 'Cette référence est déjà existe',
+            })
+          }
+        })
+    }
+    else {
       !this.visible && this.openDialogEvent.emit()
       this.toastService.error({
         detail:
@@ -713,6 +868,7 @@ export class FacturesDialogComponent
           controlsNames.join(', '),
       })
     }
+   
 
     return returnValue
   }
@@ -756,7 +912,6 @@ export class FacturesDialogComponent
 
   preview() {
     let formValue = this.formGroup.value
-    console.log(formValue)
     let factureItems = formValue.factureItems.map(
       (devisItem: FactureContentItem) => {
         return new FactureItemDto({
@@ -797,8 +952,8 @@ export class FacturesDialogComponent
 
   getExactDate(date1, date2, offset = 'add') {
     return date2
-      ? DateHelper.initiateTimeFromDate(date1).getTime()
-        == DateHelper.initiateTimeFromDate(moment(date2)).getTime()
+      ? DateHelper.initiateTimeFromDate(date1).getTime() ==
+        DateHelper.initiateTimeFromDate(moment(date2)).getTime()
         ? moment(date2)
         : offset == 'add'
         ? moment(date1).add(1, 'days')
@@ -811,6 +966,8 @@ export class FacturesDialogComponent
       : moment(date1).subtract(1, 'days')
   }
 
-  enableValidationClass = () => ValidationHelper.enableCssValidationClass(this.frm)
-  disableValidationClass = () => ValidationHelper.disableCssValidationClass(this.frm)
+  enableValidationClass = () =>
+    ValidationHelper.enableCssValidationClass(this.frm)
+  disableValidationClass = () =>
+    ValidationHelper.disableCssValidationClass(this.frm)
 }

@@ -11,7 +11,7 @@ import { AppComponentBase } from '@shared/app-component-base'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
 import { GlobalEventsService } from '@shared/globalEventsService'
 import {
-  Client,
+  // Client,
   ClientDto,
   ClientServiceProxy,
 } from '@shared/service-proxies/service-proxies'
@@ -138,8 +138,8 @@ export class ClientsComponent extends AppComponentBase
     ]
     this.formClient.categorieClient = 'PRFS'
     this.types = [
-      { name: 'Client', code: 'CLNT' },
-      { name: 'Prospect', code: 'PRSP' },
+      { name: 'Client', code: 'client' },
+      { name: 'Prospect', code: 'prospect' },
     ]
     this.devises = [
       { name: 'MAD', code: 'MAD' },
@@ -180,6 +180,7 @@ export class ClientsComponent extends AppComponentBase
 
   filterSubject = new Subject<any>()
   emitFilterEvent(filterType: string, value: any) {
+    console.log(this.selectedCategory);
     if (filterType == 'filterByInput') {
       setTimeout(() => {
         this.filterSubject.next({
@@ -210,7 +211,10 @@ export class ClientsComponent extends AppComponentBase
   //     });
   // }
   chargerListeClients(event, data) {
-    return this._clientServiceProxy.getAllClients('', '', '', '', 0).pipe(
+    let categorieFilter =  event.filters.category && event.filters.category.value
+    let typeFilter =  event.filters.type && event.filters.type.value
+    return this._clientServiceProxy.getAllClients(event.first, event.rows, event.globalFilter, event.sortField,
+      event.sortOrder, categorieFilter, typeFilter).pipe(
       map((data) => {
         data.items.forEach(
           (item) =>
@@ -223,13 +227,6 @@ export class ClientsComponent extends AppComponentBase
         }
       }),
     )
-  }
-
-  //TODO: remove this method
-  customSort(event: SortEvent) {
-    this.sortField = event.field
-    this.sortOrder = event.order
-    // this.chargerListeClients();
   }
 
   initialiseForm(): void {
@@ -380,7 +377,7 @@ export class ClientsComponent extends AppComponentBase
               this.messageService.add({
                 key: 'default',
                 severity: 'success',
-                summary: 'Opération réussite !',
+                summary: 'Opération réussie !',
                 detail:
                   'Le client est ajouté avec la référence : ' + referenceClient,
               })
@@ -449,7 +446,7 @@ export class ClientsComponent extends AppComponentBase
               this.messageService.add({
                 key: 'default',
                 severity: 'success',
-                summary: 'Opération réussite !',
+                summary: 'Opération réussie !',
                 detail:
                   'Le client ' + referenceClient + ' est modifié avec succès.',
               })
@@ -468,7 +465,7 @@ export class ClientsComponent extends AppComponentBase
   }
 
   supprimerClient(): void {
-    // this.messageService.add({ key: 'default', severity: 'success', summary: 'Opération réussite !', detail: 'Le client ' + referenceClient + ' a été supprimé avec succès.' });
+    // this.messageService.add({ key: 'default', severity: 'success', summary: 'Opération réussie !', detail: 'Le client ' + referenceClient + ' a été supprimé avec succès.' });
 
     this._confirmDialogService.deleteConfirm({
       acceptCallback: () => {
@@ -482,9 +479,9 @@ export class ClientsComponent extends AppComponentBase
           // this.montantTotalAllDevis -= this.selectedDevisItem.montantTtc
           this.emitRowDeletedEvent(this.tableChild.tableData[0])
           this._toastService.success({
-            summary: 'Opération réussite !',
+            summary: 'Opération réussie',
             detail:
-              'Le client ' + referenceClient + ' a été supprimé avec succès.',
+              'Le client ' + referenceClient + ' est supprimé avec succès.',
           })
         })
       },

@@ -47,6 +47,7 @@ import * as printJS from 'print-js'
   providers: [DialogService],
 })
 export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
+  remiseAmount: number
   constructor(
     private _referenceService: ReferenceService,
     public _fakeService: FakeService,
@@ -63,14 +64,14 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.globalEventsService.announcedThePageChangedColorSubject(
       `var(--${this.primaryColor}-color`,
     )
-
   }
 
   ngAfterViewInit() {
     if (window.history.state.clientId) {
-      console.log(window.history.state.clientId);
-      this.newDevis(window.history.state.clientId);
+      console.log(window.history.state.clientId)
+      this.newDevis(window.history.state.clientId)
     }
+
   }
 
   ngOnDestroy() {
@@ -108,10 +109,10 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       header: 'REFERENCE',
       field: 'reference',
       type: 'text',
-      format: (number) =>
+      format: (number, customPrefix) =>
         this._referenceService.formatReferenceNumber(
           number,
-          ReferencePrefix.Facture,
+          customPrefix ? customPrefix : ReferencePrefix.Facture,
         ),
     },
     {
@@ -157,7 +158,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       actualStatus: FactureStatutEnum.ReglePartiellemt,
       label: 'Régler',
       icon: 'pi pi-check',
-      command: async() => {
+      command: async () => {
         await this.showFacturePayementDialog(true)
       },
     },
@@ -165,8 +166,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       actualStatus: FactureStatutEnum.PaiementAttente,
       label: 'Régler',
       icon: 'pi pi-check',
-      command: async() => {
-
+      command: async () => {
         await this.showFacturePayementDialog()
       },
     },
@@ -237,11 +237,15 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     return moment(dateEmission).add(echeance, 'days').toDate()
   }
 
-  factureFormatReferenceNumber(reference: number) {
+  factureFormatReferenceNumber(reference: number, customPrefix) {
     return this._referenceService.formatReferenceNumber(
       reference,
-      ReferencePrefix.Facture,
+      customPrefix ? customPrefix : ReferencePrefix.Facture,
     )
+    // return this._referenceService.formatReferenceNumber(
+    //   reference,
+    //   ReferencePrefix.Facture,
+    // )
   }
 
   clientAutoCompleteSearch(event: any) {
@@ -268,7 +272,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.filterSubject.next({
         type: 'filterByButton',
         value: {
-          client: (this.selectedClient && this.selectedClient.id),
+          client: this.selectedClient && this.selectedClient.id,
           dateEmission: this.selectedDate,
           echeancePaiement: this.selectedEcheance,
           statut: this.selectedStatut,
@@ -320,11 +324,11 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
               this.tableChild.tableData = this.tableChild.tableData.filter(
                 (devis) => !devis || devis.id != this.selectedDevisItem.id,
               )
-              this.montantTotalAllDevis -= this.selectedDevisItem.montantTtc
+              this.calculateTotalMonatant()
               this.emitRowDeletedEvent(this.tableChild.tableData[0])
               this._toastService.info({
-                summary: 'Confirmed',
-                detail: 'You have accepted',
+                summary: 'Opération réussie',
+                detail: 'La facture est supprimée avec succès',
               })
             }
           })
@@ -335,7 +339,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
           case ConfirmEventType.REJECT:
             this._toastService.error({
               summary: 'Erreur',
-              detail: "une erreur s'est produite lors de la suppression",
+              detail: "Une erreur s'est produite lors de la suppression",
             })
             break
           case ConfirmEventType.CANCEL:
@@ -345,29 +349,31 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     })
   }
 
+  firstTimeCharged = true
   selectionChange(selectionEventObject) {
     if (selectionEventObject.type == 'selectionChanged') {
       this.selectedDevisItem = selectionEventObject.result
     } else if (selectionEventObject.type == 'delete') {
       this.selectedDevisItem = selectionEventObject.result
     }
-    console.log(this.selectedDevisItem.dateEmission.format())
     this.calculateSummaryTotalHTAndTVA()
     this.emitNotificationSelectedDevisChanged({
       ...this.selectedDevisItem,
-      dateEmission: new Date(this.selectedDevisItem.dateEmission._i)
-        // ? new Date(this.selectedDevisItem.dateEmission._i)
-        // : new Date(this.selectedDevisItem.dateEmission._d),
-      
+      dateEmission: new Date(this.selectedDevisItem.dateEmission._i),
+      // ? new Date(this.selectedDevisItem.dateEmission._i)
+      // : new Date(this.selectedDevisItem.dateEmission._d),
     })
-    this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis
+    this.firstTimeCharged && (this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis);
+    this.firstTimeCharged = false
+    
   }
 
-  onDialogClose(){
+  onDialogClose() {
     this.displayDialog = false
     document.body.style.overflow = 'auto'
+    this.calculateTotalMonatant()
   }
-  
+
   calculateSummaryTotalHTAndTVA() {
     if (this.selectedDevisItem) {
       this.summaryTotalHT = (this.selectedDevisItem as any).factureItems
@@ -376,24 +382,53 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.summaryTVA = this.selectedDevisItem.factureItems
         .map((item) => (item.unitPriceHT * item.quantity * item.tva) / 100)
         .reduce((accum, current) => accum + current)
+      this.remiseAmount = this.calculateRemise(
+        this.selectedDevisItem.remise,
+        this.summaryTotalHT,
+      )
     }
   }
 
+  calculateTotalMonatant() {
+    this.montantTotalAllDevis = 0;
+    this.tableChild.tableData.forEach((item) => {
+      if(item) {
+        let totalHt =  item.factureItems 
+        .map((item) => item.unitPriceHT * item.quantity)
+        .reduce((accum, current) => accum + current)
+
+        this.montantTotalAllDevis += item.factureItems 
+        .map((item) => item.totalTtc)
+        .reduce((accum, current) => accum + current) -
+            item.remise * totalHt / 100
+        console.log(this.montantTotalAllDevis, item.remise * totalHt)
+      }
+    })
+  }
+
+  calculateRemise(remise, totalHT) {
+    return (totalHT * remise) / 100
+  }
+
   crudOperationTreatment(event) {
-    let statut = event.result.statut == FactureStatutEnum.Valide
-        ? this.parseStatutForStatutValide(event.result.dateEmission, event.result.echeancePaiement)
+    let statut =
+      event.result.statut == FactureStatutEnum.Valide
+        ? this.parseStatutForStatutValide(
+            event.result.dateEmission,
+            event.result.echeancePaiement,
+          )
         : event.result.statut
 
     if (event.crudOperation == 'create') {
       let newDevis = {
         ...event.result,
-        remise: 0,
         statut,
         client: {
           ...event.result.client,
-          nom: event.result.client.nom ? event.result.client.nom : event.result.client.raisonSociale
-          },
-      
+          nom: event.result.client.nom
+            ? event.result.client.nom
+            : event.result.client.raisonSociale,
+        },
       }
       newDevis.factureItems = newDevis.factureItems.map((item: any) => {
         let total_ht = item.unitPriceHT * item.quantity
@@ -402,10 +437,17 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
           totalTtc: total_ht + (item.tva * total_ht) / 100,
         }
       })
+
+      let remiseAmount =
+        (newDevis.factureItems
+          .map((item) => item.unitPriceHT * item.quantity)
+          .reduce((accum, current) => accum + current) *
+          newDevis.remise) / 100
+
       newDevis.montantTtc =
         newDevis.factureItems
           .map((item) => item.totalTtc)
-          .reduce((accum, current) => accum + current) - newDevis.remise
+          .reduce((accum, current) => accum + current) - remiseAmount
       this.montantTotalAllDevis += newDevis.montantTtc
 
       this.tableChild.tableData = [
@@ -427,10 +469,12 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedDevisItem = {
         ...event.result,
         statut,
-          client: {
-            ...this.selectedDevisItem.client,
-            nom: event.result.client.nom ? event.result.client.nom : event.result.client.raisonSociale
-            },
+        client: {
+          ...this.selectedDevisItem.client,
+          nom: event.result.client.nom
+            ? event.result.client.nom
+            : event.result.client.raisonSociale,
+        },
       }
 
       //Calculate total montant
@@ -444,15 +488,21 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         },
       )
 
+      let remiseAmount =
+        (this.selectedDevisItem.factureItems
+          .map((item) => item.unitPriceHT * item.quantity)
+          .reduce((accum, current) => accum + current) *
+          this.selectedDevisItem.remise) /
+        100
+
       this.selectedDevisItem.montantTtc =
         this.selectedDevisItem.factureItems
           .map((item) => item.totalTtc)
-          .reduce((accum, current) => accum + current) -
-        this.selectedDevisItem.remise
-
+          .reduce((accum, current) => accum + current) - remiseAmount
+        console.log(this.selectedDevisItem.montantTtc)
       this.selectedDevisItem = {
         ...this.selectedDevisItem,
-        dateEmission: (moment(this.selectedDevisItem.dateEmission)).toDate(),
+        dateEmission: moment(this.selectedDevisItem.dateEmission).toDate(),
       }
       this.child.selectedDevisItem = { ...this.selectedDevisItem }
       let index = this.tableChild.tableData.findIndex(
@@ -471,9 +521,12 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   //#region Api Calls
   getListDevisApi$(event, data) {
     let clientFilter = event.filters.client && event.filters.client.value
-    let dateEmissionFilter = event.filters.dateEmission && event.filters.dateEmission.value
-    let echeancePaiementFilter = event.filters.echeancePaiement && event.filters.echeancePaiement.value
-    let montantTtcFilter = event.filters.montantTtc && event.filters.montantTtc.value
+    let dateEmissionFilter =
+      event.filters.dateEmission && event.filters.dateEmission.value
+    let echeancePaiementFilter =
+      event.filters.echeancePaiement && event.filters.echeancePaiement.value
+    let montantTtcFilter =
+      event.filters.montantTtc && event.filters.montantTtc.value
     let statutFilter = event.filters.statut && event.filters.statut.value
 
     return zip(
@@ -517,8 +570,10 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       map(([length, res, montantTotalAllDevis]: any) => {
         data = [...res.items]
         console.log(data)
-        data.forEach((devis: any) => { 
-          devis.client.nom = !devis.client.nom ? devis.client.raisonSociale : devis.client.nom
+        data.forEach((devis: any) => {
+          devis.client.nom = !devis.client.nom
+            ? devis.client.raisonSociale
+            : devis.client.nom
           devis.factureItems = devis.factureItems.map((item: any) => {
             let total_ht = item.unitPriceHT * item.quantity
             return {
@@ -527,11 +582,10 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           })
 
-          devis.statut = 
-            devis.statut ==  
-            FactureStatutEnum.Valide
+          devis.statut =
+            devis.statut == FactureStatutEnum.Valide
               ? moment().isAfter(
-                  (moment(devis.dateEmission)).add(
+                  moment(devis.dateEmission).add(
                     devis.echeancePaiement,
                     'days',
                   ),
@@ -539,18 +593,22 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
                 ? FactureStatutEnum.PaiementRetard
                 : FactureStatutEnum.PaiementAttente
               : devis.statut
-              // devis.statut == FactureStatutEnum.Valide ? 
-              // this.parseStatutForStatutValide(devis.dateEmission, devis.echeancePaiement) : devis.statut
+          // devis.statut == FactureStatutEnum.Valide ?
+          // this.parseStatutForStatutValide(devis.dateEmission, devis.echeancePaiement) : devis.statut
 
+          let montantTtc = devis.factureItems.map((item) => item.totalTtc).reduce(
+            (accum, current) => accum + current,
+          )
+          let montantHt = devis.factureItems
+            .map((item) => item.unitPriceHT * item.quantity)
+            .reduce((accum, current) => accum + current)
 
-          devis.montantTtc =
-            devis.factureItems
-              .map((item) => item.totalTtc)
-              .reduce((accum, current) => accum + current) - devis.remise
+          devis.montantTtc = montantTtc - (montantHt * devis.remise) / 100
         })
         return { items: data, length, montantTotalAllDevis }
       }),
     )
+
   }
 
   updateApiCall(devisId: number, devisStatut: FactureStatutEnum, detail) {
@@ -582,27 +640,28 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async showFacturePayementDialog(isPartiallySettled = false) {
-    let facturePayementInfo: FactureInfosPaiementDto = new FactureInfosPaiementDto({
-      factureId: this.selectedDevisItem.id,
-      id: 0,
-      montantPaye: 0,
-      datePaiement: moment(),
-      modePaiement: ModePaiementEnum.Cheque
-    }
-     
+    let facturePayementInfo: FactureInfosPaiementDto = new FactureInfosPaiementDto(
+      {
+        factureId: this.selectedDevisItem.id,
+        id: 0,
+        montantPaye: 0,
+        datePaiement: moment(),
+        modePaiement: ModePaiementEnum.Cheque,
+      },
     )
 
-      if(isPartiallySettled){
-        facturePayementInfo = await this._factureServiceProxy.getByFactureIdFactureInfosPaiement(this.selectedDevisItem.id)
-          .toPromise()
-      }
+    if (isPartiallySettled) {
+      facturePayementInfo = await this._factureServiceProxy
+        .getByFactureIdFactureInfosPaiement(this.selectedDevisItem.id)
+        .toPromise()
+    }
 
     this.ref = this.dialogService.open(FacturePayementComponent, {
       data: {
         reference: this.selectedDevisItem.reference,
         montantPaye: facturePayementInfo.montantPaye,
         modePaiement: facturePayementInfo.modePaiement,
-        datePaiement: facturePayementInfo.datePaiement.toDate()
+        datePaiement: facturePayementInfo.datePaiement.toDate(),
       },
       header: 'Réler le payement',
       width: '35%',
@@ -617,7 +676,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     })
 
     this.ref.onClose.subscribe((result) => {
-      
       if (result) {
         let factureInfosPaiementDto = new FactureInfosPaiementDto({
           datePaiement: moment(result.datePaiement),
@@ -627,21 +685,22 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
           id: facturePayementInfo.id,
         })
 
-        if(result.montant == 0){
-          this._factureServiceProxy.changeFactureStatut(
-            this.selectedDevisItem.id,
-            FactureStatutEnum.Valide,
-          ).subscribe(res => {
-            console.log(res)
-            this.viewUpdateSelectedItemStatut(FactureStatutEnum.PaiementAttente)
-          })
-          this._factureServiceProxy.deleteByFactureIdFactureInfosPaiement(this.selectedDevisItem.id)
-            .subscribe(res => {
-
+        if (result.montant == 0) {
+          this._factureServiceProxy
+            .changeFactureStatut(
+              this.selectedDevisItem.id,
+              FactureStatutEnum.Valide,
+            )
+            .subscribe((res) => {
+              console.log(res)
+              this.viewUpdateSelectedItemStatut(
+                FactureStatutEnum.PaiementAttente,
+              )
             })
-        }
-
-        else if (result.montant >= this.selectedDevisItem.montantTtc ) {
+          this._factureServiceProxy
+            .deleteByFactureIdFactureInfosPaiement(this.selectedDevisItem.id)
+            .subscribe((res) => {})
+        } else if (result.montant >= this.selectedDevisItem.montantTtc) {
           this._factureServiceProxy
             .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
             .subscribe((res) => {
@@ -650,17 +709,17 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
               }
             })
 
-          this._factureServiceProxy.changeFactureStatut(
-            this.selectedDevisItem.id,
-            FactureStatutEnum.Regle,
-          ).subscribe(res => {
-            if(res){
-              this.viewUpdateSelectedItemStatut(FactureStatutEnum.Regle)
-            }
-          })
-        }
-
-        else if (result.montant <= this.selectedDevisItem.montantTtc ) {
+          this._factureServiceProxy
+            .changeFactureStatut(
+              this.selectedDevisItem.id,
+              FactureStatutEnum.Regle,
+            )
+            .subscribe((res) => {
+              if (res) {
+                this.viewUpdateSelectedItemStatut(FactureStatutEnum.Regle)
+              }
+            })
+        } else if (result.montant <= this.selectedDevisItem.montantTtc) {
           this._factureServiceProxy
             .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
             .subscribe((res) => {
@@ -670,29 +729,33 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
                 })
               }
             })
-          this._factureServiceProxy.changeFactureStatut(
-            this.selectedDevisItem.id,
-            FactureStatutEnum.ReglePartiellemt,
-          ).subscribe(res => {
-            if(res){
-              this.viewUpdateSelectedItemStatut(FactureStatutEnum.ReglePartiellemt)
-            }
-          })
+          this._factureServiceProxy
+            .changeFactureStatut(
+              this.selectedDevisItem.id,
+              FactureStatutEnum.ReglePartiellemt,
+            )
+            .subscribe((res) => {
+              if (res) {
+                this.viewUpdateSelectedItemStatut(
+                  FactureStatutEnum.ReglePartiellemt,
+                )
+              }
+            })
         }
-      
       }
-
     })
   }
 
-  print(){
-    this._factureServiceProxy.getByIdFactureReport(this.selectedDevisItem.id).subscribe(res => {
-      printJS({
-        printable: res,
-        type: "pdf",
-        base64: true
+  print() {
+    this._factureServiceProxy
+      .getByIdFactureReport(this.selectedDevisItem.id)
+      .subscribe((res) => {
+        printJS({
+          printable: res,
+          type: 'pdf',
+          base64: true,
+        })
       })
-    })
   }
 
   downloadFacture() {
@@ -700,40 +763,35 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     //   AppConsts.remoteServiceBaseUrl + '/FileLoader/GetFacture/0',
     //   '_blank',
     // )
-    this._factureServiceProxy.getByIdFactureReport(this.selectedDevisItem.id).subscribe(res => {
-      const linkSource = `data:application/pdf;base64,${res}`;
-      const downloadLink = document.createElement("a");
-      const fileName = "facture_template.pdf";
-  
-      downloadLink.href = linkSource;
-      downloadLink.download = fileName;
-      downloadLink.click();
-    })
+    this._factureServiceProxy
+      .getByIdFactureReport(this.selectedDevisItem.id)
+      .subscribe((res) => {
+        const linkSource = `data:application/pdf;base64,${res}`
+        const downloadLink = document.createElement('a')
+        const fileName = 'facture_template.pdf'
 
+        downloadLink.href = linkSource
+        downloadLink.download = fileName
+        downloadLink.click()
+      })
   }
 
-  viewUpdateSelectedItemStatut(statut: any){
+  viewUpdateSelectedItemStatut(statut: any) {
     this.selectedDevisItem = {
-      ...this.selectedDevisItem, 
+      ...this.selectedDevisItem,
       dateEmission: moment(this.selectedDevisItem.dateEmission),
-      statut: statut
+      statut: statut,
     }
-    let index = this.tableChild.tableData.filter(item => item).findIndex(
-      (item) => item.id == this.selectedDevisItem.id,
-    )
-    this.tableChild.tableData[index] = {...this.selectedDevisItem}
+    let index = this.tableChild.tableData
+      .filter((item) => item)
+      .findIndex((item) => item.id == this.selectedDevisItem.id)
+    this.tableChild.tableData[index] = { ...this.selectedDevisItem }
     this.tableChild.tableData = [...this.tableChild.tableData]
   }
 
-  parseStatutForStatutValide(dateEmission: Moment, echeancePaiement: number){
-    return moment().isAfter(
-        (moment(dateEmission)).add(
-          echeancePaiement,
-          'days',
-        ),
-      )
+  parseStatutForStatutValide(dateEmission: Moment, echeancePaiement: number) {
+    return moment().isAfter(moment(dateEmission).add(echeancePaiement, 'days'))
       ? FactureStatutEnum.PaiementRetard
-      : FactureStatutEnum.PaiementAttente 
+      : FactureStatutEnum.PaiementAttente
   }
-
 }
