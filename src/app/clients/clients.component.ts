@@ -495,7 +495,7 @@ export class ClientsComponent extends AppComponentBase
       ...this.client,
     })
 
-    this.getFiveLastFacturesOrDevisElements(this.selectedTabName)
+    this.client && this.getFiveLastFacturesOrDevisElements(this.selectedTabName)
     if (this.client == null) this.client = new ClientDto()
       this.isClientProfetionnel = this.client.categorieClient == 'PRFS'
   }
