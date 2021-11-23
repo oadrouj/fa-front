@@ -20,7 +20,7 @@ import { DialogStatus } from '@shared/enums/DialogState.enum'
 import { DevisContentItem } from '@shared/models/DevisContentItem'
 import { DevisItem } from '@shared/models/DevisItem'
 import { FactureContentItem } from '@shared/models/FactureContentItem'
-import { ReferenceService } from '@shared/services/reference.service'
+import { FormatService } from '@shared/services/format.service'
 import { LazyLoadEvent, MessageService } from 'primeng/api'
 import { BehaviorSubject, Observable, of, Subscription } from 'rxjs'
 import { ToastService } from '@shared/services/toast.service'
@@ -61,7 +61,7 @@ export class FacturesDialogComponent
   remiseValue: number
   constructor(
     private formBuilder: FormBuilder,
-    private _referenceService: ReferenceService,
+    private _formatService: FormatService,
     private toastService: ToastService,
     private _factureServiceProxy: FactureServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
@@ -142,7 +142,7 @@ export class FacturesDialogComponent
               this.devisItem = this.selectedDevisItem
               // this.referenceCount = this.selectedDevisItem.reference
 
-              this.reference = this._referenceService.formatReferenceNumber(
+              this.reference = this._formatService.formatReferenceNumber(
                 this.selectedDevisItem.reference,
                 this.selectedDevisItem.referencePrefix
                   ? this.selectedDevisItem.referencePrefix
@@ -643,11 +643,7 @@ export class FacturesDialogComponent
       .updateFacture(updateDevisInput)
       .subscribe((res) => {
         if (res) {
-          console.log(
-            'test',
-            this.selectedDevisItem.client.id,
-            formValue.client.id,
-          )
+         
           this._clientServiceProxy
             .getByIdClient(formValue.client.id)
             .subscribe((res) => {
@@ -806,6 +802,12 @@ export class FacturesDialogComponent
     }
 
     if(this.formGroup.valid) {
+
+      if (isDevisStatusUpdate) {
+        returnValue = this.validateStatusApi()
+       
+      } else {
+
       let reference, referencePrefix
       if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
         reference = this.manuelReference
@@ -822,7 +824,7 @@ export class FacturesDialogComponent
           ? this.formGroup.get('reference').value[0]
           : this.selectedDevisItem.referencePrefix
       }
-  
+      
       this._factureServiceProxy
         .checkIfReferenceIsExist(referencePrefix, reference)
         .subscribe((res) => {
@@ -830,9 +832,7 @@ export class FacturesDialogComponent
             (reference == this.selectedDevisItem.reference &&
             referencePrefix == this.selectedDevisItem.referencePrefix)
         ) {
-              if (isDevisStatusUpdate) {
-                returnValue = this.validateStatusApi()
-              } else {
+              
                 if (this.devisItem && this.devisItem.isConverted) {
                   this.createApiCall(FactureStatutEnum.Valide)
                   this._router.navigate(['/app/Factures'])
@@ -852,7 +852,7 @@ export class FacturesDialogComponent
                 if (this.dialogTitle == 'Modifier') {
                   this.updateApiCall(FactureStatutEnum.Valide)
                 }
-            } 
+            
           } else {
             this.toastService.error({
               detail: 'Cette référence est déjà existe',
@@ -860,6 +860,7 @@ export class FacturesDialogComponent
           }
         })
     }
+  }
     else {
       !this.visible && this.openDialogEvent.emit()
       this.toastService.error({
@@ -868,7 +869,6 @@ export class FacturesDialogComponent
           controlsNames.join(', '),
       })
     }
-   
 
     return returnValue
   }

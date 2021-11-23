@@ -6,7 +6,7 @@ import {
   GlobalEventsService,
   ModificationStatusEnum,
 } from '@shared/globalEventsService'
-import { ReferenceService } from '../../shared/services/reference.service'
+import { FormatService } from '../../shared/services/format.service'
 import { FakeService } from '@shared/services/fake.service'
 import {
   ClientForAutoCompleteDto,
@@ -36,7 +36,7 @@ import * as printJS from 'print-js'
 export class DevisComponent implements OnInit, AfterViewInit {
   remiseAmount: number
   constructor(
-    private _referenceService: ReferenceService,
+    private _formatService: FormatService,
     public _fakeService: FakeService,
     private _devisServiceProxy: DevisServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
@@ -93,7 +93,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       field: 'reference',
       type: 'text',
       format: (number, customPrefix) =>
-      this._referenceService.formatReferenceNumber(
+      this._formatService.formatReferenceNumber(
         number,
         customPrefix ? customPrefix : ReferencePrefix.Devis,
       ),
@@ -231,7 +231,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
   }
 
   devisFormatReferenceNumber(reference: number, customPrefix ) {
-    return  this._referenceService.formatReferenceNumber(
+    return  this._formatService.formatReferenceNumber(
       reference,
       customPrefix ? customPrefix : ReferencePrefix.Devis,
     )
@@ -355,7 +355,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
   firstTimeCharged = true
   selectionChange(selectionEventObject) {
-    if (selectionEventObject.type == 'selectionChanged') {
+    if (selectionEventObject.type == 'selectionChanged' || selectionEventObject.type == 'firstSelectionChanged') {
       this.selectedDevisItem = selectionEventObject.result
     } else if (selectionEventObject.type == 'delete') {
       this.selectedDevisItem = selectionEventObject.result
@@ -618,7 +618,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
   }
 
   factureFormatReferenceNumber(reference: number) {
-    return this._referenceService.formatReferenceNumber(
+    return this._formatService.formatReferenceNumber(
       reference,
       ReferencePrefix.Facture,
     )

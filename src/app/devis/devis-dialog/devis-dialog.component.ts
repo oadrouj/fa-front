@@ -16,7 +16,7 @@ import {
 import { DialogStatus } from '@shared/enums/DialogState.enum'
 import { DevisContentItem } from '@shared/models/DevisContentItem'
 import { DevisItem } from '@shared/models/DevisItem'
-import { ReferenceService } from '@shared/services/reference.service'
+import { FormatService } from '@shared/services/format.service'
 import { LazyLoadEvent, MessageService } from 'primeng/api'
 import { BehaviorSubject, Observable, of, Subscription } from 'rxjs'
 import { ToastService } from '@shared/services/toast.service'
@@ -53,7 +53,7 @@ export class DevisDialogComponent implements OnInit {
   remiseValue: number
   constructor(
     private formBuilder: FormBuilder,
-    private _referenceService: ReferenceService,
+    private _formatService: FormatService,
     private toastService: ToastService,
     private _devisServiceProxy: DevisServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
@@ -99,7 +99,7 @@ export class DevisDialogComponent implements OnInit {
             this.dialogTitle = 'Modifier'
             this.devisItem = this.selectedDevisItem
             // this.referenceCount = this.selectedDevisItem.reference
-            this.reference = this._referenceService.formatReferenceNumber(
+            this.reference = this._formatService.formatReferenceNumber(
               this.selectedDevisItem.reference,
               this.selectedDevisItem.referencePrefix
                 ? this.selectedDevisItem.referencePrefix

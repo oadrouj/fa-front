@@ -12,7 +12,7 @@ import {
   GlobalEventsService,
   ModificationStatusEnum,
 } from '@shared/globalEventsService'
-import { ReferenceService } from '../../shared/services/reference.service'
+import { FormatService } from '../../shared/services/format.service'
 import { FakeService } from '@shared/services/fake.service'
 import {
   ClientForAutoCompleteDto,
@@ -51,7 +51,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   favIcon: HTMLLinkElement = document.querySelector('#favIcon');
 
   constructor(
-    private _referenceService: ReferenceService,
+    private _formatService: FormatService,
     public _fakeService: FakeService,
     private _factureServiceProxy: FactureServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
@@ -73,7 +73,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     if (window.history.state.clientId) {
-      console.log(window.history.state.clientId)
       this.newDevis(window.history.state.clientId)
     }
 
@@ -115,7 +114,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       field: 'reference',
       type: 'text',
       format: (number, customPrefix) =>
-        this._referenceService.formatReferenceNumber(
+        this._formatService.formatReferenceNumber(
           number,
           customPrefix ? customPrefix : ReferencePrefix.Facture,
         ),
@@ -187,11 +186,11 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
             this._toastService.info({ detail: 'La facture est devient valide' })
             this.selectedDevisItem = {
               ...this.selectedDevisItem,
-              statut: res.result.statut,
+              statut: this.parseStatutForStatutValide(res.result.dateEmission, res.result.echeancePaiement)
             }
             this.tableChild.tableData.find(
               (item) => item.id == this.selectedDevisItem.id,
-            ).statut = res.result.statut
+            ).statut = this.selectedDevisItem.statut
           }
         })
       },
@@ -243,11 +242,11 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   factureFormatReferenceNumber(reference: number, customPrefix) {
-    return this._referenceService.formatReferenceNumber(
+    return this._formatService.formatReferenceNumber(
       reference,
       customPrefix ? customPrefix : ReferencePrefix.Facture,
     )
-    // return this._referenceService.formatReferenceNumber(
+    // return this._formatService.formatReferenceNumber(
     //   reference,
     //   ReferencePrefix.Facture,
     // )
@@ -356,7 +355,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   firstTimeCharged = true
   selectionChange(selectionEventObject) {
-    if (selectionEventObject.type == 'selectionChanged') {
+    if (selectionEventObject.type == 'selectionChanged' || selectionEventObject.type == 'firstSelectionChanged') {
       this.selectedDevisItem = selectionEventObject.result
     } else if (selectionEventObject.type == 'delete') {
       this.selectedDevisItem = selectionEventObject.result
@@ -406,7 +405,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         .map((item) => item.totalTtc)
         .reduce((accum, current) => accum + current) -
             item.remise * totalHt / 100
-        console.log(this.montantTotalAllDevis, item.remise * totalHt)
       }
     })
   }
@@ -504,7 +502,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedDevisItem.factureItems
           .map((item) => item.totalTtc)
           .reduce((accum, current) => accum + current) - remiseAmount
-        console.log(this.selectedDevisItem.montantTtc)
       this.selectedDevisItem = {
         ...this.selectedDevisItem,
         dateEmission: moment(this.selectedDevisItem.dateEmission).toDate(),
@@ -574,7 +571,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     ).pipe(
       map(([length, res, montantTotalAllDevis]: any) => {
         data = [...res.items]
-        console.log(data)
         data.forEach((devis: any) => {
           devis.client.nom = !devis.client.nom
             ? devis.client.raisonSociale
@@ -697,7 +693,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
               FactureStatutEnum.Valide,
             )
             .subscribe((res) => {
-              console.log(res)
               this.viewUpdateSelectedItemStatut(
                 FactureStatutEnum.PaiementAttente,
               )

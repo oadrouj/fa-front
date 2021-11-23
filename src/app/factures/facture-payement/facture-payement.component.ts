@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum';
 import { ModePaiementEnum } from '@shared/service-proxies/service-proxies';
-import { ReferenceService } from '@shared/services/reference.service';
+import { FormatService } from '@shared/services/format.service';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 @Component({
@@ -23,13 +23,13 @@ export class FacturePayementComponent implements OnInit {
     public ref: DynamicDialogRef,
     public config: DynamicDialogConfig,
     private _formBuider: FormBuilder,
-    private _referenceService: ReferenceService,
+    private _formatService: FormatService,
   )
    { }
 
   ngOnInit(): void {
     this.initiateForm();
-    this.formGroup.get('reference').setValue(this._referenceService.formatReferenceNumber(
+    this.formGroup.get('reference').setValue(this._formatService.formatReferenceNumber(
       this.config.data.reference,
       ReferencePrefix.Facture
     ))

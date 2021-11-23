@@ -14,12 +14,19 @@ import {
   // Client,
   ClientDto,
   ClientServiceProxy,
+  DevisDto,
+  DevisServiceProxy,
+  DevisStatutEnum,
+  FactureDto,
+  FactureServiceProxy,
+  FactureStatutEnum,
 } from '@shared/service-proxies/service-proxies'
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
-import { ReferenceService } from '@shared/services/reference.service'
+import { FormatService } from '@shared/services/format.service'
 import { ToastService } from '@shared/services/toast.service'
 import csc, { ICountry } from 'country-state-city'
 import { environment } from 'environments/environment'
+import * as moment from 'moment'
 import {
   MessageService,
   ConfirmationService,
@@ -48,7 +55,7 @@ interface Devise {
   styleUrls: ['./clients.component.css'],
 })
 export class ClientsComponent extends AppComponentBase
-  implements OnInit, AfterViewInit {
+  implements OnInit {
   display: boolean = false
   nouveau: boolean = true
   titreFormulaire: string = ''
@@ -66,13 +73,14 @@ export class ClientsComponent extends AppComponentBase
   client: ClientDto = new ClientDto()
   clientApercu: ClientDto
   clients: ClientDto[]
+
   cols = [
     {
       header: 'REFERENCE',
       field: 'reference',
       type: 'text',
       format: (number) =>
-        this._referenceService.formatReferenceNumber(
+        this._formatService.formatReferenceNumber(
           number,
           ReferencePrefix.Client,
         ),
@@ -90,14 +98,14 @@ export class ClientsComponent extends AppComponentBase
     },
     {
       header: 'FACTURES EN ATTENTE',
-      field: 'totalAmountPendingInvoices',
+      field: 'pendingInvoicesAmount',
       type: 'currency',
     },
     {
       header: 'FACTURES EN RETARD',
-      field: 'totalAmountOverdueInvoices',
+      field: 'overdueInvoicesAmount',
       type: 'currency',
-    },
+    }
   ]
   selectedCategory: string
   selectedType: string
@@ -110,13 +118,24 @@ export class ClientsComponent extends AppComponentBase
 
   isFormProfetionnel: boolean = true
   isInsert: boolean
+  hasFactures: boolean
+  hasDevis: boolean
+  factureList: import("f:/repos/Facturi-Front/src/shared/service-proxies/service-proxies").FactureDto[]
+  devisList: import("f:/repos/Facturi-Front/src/shared/service-proxies/service-proxies").DevisDto[]
+  localFacturesList : {clientId: number, items: FactureDto[]}[] = []
+  localDevisList: {clientId: number, items: DevisDto[]}[] = []
+  totalAmountPendingFactures: number
+  totalAmountOverdueFactures: number
+
   constructor(
     injector: Injector,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private _clientServiceProxy: ClientServiceProxy,
     private _globalEventsService: GlobalEventsService,
-    private _referenceService: ReferenceService,
+    private _formatService: FormatService,
+    private _factureServiceProxy: FactureServiceProxy,
+    private _devisServiceProxy: DevisServiceProxy,
     private _toastService: ToastService,
     private _confirmDialogService: ConfirmDialogService,
     private _router: Router,
@@ -125,13 +144,14 @@ export class ClientsComponent extends AppComponentBase
   }
 
   scrollHeight: string = '0px'
-  favIcon: HTMLLinkElement = document.querySelector('#favIcon');
-  
+  favIcon: HTMLLinkElement = document.querySelector('#favIcon')
+
   ngOnInit(): void {
     this._globalEventsService.announcedThePageChangedColorSubject('#2A95D1')
-    
-    this.favIcon.href = "../../assets/img/ClientsTitreIcon.png"
 
+    this.favIcon.href = '../../assets/img/ClientsTitreIcon.png'
+    this.factureList = [new FactureDto()]
+    this.devisList = [new DevisDto()]
     this.categories = [
       { name: 'Particulier', code: 'PRTC' },
       { name: 'Professionnel', code: 'PRFS' },
@@ -166,17 +186,97 @@ export class ClientsComponent extends AppComponentBase
     this.scrollHeight = (height - 356).toString() + 'px'
   }
 
-  ngAfterViewInit() {}
-
   sortField: string
   sortOrder: number
+  selectedTabName = ""
+  devisCols =  [
+    {
+      header: 'REFERENCE',
+      field: 'reference',
+      type: 'text',
+      format: (number, customPrefix) =>
+      this._formatService.formatReferenceNumber(
+        number,
+        customPrefix ? customPrefix : ReferencePrefix.Devis,
+      ),
+    },
+    {
+      header: 'DATE D’EMISSION',
+      field: 'dateEmission',
+      type: 'date',
+      format: (date) => (date._i ? new Date(date._i) : new Date(date._d)),
+    },
+    {
+      header: 'ECHEANCE',
+      field: 'echeancePaiement',
+      type: 'text',
+      suffix: 'jours',
+    },
+    {
+      header: 'TOTAL HT',
+      field: 'montantHt',
+      type: 'currency',
+    },
+    {
+      header: 'TOTAL TTC',
+      field: 'montantTtc',
+      type: 'currency',
+    },
+    {
+      header: 'STATUT',
+      field: 'statut',
+      type: 'text',
+      format: this._formatService.formatDevisStatut,
+    },
+  ]
 
+  factureCols =  [
+    {
+      header: 'REFERENCE',
+      field: 'reference',
+      type: 'text',
+      format: (number, customPrefix) =>
+      this._formatService.formatReferenceNumber(
+        number,
+        customPrefix ? customPrefix : ReferencePrefix.Facture,
+      ),
+    },
+    {
+      header: 'DATE D’EMISSION',
+      field: 'dateEmission',
+      type: 'date',
+      format: (date) => (date._i ? new Date(date._i) : new Date(date._d)),
+    },
+    {
+      header: 'ECHEANCE',
+      field: 'echeancePaiement',
+      type: 'text',
+      suffix: 'jours',
+    },
+    {
+      header: 'TOTAL HT',
+      field: 'montantHt',
+      type: 'currency',
+    },
+    {
+      header: 'TOTAL TTC',
+      field: 'montantTtc',
+      type: 'currency',
+    },
+    {
+      header: 'STATUT',
+      field: 'statut',
+      type: 'text',
+      format: this._formatService.formatFactureStatut,
+    },
+  ]
+  
   //#region Subject Events
   notifySelectedDevisChanged = new Subject<any>()
   emitNotificationSelectedDevisChanged(client: any) {
     this.notifySelectedDevisChanged.next(client)
   }
-
+  
   rowDeletedSubject = new Subject<any>()
   emitRowDeletedEvent(deviItem: any) {
     this.rowDeletedSubject.next(deviItem)
@@ -184,7 +284,7 @@ export class ClientsComponent extends AppComponentBase
 
   filterSubject = new Subject<any>()
   emitFilterEvent(filterType: string, value: any) {
-    console.log(this.selectedCategory);
+  
     if (filterType == 'filterByInput') {
       setTimeout(() => {
         this.filterSubject.next({
@@ -215,22 +315,153 @@ export class ClientsComponent extends AppComponentBase
   //     });
   // }
   chargerListeClients(event, data) {
-    let categorieFilter =  event.filters.category && event.filters.category.value
-    let typeFilter =  event.filters.type && event.filters.type.value
-    return this._clientServiceProxy.getAllClients(event.first, event.rows, event.globalFilter, event.sortField,
-      event.sortOrder, categorieFilter, typeFilter).pipe(
-      map((data) => {
-        data.items.forEach(
-          (item) =>
-            item.categorieClient == 'PRFS' && (item.nom = item.raisonSociale),
+    
+    let categorieFilter = event.filters.category && event.filters.category.value
+    let typeFilter = event.filters.type && event.filters.type.value
+    return this._clientServiceProxy
+      .getAllClients(
+        event.first,
+        event.rows,
+        event.globalFilter,
+        event.sortField,
+        event.sortOrder,
+        categorieFilter,
+        typeFilter,
+      )
+      .pipe(
+        map((data) => {
+          data.items.forEach(
+            (item) => {
+              item.categorieClient == 'PRFS' && (item.nom = item.raisonSociale)
+            }
+          )
+       
+          return {
+            items: data.items,
+            length: data.items.length,
+            montantTotalAllDevis: 0,
+          }
+        }),
+      )
+  }
+
+  getFiveLastFacturesOrDevisElements(element: string) {
+    this.hasFactures = false
+    this.hasDevis = false
+    if (element == 'factures') {
+      let index;
+      if((index = this.localFacturesList.findIndex(item => item.clientId == this.client.id)) >= 0){
+        let items = this.localFacturesList[index].items
+        this.hasFactures = items.length > 0
+        this.factureList = this.hasFactures ? [...items] : [new FactureDto()];
+      }
+      else {
+      this._factureServiceProxy
+        .getAllFacture(
+          0,
+          5,
+          '',
+          '',
+          '',
+          this.client.id,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
         )
-        return {
-          items: data.items,
-          length: data.items.length,
-          montantTotalAllDevis: 0,
-        }
-      }),
-    )
+        .subscribe((res) => {
+          if (res.items.length > 0) {
+            this.hasFactures = true
+            res.items.forEach((devis: any) => {
+              devis.statut =
+                devis.statut == FactureStatutEnum.Valide
+                  ? moment().isAfter(
+                      moment(devis.dateEmission).add(
+                        devis.echeancePaiement,
+                        'days',
+                      ),
+                    )
+                    ? FactureStatutEnum.PaiementRetard
+                    : FactureStatutEnum.PaiementAttente
+                  : devis.statut
+
+              let montantTtc = devis.factureItems
+                .map((item) => item.totalTtc)
+                .reduce((accum, current) => accum + current)
+               devis.montantHt = devis.factureItems
+                .map((item) => item.unitPriceHT * item.quantity)
+                .reduce((accum, current) => accum + current)
+              
+              devis.montantTtc = montantTtc - (devis.montantHt * devis.remise) / 100
+            })
+            this.factureList = res.items;
+          }
+
+          this.localFacturesList = [...this.localFacturesList, {clientId : this.client.id, items:  res.items}]
+        })
+      }
+    } else {
+
+      let index;
+      if((index = this.localDevisList.findIndex(item => item.clientId == this.client.id)) >= 0){
+        let items = this.localDevisList[index].items
+        this.hasDevis = items.length > 0
+        this.devisList = this.hasDevis ? [...items] : [new DevisDto()];
+
+      }
+      else {
+      this._devisServiceProxy
+        .getAllDevis(
+          0,
+          5,
+          '',
+          '',
+          '',
+          this.client.id,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+        )
+        .subscribe((res) => {
+          if (res.items.length > 0) {
+            this.hasDevis = true
+            res.items.forEach((devis: any) => {
+              devis.statut = moment().isAfter(
+                moment(devis.dateEmission).add(devis.echeancePaiement, 'days'),
+              )
+                ? DevisStatutEnum.Expire
+                : devis.statut
+
+              let montantTtc = devis.devisItems
+                .map((item) => item.totalTtc)
+                .reduce((accum, current) => accum + current)
+              devis.montantHt = devis.devisItems
+                .map((item) => item.unitPriceHT * item.quantity)
+                .reduce((accum, current) => accum + current)
+
+              devis.montantTtc = montantTtc - (devis.montantHt * devis.remise) / 100
+            })
+
+            this.devisList = res.items;
+          }
+          this.localDevisList = [...this.localDevisList, {clientId : this.client.id, items: res.items}]
+        })
+      }
+    }
+
+  }
+
+  handleTabChange(event) {
+    if (event.index == 1) {
+      this.getFiveLastFacturesOrDevisElements('factures')
+      this.selectedTabName = 'factures';
+
+    } else if (event.index == 2) {
+      this.getFiveLastFacturesOrDevisElements('devis')
+      this.selectedTabName = "devis";
+
+    }
   }
 
   initialiseForm(): void {
@@ -243,23 +474,29 @@ export class ClientsComponent extends AppComponentBase
 
   isClientProfetionnel: boolean
 
-  //TODO: delete this method
-  onRowSelect(event) {
-    this.fillClientApercu(this.client)
-  }
-
   selectionChange(selectionEventObject) {
-    if (selectionEventObject.type == 'selectionChanged') {
-      this.client = selectionEventObject.result
-    } else if (selectionEventObject.type == 'delete') {
-      this.client = selectionEventObject.result
+    if(selectionEventObject.type == 'firstSelectionChanged'){
+      this.totalAmountPendingFactures = 0
+      this.totalAmountOverdueFactures = 0
+      this.tableChild.tableData.forEach(
+        (item) => {
+          item.categorieClient == 'PRFS' && (item.nom = item.raisonSociale)
+          this.totalAmountPendingFactures += item.pendingInvoicesAmount
+          this.totalAmountOverdueFactures += item.overdueInvoicesAmount
+
+        }
+      )
     }
+    
+    this.client = selectionEventObject.result
+    
     this.emitNotificationSelectedDevisChanged({
       ...this.client,
     })
-    if(this.client == null)
-      this.client = new ClientDto()
-    this.isClientProfetionnel = this.client.categorieClient == 'PRFS'
+
+    this.getFiveLastFacturesOrDevisElements(this.selectedTabName)
+    if (this.client == null) this.client = new ClientDto()
+      this.isClientProfetionnel = this.client.categorieClient == 'PRFS'
   }
 
   fillClientApercu(client): void {
@@ -371,6 +608,7 @@ export class ClientsComponent extends AppComponentBase
     this.validateForm()
     if (this.isFormValid) {
       if (this.isInsert) {
+
         this._clientServiceProxy
           .createClient(this.formClient)
           .subscribe((result) => {
@@ -390,7 +628,9 @@ export class ClientsComponent extends AppComponentBase
 
               result = {
                 ...result,
-                nom: result.categorieClient == 'PRFS' && (result.nom = result.raisonSociale),
+                nom:
+                  result.categorieClient == 'PRFS' &&
+                  (result.nom = result.raisonSociale),
               } as any
 
               this.tableChild.tableData = [
@@ -432,7 +672,9 @@ export class ClientsComponent extends AppComponentBase
 
               result = {
                 ...result,
-                nom: result.categorieClient == 'PRFS' && (result.nom = result.raisonSociale),
+                nom:
+                  result.categorieClient == 'PRFS' &&
+                  (result.nom = result.raisonSociale),
               } as any
               this.tableChild.tableData[index] = {
                 ...result,
@@ -448,7 +690,6 @@ export class ClientsComponent extends AppComponentBase
                 ...this.client,
               })
 
-              
               this.messageService.add({
                 key: 'default',
                 severity: 'success',
@@ -517,5 +758,9 @@ export class ClientsComponent extends AppComponentBase
     this._router.navigate(['/app/Factures'], {
       state: { clientId: this.client.id },
     })
+  }
+
+  navigateTo(url: string){
+    this._router.navigate([url])
   }
 }

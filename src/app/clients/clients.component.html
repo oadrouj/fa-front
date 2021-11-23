@@ -65,11 +65,14 @@
                 </tr>
             </ng-template>
         </p-table> -->
+
         <div id="footerTable" class="grid mx-2">
             <div id="totalTTC">Total TTC</div>
-            <div id="totalEnAttente">0 MAD</div>
-            <div id="totalPayees">0 MAD</div>
+            <div id="totalEnAttente">{{ this.totalAmountPendingFactures | number:'1.2-2' }} {{' ' + Currency}}</div>
+            <div id="totalPayees">{{ this.totalAmountOverdueFactures | number:'1.2-2' }} {{' ' + Currency}}</div>
         </div>
+
+
     </div>
     <div id="blockApercu" class="col-6 pt-5 px-3 pb-3">
         <div id="apercu" class="shadow-4">
@@ -94,7 +97,7 @@
                 </div>
             </div>
             <div id="ongletsClient">
-                <p-tabView>
+                <p-tabView (onChange)="handleTabChange($event)">
                     <p-tabPanel id="clientInfos" header="Infos">
                         <table>
                             <tr *ngIf="isClientProfetionnel">
@@ -160,48 +163,133 @@
                         </table>
                     </p-tabPanel>
                     <p-tabPanel header="Factures">
-                        <p-table>
-                            <ng-template pTemplate="header">
+
+                        <p-table [columns]="factureCols" [value]="factureList" dataKey="reference">
+                            <ng-template pTemplate="header" let-columns>
                                 <tr>
-                                    <th>REFERENCE</th>
-                                    <th>DATE D'EMISSION</th>
-                                    <th>ECHEANCE</th>
-                                    <th>TOTAL HT</th>
-                                    <th>TOTAL TTC</th>
-                                    <th>STATUT</th>
+                                    <th *ngFor="let col of columns">
+                                        {{col.header}}
+                                    </th>
                                 </tr>
                             </ng-template>
-                            <ng-template pTemplate="body">
+                            <ng-template pTemplate="body" let-rowData let-columns="columns">
+                                <ng-container *ngIf="!hasFactures; else hasRecordsFactures">
+
+                                    <div id="noRecordsFactures" class="absolute w-100">
+                                        <div class="mx-auto">
+                                            <p>Aucune facture pour ce client</p><br>
+                                            <img src="../../assets/img/NoRecordsFactureIcon.png">
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                <ng-template #hasRecordsFactures>
+                                    <tr style="height:40px" [pSelectableRow]="rowData">
+                                        <ng-container *ngFor="let colVar of columns">
+                                            <ng-container [ngSwitch]="colVar.type">
+
+                                                <ng-container *ngSwitchCase="'date'">
+                                                    <td [colSpan]="colVar.colspan">
+                                                        {{colVar.format(rowData[colVar.field]) | date:'shortDate'}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'currency'">
+                                                    <td [colSpan]="colVar.colspan" mode="decimal">
+                                                        {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + Currency}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'pourcentage'">
+                                                    <td [colSpan]="colVar.colspan">
+                                                        {{rowData[colVar.field] + '%'}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchDefault>
+                                                    <td [colSpan]="colVar.colspan">
+                                                        {{colVar.format ? colVar.format(rowData[colVar.field], rowData.referencePrefix) : rowData[colVar.field]}} {{colVar.suffix && ' ' + colVar.suffix}}
+                                                    </td>
+                                                </ng-container>
+
+                                            </ng-container>
+
+                                        </ng-container>
+                                    </tr>
+                                </ng-template>
+
+
+                            </ng-template>
+                            <ng-template pTemplate="loadingbody" let-columns="columns">
+                                <tr style="height:34px">
+                                    <td *ngFor="let col of columns">
+                                        <p-skeleton [ngStyle]="{'width': '100%'}"></p-skeleton>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="summary" let-rowData let-columns="columns">
+                                <button *ngIf="hasFactures" pButton type="button" (click)="navigateTo('/app/Factures')" class="p-button-raised border-none bg-orange">Voir tous les factures</button>
                             </ng-template>
                         </p-table>
-                        <div id="noRecordsFactures">
-                            <div class="mx-auto">
-                                <p>Aucune facture pour ce client</p><br>
-                                <img src="../../assets/img/NoRecordsFactureIcon.png">
-                            </div>
-                        </div>
                     </p-tabPanel>
                     <p-tabPanel header="Devis">
-                        <p-table>
-                            <ng-template pTemplate="header">
+
+                        <p-table [columns]="devisCols" [value]="devisList" dataKey="reference">
+                            <ng-template pTemplate="header" let-columns>
                                 <tr>
-                                    <th>REFERENCE</th>
-                                    <th>DATE D'EMISSION</th>
-                                    <th>ECHEANCE</th>
-                                    <th>TOTAL HT</th>
-                                    <th>TOTAL TTC</th>
-                                    <th>STATUT</th>
+                                    <th *ngFor="let col of columns">
+                                        {{col.header}}
+                                    </th>
                                 </tr>
                             </ng-template>
-                            <ng-template pTemplate="body">
+                            <ng-template pTemplate="body" let-rowData let-columns="columns">
+                                <ng-container *ngIf="!hasDevis; else hasRecordsDevis">
+                                    <div id="noRecordsFactures" class="absolute w-100">
+                                        <div class="mx-auto">
+                                            <p>Aucun devis pour ce client</p><br>
+                                            <img src="../../assets/img/NoRecordsDevisIcon.png">
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                <ng-template #hasRecordsDevis>
+                                    <tr style="height:40px" [pSelectableRow]="rowData">
+                                        <ng-container *ngFor="let colVar of columns">
+                                            <ng-container [ngSwitch]="colVar.type">
+
+                                                <ng-container *ngSwitchCase="'date'">
+                                                    <td [colSpan]="colVar.colspan">
+                                                        {{colVar.format(rowData[colVar.field]) | date:'shortDate'}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'currency'">
+                                                    <td [colSpan]="colVar.colspan" mode="decimal">
+                                                        {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + Currency}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'pourcentage'">
+                                                    <td [colSpan]="colVar.colspan">
+                                                        {{rowData[colVar.field] + '%'}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchDefault>
+                                                    <td [colSpan]="colVar.colspan">
+                                                        {{colVar.format ? colVar.format(rowData[colVar.field], rowData.referencePrefix) : rowData[colVar.field]}} {{colVar.suffix && ' ' + colVar.suffix}}
+                                                    </td>
+                                                </ng-container>
+
+                                            </ng-container>
+
+                                        </ng-container>
+                                    </tr>
+                                </ng-template>
+                            </ng-template>
+                            <ng-template pTemplate="summary">
+                                <button *ngIf="hasDevis" pButton type="button" (click)="navigateTo('/app/Devis')" class="p-button-raised bg-green border-none">Voir tous les devis</button>
                             </ng-template>
                         </p-table>
-                        <div id="noRecordsFactures">
-                            <div class="mx-auto">
-                                <p>Aucun devis pour ce client</p><br>
-                                <img src="../../assets/img/NoRecordsDevisIcon.png">
-                            </div>
-                        </div>
+
                     </p-tabPanel>
                 </p-tabView>
             </div>

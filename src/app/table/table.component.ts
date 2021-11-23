@@ -3,7 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum';
 import { DevisItem } from '@shared/models/DevisItem';
 import { ClientServiceProxy, DevisServiceProxy, FactureServiceProxy } from '@shared/service-proxies/service-proxies';
-import { ReferenceService } from '@shared/services/reference.service';
+import { FormatService } from '@shared/services/format.service';
 import { FilterMatchMode, FilterService, LazyLoadEvent } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { Subscription, Observable, zip, of } from 'rxjs';
@@ -48,7 +48,7 @@ export class TableComponent implements OnInit {
 
   constructor(
     private sanitizer: DomSanitizer,
-    public _referenceService: ReferenceService,
+    public _formatService: FormatService,
     private _devisServiceProxy: DevisServiceProxy,
     private _factureServiceProxy: FactureServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
@@ -113,18 +113,25 @@ export class TableComponent implements OnInit {
   }
   
   loadTableLazy(event: LazyLoadEvent) {
-      console.log(event);
+  
       this.getListApi$(event, this.tableData)
         .subscribe((res) => {
         this.tableData = Array.from({length: res.length})
         this.tableData.splice(event.first, event.rows, ...res.items);
         this.tableData = [...this.tableData]
         this.selectedDevis = this.tableData[0]
+
         this.montantTotalAllDevis = res.montantTotalAllDevis
-        this.selectionChange.emit({type: 'selectionChanged', result: res.items[0]})
+        this.selectionChange.emit({type: 'firstSelectionChanged', result: res.items[0]})
+
+      
       }) 
      
     }
+
+    trackByFunction = (index, item) => {
+      return item.id 
+  }
     
 }
  
