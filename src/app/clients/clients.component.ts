@@ -21,6 +21,7 @@ import {
   FactureServiceProxy,
   FactureStatutEnum,
 } from '@shared/service-proxies/service-proxies'
+
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 import { FormatService } from '@shared/services/format.service'
 import { ToastService } from '@shared/services/toast.service'
@@ -120,8 +121,8 @@ export class ClientsComponent extends AppComponentBase
   isInsert: boolean
   hasFactures: boolean
   hasDevis: boolean
-  factureList: import("f:/repos/Facturi-Front/src/shared/service-proxies/service-proxies").FactureDto[]
-  devisList: import("f:/repos/Facturi-Front/src/shared/service-proxies/service-proxies").DevisDto[]
+  factureList: FactureDto[]
+  devisList: DevisDto[]
   localFacturesList : {clientId: number, items: FactureDto[]}[] = []
   localDevisList: {clientId: number, items: DevisDto[]}[] = []
   totalAmountPendingFactures: number
