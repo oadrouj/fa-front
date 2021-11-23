@@ -1,0 +1,10 @@
+<nav class="main-header navbar navbar-expand navbar-white navbar-light" [style.background-color]="codeCouleurHeader">
+    <header-left-navbar></header-left-navbar>
+    <ul class="navbar-nav ml-auto">
+        <!-- <header-language-menu></header-language-menu> -->
+        <i class="pi pi-bell"></i>
+
+        <!-- <header-user-menu></header-user-menu> -->
+        <p-button label='{{ "Logout" | localize }}' styleClass="p-button-link" (click)="logout()"></p-button>
+    </ul>
+</nav>

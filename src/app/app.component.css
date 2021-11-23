@@ -1,0 +1,6 @@
+:host >>> .content-wrapper {
+  margin-left: 16% !important;
+}
+:host >>> .wrapper .content-wrapper {
+  min-height: calc(100vh - 60px);
+}

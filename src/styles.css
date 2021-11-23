@@ -1,0 +1,113 @@
+/* You can add global styles to this file, and also import other style files */
+
+@font-face {
+    font-family: 'Frutiger';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Frutiger'), url('assets/fonts/Frutiger.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'Frutiger Bold';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Frutiger Bold'), url('assets/fonts/Frutiger_bold.woff') format('woff');
+}
+
+:root {
+    --green-color: #0D6939;
+    --light-green-color: #C3EAD6;
+    --orange-color: #EBA20C;
+    --light-orange-color: #F2E4C8;
+    --bg-color: #F1F6FF;
+    --gray-color: #9A9FA8;
+    --light-gray-color: #DDDDDD;
+    --purple-color: #5D3D7D;
+}
+
+.w-80 {
+    width: 80%;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.positon-relative {
+    position: relative;
+}
+
+
+/* Colors and Backgrounds */
+
+.color-white {
+    color: #fff !important;
+}
+
+.color-green {
+    color: var(--green-color) !important;
+}
+
+.color-gray {
+    color: var(--gray-color) !important;
+}
+
+.color-light-gray {
+    color: var(--light-gray-color) !important;
+}
+
+.color-orange {
+    color: var(--orange-color) !important;
+}
+
+.bg-green {
+    background-color: var(--green-color) !important;
+}
+
+.bg-secondary-green {
+    background-color: #58BBA4 !important;
+}
+
+.bg-orange {
+    background-color: var(--orange-color) !important;
+    color: #fff !important;
+}
+
+.bg-light-grayorange {
+    background-color: var(--light-orange-color) !important;
+}
+
+.bg-white {
+    background-color: #fff !important;
+}
+
+.bg-turquoise {
+    background-color: #4C9D8A !important;
+}
+
+.bg-purple {
+    background-color: var(--purple-color) !important;
+}
+
+.p-dropdown .pi.pi-chevron-down:before {
+    content: ""
+}
+
+.p-dropdown .p-dropdown-trigger-icon {
+    border: 7px solid #fff;
+    border-top: 8px solid #7d86a9;
+    margin-top: 8px;
+}
+
+.vertical-baseline {
+    vertical-align: baseline;
+}
+
+.submitted .ng-invalid:not(form,
+div,
+tr)
+/* .ng-invalid .p-autocomplete-input */
+
+{
+    border: 1px red solid !important;
+}

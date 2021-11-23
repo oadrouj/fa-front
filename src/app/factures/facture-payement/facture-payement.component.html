@@ -1,0 +1,38 @@
+<div #container>
+    <div class="custom-dialog-header">
+        <span class="custom-dialog-title">Paiement du facture</span>
+        <div class="p-dialog-header-icons">
+            <button type="button" (click)="closeDialog()" class="p-dialog-header-icon p-dialog-header-maximize p-link ">
+                <span class="p-dialog-header-close-icon pi pi-times ng-tns-c139-15"></span>
+            </button>
+        </div>
+    </div>
+    <form [formGroup]="formGroup" class="mt-5">
+        <div class="grid ">
+            <div class="col-6"><span>Référence</span></div>
+            <div class="col-6"><input pInputText formControlName="reference" readonly="true"></div>
+        </div>
+        <div class="grid ">
+            <div class="col-6"><span>Montant</span></div>
+            <div class="col-6">
+                <p-inputNumber formControlName="montant" mode="decimal" [minFractionDigits]="2" placeholder=""></p-inputNumber>
+            </div>
+        </div>
+        <div class="grid">
+            <div class="col-6"><span>Date de paiement</span></div>
+            <div class="col-6">
+                <p-calendar formControlName="datePaiement" [appendTo]="container"></p-calendar>
+            </div>
+        </div>
+        <div class="grid ">
+            <div class="col-6"><span>Mode de paiement</span></div>
+            <div class="col-6">
+                <p-dropdown formControlName="modePaiement" [appendTo]="container" [options]="payementOptions" optionLabel="label" optionValue="value"></p-dropdown>
+            </div>
+        </div>
+        <div class="grid mt-3">
+            <a pButton pRipple (click)="closeDialogAndGetValue()" class="ml-auto mr-3">Términer</a>
+        </div>
+
+    </form>
+</div>

@@ -1,0 +1,191 @@
+:host>>>.p-button {
+    border: none !important;
+}
+
+:host>>>.p-dialog-mask {
+    z-index: 2040 !important;
+}
+
+:host ::ng-deep .p-dialog-header {
+    padding: 20px 30px 20px 0px;
+    background: var(--green-color);
+}
+
+:host ::ng-deep .p-dialog-header h2 {
+    color: #fff;
+    flex: 1;
+    margin-left: 80px;
+    font-weight: 400;
+}
+
+.closeButton {
+    background: transparent;
+}
+
+:host ::ng-deep .p-dialog-content {
+    padding: 0 0 0 50px;
+    overflow-x: hidden;
+    font-size: 1.312rem;
+    background-color: var(--bg-color);
+}
+
+:host ::ng-deep .p-dialog-content .p-autocomplete-input {
+    height: 46px;
+    border: 1px solid #CED0DA;
+}
+
+:host ::ng-deep .p-dialog-content h2 {
+    line-height: 0;
+    font-size: 2.415rem;
+    font-weight: 400;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #D8D8D8;
+}
+
+.autoCompleteContainer {
+    padding-bottom: 20px;
+}
+
+:host>>>.autoCompleteContainer .autocomplete {
+    padding: 7px 0 11px 0;
+}
+
+:host>>>.p-dialog {
+    min-height: 100vh;
+}
+
+.w-77 {
+    width: 78%;
+}
+
+.w-23 {
+    width: 22%;
+}
+
+:host>>>#new-devis-header .p-dropdown,
+:host>>>#new-devis-header .p-calendar {
+    width: 85%;
+}
+
+#newDevis td {
+    text-align: center;
+}
+
+#newDevis td .p-inputtext {
+    width: 100%;
+}
+
+:host>>>#newDevis td .p-dropdown,
+:host>>>#newDevis td .p-inputnumber,
+:host>>>#newDevis td .p-inputnumber-input {
+    width: 100%;
+}
+
+:host>>>#newDevis td .p-dropdown,
+:host>>>#newDevis td .p-inputnumber,
+:host>>>#newDevis td .p-inputnumber-input {
+    width: 100%;
+}
+
+:host>>>#newDevis td .p-inputtext,
+:host>>>#newDevis td .p-datapicker .p-inputtext,
+:host>>>#newDevis td .p-dropdown .p-inputtext,
+:host>>>#newDevis td .p-inputnumber-input {
+    padding: 15px 6px;
+}
+
+#newDevis td .p-inputtext,
+:host>>>#newDevis td .p-dropdown,
+:host>>>#newDevis td .p-inputnumber-input,
+:host>>>#newDevis td .p-calendar {
+    border-color: #CED0DA;
+}
+
+:host>>>#newDevis .p-datatable .p-datatable-scrollable-body {
+    overflow-y: auto !important;
+}
+
+:host>>>#newDevis .p-datatable .p-datatable-thead>tr>th {
+    font-size: 1.3rem;
+    font-weight: 400;
+}
+
+:host>>>#newDevis .p-datatable .p-datatable-thead>tr>th {
+    padding-right: 0;
+    padding-bottom: 0;
+}
+
+:host>>>#newDevis .p-datatable .p-datatable-tbody>tr>td {
+    padding-left: 6px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-right: 6.4px;
+}
+
+:host>>>#newDevis .p-datatable .p-datatable-thead>tr>th:last-child,
+:host>>>#newDevis .p-datatable .p-datatable-tbody>tr>td:last-child {
+    width: 5%;
+}
+
+:host>>>#newDevis .p-datatable .p-datatable-scrollable-header,
+:host>>>#newDevis .p-datatable .p-datatable-scrollable-footer,
+:host>>>#newDevis .p-datatable .p-datatable-thead>tr>th,
+:host>>>#newDevis .p-datatable .p-datatable-tbody>tr,
+:host>>>#newDevis .p-datatable .p-datatable-footer {
+    background-color: transparent;
+}
+
+:host>>>#newDevis .p-datatable .p-datatable-thead>tr>th,
+:host>>>#newDevis .p-datatable .p-datatable-tbody>tr>td {
+    border: none;
+}
+
+:host>>>#newDevis .p-inputtext {
+    font-size: .93rem;
+    color: var(--gray-color);
+}
+
+.new-devis-summary {
+    flex-basis: 35%;
+    font-size: 1.3rem;
+    font-weight: 400;
+}
+
+.new-devis-summary .grid div {
+    padding: 2px;
+}
+
+:host>>>.p-dialog .p-accordion {
+    margin-left: 1.36rem;
+    margin-right: 1.36rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 50%);
+}
+
+:host>>>.p-dialog .p-accordion a.p-accordion-header-link {
+    display: block;
+    border-top: 1px solid var(--light-gray-color);
+}
+
+:host>>>.p-dialog .p-accordion a.p-accordion-header-link .p-accordion-toggle-icon {
+    border: 1px solid var(--light-gray-color);
+    padding-bottom: 3px;
+    color: var(--light-gray-color);
+}
+
+:host>>>.p-dialog .p-accordion a.p-accordion-header-link .p-accordion-toggle-icon:before {
+    font-size: 0.625rem;
+}
+
+:host>>>.p-dialog #new-devis-header .p-calendar,
+:host>>>.p-dialog #new-devis-header .p-dropdown,
+:host>>>.p-dialog #new-devis-header textarea {
+    border: 1px solid #CED0DA;
+}
+
+:host>>>.p-dialog #new-devis-header .p-datepicker {
+    top: -210px !important;
+}

@@ -1,0 +1,12 @@
+
+<div class="m-3">
+    <app-account-header-min></app-account-header-min>
+    <div>
+        <app-register-step-one *ngIf="isStepOne"></app-register-step-one>
+        <app-register-step-two code="{{code}}" *ngIf="isStepTwo"></app-register-step-two>
+        <app-register-step-three code="{{code}}" *ngIf="isStepThree"></app-register-step-three>
+        <app-register-step-four status="{{status}}" code="{{code}}" *ngIf="isStepFour"></app-register-step-four>
+        <app-register-step-five *ngIf="isStepFive"></app-register-step-five>
+        <app-register-end *ngIf="isStepEnd"></app-register-end>
+    </div>
+</div>

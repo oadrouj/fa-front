@@ -1,0 +1,7 @@
+:host>>>.p-sortable-column-icon {
+    display: none;
+}
+
+:host>>>.p-highlight .p-sortable-column-icon {
+    display: block;
+}

@@ -1,0 +1,67 @@
+#register-end-root-div {
+    width: 100%;
+    max-width: 1600px;
+}
+#img-background {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    z-index: -1;
+    width: 65%;
+}
+#left-content {
+    min-height: 100%;
+    padding: 15px;
+}
+#left-content-texts {
+    margin-top: 20%;
+}
+#left-content-texts p {
+    margin-bottom: 20px;
+}
+#text-one {
+    font-size: 46px;
+    font-weight: bold;
+    color: #93969A;
+}
+#text-two {
+    font-size: 36px;
+    color: #93969A;
+    width: 525px;
+}
+#text-three {
+    font-size: 32px;
+    color: #93969A;
+}
+#left-content-button {
+    width: 100%;
+    padding-top: 15px;
+}
+:host >>> #left-button button {
+    width: 413px;
+    height: 74px;
+    color: white;
+    background-color: #4A266B;
+    border: none;
+    border-radius: 27px;
+    font-size: 28px;
+}
+:host >>> #left-button button:hover {
+    color: white;
+    background-color: #9470B5;
+    border: none;
+}
+#right-content {
+    min-height: 100%;
+    padding: 15px;
+}
+#right-content p {
+    width: 457px;
+    font-size: 40px;
+    color: white;
+}
+#right-content img {
+    width: 633px;
+}
+@media (min-width: 1700px) {
+}

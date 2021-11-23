@@ -1,0 +1,419 @@
+<div class="grid grid-nogutter ">
+    <div id="blockLeft" class="col-6 pt-5">
+        <div class="pl-2">
+            <div class="grid p-2">
+                <div class="col-8" id="titreBlock">
+                    <img id="logoTitre" src="../../assets/img/ClientsTitreIcon.png" class="vertical-baseline" />
+                    <span id="titre" class="ml-2">Clients</span>
+                    <p id="sousTitre" class="mt-2">Tous vos clients en un seul endroit !</p>
+                </div>
+                <div class="col-4" id="nouveauClientBlock">
+                    <p-button id="nouveauClient" label="Nouveau client" (click)="showDialogNouveau()"></p-button>
+                </div>
+            </div>
+            <div class="grid p-2">
+                <div class="col-5" id="filtreLeftBlock">
+                    <span class="p-input-icon-left shadow-1">
+                        <i class="pi pi-search"></i>
+                        <input type="text" pInputText placeholder="Recherchez ici" [(ngModel)]="champsRecherche"
+                            (input)="emitFilterEvent('filterByInput', $event.target.value)" />
+                    </span>
+                </div>
+                <div class="col-7" id="filtreRightBlock">
+                    <p-button class="content" label="Filtrer" (click)="emitFilterEvent('filterByButton', null)" icon="pi pi-filter" iconPos="left"></p-button>
+                    <p-dropdown class="content" [options]="types" placeholder="Type" [(ngModel)]="selectedType" optionLabel="name" optionValue="code">
+                    </p-dropdown>
+                    <p-dropdown class="content" [options]="categories" placeholder="Catégorie" [(ngModel)]="selectedCategory" optionLabel="name" optionValue="code">
+                    </p-dropdown>
+                </div>
+            </div>
+        </div>
+
+        <app-table #dt1 [cols]="cols" [currency]="Currency" [styleClass]="'table'" (selectionChange)="selectionChange($event)" [styleId]="'tableClients'" [highlightColorInput]="tableSelectionColor" [rowDeletedEvent]="rowDeletedSubject.asObservable()" [filterEvent]="filterSubject.asObservable()"
+            [getListApi$]="chargerListeClients" [SelectItemEvent]="notifySelectedDevisChanged.asObservable()" [globalFilterFields]="['categorie','type']">
+        </app-table>
+
+        <!-- <p-table id="tableClients" [value]="clients" [rows]="5" selectionMode="single" [(selection)]="client" dataKey="id" 
+            (onRowSelect)="onRowSelect($event)" (onSort)="customSort($event)" [customSort]="true" [lazy]="true" [scrollable]="true" 
+            [virtualScroll]="true" [virtualRowHeight]="54" [totalRecords]="300" >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="reference">RéFERENCE
+                        <p-sortIcon field="reference"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="creationTime">DATE D'AJOUT
+                        <p-sortIcon field="creationTime"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="nom">CLIENT
+                        <p-sortIcon field="nom"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="telFix">fACTURES EN ATTENTE
+                        <p-sortIcon field="telFix"></p-sortIcon>
+                    </th>
+                    <th pSortableColumn="telFix2">FACTURES PAYéES
+                        <p-sortIcon field="telFix2"></p-sortIcon>
+                    </th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-client>
+                <tr [pSelectableRow]="client">
+                    <td>{{getReferenceFromReferenceNumber(client.reference)}}</td>
+                    <td>{{getCreationDateFromClient(client)}}</td>
+                    <td>{{getNomFromClient(client)}}</td>
+                    <td>0 MAD</td>
+                    <td>0 MAD</td>
+                </tr>
+            </ng-template>
+        </p-table> -->
+
+        <div id="footerTable" class="grid mx-2">
+            <div id="totalTTC">Total TTC</div>
+            <div id="totalEnAttente">{{ this.totalAmountPendingFactures | number:'1.2-2' }} {{' ' + Currency}}</div>
+            <div id="totalPayees">{{ this.totalAmountOverdueFactures | number:'1.2-2' }} {{' ' + Currency}}</div>
+        </div>
+
+
+    </div>
+    <div id="blockApercu" class="col-6 pt-5 px-3 pb-3">
+        <div id="apercu" class="shadow-4">
+            <div id="headerApercu">
+                <div>
+                    <p-button label="Nouvelle Facture" (click)="newFacture()" styleClass="p-button-link"></p-button>
+                    <p-button label="Nouveau Devis" (click)="newDevis()" styleClass="p-button-link"></p-button>
+                    <p-button label="Modifier" styleClass="p-button-link" (click)="showDialogModifier()"></p-button>
+                    <p-button label="Supprimer" styleClass="p-button-link" (click)="supprimerClient()"></p-button>
+                </div>
+            </div>
+            <div id="rappelClient">
+                <div class="pl-4">
+                    <span id="nomClientApercu">
+                        {{replaceIfIsNullOrEmpty(isClientProfetionnel ? client.raisonSociale : client.nom)}}
+                    </span><br>
+                    <span id="referenceClientApercu">
+                        {{getReferenceFromReferenceNumber(client.reference)}}
+                    </span><br>
+                    <span id="categorieClientApercu">Prospect -
+                        {{replaceIfIsNullOrEmpty(isClientProfetionnel ? "Profetionnel" : "Particulier")}}</span>
+                </div>
+            </div>
+            <div id="ongletsClient">
+                <p-tabView (onChange)="handleTabChange($event)">
+                    <p-tabPanel id="clientInfos" header="Infos">
+                        <table>
+                            <tr *ngIf="isClientProfetionnel">
+                                <td>Raison sociale</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.raisonSociale)}}</td>
+                            </tr>
+                            <tr *ngIf="isClientProfetionnel">
+                                <td>ICE</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.ice)}}</td>
+                            </tr>
+                            <tr *ngIf="!isClientProfetionnel">
+                                <td>NOM</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.nom)}}</td>
+                            </tr>
+                            <tr *ngIf="isClientProfetionnel">
+                                <td>Secteur d’activité</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.secteurActivite)}}</td>
+                            </tr>
+                            <tr>
+                                <td>Téléphone fixe</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.telFix)}}</td>
+                            </tr>
+                            <tr>
+                                <td>Téléphone portable</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.telPortable)}}</td>
+                            </tr>
+                            <tr>
+                                <td>E-mail</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.email)}}</td>
+                            </tr>
+                            <tr>
+                                <td>Site Web</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.siteWeb)}}</td>
+                            </tr>
+                            <tr>
+                                <td>Adresse</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.adresse)}}</td>
+                            </tr>
+                            <tr>
+                                <td>Ville</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.ville)}}</td>
+                            </tr>
+                            <tr>
+                                <td>Pays</td>
+                                <td>{{replaceIfIsNullOrEmpty(getPaysFromIsoCode())}}</td>
+                            </tr>
+                            <tr>
+                                <td>Code postal</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.codePostal)}}</td>
+                            </tr>
+                            <tr>
+                                <td>Devise de facturation</td>
+                                <td>{{replaceIfIsNullOrEmpty(client.deviseFacturation)}}</td>
+                            </tr>
+                            <tr>
+                                <td>Remise</td>
+                                <td>{{client.remisePermanente}} %</td>
+                            </tr>
+                            <tr>
+                                <td>Délai de paiement</td>
+                                <td>{{client.delaiPaiement}} Jours</td>
+                            </tr>
+                        </table>
+                    </p-tabPanel>
+                    <p-tabPanel header="Factures">
+
+                        <p-table [columns]="factureCols" [value]="factureList" dataKey="reference">
+                            <ng-template pTemplate="header" let-columns>
+                                <tr>
+                                    <th *ngFor="let col of columns">
+                                        {{col.header}}
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-rowData let-columns="columns">
+                                <ng-container *ngIf="!hasFactures; else hasRecordsFactures">
+
+                                    <div id="noRecordsFactures" class="absolute w-100">
+                                        <div class="mx-auto">
+                                            <p>Aucune facture pour ce client</p><br>
+                                            <img src="../../assets/img/NoRecordsFactureIcon.png">
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                <ng-template #hasRecordsFactures>
+                                    <tr style="height:40px" [pSelectableRow]="rowData">
+                                        <ng-container *ngFor="let colVar of columns">
+                                            <ng-container [ngSwitch]="colVar.type">
+
+                                                <ng-container *ngSwitchCase="'date'">
+                                                    <td [colSpan]="colVar.colspan">
+                                                        {{colVar.format(rowData[colVar.field]) | date:'shortDate'}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'currency'">
+                                                    <td [colSpan]="colVar.colspan" mode="decimal">
+                                                        {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + Currency}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'pourcentage'">
+                                                    <td [colSpan]="colVar.colspan">
+                                                        {{rowData[colVar.field] + '%'}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchDefault>
+                                                    <td [colSpan]="colVar.colspan">
+                                                        {{colVar.format ? colVar.format(rowData[colVar.field], rowData.referencePrefix) : rowData[colVar.field]}} {{colVar.suffix && ' ' + colVar.suffix}}
+                                                    </td>
+                                                </ng-container>
+
+                                            </ng-container>
+
+                                        </ng-container>
+                                    </tr>
+                                </ng-template>
+
+
+                            </ng-template>
+                            <ng-template pTemplate="loadingbody" let-columns="columns">
+                                <tr style="height:34px">
+                                    <td *ngFor="let col of columns">
+                                        <p-skeleton [ngStyle]="{'width': '100%'}"></p-skeleton>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="summary" let-rowData let-columns="columns">
+                                <button *ngIf="hasFactures" pButton type="button" (click)="navigateTo('/app/Factures')" class="p-button-raised border-none bg-orange">Voir tous les factures</button>
+                            </ng-template>
+                        </p-table>
+                    </p-tabPanel>
+                    <p-tabPanel header="Devis">
+
+                        <p-table [columns]="devisCols" [value]="devisList" dataKey="reference">
+                            <ng-template pTemplate="header" let-columns>
+                                <tr>
+                                    <th *ngFor="let col of columns">
+                                        {{col.header}}
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-rowData let-columns="columns">
+                                <ng-container *ngIf="!hasDevis; else hasRecordsDevis">
+                                    <div id="noRecordsFactures" class="absolute w-100">
+                                        <div class="mx-auto">
+                                            <p>Aucun devis pour ce client</p><br>
+                                            <img src="../../assets/img/NoRecordsDevisIcon.png">
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                <ng-template #hasRecordsDevis>
+                                    <tr style="height:40px" [pSelectableRow]="rowData">
+                                        <ng-container *ngFor="let colVar of columns">
+                                            <ng-container [ngSwitch]="colVar.type">
+
+                                                <ng-container *ngSwitchCase="'date'">
+                                                    <td [colSpan]="colVar.colspan">
+                                                        {{colVar.format(rowData[colVar.field]) | date:'shortDate'}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'currency'">
+                                                    <td [colSpan]="colVar.colspan" mode="decimal">
+                                                        {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + Currency}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'pourcentage'">
+                                                    <td [colSpan]="colVar.colspan">
+                                                        {{rowData[colVar.field] + '%'}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchDefault>
+                                                    <td [colSpan]="colVar.colspan">
+                                                        {{colVar.format ? colVar.format(rowData[colVar.field], rowData.referencePrefix) : rowData[colVar.field]}} {{colVar.suffix && ' ' + colVar.suffix}}
+                                                    </td>
+                                                </ng-container>
+
+                                            </ng-container>
+
+                                        </ng-container>
+                                    </tr>
+                                </ng-template>
+                            </ng-template>
+                            <ng-template pTemplate="summary">
+                                <button *ngIf="hasDevis" pButton type="button" (click)="navigateTo('/app/Devis')" class="p-button-raised bg-green border-none">Voir tous les devis</button>
+                            </ng-template>
+                        </p-table>
+
+                    </p-tabPanel>
+                </p-tabView>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog id="dialogClient" header="{{titreFormulaire}}" [(visible)]="display" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
+
+    <p-selectButton [options]="categories2" [(ngModel)]="formClient.categorieClient" optionLabel="name" optionValue="code" (click)="onFormCategorySelected()">
+    </p-selectButton>
+
+    <div class="grid blockForm mx-3 mt-4 mb-2">
+        <div class="col-12">
+            <span class="title">PROFIL</span>
+        </div>
+        <div class="col-5 label" *ngIf="isFormProfetionnel">
+            <span>Secteur d’activité</span>
+        </div>
+        <div class="col-7" *ngIf="isFormProfetionnel">
+            <input type="text" pInputText placeholder="Text..." [(ngModel)]="formClient.secteurActivite" />
+        </div>
+        <div class="col-5 label" *ngIf="isFormProfetionnel">
+            <span>ICE</span>
+        </div>
+        <div class="col-7" *ngIf="isFormProfetionnel">
+            <input type="text" pInputText placeholder="123..." pKeyFilter="pint" [(ngModel)]="formClient.ice" />
+        </div>
+        <div class="col-5 label" *ngIf="!isFormProfetionnel">
+            <span>Nom <span>*</span></span>
+        </div>
+        <div class="col-7" *ngIf="!isFormProfetionnel">
+            <input type="text" pInputText placeholder="Text" class="{{nomClass}}" [(ngModel)]="formClient.nom" />
+        </div>
+    </div>
+
+    <div class="grid blockForm mx-3 mt-4 mb-2">
+        <div class="col-12">
+            <span class="title">Coordonnées</span>
+        </div>
+        <div class="col-5 label" *ngIf="isFormProfetionnel">
+            <span>Raison sociale <span>*</span></span>
+        </div>
+        <div class="col-7" *ngIf="isFormProfetionnel">
+            <input type="text" pInputText placeholder="Text" class="{{rSClass}}" [(ngModel)]="formClient.raisonSociale" />
+        </div>
+        <div class="col-5 label">
+            <span>Adresse</span>
+        </div>
+        <div class="col-7">
+            <input type="text" pInputText placeholder="Text" [(ngModel)]="formClient.adresse" />
+        </div>
+        <div class="col-5 label">
+            <span>Pays</span>
+        </div>
+        <div class="col-7">
+            <p-dropdown [options]="countries" [(ngModel)]="formClient.pays" optionLabel="name" optionValue="isoCode" name="Pays"></p-dropdown>
+        </div>
+        <div class="col-5 label">
+            <span>Ville</span>
+        </div>
+        <div class="col-7">
+            <input type="text" pInputText placeholder="Text" [(ngModel)]="formClient.ville" />
+        </div>
+        <div class="col-5 label">
+            <span>Code postal</span>
+        </div>
+        <div class="col-7">
+            <input type="text" pInputText placeholder="123..." pKeyFilter="pint" [(ngModel)]="formClient.codePostal" />
+        </div>
+        <div class="col-5 label">
+            <span>E-mail</span>
+        </div>
+        <div class="col-7">
+            <input type="text" pInputText placeholder="Text@Text.Text" pKeyFilter="email" [(ngModel)]="formClient.email" />
+        </div>
+        <div class="col-5 label">
+            <span>Téléphone fixe</span>
+        </div>
+        <div class="col-7">
+            <input type="text" pInputText placeholder="212 699 99 99 99" pKeyFilter="pint" [(ngModel)]="formClient.telFix" />
+        </div>
+        <div class="col-5 label">
+            <span>Téléphone portable</span>
+        </div>
+        <div class="col-7">
+            <input type="text" pInputText placeholder="212 699 99 99 99" pKeyFilter="pint" [(ngModel)]="formClient.telPortable" />
+        </div>
+        <div class="col-5 label" *ngIf="isFormProfetionnel">
+            <span>Site Web</span>
+        </div>
+        <div class="col-7" *ngIf="isFormProfetionnel">
+            <input type="text" pInputText placeholder="Text" [(ngModel)]="formClient.siteWeb" />
+        </div>
+    </div>
+
+
+    <div class="grid blockForm mx-3 mt-4 mb-2">
+        <div class="col-12">
+            <span class="title">MODALITES DE FACTURATION</span>
+        </div>
+        <div class="col-5 label">
+            <span>Devise de facturation</span>
+        </div>
+        <div class="col-7">
+            <p-dropdown [options]="devises" [(ngModel)]="formClient.deviseFacturation" optionLabel="name" optionValue="code">
+            </p-dropdown>
+        </div>
+        <div class="col-5 label">
+            <span>Remise permanente</span>
+        </div>
+        <div class="col-7">
+            <p-inputNumber placeholder="00,00%" mode="decimal" suffix="%" :min="0" :max="100" [minFractionDigits]="2" [maxFractionDigits]="2" [(ngModel)]="formClient.remisePermanente"></p-inputNumber>
+        </div>
+        <div class="col-5 label">
+            <span>Délai de paiement</span>
+        </div>
+        <div class="col-7">
+            <p-inputNumber placeholder="123..." mode="decimal" suffix=" Jours" :min="0" [(ngModel)]="formClient.delaiPaiement"></p-inputNumber>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button id="buttonValider" (click)="valider()" label="Valider"></p-button>
+    </ng-template>
+</p-dialog>
+<p-toast key="default" position="top-right"></p-toast>
+<p-confirmDialog icon="pi pi-exclamation-triangle"></p-confirmDialog>

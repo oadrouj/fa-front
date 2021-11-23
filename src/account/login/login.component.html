@@ -1,0 +1,98 @@
+﻿<div class="m-3">
+  <app-account-header-min></app-account-header-min>
+  <div id="loginContent" class="mx-auto">
+    <div *ngIf="seConnecterAreaShown">
+      <div id="header-se-connecter" class="text-center">
+        <span class="mx-auto">Se connecter</span>
+      </div>
+      <div id="body-se-connecter" class="mx-auto">
+        <div class="input-block">
+          <label for="input-nom-utilisateur text-left">Nom d’utilisateur</label>
+          <input id="input-nom-utilisateur" type="text" pInputText name="userNameOrEmailAddress"
+            placeholder="Votre nom d'utilisateur ici ..."
+            [(ngModel)]="authService.authenticateModel.userNameOrEmailAddress">
+        </div>
+        <div class="input-block">
+          <label for="input-mdp text-left">Mot de passe</label>
+          <input id="input-mdp" type="password" pInputText name="password" placeholder="Votre mot de passe ici ..."
+            [(ngModel)]="authService.authenticateModel.password">
+        </div>
+        <div id="div-forgot-mdp" class="text-right">
+          <p-button id="btn-forgot-mdp" label="Mot de passe oublié ?" styleClass="p-button-link"
+            (click)="ShowForgotPass()"></p-button>
+        </div>
+        <div id="div-forgot-mdp" class="text-left">
+          <p-button id="btn-forgot-mdp" label="Créez un compte !" styleClass="p-button-link"
+            (click)="register()"></p-button>
+        </div>
+        <div class="div-buttons">
+          <p-button id="btn-se-connecter" label="Se connecter" (click)="login()"></p-button>
+          <p id="ou">Ou</p>
+          <p-button id="btn-google">
+            <img src="../../assets/img/IconeGoogleWhite.png" class="mr-6" />
+            <span>Se connecter avec google</span>
+          </p-button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sendMailArea" *ngIf="sendMailAreaShown" class="text-center">
+      <button pButton pRipple type="button" icon="pi pi-arrow-left"
+        class="p-button-rounded p-button-outlined return-button" (click)="returnToLogin()"></button>
+      <img src="../../assets/img/LogoFacturi.png" class="logo-facturi">
+      <div id="send-mail-content" class="mx-auto">
+        <p class="title">Mot de passe oublié ?</p>
+        <p class="text">Saisisez l'adresse mail que vous utilisez pour vous connecter, et nous vous enverons des
+          instructions pour réinitialiser votre mot de passe.</p>
+        <p class="text">Pour des raison de sécurité, nous n'enregistrons jamais votre mot de passe en claire. Du coup
+          nous n'allons pas vous l'envoyé par mail.</p>
+        <div class="input-block">
+          <span>
+            <label for="input-mail">Adresse Mail</label>
+            <input id="input-mail" type="text" pInputText name="userNameOrEmailAddress"
+              placeholder="Votre adresse mail ici ..."
+              [(ngModel)]="emailAdress">
+          </span>
+        </div>
+        <div class="div-buttons">
+          <p-button id="btn-se-connecter" label="Envoyer" (click)="envoyerMail()"></p-button>
+        </div>
+      </div>
+    </div>
+
+    <div id="mailSentArea" *ngIf="mailSentAreaShown" class="text-center">
+      <button pButton pRipple type="button" icon="pi pi-arrow-left"
+        class="p-button-rounded p-button-outlined return-button" (click)="returnToLogin()"></button>
+      <img src="../../assets/img/LogoFacturi.png" class="logo-facturi">
+      <div id="mail-sent-content" class="mx-auto">
+        <p class="title">Lien de réinitialisation envoyé !</p>
+        <p class="text">Nous vous invitons à consulter votre boite email</p>
+        <p class="text">pour réinitialiser votre mot de passe.</p>
+      </div>
+    </div>
+
+    <div id="resetPassArea" *ngIf="resetPassAreaShown" class="text-center">
+      <button pButton pRipple type="button" icon="pi pi-arrow-left"
+        class="p-button-rounded p-button-outlined return-button" (click)="returnToLogin()"></button>
+      <img src="../../assets/img/LogoFacturi.png" class="logo-facturi">
+      <div id="reinit-pass-content" class="mx-auto">
+        <p class="title">Réinitialisez votre mot de passe</p>
+        <p class="text">Saisisez votre nouveau mot de passe et confirmez le pour pouvoir le réinitialiser.</p>
+        <div class="input-block">
+          <label for="input-mdp-res text-left">Mot de passe</label>
+          <input id="input-mdp-res" type="password" pInputText name="password" placeholder="Votre mot de passe ici ..."
+            [(ngModel)]="password">
+        </div>
+        <span>
+          <div class="input-block">
+            <input id="input-mdp-resc" type="password" pInputText name="password" placeholder="Votre mot de passe ici ...">
+          </div>
+        </span>
+        <div class="div-buttons">
+          <p-button id="btn-se-connecter" label="Réinitialiser" (click)="reinitialiser()"></p-button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

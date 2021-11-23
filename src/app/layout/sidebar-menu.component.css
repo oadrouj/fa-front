@@ -1,0 +1,4 @@
+:host >>> .nav-pills .nav-link.active {
+    background-color: transparent;
+    color: #2A95D1;
+}
