@@ -678,6 +678,7 @@ export class DevisDialogComponent implements OnInit {
           .checkIfReferenceIsExist(referencePrefix, reference)
           .subscribe((res) => {
             if (
+              (!res && !this.selectedDevisItem) ||
               !res || this.dialogTitle == 'Modifier' && 
                 (
                   reference == this.selectedDevisItem.reference &&

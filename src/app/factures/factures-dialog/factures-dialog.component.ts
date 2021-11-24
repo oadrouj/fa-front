@@ -747,7 +747,8 @@ export class FacturesDialogComponent
       this._factureServiceProxy
         .checkIfReferenceIsExist(referencePrefix, reference)
         .subscribe((res) => {
-          if (!res || this.dialogTitle == 'Modifier' &&
+          if ((!res && !this.selectedDevisItem) ||
+            !res || this.dialogTitle == 'Modifier' &&
           (reference == this.selectedDevisItem.reference &&
           referencePrefix == this.selectedDevisItem.referencePrefix)
           ) {
