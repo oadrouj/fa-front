@@ -73,7 +73,8 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     if (window.history.state.clientId) {
-      this.newDevis(window.history.state.clientId)
+     this.newDevis(window.history.state.clientId) 
+     
     }
 
   }
@@ -303,9 +304,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   //#endregion
 
   newDevis(clientId?) {
-    this.displayDialog = true
     clientId && (this.child.selectedClientId = clientId)
     this.emitDialogStatus(DialogStatus.New, 'facture')
+    this.displayDialog = true
   }
 
   editDevis() {

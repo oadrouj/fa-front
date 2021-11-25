@@ -67,7 +67,6 @@ export class DevisDialogComponent implements OnInit {
     this.eventsSubscription = this.SelectDevisItemEvent.subscribe(
       (devisItem: DevisItem) => {
         this.selectedDevisItem = devisItem
-        this.clearTableControl()
       },
     )
 
@@ -542,8 +541,7 @@ export class DevisDialogComponent implements OnInit {
               },
             })
           })
-        this.closeDialogEvent.emit()
-        this.disableValidationClass()
+        this.closeDialog()
       }
     })
     this.toastService.info({
@@ -628,8 +626,7 @@ export class DevisDialogComponent implements OnInit {
                 },
               })
             }
-            this.closeDialogEvent.emit()
-            this.disableValidationClass()
+            this.closeDialog();
           })
       }
     })

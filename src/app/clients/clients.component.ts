@@ -205,7 +205,7 @@ export class ClientsComponent extends AppComponentBase
       header: 'DATE D’EMISSION',
       field: 'dateEmission',
       type: 'date',
-      format: (date) => (date._i ? new Date(date._i) : new Date(date._d)),
+      format: (date) => date && (date._i ? new Date(date._i) : new Date(date._d)),
     },
     {
       header: 'ECHEANCE',
@@ -246,7 +246,7 @@ export class ClientsComponent extends AppComponentBase
       header: 'DATE D’EMISSION',
       field: 'dateEmission',
       type: 'date',
-      format: (date) => (date._i ? new Date(date._i) : new Date(date._d)),
+      format: (date) => date &&  (date._i ? new Date(date._i) : new Date(date._d)),
     },
     {
       header: 'ECHEANCE',
