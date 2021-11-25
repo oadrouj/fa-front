@@ -71,16 +71,16 @@ export class FacturesDialogComponent
   ) {}
   test = false
   ngOnInit() {
+    
     this.initiateFormGroup()
     this.devisOptionsFormGroup = this.initiateDevisOptionsGroup()
-
+    
     this.eventsSubscription = this.SelectDevisItemEvent.subscribe(
       (devisItem: any) => {
         this.selectedDevisItem = {
           ...devisItem,
           client: devisItem.client,
         }
-        this.clearTableControl()
         // dateEmission: this.selectedDevisItem.dateEmission.toDate()}
       },
     )
@@ -121,9 +121,11 @@ export class FacturesDialogComponent
 
                 this.calculateSummaryTotalHTAndTTC()
                 this.formGroup.get('client').setValue(this.devisItem.client)
-              } else {
-                this.getNewReference()
+              }
+               else {
                 this.initiateFormGroupForNewDevis()
+                this.getNewReference()  
+
                 this.dialogTitle = 'Nouveau'
                 this.selectedClientId &&
                   this._clientServiceProxy
@@ -132,8 +134,11 @@ export class FacturesDialogComponent
                       let nom = res.nom || res.raisonSociale
                       this.formGroup.get('client').setValue({ ...res, nom })
                     })
+                console.log(this.getFromArrayControl.controls)
                 this.devisItem = null
+                  
               }
+
               break
 
             case DialogStatus.Edit:
@@ -204,7 +209,9 @@ export class FacturesDialogComponent
     )
   }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() {
+    
+  }
   ngOnDestroy(): void {}
   //#region properties
 
@@ -594,8 +601,7 @@ export class FacturesDialogComponent
                 },
               })
             })
-          this.closeDialogEvent.emit()
-          this.disableValidationClass()
+          this.closeDialog()
         }
       })
     this.toastService.info({
@@ -693,8 +699,8 @@ export class FacturesDialogComponent
                   },
                 })
               }
-              this.closeDialogEvent.emit()
-              this.disableValidationClass()
+              this.closeDialog()
+              
             })
         }
       })
