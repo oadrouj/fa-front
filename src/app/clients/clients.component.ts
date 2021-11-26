@@ -538,7 +538,7 @@ export class ClientsComponent extends AppComponentBase
   }
 
   replaceIfIsNullOrEmpty(str: string): string {
-    if (this.isNullOrEmpty(str)) {
+    if (!str || this.isNullOrEmpty(str)) {
       return '...'
     } else {
       return str
@@ -724,7 +724,9 @@ export class ClientsComponent extends AppComponentBase
           this.tableChild.tableData = this.tableChild.tableData.filter(
             (item) => !item || item.id != this.client.id,
           )
-          // this.montantTotalAllDevis -= this.selectedDevisItem.montantTtc
+          this.client = new ClientDto();
+          this.totalAmountPendingFactures = 0
+          this.totalAmountOverdueFactures = 0
           this.emitRowDeletedEvent(this.tableChild.tableData[0])
           this._toastService.success({
             summary: 'Opération réussie',

@@ -196,9 +196,9 @@ export class DevisComponent implements OnInit, AfterViewInit {
   echeancePayementOptions = [30, 60, 90]
   echeancePayementSelected = this.echeancePayementOptions[0] || ''
   selectedDevisItem!: any
-  summaryTotalHT: number
-  summaryTVA: number
-  summaryTotalTTC: number
+  summaryTotalHT = 0
+  summaryTVA = 0
+  summaryTotalTTC = 0
   montantTotalAllDevis = 0
   Currency = 'MAD'
 
@@ -328,8 +328,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
                 (devis) => !devis || devis.id != this.selectedDevisItem.id,
               )
               this.calculateTotalMonatant();
-
+              this.summaryTotalHT = 0;
+              this.summaryTVA = 0
+              
               // this.montantTotalAllDevis -= this.selectedDevisItem.montantTtc
+              this.selectedDevisItem = null;
               this.emitRowDeletedEvent(this.tableChild.tableData[0])
               this._toastService.info({
                 summary: 'Opération réussie',
