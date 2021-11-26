@@ -174,7 +174,8 @@ i.pi-search {
 
 :host ::ng-deep .p-splitbutton {
     font-weight: 400;
-    width: 93.04px;
+    min-width: 93.04px;
+    min-height: 37px;
 }
 
 :host ::ng-deep .p-splitbutton button {
