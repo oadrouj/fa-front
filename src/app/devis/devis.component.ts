@@ -210,20 +210,21 @@ export class DevisComponent implements OnInit, AfterViewInit {
   }
 
   formatStatut(statut?: DevisStatutEnum) {
-    switch (statut) {
-      case DevisStatutEnum.Cree:
-        return 'Brouillon'
-      case DevisStatutEnum.Valide:
-        return 'Validé'
-      case DevisStatutEnum.Converti:
-        return 'Convérti'
-      case DevisStatutEnum.Rejete:
-        return 'Rejeté'
-      case DevisStatutEnum.Expire:
-        return 'Expiré'
-      case DevisStatutEnum.Undefined:
-        return ''
-    }
+      switch (statut) {
+        case DevisStatutEnum.Cree:
+          return 'Brouillon'
+        case DevisStatutEnum.Valide:
+          return 'Validé'
+        case DevisStatutEnum.Converti:
+          return 'Convérti'
+        case DevisStatutEnum.Rejete:
+          return 'Rejeté'
+        case DevisStatutEnum.Expire:
+          return 'Expiré'
+        case DevisStatutEnum.Undefined:
+          return ' '
+      }
+  
   }
 
   getDateEcheance(dateEmission: Date, echeance: number) {

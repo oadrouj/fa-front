@@ -234,7 +234,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       case FactureStatutEnum.PaiementRetard:
         return 'Paiement en retard'
       default:
-        return ''
+        return ' '
     }
   }
 
