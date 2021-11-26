@@ -180,6 +180,7 @@ i.pi-search {
 
 :host ::ng-deep .p-splitbutton {
     font-weight: 400;
+    /* width: 93.04px; */
     max-width: 162px;
 }
 

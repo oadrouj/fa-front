@@ -97,7 +97,7 @@ export class FacturesDialogComponent
               if (isConvertedDevis) {
                 this.getNewReference()
                 this.initiateFormGroupWithTableControls()
-                this.dialogTitle = 'Nouveau'
+                this.dialogTitle = 'Nouvelle'
                 this.selectedDevisItem = {
                   ...this.selectedDevisItem,
                   factureItems: this.selectedDevisItem.devisItems,
@@ -126,7 +126,7 @@ export class FacturesDialogComponent
                 this.initiateFormGroupForNewDevis()
                 this.getNewReference()  
 
-                this.dialogTitle = 'Nouveau'
+                this.dialogTitle = 'Nouvelle'
                 this.selectedClientId &&
                   this._clientServiceProxy
                     .getByIdClient(this.selectedClientId)
@@ -734,7 +734,7 @@ export class FacturesDialogComponent
 
     if (this.formGroup.get('client').valid) {
       let reference, referencePrefix
-      if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
+      if (this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') {
         reference = this.manuelReference
           ? +this.formGroup.get('reference').value.substring(1)
           : this.referenceCount
@@ -767,7 +767,7 @@ export class FacturesDialogComponent
             }
 
             if (
-              this.dialogTitle == 'Nouveau' ||
+              this.dialogTitle == 'Nouvelle' ||
               this.dialogTitle == 'Dupliquer'
             ) {
               this.createApiCall(FactureStatutEnum.Cree)
@@ -816,7 +816,7 @@ export class FacturesDialogComponent
       } else {
 
       let reference, referencePrefix
-      if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
+      if (this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') {
         reference = this.manuelReference
           ? +this.formGroup.get('reference').value.substring(1)
           : this.referenceCount
@@ -849,7 +849,7 @@ export class FacturesDialogComponent
                 }
   
                 if (
-                  this.dialogTitle == 'Nouveau' ||
+                  this.dialogTitle == 'Nouvelle' ||
                   this.dialogTitle == 'Dupliquer'
                 ) {
                   this.createApiCall(FactureStatutEnum.Valide)
@@ -935,7 +935,7 @@ export class FacturesDialogComponent
     let dateEmission = this.getExactDate(formValue.dateEmission, new Date())
 
     let reference, referencePrefix
-    if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
+    if (this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') {
       reference = this.manuelReference
         ? +this.formGroup.get('reference').value.substring(1)
         : this.referenceCount

@@ -39,7 +39,7 @@
                                     </div>
                                 </ng-template>
 
-                                <div class="col text-center">
+                                <div class="col text-center" *ngIf="!manuelReference">
                                     <button pButton label="Changer" (click)="changeReference()" class="p-button-text" [ngClass]="'color-' + primaryColor"></button>
                                 </div>
                             </div>
