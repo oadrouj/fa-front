@@ -205,9 +205,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   echeancePayementOptions = [30, 60, 90]
   echeancePayementSelected = this.echeancePayementOptions[0] || ''
   selectedDevisItem!: any
-  summaryTotalHT: number
-  summaryTVA: number
-  summaryTotalTTC: number
+  summaryTotalHT = 0
+  summaryTVA = 0
+  summaryTotalTTC = 0
   montantTotalAllDevis = 0
   Currency = 'MAD'
   ref: DynamicDialogRef
@@ -330,6 +330,10 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
                 (devis) => !devis || devis.id != this.selectedDevisItem.id,
               )
               this.calculateTotalMonatant()
+              this.selectedDevisItem = null;
+              this.summaryTotalHT = 0;
+              this.summaryTVA = 0
+
               this.emitRowDeletedEvent(this.tableChild.tableData[0])
               this._toastService.info({
                 summary: 'Opération réussie',

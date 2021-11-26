@@ -47,7 +47,7 @@
         <div class="rightSection md:col-12 p-0">
             <div class="devis-details">
                 <div class="header flex justify-content-between">
-                    <p-splitButton class=" border-radius-6" [label]="formatStatut(selectedDevisItem && selectedDevisItem.statut)" [model]="getStatusOptions()"> </p-splitButton>
+                    <p-splitButton class=" border-radius-6" [label]="selectedDevisItem ? formatStatut(selectedDevisItem.statut) : ' '" [model]="getStatusOptions()"> </p-splitButton>
                     <div class="flex">
                         <button pButton label="Télécharger" class="p-button-text" (click)="downloadDevis()"></button>
                         <button pButton label="Imprimer" class="p-button-text" (click)="print()"></button>
@@ -147,7 +147,7 @@
                                 <span>REMISE</span>
                             </div>
                             <div class="col-5">
-                                <span>{{selectedDevisItem &&  this.remiseAmount | number:'1.2-2' }}
+                                <span>{{(selectedDevisItem ?  this.remiseAmount : 0) | number:'1.2-2' }}
                                     {{' ' + Currency}}</span>
                             </div>
                         </div>
@@ -168,7 +168,7 @@
                                 <span>TOTAL ESTIME TTC</span>
                             </div>
                             <div class="col-md-5">
-                                <span>{{selectedDevisItem && this.selectedDevisItem.montantTtc | number:'1.2-2' }}
+                                <span>{{(selectedDevisItem ? this.selectedDevisItem.montantTtc : 0) | number:'1.2-2' }}
                                     {{' ' + Currency}}</span>
                             </div>
                         </div>
