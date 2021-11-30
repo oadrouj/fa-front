@@ -2001,7 +2001,6 @@ export class DevisServiceProxy {
                     }
                     }
             });
-    
         if (clientId === null)
             throw new Error("The parameter 'clientId' cannot be null.");
         else if (clientId !== undefined)
@@ -2845,7 +2844,6 @@ export class FactureServiceProxy {
                             url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
                         else
                             url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
-                
                     }
                     }
             });
@@ -6393,6 +6391,7 @@ export class DevisItemDto implements IDevisItemDto {
     unitPriceHT: number;
     tva: number;
     totalTtc: number;
+    catalogueId: number | undefined;
 
     constructor(data?: IDevisItemDto) {
         if (data) {
@@ -6412,6 +6411,7 @@ export class DevisItemDto implements IDevisItemDto {
             this.unitPriceHT = _data["unitPriceHT"];
             this.tva = _data["tva"];
             this.totalTtc = _data["totalTtc"];
+            this.catalogueId = _data["catalogueId"];
         }
     }
 
@@ -6431,6 +6431,7 @@ export class DevisItemDto implements IDevisItemDto {
         data["unitPriceHT"] = this.unitPriceHT;
         data["tva"] = this.tva;
         data["totalTtc"] = this.totalTtc;
+        data["catalogueId"] = this.catalogueId;
         return data; 
     }
 
@@ -6450,6 +6451,7 @@ export interface IDevisItemDto {
     unitPriceHT: number;
     tva: number;
     totalTtc: number;
+    catalogueId: number | undefined;
 }
 
 export class CreateDevisInput implements ICreateDevisInput {
@@ -6817,7 +6819,6 @@ export enum FactureStatutEnum {
     PaiementRetard = 5,
     undefined = -1
 }
-
 export class FactureItemDto implements IFactureItemDto {
     designation: string | undefined;
     date: moment.Moment;
@@ -7235,6 +7236,7 @@ export enum ModePaiementEnum {
     Liquide = 2,
     Effet = 3,
 }
+
 
 export class FactureInfosPaiementDto implements IFactureInfosPaiementDto {
     datePaiement: moment.Moment;

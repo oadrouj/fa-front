@@ -753,9 +753,9 @@ export class FacturesDialogComponent
       designation: {designation: event.designation},
       date: event.addedDate.toDate(),
       quantity: event.minimalQuantity,
-      unit: event.unity,
+      unit: event.unity || 'h',
       unitPriceHT: event.htPrice,
-      tva: event.tva,
+      tva: event.tva || 20,
       totalTtc: this._calculationsService
         .calculateTTCWithQuantity(event.htPrice, event.tva, event.minimalQuantity),
     })
@@ -771,8 +771,8 @@ export class FacturesDialogComponent
     })
     console.log(factureItems.at(index).value);
   }
+
   saveBrouillon() {
-   
     // this.frm.nativeElement.classList.add('submitted')
 
     if (this.formGroup.get('client').valid) {
