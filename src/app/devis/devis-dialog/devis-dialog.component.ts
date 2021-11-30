@@ -54,7 +54,7 @@ export class DevisDialogComponent implements OnInit {
   manuelReference: boolean
   remiseAmount: number
   remiseValue: number
-  filteredCatalogues: import("c:/Dev/repos/Facturi-Front/src/shared/service-proxies/service-proxies").CatalogueForAutoCompleteDto[]
+  filteredCatalogues: CatalogueForAutoCompleteDto[]
   constructor(
     private formBuilder: FormBuilder,
     private _formatService: FormatService,
