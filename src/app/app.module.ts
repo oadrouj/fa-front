@@ -68,10 +68,11 @@ import { ToastService } from '@shared/services/toast.service';
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
 import {DynamicDialogModule} from 'primeng/dynamicdialog';
 import { FacturePayementComponent } from './factures/facture-payement/facture-payement.component';
+import { CatalogueComponent } from './catalogue/catalogue.component';
 
 
 @NgModule({
-  declarations: [
+  declarations: [	
     AppComponent,
     HomeComponent,
     AboutComponent,
@@ -106,8 +107,8 @@ import { FacturePayementComponent } from './factures/facture-payement/facture-pa
     DevisDialogComponent,
     TableComponent,
     FacturePayementComponent,
-
-  ],
+      CatalogueComponent
+   ],
   imports: [
     CommonModule,
     FormsModule,

@@ -2,7 +2,7 @@
 import { Moment } from "moment"
 
 export class FactureContentItem {
-    description!: string
+    designation!: string
     date!: Moment
     quantity!: number
     unit!: string

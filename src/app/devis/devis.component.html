@@ -12,7 +12,8 @@
                         <h1 class="title" [ngClass]="'color-' + primaryColor">{{title}}</h1>
                     </div>
 
-                    <button pButton (click)="newDevis()" class="btn-new-devis text-normal" [ngClass]="'bg-' + primaryColor" [label]="'Nouveau ' + title"></button>
+                    <button pButton (click)="newDevis()" class="btn-new-devis text-normal"
+                        [ngClass]="'bg-' + primaryColor" [label]="'Nouveau ' + title"></button>
 
                 </div>
                 <p class="subtitle pt-2">Visualisez, modifiez et gérez toutes vos {{title | lowercase}} !</p>
@@ -20,22 +21,31 @@
                 <span class="searchInput p-input-icon-left mt-2 shadow-1">
                     <i class="pi pi-search"></i>
                     <input pInputText [(ngModel)]="searchText"
-                        (input)="emitFilterEvent('filterByInput', $event.target.value)"
-                        class="" placeholder="Rechercher ici" />
+                        (input)="emitFilterEvent('filterByInput', $event.target.value)" class=""
+                        placeholder="Rechercher ici" />
                 </span>
 
                 <div class="flex align-items-center pt-4 filterContainer">
-                    <p-autoComplete [(ngModel)]="selectedClient" placeholder="Client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)" field="nom"></p-autoComplete>
+                    <p-autoComplete [(ngModel)]="selectedClient" placeholder="Client" [suggestions]="clientSuggestions"
+                        (completeMethod)="clientAutoCompleteSearch($event)" field="nom"></p-autoComplete>
                     <p-calendar [(ngModel)]="selectedDate" selectionMode="range" placeholder="Date"></p-calendar>
                     <p-inputNumber [(ngModel)]="selectedEcheance" placeholder="Echéance"></p-inputNumber>
-                    <p-inputNumber [(ngModel)]="selectedMontant" placeholder="Montant" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
-                    <p-dropdown [options]="statutOptions" [(ngModel)]="selectedStatut" placeholder="Statut" optionLabel="label" optionValue="value" [showClear]="false"></p-dropdown>
-                    <button pButton pRipple (click)="emitFilterEvent('filterByButton', null)" class="filterBtn p-button-rounded  ml-2" [ngClass]="'bg-' + primaryColor" label="Filtrer" icon="pi pi-filter"></button>
+                    <p-inputNumber [(ngModel)]="selectedMontant" placeholder="Montant" mode="decimal"
+                        [minFractionDigits]="2"></p-inputNumber>
+                    <p-dropdown [options]="statutOptions" [(ngModel)]="selectedStatut" placeholder="Statut"
+                        optionLabel="label" optionValue="value" [showClear]="false"></p-dropdown>
+                    <button pButton pRipple (click)="emitFilterEvent('filterByButton', null)"
+                        class="filterBtn p-button-rounded  ml-2" [ngClass]="'bg-' + primaryColor" label="Filtrer"
+                        icon="pi pi-filter"></button>
                 </div>
             </div>
 
-            <app-table #dt1 [cols]="cols" [currency]="Currency" [styleClass]="'table'" (selectionChange)="selectionChange($event)" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [rowDeletedEvent]="rowDeletedSubject.asObservable()" [filterEvent]="filterSubject.asObservable()"
-                [getListApi$]="getListDevisApi$" [SelectItemEvent]="notifySelectedDevisChanged.asObservable()" [globalFilterFields]="['reference','client','dateEmission','echeancePaiement', 'montantTtc','statut']">
+            <app-table #dt1 [cols]="cols" [currency]="Currency" [styleClass]="'table'"
+                (selectionChange)="selectionChange($event)" [styleId]="'devisList'"
+                [highlightColorInput]="tableSelectionColor" [rowDeletedEvent]="rowDeletedSubject.asObservable()"
+                [filterEvent]="filterSubject.asObservable()" [getListApi$]="getListDevisApi$"
+                [SelectItemEvent]="notifySelectedDevisChanged.asObservable()"
+                [globalFilterFields]="['reference','client','dateEmission','echeancePaiement', 'montantTtc','statut']">
             </app-table>
 
             <div class="devisTotal flex justify-content-between align-items-center w-100">
@@ -47,7 +57,9 @@
         <div class="rightSection md:col-12 p-0">
             <div class="devis-details">
                 <div class="header flex justify-content-between">
-                    <p-splitButton class=" border-radius-6" [label]="selectedDevisItem ? formatStatut(selectedDevisItem.statut) : ' '" [model]="getStatusOptions()"> </p-splitButton>
+                    <p-splitButton class=" border-radius-6"
+                        [label]="selectedDevisItem ? formatStatut(selectedDevisItem.statut) : ' '"
+                        [model]="getStatusOptions()"> </p-splitButton>
                     <div class="flex">
                         <button pButton label="Télécharger" class="p-button-text" (click)="downloadDevis()"></button>
                         <button pButton label="Imprimer" class="p-button-text" (click)="print()"></button>
@@ -62,11 +74,15 @@
                             <img src="assets/img/logo.png" alt="">
                         </div>
                         <div class="col-7 text-right">
-                            <h1>{{title}} {{selectedDevisItem && devisFormatReferenceNumber(selectedDevisItem.reference, selectedDevisItem.referencePrefix)}}</h1>
-                            <p class="date my-2">Date d'émission: {{selectedDevisItem && selectedDevisItem.dateEmission | date:'shortDate'}}
+                            <h1>{{title}}
+                                {{selectedDevisItem && devisFormatReferenceNumber(selectedDevisItem.reference, selectedDevisItem.referencePrefix)}}
+                            </h1>
+                            <p class="date my-2">Date d'émission:
+                                {{selectedDevisItem && selectedDevisItem.dateEmission | date:'shortDate'}}
                             </p>
                             <p class="date my-1">
-                                Date d'échéance: {{selectedDevisItem && getDateEcheance(selectedDevisItem.dateEmission, selectedDevisItem.echeancePaiement) | date:'shortDate'}}
+                                Date d'échéance:
+                                {{selectedDevisItem && getDateEcheance(selectedDevisItem.dateEmission, selectedDevisItem.echeancePaiement) | date:'shortDate'}}
                             </p>
                         </div>
                     </div>
@@ -181,12 +197,18 @@
 
 
 <!-- Dialog -->
-<app-devis-dialog #devisDialog [visible]="displayDialog" (openDialogEvent)="displayDialog=true" (closeDialogEvent)="onDialogClose()" (crudOperationEvent)="crudOperationTreatment($event)" [devisFormatReferenceNumber]="devisFormatReferenceNumber" [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()"
+<app-devis-dialog #devisDialog [visible]="displayDialog" (openDialogEvent)="displayDialog=true"
+    (closeDialogEvent)="onDialogClose()" (crudOperationEvent)="crudOperationTreatment($event)"
+    [devisFormatReferenceNumber]="devisFormatReferenceNumber"
+    [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()"
     [dialogStatusEvent]="dialogStatusEvent.asObservable()">
 </app-devis-dialog>
 
 
 <!-- Dialog -->
-<app-factures-dialog #factureDialog [visible]="dialogComponentShown" (openDialogEvent)="dialogComponentShown=true" (closeDialogEvent)="dialogComponentShown=false" (crudOperationEvent)="factureCrudOperationTreatment($event)" [factureFormatReferenceNumber]="factureFormatReferenceNumber"
-    [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()" [dialogStatusEvent]="dialogStatusEvent.asObservable()">
+<app-factures-dialog #factureDialog [visible]="dialogComponentShown" (openDialogEvent)="dialogComponentShown=true"
+    (closeDialogEvent)="dialogComponentShown=false" (crudOperationEvent)="factureCrudOperationTreatment($event)"
+    [factureFormatReferenceNumber]="factureFormatReferenceNumber"
+    [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()"
+    [dialogStatusEvent]="dialogStatusEvent.asObservable()">
 </app-factures-dialog>

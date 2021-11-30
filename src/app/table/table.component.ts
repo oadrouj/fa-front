@@ -2,7 +2,7 @@ import { Component, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild 
 import { DomSanitizer } from '@angular/platform-browser';
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum';
 import { DevisItem } from '@shared/models/DevisItem';
-import { ClientServiceProxy, DevisServiceProxy, FactureServiceProxy } from '@shared/service-proxies/service-proxies';
+import { CatalogueServiceProxy, ClientServiceProxy, DevisServiceProxy, FactureServiceProxy } from '@shared/service-proxies/service-proxies';
 import { FormatService } from '@shared/services/format.service';
 import { FilterMatchMode, FilterService, LazyLoadEvent } from 'primeng/api';
 import { Table } from 'primeng/table';
@@ -52,6 +52,8 @@ export class TableComponent implements OnInit {
     private _devisServiceProxy: DevisServiceProxy,
     private _factureServiceProxy: FactureServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
+    private _catalogueServiceProxy: CatalogueServiceProxy,
+
   ) {}
 
   ngOnInit(): void {
@@ -67,12 +69,14 @@ export class TableComponent implements OnInit {
       }
     ) 
 
-    this.eventsSubscription = this.rowDeletedEvent.subscribe((res: any) =>  {
-      if(res && res.id) {
-        this.selectionChange.emit({type: 'delete', result: res});
-      
-      }
-    })
+    if(this.rowDeletedEvent) {
+      this.eventsSubscription = this.rowDeletedEvent.subscribe((res: any) =>  {
+        if(res && res.id) {
+          this.selectionChange.emit({type: 'delete', result: res});
+        }
+      })
+    }
+    
 
     this.eventsSubscription = this.filterEvent.subscribe((res: any) => {
       if(res.type == 'filterByInput') {
@@ -111,9 +115,13 @@ export class TableComponent implements OnInit {
   onRowSelect(event: any) {
     this.selectionChange.emit({type: 'selectionChanged', result: event.data})
   }
+
+  onRowUnselect() {
+    this.selectionChange.emit({type: 'selectionChanged', result: null})
+  }
   
   loadTableLazy(event: LazyLoadEvent) {
-  
+      console.log(event);
       this.getListApi$(event, this.tableData)
         .subscribe((res) => {
         this.tableData = Array.from({length: res.length})
@@ -124,7 +132,6 @@ export class TableComponent implements OnInit {
         this.montantTotalAllDevis = res.montantTotalAllDevis
         this.selectionChange.emit({type: 'firstSelectionChanged', result: res.items[0]})
 
-      
       }) 
      
     }

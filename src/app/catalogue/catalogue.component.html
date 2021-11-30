@@ -1,0 +1,154 @@
+<p-confirmDialog #cd [style]="{width: '50vw'}" [baseZIndex]="10000" rejectButtonStyleClass="p-button-text">
+    <ng-template pTemplate="footer">
+        <button type="button" pButton icon="pi pi-check" label="Oui" (click)="cd.accept()"></button>
+        <button type="button" pButton class="p-button-danger" icon="pi pi-times" label="Non" (click)="cd.reject()"></button>
+    </ng-template>
+</p-confirmDialog>
+<p-toast [style]="{marginTop: 'marginTop'}" styleClass="styleClass" [baseZIndex]="20000"></p-toast>
+
+<div class="main pt-5">
+    <div class="grid  mx-0 ">
+        <div class="leftSection md:col-12 p-0 positon-relative">
+            <div class="pl-3">
+                <div class="header  ">
+                    <div class="flex justify-content-between align-items-start">
+                        <div class="flex flex-wrap align-items-start">
+                            <img [src]="imageSrc" class="mr-3" />
+                            <h1 class="title" [ngClass]="'color-' + primaryColor">{{title}}</h1>
+                        </div>
+
+                        <button pButton (click)="newCatalogue()" class="btn-new-devis text-normal" [ngClass]="'bg-' + primaryColor" [label]="'Nouveau ' + title"></button>
+
+                    </div>
+
+                    <p class="subtitle pt-2">Tous vos produits et services en un seul endroit !</p>
+
+                    <div class="flex justify-content-between">
+                        <span class="searchInput p-input-icon-left mt-2 shadow-1">
+                            <i class="pi pi-search"></i>
+                            <input pInputText [(ngModel)]="searchText"
+                                (input)="emitFilterEvent('filterByInput', $event.target.value)" class=""
+                                placeholder="Rechercher ici" />
+                        </span>
+
+                        <div class="flex align-items-center filterContainer">
+                            <p-dropdown [options]="typeOptions" [(ngModel)]="selectedType" optionLabel="label" optionValue="value" placeholder="Type" [showClear]="false"></p-dropdown>
+                            <button pButton pRipple (click)="emitFilterEvent('filterByButton', null)" class="filterBtn p-button-rounded  ml-2" [ngClass]="'bg-' + primaryColor" label="Filtrer" icon="pi pi-filter"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <app-table #dt1 [cols]="cols" [currency]="Currency" [styleClass]="'table'" (selectionChange)="selectionChange($event)" [styleId]="'devisList'" [SelectItemEvent]="notifySelectedDevisChanged.asObservable()" [highlightColorInput]="tableSelectionColor" [filterEvent]="filterSubject.asObservable()"
+                [getListApi$]="getListApi" [globalFilterFields]="['reference','client']">
+            </app-table>
+
+            <!-- <div class="devisTotal flex justify-content-between align-items-center w-100">
+                <span class="color-gray ">Total TTC</span>
+                <span class="color-gray">{{montantTotalAllDevis | number:'1.2-2' }} {{' ' + Currency}}</span>
+            </div> -->
+        </div>
+
+        <div class="rightSection col-12 p-0">
+            <div class="devis-details">
+                <div class="header flex justify-content-end">
+                    <button pButton label="Modifier" class="p-button-text" (click)="editCatalogue()"></button>
+                    <button pButton label="Supprimer" class="p-button-text" (click)="deleteCatalogue()"></button>
+                </div>
+                <div class="content p-4">
+                    <div class="flex flex-column px-1">
+                        <h2>{{replaceIfIsNullOrEmpty('designation')}}</h2>
+                        <h2 class="lineHeight-18">{{replaceIfIsNullOrEmpty('description')}}</h2>
+                        <span class="color-purple text-xl">{{catalogueFormatReferenceNumber(selectedItem)}} -
+                            {{replaceIfIsNullOrEmpty('catalogueType')}}</span>
+                        <div class="grid pt-3 w-25rem">
+                            <div class="col-7">Unité</div>
+                            <div class="col-5">{{replaceIfIsNullOrEmpty('unity')}}</div>
+
+                            <div class="col-7">Devise</div>
+                            <div class="col-5">{{Currency}}</div>
+
+                            <div class="col-7">Prix HT</div>
+                            <div class="col-5">{{replaceIfIsNullOrEmpty('htPrice')}}</div>
+
+                            <div class="col-7">TVA</div>
+                            <div class="col-5">{{replaceIfIsNullOrEmpty('tva')}}%</div>
+
+                            <div class="col-7">Prix TTC</div>
+                            <div class="col-5">{{replaceIfIsNullOrEmpty('ttcPrice')}} {{Currency}}</div>
+
+                            <div class="col-7">Quantité minimale</div>
+                            <div class="col-5">{{replaceIfIsNullOrEmpty('minimalQuantity')}} Heures</div>
+
+                            <div class="col-7">Total Ventes TTC</div>
+                            <div class="col-5 color-purple">{{replaceIfIsNullOrEmpty('totalSalesTTC')}} {{Currency}}</div>
+
+                            <div class="col-7">Total Unités vendues</div>
+                            <div class="col-5 color-purple">
+                                {{replaceIfIsNullOrEmpty('totalUnitsSold')}} {{replaceIfIsNullOrEmpty('unity')}}
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog #dialog id="dialogCatalogue" header="{{dialogTitle}} ITEM" [(visible)]="dialogDisplay" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
+
+    <p-selectButton [options]="catalogueOptions" [(ngModel)]="dialogSelectedType" class="uppercase">
+    </p-selectButton>
+    <form [formGroup]="formGroup">
+        <div class="grid blockForm mx-3 mt-3 mb-2" #container>
+            <div class="col-5 label">
+                <span>Désignation</span>
+            </div>
+            <div class="col-7">
+                <input type="text" pInputText placeholder="Text" formControlName="designation" />
+            </div>
+
+            <div class="col-5 label">
+                <span>Description</span>
+            </div>
+            <div class="col-7">
+                <input type="text" pInputText placeholder="Text" formControlName="description" />
+            </div>
+
+            <div class="col-5 label">
+                <span>Unité</span>
+            </div>
+            <div class="col-7">
+                <p-dropdown formControlName="unity" [options]="unityOptions" placeholder="Liste">
+                </p-dropdown>
+            </div>
+
+            <div class="col-5 label">
+                <span>Prix HT</span>
+            </div>
+            <div class="col-7">
+                <input type="text" pInputText placeholder="Text" formControlName="htPrice" />
+            </div>
+
+            <div class="col-5 label">
+                <span>TVA</span>
+            </div>
+            <div class="col-7">
+                <p-dropdown formControlName="tva" [options]="tvaOptions" id="tva" placeholder="Liste">
+                </p-dropdown>
+            </div>
+
+            <div class="col-5 label">
+                <span>Quantité minimale</span>
+            </div>
+            <div class="col-7">
+                <input type="text" pInputText placeholder="Text" formControlName="minimalQuantity" />
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <p-button id="buttonValider" (click)="submit()" label="Valider"></p-button>
+    </ng-template>
+</p-dialog>

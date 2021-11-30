@@ -201,8 +201,8 @@ export class DevisDialogComponent implements OnInit {
   }
   cols = [
     {
-      header: 'DESCRIPTION',
-      field: 'description',
+      header: 'DESIGNATION',
+      field: 'designation',
       type: 'inputText',
       colspan: 3,
     },
@@ -309,7 +309,7 @@ export class DevisDialogComponent implements OnInit {
 
   initiateTableForm() {
     return this.formBuilder.group({
-      description: ['', Validators.required],
+      designation: ['', Validators.required],
       date: [new Date(), Validators.required],
       quantity: [1, Validators.required],
       unit: ['h', Validators.required],
@@ -506,7 +506,7 @@ export class DevisDialogComponent implements OnInit {
       statut: devisStatus,
       devisItems: formValue.devisItems.map((devisItem: DevisContentItem) => {
         return new DevisItemDto({
-          description: devisItem.description,
+          designation: devisItem.designation,
           date: this.getExactDate(devisItem.date, new Date()),
           quantity: devisItem.quantity ?? 0,
           unit: devisItem.unit,
@@ -546,7 +546,7 @@ export class DevisDialogComponent implements OnInit {
     })
     this.toastService.info({
       summary: 'Opértion réussie',
-      detail: 'Vous avez ajouter ce devis en brouillon',
+      detail: 'Vous avez ajouté ce devis en brouillon',
     })
   }
 
@@ -571,7 +571,7 @@ export class DevisDialogComponent implements OnInit {
       statut: devisStatus,
       devisItems: formValue.devisItems.map((devisItem: DevisContentItem) => {
         return new DevisItemDto({
-          description: devisItem.description,
+          designation: devisItem.designation,
           date: this.getExactDate(devisItem.date, new Date()),
           quantity: devisItem.quantity ?? 0,
           unit: devisItem.unit,
@@ -633,7 +633,7 @@ export class DevisDialogComponent implements OnInit {
 
     this.toastService.info({
       summary: 'Opértion réussie',
-      detail: 'Vous avez modifier ce devis en brouillon',
+      detail: 'Vous avez modifié ce devis en brouillon',
     })
   }
 
@@ -718,7 +718,7 @@ export class DevisDialogComponent implements OnInit {
       client: 'Client',
       messageIntroduction: "Message d'introduction",
       piedDePage: 'Pied de page',
-      devisItems: 'Description',
+      devisItems: 'designation',
     }
 
     for (let control in this.formGroup.controls) {
@@ -791,7 +791,7 @@ export class DevisDialogComponent implements OnInit {
     let formValue = this.formGroup.value
     let devisItems = formValue.devisItems.map((devisItem: DevisContentItem) => {
       return new DevisItemDto({
-        description: devisItem.description,
+        designation: devisItem.designation,
         date: this.getExactDate(devisItem.date, new Date()),
         quantity: devisItem.quantity ?? 0,
         unit: devisItem.unit,
