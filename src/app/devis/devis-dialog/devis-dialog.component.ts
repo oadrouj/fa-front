@@ -553,6 +553,7 @@ export class DevisDialogComponent implements OnInit {
   updateApiCall(devisStatus: DevisStatutEnum) {
     let formValue = this.formGroup.value
     let updateDevisInput = new UpdateDevisInput({
+      ...this.devisItem,
       id: this.devisItem.id,
       reference: this.manuelReference
         ? +this.formGroup.get('reference').value.substring(1)
