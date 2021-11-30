@@ -172,13 +172,6 @@ export class ClientsComponent extends AppComponentBase
       { name: 'DOL', code: 'DOL' },
     ]
 
-    // this.chargerListeClients();
-    // if (this.clients.length != 0) {
-    //   this.fillClientApercu(this.clients[0]);
-    // } else {
-    //   this.clientApercu = new ClientDto();
-    // }
-
     this.countries = csc.getAllCountries()
     this.initialiseForm()
 
@@ -304,17 +297,7 @@ export class ClientsComponent extends AppComponentBase
     }
   }
   //#endregion
-  // chargerListeClients(): void {
-  //   this._clientServiceProxy.getAllClients(this.champsRecherche, this.selectedCategory, this.selectedType,
-  //     this.sortField, this.sortOrder).subscribe((listResult) => {
-  //       this.clients = listResult.items;
-  //       if (this.clients.length != 0) {
-  //         this.fillClientApercu(this.clients[0]);
-  //       } else {
-  //         this.clientApercu = new ClientDto();
-  //       }
-  //     });
-  // }
+
   chargerListeClients(event, data) {
     
     let categorieFilter = event.filters.category && event.filters.category.value

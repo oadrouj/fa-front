@@ -150,7 +150,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ]
   DevisContentItemsCols = [
-    { header: 'DESCRIPTION', field: 'description', type: 'text', colspan: 0 },
+    { header: 'DESIGNATION', field: 'designation', type: 'text', colspan: 0 },
     { header: 'DATE', field: 'date', type: 'date', colspan: 0 },
     { header: 'quantity', field: 'quantity', type: 'text' },
     { header: 'UNITE', field: 'unit', type: 'text' },

@@ -57,7 +57,6 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     if (window.history.state.clientId) {
-      console.log(window.history.state.clientId);
       this.newDevis(window.history.state.clientId);
     }
   }
@@ -128,7 +127,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
     },
   ]
   DevisContentItemsCols = [
-    { header: 'DESCRIPTION', field: 'description', type: 'text', colspan: 2 },
+    { header: 'DESIGNATION', field: 'designation', type: 'text', colspan: 2 },
     { header: 'DATE', field: 'date', type: 'date', colspan: 0 },
     { header: 'quantity', field: 'quantity', type: 'text' },
     { header: 'UNITE', field: 'unit', type: 'text' },
@@ -343,16 +342,16 @@ export class DevisComponent implements OnInit, AfterViewInit {
       },
 
       rejectCallback: (type: any) => {
-        switch (type) {
-          case ConfirmEventType.REJECT:
-            this._toastService.error({
-              summary: 'Erreur',
-              detail: "Une erreur s'est produite lors de la suppression",
-            })
-            break
-          case ConfirmEventType.CANCEL:
-            break
-        }
+        // switch (type) {
+        //   case ConfirmEventType.REJECT:
+        //     this._toastService.error({
+        //       summary: 'Erreur',
+        //       detail: "Une erreur s'est produite lors de la suppression",
+        //     })
+        //     break
+        //   case ConfirmEventType.CANCEL:
+        //     break
+        // }
       },
     })
   }
@@ -654,16 +653,6 @@ export class DevisComponent implements OnInit, AfterViewInit {
  
       this.montantTotalAllDevis += newDevis.montantTtc
 
-      // this.tableChild.tableData = [...this.tableChild.tableData ,{...newDevis}]
-      // this.tableChild.tableData.sort((a, b) => a.reference < b.reference ? 1 : -1)
-
-      // this.selectedDevisItem = {
-      //   ...newDevis,
-      //   dateEmission: newDevis.dateEmission.toDate()
-      // }
-      // this.emitNotificationSelectedDevisChanged({
-      //   ...this.selectedDevisItem
-      // })
     } else if (event.crudOperation == 'update') {
       this.selectedDevisItem = {
         ...event.result,

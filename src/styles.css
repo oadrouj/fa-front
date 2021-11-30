@@ -23,6 +23,7 @@
     --gray-color: #9A9FA8;
     --light-gray-color: #DDDDDD;
     --purple-color: #5D3D7D;
+    --light-purple-color: #DDD7E3
 }
 
 .w-80 {
@@ -58,6 +59,10 @@
 
 .color-orange {
     color: var(--orange-color) !important;
+}
+
+.color-purple {
+    color: var(--purple-color) !important;
 }
 
 .bg-green {

@@ -41,4 +41,18 @@ error = ({summary, detail}: ToastArgs) => {
   this.toast('error',  summary || 'Erreur', detail)
 }
 
+deleteInternalError = () => {
+  this.error({
+    summary: 'Erreur',
+    detail: "Une erreur s'est produite lors de la suppression",
+  })
+}
+
+internalError(){
+  this.error({
+    summary: 'Erreur',
+    detail: 'Erreur produite',
+  })
+}
+
 }

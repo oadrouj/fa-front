@@ -1,7 +1,7 @@
 import { Moment } from "moment"
 
 export class DevisContentItem {
-    description!: string
+    designation!: string
     date!: Moment
     quantity!: number
     unit!: string
@@ -11,7 +11,7 @@ export class DevisContentItem {
 }
 
 // export class DevisContentItem {
-//     description!: string
+//     designation!: string
 //     date!: Date
 //     quantit!: number
 //     unite!: string

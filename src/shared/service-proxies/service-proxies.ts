@@ -141,6 +141,369 @@ export class AccountServiceProxy {
 }
 
 @Injectable()
+export class CatalogueServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createCatalogue(body: CreateCatalogueInput | undefined): Observable<CreateCatalogueResult> {
+        let url_ = this.baseUrl + "/api/services/app/Catalogue/CreateCatalogue";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateCatalogue(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateCatalogue(<any>response_);
+                } catch (e) {
+                    return <Observable<CreateCatalogueResult>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<CreateCatalogueResult>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreateCatalogue(response: HttpResponseBase): Observable<CreateCatalogueResult> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CreateCatalogueResult.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CreateCatalogueResult>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    updateCatalogue(body: UpdateCatalogueInput | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Catalogue/UpdateCatalogue";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateCatalogue(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateCatalogue(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdateCatalogue(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
+    }
+
+    /**
+     * @param catalogueId (optional) 
+     * @return Success
+     */
+    deleteCatalogue(catalogueId: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Catalogue/DeleteCatalogue?";
+        if (catalogueId === null)
+            throw new Error("The parameter 'catalogueId' cannot be null.");
+        else if (catalogueId !== undefined)
+            url_ += "catalogueId=" + encodeURIComponent("" + catalogueId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteCatalogue(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteCatalogue(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processDeleteCatalogue(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getByIdCatalogue(id: number | undefined): Observable<CatalogueDto> {
+        let url_ = this.baseUrl + "/api/services/app/Catalogue/GetByIdCatalogue?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByIdCatalogue(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByIdCatalogue(<any>response_);
+                } catch (e) {
+                    return <Observable<CatalogueDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<CatalogueDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetByIdCatalogue(response: HttpResponseBase): Observable<CatalogueDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CatalogueDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CatalogueDto>(<any>null);
+    }
+
+    /**
+     * @param keyword (optional) 
+     * @return Success
+     */
+    getCatalogueForAutoComplete(keyword: string | null | undefined): Observable<CatalogueForAutoCompleteDtoListResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Catalogue/GetCatalogueForAutoComplete?";
+        if (keyword !== undefined && keyword !== null)
+            url_ += "keyword=" + encodeURIComponent("" + keyword) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCatalogueForAutoComplete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCatalogueForAutoComplete(<any>response_);
+                } catch (e) {
+                    return <Observable<CatalogueForAutoCompleteDtoListResultDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<CatalogueForAutoCompleteDtoListResultDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetCatalogueForAutoComplete(response: HttpResponseBase): Observable<CatalogueForAutoCompleteDtoListResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CatalogueForAutoCompleteDtoListResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CatalogueForAutoCompleteDtoListResultDto>(<any>null);
+    }
+
+    /**
+     * @param first (optional) 
+     * @param rows (optional) 
+     * @param globalFilter (optional) 
+     * @param sortField (optional) 
+     * @param sortOrder (optional) 
+     * @param filtres_CatalogueType (optional) 
+     * @return Success
+     */
+    getAllCatalogues(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_CatalogueType: string | null | undefined): Observable<CatalogueDtoListResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Catalogue/GetAllCatalogues?";
+        if (first === null)
+            throw new Error("The parameter 'first' cannot be null.");
+        else if (first !== undefined)
+            url_ += "First=" + encodeURIComponent("" + first) + "&";
+        if (rows === null)
+            throw new Error("The parameter 'rows' cannot be null.");
+        else if (rows !== undefined)
+            url_ += "Rows=" + encodeURIComponent("" + rows) + "&";
+        if (globalFilter !== undefined && globalFilter !== null)
+            url_ += "GlobalFilter=" + encodeURIComponent("" + globalFilter) + "&";
+        if (sortField !== undefined && sortField !== null)
+            url_ += "SortField=" + encodeURIComponent("" + sortField) + "&";
+        if (sortOrder !== undefined && sortOrder !== null)
+            url_ += "SortOrder=" + encodeURIComponent("" + sortOrder) + "&";
+        if (filtres_CatalogueType !== undefined && filtres_CatalogueType !== null)
+            url_ += "Filtres.CatalogueType=" + encodeURIComponent("" + filtres_CatalogueType) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllCatalogues(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllCatalogues(<any>response_);
+                } catch (e) {
+                    return <Observable<CatalogueDtoListResultDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<CatalogueDtoListResultDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAllCatalogues(response: HttpResponseBase): Observable<CatalogueDtoListResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CatalogueDtoListResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CatalogueDtoListResultDto>(<any>null);
+    }
+}
+
+@Injectable()
 export class ClientServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -1626,18 +1989,19 @@ export class DevisServiceProxy {
             throw new Error("The parameter 'statut' cannot be null.");
         else if (statut !== undefined)
             url_ += "Statut=" + encodeURIComponent("" + statut) + "&";
-        if (devisItems !== undefined && devisItems !== null)
-        devisItems && devisItems.forEach((item, index) => {
-            for (let attr in item){
-                if (item.hasOwnProperty(attr)) {
-                    if(attr != "date")
-                        url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-                    else
-                        url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
-            
-                }
-                }
-        });
+            if (devisItems !== undefined && devisItems !== null)
+            devisItems && devisItems.forEach((item, index) => {
+                for (let attr in item){
+                    if (item.hasOwnProperty(attr)) {
+                        if(attr != "date")
+                            url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
+                        else
+                            url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
+                
+                    }
+                    }
+            });
+    
         if (clientId === null)
             throw new Error("The parameter 'clientId' cannot be null.");
         else if (clientId !== undefined)
@@ -2473,19 +2837,19 @@ export class FactureServiceProxy {
             throw new Error("The parameter 'statut' cannot be null.");
         else if (statut !== undefined)
             url_ += "Statut=" + encodeURIComponent("" + statut) + "&";
-        if (factureItems !== undefined && factureItems !== null)
-        if (factureItems !== undefined && factureItems !== null)
-        factureItems && factureItems.forEach((item, index) => {
-            for (let attr in item){
-                if (item.hasOwnProperty(attr)) {
-                    if(attr != "date")
-                        url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-                    else
-                        url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
-            
-                }
-                }
-        });
+            if (factureItems !== undefined && factureItems !== null)
+            factureItems && factureItems.forEach((item, index) => {
+                for (let attr in item){
+                    if (item.hasOwnProperty(attr)) {
+                        if(attr != "date")
+                            url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
+                        else
+                            url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
+                
+                    }
+                    }
+            });
+    
         if (clientId === null)
             throw new Error("The parameter 'clientId' cannot be null.");
         else if (clientId !== undefined)
@@ -5129,6 +5493,475 @@ export interface IRegisterOutput {
     userId: number;
 }
 
+export class CreateCatalogueInput implements ICreateCatalogueInput {
+    catalogueType: string | undefined;
+    designation: string | undefined;
+    description: string | undefined;
+    htPrice: number;
+    unity: string | undefined;
+    tva: number;
+    minimalQuantity: number;
+
+    constructor(data?: ICreateCatalogueInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.catalogueType = _data["catalogueType"];
+            this.designation = _data["designation"];
+            this.description = _data["description"];
+            this.htPrice = _data["htPrice"];
+            this.unity = _data["unity"];
+            this.tva = _data["tva"];
+            this.minimalQuantity = _data["minimalQuantity"];
+        }
+    }
+
+    static fromJS(data: any): CreateCatalogueInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateCatalogueInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["catalogueType"] = this.catalogueType;
+        data["designation"] = this.designation;
+        data["description"] = this.description;
+        data["htPrice"] = this.htPrice;
+        data["unity"] = this.unity;
+        data["tva"] = this.tva;
+        data["minimalQuantity"] = this.minimalQuantity;
+        return data; 
+    }
+
+    clone(): CreateCatalogueInput {
+        const json = this.toJSON();
+        let result = new CreateCatalogueInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateCatalogueInput {
+    catalogueType: string | undefined;
+    designation: string | undefined;
+    description: string | undefined;
+    htPrice: number;
+    unity: string | undefined;
+    tva: number;
+    minimalQuantity: number;
+}
+
+export class CreateCatalogueResult implements ICreateCatalogueResult {
+    id: number;
+    reference: number;
+    addedDate: moment.Moment;
+
+    constructor(data?: ICreateCatalogueResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.reference = _data["reference"];
+            this.addedDate = _data["addedDate"] ? moment(_data["addedDate"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): CreateCatalogueResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateCatalogueResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["reference"] = this.reference;
+        data["addedDate"] = this.addedDate ? this.addedDate.toISOString() : <any>undefined;
+        return data; 
+    }
+
+    clone(): CreateCatalogueResult {
+        const json = this.toJSON();
+        let result = new CreateCatalogueResult();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateCatalogueResult {
+    id: number;
+    reference: number;
+    addedDate: moment.Moment;
+}
+
+export class UpdateCatalogueInput implements IUpdateCatalogueInput {
+    catalogueType: string | undefined;
+    designation: string | undefined;
+    description: string | undefined;
+    htPrice: number;
+    unity: string | undefined;
+    tva: number;
+    minimalQuantity: number;
+    id: number;
+
+    constructor(data?: IUpdateCatalogueInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.catalogueType = _data["catalogueType"];
+            this.designation = _data["designation"];
+            this.description = _data["description"];
+            this.htPrice = _data["htPrice"];
+            this.unity = _data["unity"];
+            this.tva = _data["tva"];
+            this.minimalQuantity = _data["minimalQuantity"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): UpdateCatalogueInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateCatalogueInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["catalogueType"] = this.catalogueType;
+        data["designation"] = this.designation;
+        data["description"] = this.description;
+        data["htPrice"] = this.htPrice;
+        data["unity"] = this.unity;
+        data["tva"] = this.tva;
+        data["minimalQuantity"] = this.minimalQuantity;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): UpdateCatalogueInput {
+        const json = this.toJSON();
+        let result = new UpdateCatalogueInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdateCatalogueInput {
+    catalogueType: string | undefined;
+    designation: string | undefined;
+    description: string | undefined;
+    htPrice: number;
+    unity: string | undefined;
+    tva: number;
+    minimalQuantity: number;
+    id: number;
+}
+
+export class CatalogueDto implements ICatalogueDto {
+    reference: number;
+    referencePrefix: string | undefined;
+    catalogueType: string | undefined;
+    addedDate: moment.Moment;
+    designation: string | undefined;
+    description: string | undefined;
+    htPrice: number;
+    unity: string | undefined;
+    tva: number;
+    minimalQuantity: number;
+    ttcPrice: number;
+    totalSalesTTC: number;
+    totalUnitsSold: number;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    constructor(data?: ICatalogueDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.reference = _data["reference"];
+            this.referencePrefix = _data["referencePrefix"];
+            this.catalogueType = _data["catalogueType"];
+            this.addedDate = _data["addedDate"] ? moment(_data["addedDate"].toString()) : <any>undefined;
+            this.designation = _data["designation"];
+            this.description = _data["description"];
+            this.htPrice = _data["htPrice"];
+            this.unity = _data["unity"];
+            this.tva = _data["tva"];
+            this.minimalQuantity = _data["minimalQuantity"];
+            this.ttcPrice = _data["ttcPrice"];
+            this.totalSalesTTC = _data["totalSalesTTC"];
+            this.totalUnitsSold = _data["totalUnitsSold"];
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): CatalogueDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CatalogueDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["reference"] = this.reference;
+        data["referencePrefix"] = this.referencePrefix;
+        data["catalogueType"] = this.catalogueType;
+        data["addedDate"] = this.addedDate ? this.addedDate.toISOString() : <any>undefined;
+        data["designation"] = this.designation;
+        data["description"] = this.description;
+        data["htPrice"] = this.htPrice;
+        data["unity"] = this.unity;
+        data["tva"] = this.tva;
+        data["minimalQuantity"] = this.minimalQuantity;
+        data["ttcPrice"] = this.ttcPrice;
+        data["totalSalesTTC"] = this.totalSalesTTC;
+        data["totalUnitsSold"] = this.totalUnitsSold;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): CatalogueDto {
+        const json = this.toJSON();
+        let result = new CatalogueDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICatalogueDto {
+    reference: number;
+    referencePrefix: string | undefined;
+    catalogueType: string | undefined;
+    addedDate: moment.Moment;
+    designation: string | undefined;
+    description: string | undefined;
+    htPrice: number;
+    unity: string | undefined;
+    tva: number;
+    minimalQuantity: number;
+    ttcPrice: number;
+    totalSalesTTC: number;
+    totalUnitsSold: number;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+}
+
+export class CatalogueForAutoCompleteDto implements ICatalogueForAutoCompleteDto {
+    designation: string | undefined;
+    addedDate: moment.Moment;
+    htPrice: number;
+    unity: string | undefined;
+    tva: number;
+    minimalQuantity: number;
+    id: number;
+
+    constructor(data?: ICatalogueForAutoCompleteDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.designation = _data["designation"];
+            this.addedDate = _data["addedDate"] ? moment(_data["addedDate"].toString()) : <any>undefined;
+            this.htPrice = _data["htPrice"];
+            this.unity = _data["unity"];
+            this.tva = _data["tva"];
+            this.minimalQuantity = _data["minimalQuantity"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): CatalogueForAutoCompleteDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CatalogueForAutoCompleteDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["designation"] = this.designation;
+        data["addedDate"] = this.addedDate ? this.addedDate.toISOString() : <any>undefined;
+        data["htPrice"] = this.htPrice;
+        data["unity"] = this.unity;
+        data["tva"] = this.tva;
+        data["minimalQuantity"] = this.minimalQuantity;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): CatalogueForAutoCompleteDto {
+        const json = this.toJSON();
+        let result = new CatalogueForAutoCompleteDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICatalogueForAutoCompleteDto {
+    designation: string | undefined;
+    addedDate: moment.Moment;
+    htPrice: number;
+    unity: string | undefined;
+    tva: number;
+    minimalQuantity: number;
+    id: number;
+}
+
+export class CatalogueForAutoCompleteDtoListResultDto implements ICatalogueForAutoCompleteDtoListResultDto {
+    items: CatalogueForAutoCompleteDto[] | undefined;
+
+    constructor(data?: ICatalogueForAutoCompleteDtoListResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(CatalogueForAutoCompleteDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CatalogueForAutoCompleteDtoListResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CatalogueForAutoCompleteDtoListResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): CatalogueForAutoCompleteDtoListResultDto {
+        const json = this.toJSON();
+        let result = new CatalogueForAutoCompleteDtoListResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICatalogueForAutoCompleteDtoListResultDto {
+    items: CatalogueForAutoCompleteDto[] | undefined;
+}
+
+export class CatalogueDtoListResultDto implements ICatalogueDtoListResultDto {
+    items: CatalogueDto[] | undefined;
+
+    constructor(data?: ICatalogueDtoListResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(CatalogueDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CatalogueDtoListResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CatalogueDtoListResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): CatalogueDtoListResultDto {
+        const json = this.toJSON();
+        let result = new CatalogueDtoListResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICatalogueDtoListResultDto {
+    items: CatalogueDto[] | undefined;
+}
+
 export class ClientDto implements IClientDto {
     reference: number;
     categorieClient: string | undefined;
@@ -5553,7 +6386,7 @@ export enum DevisStatutEnum {
 }
 
 export class DevisItemDto implements IDevisItemDto {
-    description: string | undefined;
+    designation: string | undefined;
     date: moment.Moment;
     quantity: number;
     unit: string | undefined;
@@ -5572,7 +6405,7 @@ export class DevisItemDto implements IDevisItemDto {
 
     init(_data?: any) {
         if (_data) {
-            this.description = _data["description"];
+            this.designation = _data["designation"];
             this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
             this.quantity = _data["quantity"];
             this.unit = _data["unit"];
@@ -5591,7 +6424,7 @@ export class DevisItemDto implements IDevisItemDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["description"] = this.description;
+        data["designation"] = this.designation;
         data["date"] = this.date ? this.date.toISOString() : <any>undefined;
         data["quantity"] = this.quantity;
         data["unit"] = this.unit;
@@ -5610,7 +6443,7 @@ export class DevisItemDto implements IDevisItemDto {
 }
 
 export interface IDevisItemDto {
-    description: string | undefined;
+    designation: string | undefined;
     date: moment.Moment;
     quantity: number;
     unit: string | undefined;
@@ -5717,6 +6550,10 @@ export class UpdateDevisInput implements IUpdateDevisInput {
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
     id: number;
 
     constructor(data?: IUpdateDevisInput) {
@@ -5744,6 +6581,10 @@ export class UpdateDevisInput implements IUpdateDevisInput {
                     this.devisItems.push(DevisItemDto.fromJS(item));
             }
             this.clientId = _data["clientId"];
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
             this.id = _data["id"];
         }
     }
@@ -5771,6 +6612,10 @@ export class UpdateDevisInput implements IUpdateDevisInput {
                 data["devisItems"].push(item.toJSON());
         }
         data["clientId"] = this.clientId;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
         data["id"] = this.id;
         return data; 
     }
@@ -5794,6 +6639,10 @@ export interface IUpdateDevisInput {
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
     id: number;
 }
 
@@ -5970,13 +6819,14 @@ export enum FactureStatutEnum {
 }
 
 export class FactureItemDto implements IFactureItemDto {
-    description: string | undefined;
+    designation: string | undefined;
     date: moment.Moment;
     quantity: number;
     unit: string | undefined;
     unitPriceHT: number;
     tva: number;
     totalTtc: number;
+    catalogueId: number | undefined;
 
     constructor(data?: IFactureItemDto) {
         if (data) {
@@ -5989,13 +6839,14 @@ export class FactureItemDto implements IFactureItemDto {
 
     init(_data?: any) {
         if (_data) {
-            this.description = _data["description"];
+            this.designation = _data["designation"];
             this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
             this.quantity = _data["quantity"];
             this.unit = _data["unit"];
             this.unitPriceHT = _data["unitPriceHT"];
             this.tva = _data["tva"];
             this.totalTtc = _data["totalTtc"];
+            this.catalogueId = _data["catalogueId"];
         }
     }
 
@@ -6008,13 +6859,14 @@ export class FactureItemDto implements IFactureItemDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["description"] = this.description;
+        data["designation"] = this.designation;
         data["date"] = this.date ? this.date.toISOString() : <any>undefined;
         data["quantity"] = this.quantity;
         data["unit"] = this.unit;
         data["unitPriceHT"] = this.unitPriceHT;
         data["tva"] = this.tva;
         data["totalTtc"] = this.totalTtc;
+        data["catalogueId"] = this.catalogueId;
         return data; 
     }
 
@@ -6027,13 +6879,14 @@ export class FactureItemDto implements IFactureItemDto {
 }
 
 export interface IFactureItemDto {
-    description: string | undefined;
+    designation: string | undefined;
     date: moment.Moment;
     quantity: number;
     unit: string | undefined;
     unitPriceHT: number;
     tva: number;
     totalTtc: number;
+    catalogueId: number | undefined;
 }
 
 export class CreateFactureInput implements ICreateFactureInput {

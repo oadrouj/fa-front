@@ -38,6 +38,9 @@ import {
   FactureItemDto,
   DevisStatutEnum,
   ReportGeneratorServiceProxy,
+  CatalogueServiceProxy,
+  CatalogueForAutoCompleteDto,
+  CatalogueForAutoCompleteDtoListResultDto,
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
@@ -50,6 +53,7 @@ import { map } from 'rxjs/operators'
 import { ConvertDevisToFactureService } from '@shared/services/ConvertDevisToFacture.service'
 import { Router } from '@angular/router'
 import { ValidationHelper } from '@shared/helpers/ValidationHelper'
+import { CalculationsService } from '@shared/services/calculations.service'
 @Component({
   selector: 'app-factures-dialog',
   templateUrl: './factures-dialog.component.html',
@@ -59,15 +63,18 @@ import { ValidationHelper } from '@shared/helpers/ValidationHelper'
 export class FacturesDialogComponent
   implements OnInit, AfterViewInit, OnDestroy {
   remiseValue: number
+  filteredCatalogues: CatalogueForAutoCompleteDto[]
   constructor(
     private formBuilder: FormBuilder,
     private _formatService: FormatService,
     private toastService: ToastService,
     private _factureServiceProxy: FactureServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
+    private _catalogueServiceProxy: CatalogueServiceProxy,
     public globalEventsService: GlobalEventsService,
     private _router: Router,
     private _devisServiceProxy: DevisServiceProxy,
+    private _calculationsService: CalculationsService,
   ) {}
   test = false
   ngOnInit() {
@@ -258,9 +265,9 @@ export class FacturesDialogComponent
   }
   cols = [
     {
-      header: 'DESCRIPTION',
-      field: 'description',
-      type: 'inputText',
+      header: 'DESIGNATION',
+      field: 'designation',
+      type: 'autocomplete',
       colspan: 3,
     },
     { header: 'DATE', field: 'date', type: 'calendar', colspan: 2 },
@@ -349,6 +356,7 @@ export class FacturesDialogComponent
       this.getFromArrayControl.push(this.initiateTableForm())
       return {
         ...item,
+        designation: {designation: item.designation},
         date: item.date.toDate(),
         tva: !item.tva ? 20 : item.tva,
       }
@@ -366,7 +374,8 @@ export class FacturesDialogComponent
 
   initiateTableForm() {
     return this.formBuilder.group({
-      description: ['', Validators.required],
+      catalogueId: [null],
+      designation: ['', Validators.required],
       date: [new Date(), Validators.required],
       quantity: [1, Validators.required],
       unit: ['h', Validators.required],
@@ -560,9 +569,10 @@ export class FacturesDialogComponent
       remise: this.devisOptionsFormGroup.get('remise').value ?? 0,
       statut: devisStatus,
       factureItems: formValue.factureItems.map(
-        (devisItem: FactureContentItem) => {
+        (devisItem) => {
           return new FactureItemDto({
-            description: devisItem.description,
+            catalogueId: devisItem.catalogueId,
+            designation: devisItem.designation.designation,
             date: this.getExactDate(devisItem.date, new Date()),
             quantity: devisItem.quantity ?? 0,
             unit: devisItem.unit,
@@ -606,7 +616,7 @@ export class FacturesDialogComponent
       })
     this.toastService.info({
       summary: 'Opértion réussie',
-      detail: 'Vous avez ajouter cette facture en brouillon',
+      detail: 'Vous avez ajouté cette facture en brouillon',
     })
   }
 
@@ -631,9 +641,10 @@ export class FacturesDialogComponent
       remise: this.devisOptionsFormGroup.get('remise').value,
       statut: devisStatus,
       factureItems: formValue.factureItems.map(
-        (devisItem: FactureContentItem) => {
+        (devisItem) => {
           return new FactureItemDto({
-            description: devisItem.description,
+            catalogueId: devisItem.catalogueId,
+            designation: devisItem.designation.designation,
             date: this.getExactDate(devisItem.date, new Date()),
             quantity: devisItem.quantity ?? 0,
             unit: devisItem.unit,
@@ -707,7 +718,7 @@ export class FacturesDialogComponent
 
     this.toastService.info({
       summary: 'Opértion réussie',
-      detail: 'Vous avez modifier cette facture en brouillon',
+      detail: 'Vous avez modifié cette facture en brouillon',
     })
   }
 
@@ -721,15 +732,47 @@ export class FacturesDialogComponent
     }, 500)
   }
 
+  filterCatalogues(event){
+    setTimeout(() => {
+      this._catalogueServiceProxy
+        .getCatalogueForAutoComplete(event.query)
+        .subscribe((res) => {
+          this.filteredCatalogues = res.items
+        })
+    }, 500)
+  }
+
   onSelectClientAutoComplete() {
     this.selectedClientId = this.formGroup.get('client').value['id']
   }
 
+  onSelectCatalogAutoComplete(event: CatalogueForAutoCompleteDto, index) {
+    let factureItems = this.formGroup.get('factureItems') as FormArray
+    factureItems.at(index).setValue({
+      catalogueId: event.id,
+      designation: {designation: event.designation},
+      date: event.addedDate.toDate(),
+      quantity: event.minimalQuantity,
+      unit: event.unity,
+      unitPriceHT: event.htPrice,
+      tva: event.tva,
+      totalTtc: this._calculationsService
+        .calculateTTCWithQuantity(event.htPrice, event.tva, event.minimalQuantity),
+    })
+
+    this.calculateSummaryTotalHTAndTTC()
+    this.RecalculateRows()
+  }
+
+  onClearCatalogAutoComplete(index){
+    let factureItems = this.formGroup.get('factureItems') as FormArray
+    factureItems.at(index).patchValue({
+      catalogueId: 0,
+    })
+    console.log(factureItems.at(index).value);
+  }
   saveBrouillon() {
-    // this.formGroup.setValidators(() => { return this.formGroup.get('client') :  Validators.required})
-    // this.formGroup.clearValidators()
-    // this.formGroup.updateValueAndValidity();
-    // this.formGroup.get('client').validator = Validators.required
+   
     // this.frm.nativeElement.classList.add('submitted')
 
     if (this.formGroup.get('client').valid) {
@@ -800,7 +843,7 @@ export class FacturesDialogComponent
       client: 'Client',
       messageIntroduction: "Message d'introduction",
       piedDePage: 'Pied de page',
-      factureItems: 'Description',
+      factureItems: 'Description', 
     }
 
     for (let control in this.formGroup.controls) {
@@ -920,9 +963,10 @@ export class FacturesDialogComponent
   preview() {
     let formValue = this.formGroup.value
     let factureItems = formValue.factureItems.map(
-      (devisItem: FactureContentItem) => {
+      (devisItem) => {
         return new FactureItemDto({
-          description: devisItem.description,
+          catalogueId: devisItem.catalogueId,
+          designation: devisItem.designation,
           date: this.getExactDate(devisItem.date, new Date()),
           quantity: devisItem.quantity ?? 0,
           unit: devisItem.unit,
