@@ -30,6 +30,8 @@ import {
   DevisServiceProxy,
   UpdateDevisInput,
   DevisStatutEnum,
+  CatalogueServiceProxy,
+  CatalogueForAutoCompleteDto,
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
@@ -40,6 +42,7 @@ import {
 } from '@shared/globalEventsService'
 import { map } from 'rxjs/operators'
 import { ValidationHelper } from '@shared/helpers/ValidationHelper'
+import { CalculationsService } from '@shared/services/calculations.service'
 @Component({
   selector: 'app-devis-dialog',
   templateUrl: './devis-dialog.component.html',
@@ -51,6 +54,7 @@ export class DevisDialogComponent implements OnInit {
   manuelReference: boolean
   remiseAmount: number
   remiseValue: number
+  filteredCatalogues: import("c:/Dev/repos/Facturi-Front/src/shared/service-proxies/service-proxies").CatalogueForAutoCompleteDto[]
   constructor(
     private formBuilder: FormBuilder,
     private _formatService: FormatService,
@@ -58,6 +62,8 @@ export class DevisDialogComponent implements OnInit {
     private _devisServiceProxy: DevisServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
     public globalEventsService: GlobalEventsService,
+    private _catalogueServiceProxy: CatalogueServiceProxy,
+    private _calculationsService: CalculationsService,
   ) {}
 
   ngOnInit(): void {
@@ -203,7 +209,7 @@ export class DevisDialogComponent implements OnInit {
     {
       header: 'DESIGNATION',
       field: 'designation',
-      type: 'inputText',
+      type: 'autocomplete',
       colspan: 3,
     },
     { header: 'DATE', field: 'date', type: 'calendar', colspan: 2 },
@@ -309,6 +315,7 @@ export class DevisDialogComponent implements OnInit {
 
   initiateTableForm() {
     return this.formBuilder.group({
+      catalogueId: [null],
       designation: ['', Validators.required],
       date: [new Date(), Validators.required],
       quantity: [1, Validators.required],
@@ -504,9 +511,10 @@ export class DevisDialogComponent implements OnInit {
       piedDePage: formValue.piedDePage,
       remise: this.devisOptionsFormGroup.get('remise').value ?? 0,
       statut: devisStatus,
-      devisItems: formValue.devisItems.map((devisItem: DevisContentItem) => {
+      devisItems: formValue.devisItems.map((devisItem) => {
         return new DevisItemDto({
-          designation: devisItem.designation,
+          catalogueId: devisItem.catalogueId,
+          designation: devisItem.designation.designation,
           date: this.getExactDate(devisItem.date, new Date()),
           quantity: devisItem.quantity ?? 0,
           unit: devisItem.unit,
@@ -570,9 +578,10 @@ export class DevisDialogComponent implements OnInit {
       piedDePage: formValue.piedDePage,
       remise: this.devisOptionsFormGroup.get('remise').value,
       statut: devisStatus,
-      devisItems: formValue.devisItems.map((devisItem: DevisContentItem) => {
+      devisItems: formValue.devisItems.map((devisItem) => {
         return new DevisItemDto({
-          designation: devisItem.designation,
+          catalogueId: devisItem.catalogueId,
+          designation: devisItem.designation.designation,
           date: this.getExactDate(devisItem.date, new Date()),
           quantity: devisItem.quantity ?? 0,
           unit: devisItem.unit,
@@ -650,6 +659,42 @@ export class DevisDialogComponent implements OnInit {
 
   onSelectClientAutoComplete() {
     this.selectedClientId = this.formGroup.get('client').value['id']
+  }
+
+  filterCatalogues(event){
+    setTimeout(() => {
+      this._catalogueServiceProxy
+        .getCatalogueForAutoComplete(event.query)
+        .subscribe((res) => {
+          this.filteredCatalogues = res.items
+        })
+    }, 500)
+  }
+
+  onSelectCatalogAutoComplete(event: CatalogueForAutoCompleteDto, index) {
+    let factureItems = this.formGroup.get('devisItems') as FormArray
+    factureItems.at(index).setValue({
+      catalogueId: event.id,
+      designation: {designation: event.designation},
+      date: event.addedDate.toDate(),
+      quantity: event.minimalQuantity,
+      unit: event.unity || 'h',
+      unitPriceHT: event.htPrice,
+      tva: event.tva || 20,
+      totalTtc: this._calculationsService
+        .calculateTTCWithQuantity(event.htPrice, event.tva, event.minimalQuantity),
+    })
+
+    this.calculateSummaryTotalHTAndTTC()
+    this.RecalculateRows()
+  }
+
+  onClearCatalogAutoComplete(index){
+    let factureItems = this.formGroup.get('devisItems') as FormArray
+    factureItems.at(index).patchValue({
+      catalogueId: 0,
+    })
+    console.log(factureItems.at(index).value);
   }
 
   saveBrouillon() {
@@ -790,8 +835,9 @@ export class DevisDialogComponent implements OnInit {
 
   preview() {
     let formValue = this.formGroup.value
-    let devisItems = formValue.devisItems.map((devisItem: DevisContentItem) => {
+    let devisItems = formValue.devisItems.map((devisItem) => {
       return new DevisItemDto({
+        catalogueId: devisItem.catalogueId,
         designation: devisItem.designation,
         date: this.getExactDate(devisItem.date, new Date()),
         quantity: devisItem.quantity ?? 0,
