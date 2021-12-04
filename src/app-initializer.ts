@@ -35,6 +35,7 @@ export class AppInitializer {
                   const angularLocale = this.convertAbpLocaleToAngularLocale(
                     abp.localization.currentLanguage.name
                   );
+                   /* webpackInclude: /(fr-MA)\.js$/ */
                   import(`@angular/common/locales/${angularLocale}.js`).then(
                     (module) => {
                       registerLocaleData(module.default);

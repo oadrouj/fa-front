@@ -100,14 +100,7 @@ import { CatalogueComponent } from './catalogue/catalogue.component';
     SidebarLogoComponent,
     SidebarUserPanelComponent,
     SidebarMenuComponent,
-    ClientsComponent,
-    DevisComponent,
-    FacturesComponent,
-    FacturesDialogComponent,
-    DevisDialogComponent,
-    TableComponent,
-    FacturePayementComponent,
-      CatalogueComponent
+    
    ],
   imports: [
     CommonModule,
