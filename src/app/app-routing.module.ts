@@ -2,16 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { AppRouteGuard } from '@shared/auth/auth-route-guard';
-import { HomeComponent } from './home/home.component';
-import { AboutComponent } from './about/about.component';
-import { UsersComponent } from './users/users.component';
-import { TenantsComponent } from './tenants/tenants.component';
-import { RolesComponent } from 'app/roles/roles.component';
-import { ChangePasswordComponent } from './users/change-password/change-password.component';
-import { ClientsComponent } from './clients/clients.component';
-import { DevisComponent } from './devis/devis.component';
-import { FacturesComponent } from './factures/factures.component';
-import { CatalogueComponent } from './catalogue/catalogue.component';
 
 @NgModule({
     imports: [
@@ -20,10 +10,34 @@ import { CatalogueComponent } from './catalogue/catalogue.component';
                 path: '',
                 component: AppComponent,
                 children: [
-                    { path: 'Clients', component: ClientsComponent,  canActivate: [AppRouteGuard] },
-                    { path: 'Devis', component: DevisComponent,  canActivate: [AppRouteGuard] },
-                    { path: 'Factures', component: FacturesComponent,  canActivate: [AppRouteGuard] },
-                    { path: 'Catalogue', component: CatalogueComponent, canActivate: [AppRouteGuard] }
+                    {   
+                        path: 'Clients',
+                        loadChildren: () => import('./clients/clients.module').then(m => m.ClientsModule), // Lazy load account module
+                        data: { preload: true },
+                        canActivate: [AppRouteGuard] 
+
+                    },
+                    {   
+                        path: 'Devis',
+                        loadChildren: () => import('./devis/devis.module').then(m => m.DevisModule), // Lazy load account module
+                        data: { preload: true },
+                        canActivate: [AppRouteGuard] 
+
+                    },
+                    {   
+                        path: 'Factures',
+                        loadChildren: () => import('./factures/factures.module').then(m => m.FacturesModule), // Lazy load account module
+                        data: { preload: true },
+                        canActivate: [AppRouteGuard] 
+
+                    },
+                    {   
+                        path: 'Catalogue',
+                        loadChildren: () => import('./catalogue/catalogue.module').then(m => m.CatalogueModule), // Lazy load account module
+                        data: { preload: true },
+                        canActivate: [AppRouteGuard] 
+
+                    },
                     
                     // { path: 'home', component: HomeComponent,  canActivate: [AppRouteGuard] },
                     // { path: 'users', component: UsersComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
