@@ -917,6 +917,62 @@ export class ClientServiceProxy {
         }
         return _observableOf<ClientForAutoCompleteDtoListResultDto>(<any>null);
     }
+
+    /**
+     * @param clientId (optional) 
+     * @return Success
+     */
+    getClientDefaults(clientId: number | undefined): Observable<ClientDefaultsDto> {
+        let url_ = this.baseUrl + "/api/services/app/Client/GetClientDefaults?";
+        if (clientId === null)
+            throw new Error("The parameter 'clientId' cannot be null.");
+        else if (clientId !== undefined)
+            url_ += "ClientId=" + encodeURIComponent("" + clientId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetClientDefaults(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetClientDefaults(<any>response_);
+                } catch (e) {
+                    return <Observable<ClientDefaultsDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ClientDefaultsDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetClientDefaults(response: HttpResponseBase): Observable<ClientDefaultsDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ClientDefaultsDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ClientDefaultsDto>(<any>null);
+    }
 }
 
 @Injectable()
@@ -980,6 +1036,69 @@ export class ConfigurationServiceProxy {
             }));
         }
         return _observableOf<void>(<any>null);
+    }
+}
+
+@Injectable()
+export class CountryServiceAppServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @return Success
+     */
+    getAllCountries(): Observable<CountryDtoListResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/CountryServiceApp/GetAllCountries";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllCountries(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllCountries(<any>response_);
+                } catch (e) {
+                    return <Observable<CountryDtoListResultDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<CountryDtoListResultDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAllCountries(response: HttpResponseBase): Observable<CountryDtoListResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CountryDtoListResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CountryDtoListResultDto>(<any>null);
     }
 }
 
@@ -1950,25 +2069,21 @@ export class DevisServiceProxy {
 
     /**
      * @param reference (optional) 
-     * @param referencePrefix (optional) 
      * @param dateEmission (optional) 
      * @param echeancePaiement (optional) 
      * @param messageIntroduction (optional) 
      * @param piedDePage (optional) 
      * @param remise (optional) 
+     * @param currency (optional) 
      * @param statut (optional) 
      * @param devisItems (optional) 
      * @param clientId (optional) 
      * @return Success
      */
-    getByteDataDevisReport(reference: number | undefined, referencePrefix: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined): Observable<string> {
+    getByteDataDevisReport(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, currency: string | null | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Devis/GetByteDataDevisReport?";
-        if (reference === null)
-            throw new Error("The parameter 'reference' cannot be null.");
-        else if (reference !== undefined)
+        if (reference !== undefined && reference !== null)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
-        if (referencePrefix !== undefined && referencePrefix !== null)
-            url_ += "ReferencePrefix=" + encodeURIComponent("" + referencePrefix) + "&";
         if (dateEmission === null)
             throw new Error("The parameter 'dateEmission' cannot be null.");
         else if (dateEmission !== undefined)
@@ -1985,21 +2100,18 @@ export class DevisServiceProxy {
             throw new Error("The parameter 'remise' cannot be null.");
         else if (remise !== undefined)
             url_ += "Remise=" + encodeURIComponent("" + remise) + "&";
+        if (currency !== undefined && currency !== null)
+            url_ += "Currency=" + encodeURIComponent("" + currency) + "&";
         if (statut === null)
             throw new Error("The parameter 'statut' cannot be null.");
         else if (statut !== undefined)
             url_ += "Statut=" + encodeURIComponent("" + statut) + "&";
-            if (devisItems !== undefined && devisItems !== null)
+        if (devisItems !== undefined && devisItems !== null)
             devisItems && devisItems.forEach((item, index) => {
-                for (let attr in item){
-                    if (item.hasOwnProperty(attr)) {
-                        if(attr != "date")
-                            url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-                        else
-                            url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
-                
-                    }
-                    }
+                for (let attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
+        			}
             });
         if (clientId === null)
             throw new Error("The parameter 'clientId' cannot be null.");
@@ -2052,19 +2164,12 @@ export class DevisServiceProxy {
     }
 
     /**
-     * @param referencePrefix (optional) 
      * @param reference (optional) 
      * @return Success
      */
-    checkIfReferenceIsExist(referencePrefix: string | undefined, reference: number | undefined): Observable<boolean> {
+    checkIfReferenceIsExist(reference: string | null | undefined): Observable<boolean> {
         let url_ = this.baseUrl + "/api/services/app/Devis/CheckIfReferenceIsExist?";
-        if (referencePrefix === null)
-            throw new Error("The parameter 'referencePrefix' cannot be null.");
-        else if (referencePrefix !== undefined)
-            url_ += "referencePrefix=" + encodeURIComponent("" + referencePrefix) + "&";
-        if (reference === null)
-            throw new Error("The parameter 'reference' cannot be null.");
-        else if (reference !== undefined)
+        if (reference !== undefined && reference !== null)
             url_ += "reference=" + encodeURIComponent("" + reference) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2797,25 +2902,21 @@ export class FactureServiceProxy {
 
     /**
      * @param reference (optional) 
-     * @param referencePrefix (optional) 
      * @param dateEmission (optional) 
      * @param echeancePaiement (optional) 
      * @param messageIntroduction (optional) 
      * @param piedDePage (optional) 
      * @param remise (optional) 
+     * @param currency (optional) 
      * @param statut (optional) 
      * @param factureItems (optional) 
      * @param clientId (optional) 
      * @return Success
      */
-    getByteDataFactureReport(reference: number | undefined, referencePrefix: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined): Observable<string> {
+    getByteDataFactureReport(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, currency: string | null | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Facture/GetByteDataFactureReport?";
-        if (reference === null)
-            throw new Error("The parameter 'reference' cannot be null.");
-        else if (reference !== undefined)
+        if (reference !== undefined && reference !== null)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
-        if (referencePrefix !== undefined && referencePrefix !== null)
-            url_ += "ReferencePrefix=" + encodeURIComponent("" + referencePrefix) + "&";
         if (dateEmission === null)
             throw new Error("The parameter 'dateEmission' cannot be null.");
         else if (dateEmission !== undefined)
@@ -2832,22 +2933,19 @@ export class FactureServiceProxy {
             throw new Error("The parameter 'remise' cannot be null.");
         else if (remise !== undefined)
             url_ += "Remise=" + encodeURIComponent("" + remise) + "&";
+        if (currency !== undefined && currency !== null)
+            url_ += "Currency=" + encodeURIComponent("" + currency) + "&";
         if (statut === null)
             throw new Error("The parameter 'statut' cannot be null.");
         else if (statut !== undefined)
             url_ += "Statut=" + encodeURIComponent("" + statut) + "&";
-            if (factureItems !== undefined && factureItems !== null)
+        if (factureItems !== undefined && factureItems !== null)
             factureItems && factureItems.forEach((item, index) => {
-                for (let attr in item){
-                    if (item.hasOwnProperty(attr)) {
-                        if(attr != "date")
-                            url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-                        else
-                            url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
-                    }
-                    }
+                for (let attr in item)
+        			if (item.hasOwnProperty(attr)) {
+        				url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
+        			}
             });
-    
         if (clientId === null)
             throw new Error("The parameter 'clientId' cannot be null.");
         else if (clientId !== undefined)
@@ -3067,19 +3165,12 @@ export class FactureServiceProxy {
     }
 
     /**
-     * @param referencePrefix (optional) 
      * @param reference (optional) 
      * @return Success
      */
-    checkIfReferenceIsExist(referencePrefix: string | undefined, reference: number | undefined): Observable<boolean> {
+    checkIfReferenceIsExist(reference: string | null | undefined): Observable<boolean> {
         let url_ = this.baseUrl + "/api/services/app/Facture/CheckIfReferenceIsExist?";
-        if (referencePrefix === null)
-            throw new Error("The parameter 'referencePrefix' cannot be null.");
-        else if (referencePrefix !== undefined)
-            url_ += "referencePrefix=" + encodeURIComponent("" + referencePrefix) + "&";
-        if (reference === null)
-            throw new Error("The parameter 'reference' cannot be null.");
-        else if (reference !== undefined)
+        if (reference !== undefined && reference !== null)
             url_ += "reference=" + encodeURIComponent("" + reference) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3261,7 +3352,6 @@ export class ReportGeneratorServiceProxy {
 
     /**
      * @param reference (optional) 
-     * @param referencePrefix (optional) 
      * @param dateEmission (optional) 
      * @param echeancePaiement (optional) 
      * @param messageIntroduction (optional) 
@@ -3289,11 +3379,13 @@ export class ReportGeneratorServiceProxy {
      * @param client_DelaiPaiement (optional) 
      * @param client_PendingInvoicesAmount (optional) 
      * @param client_OverdueInvoicesAmount (optional) 
+     * @param client_ClientType (optional) 
      * @param client_LastModificationTime (optional) 
      * @param client_LastModifierUserId (optional) 
      * @param client_CreationTime (optional) 
      * @param client_CreatorUserId (optional) 
      * @param client_Id (optional) 
+     * @param currency (optional) 
      * @param lastModificationTime (optional) 
      * @param lastModifierUserId (optional) 
      * @param creationTime (optional) 
@@ -3301,14 +3393,10 @@ export class ReportGeneratorServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    getByteDataFacture(reference: number | undefined, referencePrefix: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_PendingInvoicesAmount: number | undefined, client_OverdueInvoicesAmount: number | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
+    getByteDataFacture(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_PendingInvoicesAmount: number | undefined, client_OverdueInvoicesAmount: number | undefined, client_ClientType: string | null | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, currency: string | null | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/ReportGenerator/GetByteDataFacture?";
-        if (reference === null)
-            throw new Error("The parameter 'reference' cannot be null.");
-        else if (reference !== undefined)
+        if (reference !== undefined && reference !== null)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
-        if (referencePrefix !== undefined && referencePrefix !== null)
-            url_ += "ReferencePrefix=" + encodeURIComponent("" + referencePrefix) + "&";
         if (dateEmission === null)
             throw new Error("The parameter 'dateEmission' cannot be null.");
         else if (dateEmission !== undefined)
@@ -3388,6 +3476,8 @@ export class ReportGeneratorServiceProxy {
             throw new Error("The parameter 'client_OverdueInvoicesAmount' cannot be null.");
         else if (client_OverdueInvoicesAmount !== undefined)
             url_ += "Client.OverdueInvoicesAmount=" + encodeURIComponent("" + client_OverdueInvoicesAmount) + "&";
+        if (client_ClientType !== undefined && client_ClientType !== null)
+            url_ += "Client.ClientType=" + encodeURIComponent("" + client_ClientType) + "&";
         if (client_LastModificationTime !== undefined && client_LastModificationTime !== null)
             url_ += "Client.LastModificationTime=" + encodeURIComponent(client_LastModificationTime ? "" + client_LastModificationTime.toJSON() : "") + "&";
         if (client_LastModifierUserId !== undefined && client_LastModifierUserId !== null)
@@ -3402,6 +3492,8 @@ export class ReportGeneratorServiceProxy {
             throw new Error("The parameter 'client_Id' cannot be null.");
         else if (client_Id !== undefined)
             url_ += "Client.Id=" + encodeURIComponent("" + client_Id) + "&";
+        if (currency !== undefined && currency !== null)
+            url_ += "Currency=" + encodeURIComponent("" + currency) + "&";
         if (lastModificationTime !== undefined && lastModificationTime !== null)
             url_ += "LastModificationTime=" + encodeURIComponent(lastModificationTime ? "" + lastModificationTime.toJSON() : "") + "&";
         if (lastModifierUserId !== undefined && lastModifierUserId !== null)
@@ -3464,7 +3556,6 @@ export class ReportGeneratorServiceProxy {
 
     /**
      * @param reference (optional) 
-     * @param referencePrefix (optional) 
      * @param dateEmission (optional) 
      * @param echeancePaiement (optional) 
      * @param messageIntroduction (optional) 
@@ -3492,11 +3583,13 @@ export class ReportGeneratorServiceProxy {
      * @param client_DelaiPaiement (optional) 
      * @param client_PendingInvoicesAmount (optional) 
      * @param client_OverdueInvoicesAmount (optional) 
+     * @param client_ClientType (optional) 
      * @param client_LastModificationTime (optional) 
      * @param client_LastModifierUserId (optional) 
      * @param client_CreationTime (optional) 
      * @param client_CreatorUserId (optional) 
      * @param client_Id (optional) 
+     * @param currency (optional) 
      * @param lastModificationTime (optional) 
      * @param lastModifierUserId (optional) 
      * @param creationTime (optional) 
@@ -3504,14 +3597,10 @@ export class ReportGeneratorServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    getByteDataDevis(reference: number | undefined, referencePrefix: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_PendingInvoicesAmount: number | undefined, client_OverdueInvoicesAmount: number | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
+    getByteDataDevis(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_PendingInvoicesAmount: number | undefined, client_OverdueInvoicesAmount: number | undefined, client_ClientType: string | null | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, currency: string | null | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/ReportGenerator/GetByteDataDevis?";
-        if (reference === null)
-            throw new Error("The parameter 'reference' cannot be null.");
-        else if (reference !== undefined)
+        if (reference !== undefined && reference !== null)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
-        if (referencePrefix !== undefined && referencePrefix !== null)
-            url_ += "ReferencePrefix=" + encodeURIComponent("" + referencePrefix) + "&";
         if (dateEmission === null)
             throw new Error("The parameter 'dateEmission' cannot be null.");
         else if (dateEmission !== undefined)
@@ -3591,6 +3680,8 @@ export class ReportGeneratorServiceProxy {
             throw new Error("The parameter 'client_OverdueInvoicesAmount' cannot be null.");
         else if (client_OverdueInvoicesAmount !== undefined)
             url_ += "Client.OverdueInvoicesAmount=" + encodeURIComponent("" + client_OverdueInvoicesAmount) + "&";
+        if (client_ClientType !== undefined && client_ClientType !== null)
+            url_ += "Client.ClientType=" + encodeURIComponent("" + client_ClientType) + "&";
         if (client_LastModificationTime !== undefined && client_LastModificationTime !== null)
             url_ += "Client.LastModificationTime=" + encodeURIComponent(client_LastModificationTime ? "" + client_LastModificationTime.toJSON() : "") + "&";
         if (client_LastModifierUserId !== undefined && client_LastModifierUserId !== null)
@@ -3605,6 +3696,8 @@ export class ReportGeneratorServiceProxy {
             throw new Error("The parameter 'client_Id' cannot be null.");
         else if (client_Id !== undefined)
             url_ += "Client.Id=" + encodeURIComponent("" + client_Id) + "&";
+        if (currency !== undefined && currency !== null)
+            url_ += "Currency=" + encodeURIComponent("" + currency) + "&";
         if (lastModificationTime !== undefined && lastModificationTime !== null)
             url_ += "LastModificationTime=" + encodeURIComponent(lastModificationTime ? "" + lastModificationTime.toJSON() : "") + "&";
         if (lastModifierUserId !== undefined && lastModifierUserId !== null)
@@ -5682,7 +5775,6 @@ export interface IUpdateCatalogueInput {
 
 export class CatalogueDto implements ICatalogueDto {
     reference: number;
-    referencePrefix: string | undefined;
     catalogueType: string | undefined;
     addedDate: moment.Moment;
     designation: string | undefined;
@@ -5712,7 +5804,6 @@ export class CatalogueDto implements ICatalogueDto {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
-            this.referencePrefix = _data["referencePrefix"];
             this.catalogueType = _data["catalogueType"];
             this.addedDate = _data["addedDate"] ? moment(_data["addedDate"].toString()) : <any>undefined;
             this.designation = _data["designation"];
@@ -5742,7 +5833,6 @@ export class CatalogueDto implements ICatalogueDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
-        data["referencePrefix"] = this.referencePrefix;
         data["catalogueType"] = this.catalogueType;
         data["addedDate"] = this.addedDate ? this.addedDate.toISOString() : <any>undefined;
         data["designation"] = this.designation;
@@ -5772,7 +5862,6 @@ export class CatalogueDto implements ICatalogueDto {
 
 export interface ICatalogueDto {
     reference: number;
-    referencePrefix: string | undefined;
     catalogueType: string | undefined;
     addedDate: moment.Moment;
     designation: string | undefined;
@@ -5980,6 +6069,7 @@ export class ClientDto implements IClientDto {
     delaiPaiement: number;
     pendingInvoicesAmount: number;
     overdueInvoicesAmount: number;
+    clientType: string | undefined;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
@@ -6016,6 +6106,7 @@ export class ClientDto implements IClientDto {
             this.delaiPaiement = _data["delaiPaiement"];
             this.pendingInvoicesAmount = _data["pendingInvoicesAmount"];
             this.overdueInvoicesAmount = _data["overdueInvoicesAmount"];
+            this.clientType = _data["clientType"];
             this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
             this.lastModifierUserId = _data["lastModifierUserId"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
@@ -6052,6 +6143,7 @@ export class ClientDto implements IClientDto {
         data["delaiPaiement"] = this.delaiPaiement;
         data["pendingInvoicesAmount"] = this.pendingInvoicesAmount;
         data["overdueInvoicesAmount"] = this.overdueInvoicesAmount;
+        data["clientType"] = this.clientType;
         data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
         data["lastModifierUserId"] = this.lastModifierUserId;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
@@ -6088,6 +6180,7 @@ export interface IClientDto {
     delaiPaiement: number;
     pendingInvoicesAmount: number;
     overdueInvoicesAmount: number;
+    clientType: string | undefined;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
@@ -6244,6 +6337,57 @@ export interface IClientForAutoCompleteDtoListResultDto {
     items: ClientForAutoCompleteDto[] | undefined;
 }
 
+export class ClientDefaultsDto implements IClientDefaultsDto {
+    currency: string | undefined;
+    paymentPeriod: number;
+    permanentDiscount: number;
+
+    constructor(data?: IClientDefaultsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.currency = _data["currency"];
+            this.paymentPeriod = _data["paymentPeriod"];
+            this.permanentDiscount = _data["permanentDiscount"];
+        }
+    }
+
+    static fromJS(data: any): ClientDefaultsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ClientDefaultsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["currency"] = this.currency;
+        data["paymentPeriod"] = this.paymentPeriod;
+        data["permanentDiscount"] = this.permanentDiscount;
+        return data; 
+    }
+
+    clone(): ClientDefaultsDto {
+        const json = this.toJSON();
+        let result = new ClientDefaultsDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IClientDefaultsDto {
+    currency: string | undefined;
+    paymentPeriod: number;
+    permanentDiscount: number;
+}
+
 export class ChangeUiThemeInput implements IChangeUiThemeInput {
     theme: string;
 
@@ -6285,6 +6429,104 @@ export class ChangeUiThemeInput implements IChangeUiThemeInput {
 
 export interface IChangeUiThemeInput {
     theme: string;
+}
+
+export class CountryDto implements ICountryDto {
+    paysName: string | undefined;
+    id: number;
+
+    constructor(data?: ICountryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paysName = _data["paysName"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): CountryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CountryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paysName"] = this.paysName;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): CountryDto {
+        const json = this.toJSON();
+        let result = new CountryDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICountryDto {
+    paysName: string | undefined;
+    id: number;
+}
+
+export class CountryDtoListResultDto implements ICountryDtoListResultDto {
+    items: CountryDto[] | undefined;
+
+    constructor(data?: ICountryDtoListResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(CountryDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CountryDtoListResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CountryDtoListResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): CountryDtoListResultDto {
+        const json = this.toJSON();
+        let result = new CountryDtoListResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICountryDtoListResultDto {
+    items: CountryDto[] | undefined;
 }
 
 export class UserDto implements IUserDto {
@@ -6383,6 +6625,7 @@ export enum DevisStatutEnum {
     Undefined = -1
 }
 
+
 export class DevisItemDto implements IDevisItemDto {
     designation: string | undefined;
     date: moment.Moment;
@@ -6455,13 +6698,13 @@ export interface IDevisItemDto {
 }
 
 export class CreateDevisInput implements ICreateDevisInput {
-    reference: number;
-    referencePrefix: string | undefined;
+    reference: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
     piedDePage: string | undefined;
     remise: number;
+    currency: string | undefined;
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
@@ -6478,12 +6721,12 @@ export class CreateDevisInput implements ICreateDevisInput {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
-            this.referencePrefix = _data["referencePrefix"];
             this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
             this.echeancePaiement = _data["echeancePaiement"];
             this.messageIntroduction = _data["messageIntroduction"];
             this.piedDePage = _data["piedDePage"];
             this.remise = _data["remise"];
+            this.currency = _data["currency"];
             this.statut = _data["statut"];
             if (Array.isArray(_data["devisItems"])) {
                 this.devisItems = [] as any;
@@ -6504,12 +6747,12 @@ export class CreateDevisInput implements ICreateDevisInput {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
-        data["referencePrefix"] = this.referencePrefix;
         data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
         data["echeancePaiement"] = this.echeancePaiement;
         data["messageIntroduction"] = this.messageIntroduction;
         data["piedDePage"] = this.piedDePage;
         data["remise"] = this.remise;
+        data["currency"] = this.currency;
         data["statut"] = this.statut;
         if (Array.isArray(this.devisItems)) {
             data["devisItems"] = [];
@@ -6529,26 +6772,26 @@ export class CreateDevisInput implements ICreateDevisInput {
 }
 
 export interface ICreateDevisInput {
-    reference: number;
-    referencePrefix: string | undefined;
+    reference: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
     piedDePage: string | undefined;
     remise: number;
+    currency: string | undefined;
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
 }
 
 export class UpdateDevisInput implements IUpdateDevisInput {
-    reference: number;
-    referencePrefix: string | undefined;
+    reference: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
     piedDePage: string | undefined;
     remise: number;
+    currency: string | undefined;
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
@@ -6570,12 +6813,12 @@ export class UpdateDevisInput implements IUpdateDevisInput {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
-            this.referencePrefix = _data["referencePrefix"];
             this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
             this.echeancePaiement = _data["echeancePaiement"];
             this.messageIntroduction = _data["messageIntroduction"];
             this.piedDePage = _data["piedDePage"];
             this.remise = _data["remise"];
+            this.currency = _data["currency"];
             this.statut = _data["statut"];
             if (Array.isArray(_data["devisItems"])) {
                 this.devisItems = [] as any;
@@ -6601,12 +6844,12 @@ export class UpdateDevisInput implements IUpdateDevisInput {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
-        data["referencePrefix"] = this.referencePrefix;
         data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
         data["echeancePaiement"] = this.echeancePaiement;
         data["messageIntroduction"] = this.messageIntroduction;
         data["piedDePage"] = this.piedDePage;
         data["remise"] = this.remise;
+        data["currency"] = this.currency;
         data["statut"] = this.statut;
         if (Array.isArray(this.devisItems)) {
             data["devisItems"] = [];
@@ -6631,13 +6874,13 @@ export class UpdateDevisInput implements IUpdateDevisInput {
 }
 
 export interface IUpdateDevisInput {
-    reference: number;
-    referencePrefix: string | undefined;
+    reference: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
     piedDePage: string | undefined;
     remise: number;
+    currency: string | undefined;
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
@@ -6649,8 +6892,7 @@ export interface IUpdateDevisInput {
 }
 
 export class DevisDto implements IDevisDto {
-    reference: number;
-    referencePrefix: string | undefined;
+    reference: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -6660,6 +6902,7 @@ export class DevisDto implements IDevisDto {
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
     client: ClientDto;
+    currency: string | undefined;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
@@ -6678,7 +6921,6 @@ export class DevisDto implements IDevisDto {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
-            this.referencePrefix = _data["referencePrefix"];
             this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
             this.echeancePaiement = _data["echeancePaiement"];
             this.messageIntroduction = _data["messageIntroduction"];
@@ -6692,6 +6934,7 @@ export class DevisDto implements IDevisDto {
             }
             this.clientId = _data["clientId"];
             this.client = _data["client"] ? ClientDto.fromJS(_data["client"]) : <any>undefined;
+            this.currency = _data["currency"];
             this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
             this.lastModifierUserId = _data["lastModifierUserId"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
@@ -6710,7 +6953,6 @@ export class DevisDto implements IDevisDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
-        data["referencePrefix"] = this.referencePrefix;
         data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
         data["echeancePaiement"] = this.echeancePaiement;
         data["messageIntroduction"] = this.messageIntroduction;
@@ -6724,6 +6966,7 @@ export class DevisDto implements IDevisDto {
         }
         data["clientId"] = this.clientId;
         data["client"] = this.client ? this.client.toJSON() : <any>undefined;
+        data["currency"] = this.currency;
         data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
         data["lastModifierUserId"] = this.lastModifierUserId;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
@@ -6741,8 +6984,7 @@ export class DevisDto implements IDevisDto {
 }
 
 export interface IDevisDto {
-    reference: number;
-    referencePrefix: string | undefined;
+    reference: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -6752,6 +6994,7 @@ export interface IDevisDto {
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
     client: ClientDto;
+    currency: string | undefined;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
@@ -6819,6 +7062,7 @@ export enum FactureStatutEnum {
     PaiementRetard = 5,
     undefined = -1
 }
+
 export class FactureItemDto implements IFactureItemDto {
     designation: string | undefined;
     date: moment.Moment;
@@ -6891,13 +7135,13 @@ export interface IFactureItemDto {
 }
 
 export class CreateFactureInput implements ICreateFactureInput {
-    reference: number;
-    referencePrefix: string | undefined;
+    reference: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
     piedDePage: string | undefined;
     remise: number;
+    currency: string | undefined;
     statut: FactureStatutEnum;
     factureItems: FactureItemDto[] | undefined;
     clientId: number;
@@ -6914,12 +7158,12 @@ export class CreateFactureInput implements ICreateFactureInput {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
-            this.referencePrefix = _data["referencePrefix"];
             this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
             this.echeancePaiement = _data["echeancePaiement"];
             this.messageIntroduction = _data["messageIntroduction"];
             this.piedDePage = _data["piedDePage"];
             this.remise = _data["remise"];
+            this.currency = _data["currency"];
             this.statut = _data["statut"];
             if (Array.isArray(_data["factureItems"])) {
                 this.factureItems = [] as any;
@@ -6940,12 +7184,12 @@ export class CreateFactureInput implements ICreateFactureInput {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
-        data["referencePrefix"] = this.referencePrefix;
         data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
         data["echeancePaiement"] = this.echeancePaiement;
         data["messageIntroduction"] = this.messageIntroduction;
         data["piedDePage"] = this.piedDePage;
         data["remise"] = this.remise;
+        data["currency"] = this.currency;
         data["statut"] = this.statut;
         if (Array.isArray(this.factureItems)) {
             data["factureItems"] = [];
@@ -6965,26 +7209,26 @@ export class CreateFactureInput implements ICreateFactureInput {
 }
 
 export interface ICreateFactureInput {
-    reference: number;
-    referencePrefix: string | undefined;
+    reference: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
     piedDePage: string | undefined;
     remise: number;
+    currency: string | undefined;
     statut: FactureStatutEnum;
     factureItems: FactureItemDto[] | undefined;
     clientId: number;
 }
 
 export class UpdateFactureInput implements IUpdateFactureInput {
-    reference: number;
-    referencePrefix: string | undefined;
+    reference: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
     piedDePage: string | undefined;
     remise: number;
+    currency: string | undefined;
     statut: FactureStatutEnum;
     factureItems: FactureItemDto[] | undefined;
     clientId: number;
@@ -7002,12 +7246,12 @@ export class UpdateFactureInput implements IUpdateFactureInput {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
-            this.referencePrefix = _data["referencePrefix"];
             this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
             this.echeancePaiement = _data["echeancePaiement"];
             this.messageIntroduction = _data["messageIntroduction"];
             this.piedDePage = _data["piedDePage"];
             this.remise = _data["remise"];
+            this.currency = _data["currency"];
             this.statut = _data["statut"];
             if (Array.isArray(_data["factureItems"])) {
                 this.factureItems = [] as any;
@@ -7029,12 +7273,12 @@ export class UpdateFactureInput implements IUpdateFactureInput {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
-        data["referencePrefix"] = this.referencePrefix;
         data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
         data["echeancePaiement"] = this.echeancePaiement;
         data["messageIntroduction"] = this.messageIntroduction;
         data["piedDePage"] = this.piedDePage;
         data["remise"] = this.remise;
+        data["currency"] = this.currency;
         data["statut"] = this.statut;
         if (Array.isArray(this.factureItems)) {
             data["factureItems"] = [];
@@ -7055,13 +7299,13 @@ export class UpdateFactureInput implements IUpdateFactureInput {
 }
 
 export interface IUpdateFactureInput {
-    reference: number;
-    referencePrefix: string | undefined;
+    reference: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
     piedDePage: string | undefined;
     remise: number;
+    currency: string | undefined;
     statut: FactureStatutEnum;
     factureItems: FactureItemDto[] | undefined;
     clientId: number;
@@ -7069,8 +7313,7 @@ export interface IUpdateFactureInput {
 }
 
 export class FactureDto implements IFactureDto {
-    reference: number;
-    referencePrefix: string | undefined;
+    reference: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -7080,6 +7323,7 @@ export class FactureDto implements IFactureDto {
     factureItems: FactureItemDto[] | undefined;
     clientId: number;
     client: ClientDto;
+    currency: string | undefined;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
@@ -7098,7 +7342,6 @@ export class FactureDto implements IFactureDto {
     init(_data?: any) {
         if (_data) {
             this.reference = _data["reference"];
-            this.referencePrefix = _data["referencePrefix"];
             this.dateEmission = _data["dateEmission"] ? moment(_data["dateEmission"].toString()) : <any>undefined;
             this.echeancePaiement = _data["echeancePaiement"];
             this.messageIntroduction = _data["messageIntroduction"];
@@ -7112,6 +7355,7 @@ export class FactureDto implements IFactureDto {
             }
             this.clientId = _data["clientId"];
             this.client = _data["client"] ? ClientDto.fromJS(_data["client"]) : <any>undefined;
+            this.currency = _data["currency"];
             this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
             this.lastModifierUserId = _data["lastModifierUserId"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
@@ -7130,7 +7374,6 @@ export class FactureDto implements IFactureDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["reference"] = this.reference;
-        data["referencePrefix"] = this.referencePrefix;
         data["dateEmission"] = this.dateEmission ? this.dateEmission.toISOString() : <any>undefined;
         data["echeancePaiement"] = this.echeancePaiement;
         data["messageIntroduction"] = this.messageIntroduction;
@@ -7144,6 +7387,7 @@ export class FactureDto implements IFactureDto {
         }
         data["clientId"] = this.clientId;
         data["client"] = this.client ? this.client.toJSON() : <any>undefined;
+        data["currency"] = this.currency;
         data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
         data["lastModifierUserId"] = this.lastModifierUserId;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
@@ -7161,8 +7405,7 @@ export class FactureDto implements IFactureDto {
 }
 
 export interface IFactureDto {
-    reference: number;
-    referencePrefix: string | undefined;
+    reference: string | undefined;
     dateEmission: moment.Moment;
     echeancePaiement: number;
     messageIntroduction: string | undefined;
@@ -7172,6 +7415,7 @@ export interface IFactureDto {
     factureItems: FactureItemDto[] | undefined;
     clientId: number;
     client: ClientDto;
+    currency: string | undefined;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
@@ -7236,7 +7480,6 @@ export enum ModePaiementEnum {
     Liquide = 2,
     Effet = 3,
 }
-
 
 export class FactureInfosPaiementDto implements IFactureInfosPaiementDto {
     datePaiement: moment.Moment;

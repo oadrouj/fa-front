@@ -94,8 +94,7 @@ i.pi-search {
 
 :host>>>#devisList .p-datatable .p-datatable-thead>tr>th {
     font-size: 0.85rem;
-    padding-right: 0px;
-    padding-left: 2px;
+    padding: 0px;
     text-align: center;
     text-transform: uppercase;
     background-color: transparent;
@@ -205,8 +204,14 @@ i.pi-search {
 }
 
 :host>>>#dialogCatalogue .p-dialog-footer {
+    display: flex;
+    justify-content: space-between;
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
+}
+
+:host>>>#dialogCatalogue .p-dialog-footer span {
+    align-self: center;
 }
 
 :host>>>#dialogCatalogue .p-dialog .p-dialog-header .p-dialog-header-icon {

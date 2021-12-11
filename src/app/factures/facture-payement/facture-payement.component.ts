@@ -28,11 +28,9 @@ export class FacturePayementComponent implements OnInit {
    { }
 
   ngOnInit(): void {
+    
     this.initiateForm();
-    this.formGroup.get('reference').setValue(this._formatService.formatReferenceNumber(
-      this.config.data.reference,
-      ReferencePrefix.Facture
-    ))
+    this.formGroup.get('reference').setValue(this.config.data.reference)
     
   }
 

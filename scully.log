@@ -1,0 +1,16 @@
+
+----------------------------------
+Using stored unhandled routes!.
+   To discover new routes in the angular app use "npm run scully -- --scanRoutes"
+----------------------------------No configuration for route "/account/home/:resetPassword" found. SkippingNo configuration for route "/account/validateMail/:userId" found. Skipping
+
+
+Received Kill commandClosed servers
+
+
+----------------------------------
+Using stored unhandled routes!.
+   To discover new routes in the angular app use "npm run scully -- --scanRoutes"
+----------------------------------No configuration for route "/account/home/:resetPassword" found. SkippingNo configuration for route "/account/validateMail/:userId" found. Skipping
+
+

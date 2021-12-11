@@ -114,11 +114,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       header: 'REFERENCE',
       field: 'reference',
       type: 'text',
-      format: (number, customPrefix) =>
-        this._formatService.formatReferenceNumber(
-          number,
-          customPrefix ? customPrefix : ReferencePrefix.Facture,
-        ),
+     
     },
     {
       header: 'CLIENT',
@@ -146,13 +142,13 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       header: 'STATUT',
       field: 'statut',
       type: 'text',
-      format: this.formatStatut,
+      format: this.formatStatut, 
     },
   ]
   DevisContentItemsCols = [
     { header: 'DESIGNATION', field: 'designation', type: 'text', colspan: 0 },
     { header: 'DATE', field: 'date', type: 'date', colspan: 0 },
-    { header: 'quantity', field: 'quantity', type: 'text' },
+    { header: 'QTÉ', field: 'quantity', type: 'text' },
     { header: 'UNITE', field: 'unit', type: 'text' },
     { header: 'PU HT', field: 'unitPriceHT', type: 'currency' },
     { header: 'TVA', field: 'tva', type: 'pourcentage' },
@@ -209,7 +205,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   summaryTVA = 0
   summaryTotalTTC = 0
   montantTotalAllDevis = 0
-  Currency = 'MAD'
   ref: DynamicDialogRef
 
   //#endregion
@@ -247,10 +242,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       reference,
       customPrefix ? customPrefix : ReferencePrefix.Facture,
     )
-    // return this._formatService.formatReferenceNumber(
-    //   reference,
-    //   ReferencePrefix.Facture,
-    // )
+   
   }
 
   clientAutoCompleteSearch(event: any) {
@@ -440,28 +432,21 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       newDevis.factureItems = newDevis.factureItems.map((item: any) => {
         let total_ht = item.unitPriceHT * item.quantity
-        return {
-          ...item,
-          totalTtc: total_ht + (item.tva * total_ht) / 100,
-        }
+        return { ...item, totalTtc: total_ht + (item.tva * total_ht) / 100}
       })
 
-      let remiseAmount =
-        (newDevis.factureItems
+      let remiseAmount = (newDevis.factureItems
           .map((item) => item.unitPriceHT * item.quantity)
-          .reduce((accum, current) => accum + current) *
-          newDevis.remise) / 100
+          .reduce((accum, current) => accum + current) * newDevis.remise) / 100
 
-      newDevis.montantTtc =
-        newDevis.factureItems
+      newDevis.montantTtc = newDevis.factureItems
           .map((item) => item.totalTtc)
           .reduce((accum, current) => accum + current) - remiseAmount
-      this.montantTotalAllDevis += newDevis.montantTtc
+          this.montantTotalAllDevis += newDevis.montantTtc
 
-      this.tableChild.tableData = [
-        ...this.tableChild.tableData,
-        { ...newDevis },
+      this.tableChild.tableData = [...this.tableChild.tableData, { ...newDevis },
       ]
+
       this.tableChild.tableData.sort((a, b) =>
         a.reference < b.reference ? 1 : -1,
       )
@@ -470,9 +455,13 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         ...newDevis,
         dateEmission: newDevis.dateEmission.toDate(),
       }
+
       this.emitNotificationSelectedDevisChanged({
         ...this.selectedDevisItem,
       })
+
+      console.log(newDevis)
+      
     } else if (event.crudOperation == 'update') {
       this.selectedDevisItem = {
         ...event.result,
@@ -584,7 +573,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
             let total_ht = item.unitPriceHT * item.quantity
             return {
               ...item,
-              // totalTtc: total_ht + (item.tva * total_ht) / 100,
             }
           })
 
@@ -599,9 +587,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
                 ? FactureStatutEnum.PaiementRetard
                 : FactureStatutEnum.PaiementAttente
               : devis.statut
-          // devis.statut == FactureStatutEnum.Valide ?
-          // this.parseStatutForStatutValide(devis.dateEmission, devis.echeancePaiement) : devis.statut
-
+        
           let montantTtc = devis.factureItems.map((item) => item.totalTtc).reduce(
             (accum, current) => accum + current,
           )
@@ -798,5 +784,17 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     return moment().isAfter(moment(dateEmission).add(echeancePaiement, 'days'))
       ? FactureStatutEnum.PaiementRetard
       : FactureStatutEnum.PaiementAttente
+  }
+
+  isNullOrEmpty(str: string): boolean {
+    return str == undefined || str.toString().trim() == ''
+  }
+
+  replaceIfIsNullOrEmpty(str: string): string {
+    if (!str || this.isNullOrEmpty(str)) {
+      return '...'
+    } else {
+      return str
+    }
   }
 }

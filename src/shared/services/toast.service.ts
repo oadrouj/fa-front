@@ -20,7 +20,8 @@ toast(severity: string, summary: string, detail: string){
   this.messageService.add({
     severity,
     summary,
-    detail
+    detail,
+    life: 1600
   })
 }
  

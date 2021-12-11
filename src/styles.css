@@ -116,3 +116,11 @@ tr)
 {
     border: 1px red solid !important;
 }
+
+.p-datatable .p-datatable-thead>tr>th i.pi-sort-alt.p-sortable-column-icon {
+    display: none;
+}
+
+.red-color {
+    color: red !important;
+}
