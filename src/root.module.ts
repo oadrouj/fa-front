@@ -21,6 +21,8 @@ import { AppInitializer } from './app-initializer';
 
 
 import { GlobalEventsService } from './shared/globalEventsService';
+import localeDeAt from '@angular/common/locales/fr';
+import { registerLocaleData } from '@angular/common';
 
 export function getCurrentLanguage(): string {
   if (abp.localization.currentLanguage.name) {
@@ -30,6 +32,8 @@ export function getCurrentLanguage(): string {
   // todo: Waiting for https://github.com/angular/angular/issues/31465 to be fixed.
   return 'en';
 }
+
+registerLocaleData(localeDeAt);
 
 @NgModule({
   imports: [
@@ -56,7 +60,8 @@ export function getCurrentLanguage(): string {
     { provide: API_BASE_URL, useFactory: () => AppConsts.remoteServiceBaseUrl },
     {
       provide: LOCALE_ID,
-      useFactory: getCurrentLanguage,
+      useValue: "fr",
+      // useFactory: getCurrentLanguage,
     },
     GlobalEventsService
   ],

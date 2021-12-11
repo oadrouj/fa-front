@@ -5,3 +5,20 @@
 :host>>>.p-highlight .p-sortable-column-icon {
     display: block;
 }
+
+:host>>>.p-datatable .p-datatable-thead>tr>th {
+    padding: 0;
+    vertical-align: middle;
+}
+
+:host>>>.p-datatable .p-sortable-column .p-sortable-column-icon {
+    display: inline-flex;
+}
+
+:host>>>.p-datatable .p-sortable-column .p-sortable-column-icon {
+    margin-left: 0;
+}
+
+:host>>>.p-datatable .p-sortable-column-icon.pi {
+    font-size: .9rem;
+}

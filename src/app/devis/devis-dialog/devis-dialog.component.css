@@ -22,7 +22,7 @@
     background: transparent;
 }
 
-:host ::ng-deep .p-dialog-content {
+:host ::ng-deep #devisDialog .p-dialog-content {
     padding: 0 0 0 50px;
     overflow-x: hidden;
     font-size: 1.312rem;
@@ -52,7 +52,7 @@
     padding: 7px 0 11px 0;
 }
 
-:host>>>.p-dialog {
+:host>>>#devisDialog .p-dialog {
     min-height: 100vh;
 }
 
@@ -114,14 +114,19 @@
 
 :host>>>#newDevis .p-datatable .p-datatable-thead>tr>th {
     padding-right: 0;
+    padding-left: 0;
     padding-bottom: 0;
 }
 
 :host>>>#newDevis .p-datatable .p-datatable-tbody>tr>td {
-    padding-left: 6px;
+    padding-left: 0px;
     padding-top: 8px;
     padding-bottom: 8px;
-    padding-right: 6.4px;
+    padding-right: 8px;
+}
+
+:host>>>#newDevis .p-datatable .p-datatable-tbody>tr>td.lastElement {
+    width: 11vw;
 }
 
 :host>>>#newDevis .p-datatable .p-datatable-thead>tr>th:last-child,
@@ -188,4 +193,119 @@
 
 :host>>>.p-dialog #new-devis-header .p-datepicker {
     top: -210px !important;
+}
+
+
+/*region Client dialog */
+
+:host>>>#dialogClient .p-dialog {
+    border-radius: 20px;
+    width: 550px;
+}
+
+:host>>>#dialogClient .p-dialog-header {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    background-color: #2A95D1;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    text-align: center;
+    justify-content: normal;
+    position: relative;
+}
+
+:host>>>#dialogClient .p-dropdown-panel {
+    z-index: 15000 !important;
+}
+
+:host>>>#dialogClient .p-dialog-footer {
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+:host>>>#dialogClient .p-dialog-footer span {
+    align-self: center;
+}
+
+:host>>>#dialogClient .p-dialog .p-dialog-header .p-dialog-header-icon {
+    color: white;
+}
+
+:host>>>#dialogClient .p-dialog .p-dialog-header-icons {
+    position: absolute;
+    right: 0px;
+}
+
+:host>>>#dialogClient .p-dialog .p-dialog-header .p-dialog-title {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+:host>>>#dialogClient .p-buttonset .p-button {
+    width: 50%;
+}
+
+:host>>>#dialogClient .p-dialog .p-dialog-content {
+    padding: 1.5rem 1.5rem 2rem 1.5rem;
+}
+
+:host>>>#dialogClient .p-selectbutton .p-button {
+    background-color: #E4EDF2;
+    font-size: 14px;
+}
+
+:host>>>#dialogClient .p-selectbutton .p-button.p-highlight {
+    background-color: #2A95D1;
+}
+
+:host>>>#buttonValider .p-button {
+    width: 122px;
+    height: 48px;
+    background-color: #2A95D1;
+}
+
+.blockForm .title {
+    font-size: 17px;
+    color: #676767;
+    text-transform: uppercase;
+}
+
+.blockForm div.label {
+    display: flex;
+    justify-content: left;
+    align-items: flex-end;
+}
+
+.blockForm div.label span {
+    font-size: 14px;
+    color: #9A9FA8;
+    vertical-align: bottom;
+}
+
+.red-color {
+    color: red !important;
+}
+
+.blockForm .p-inputtext {
+    width: 100%;
+    height: 32px;
+    border-radius: 4px;
+}
+
+:host>>>.blockForm .p-inputnumber {
+    width: 100%;
+    height: 32px;
+    border-radius: 4px;
+}
+
+:host>>>.blockForm .p-dropdown {
+    width: 100%;
+    height: 34px;
+    border-radius: 4px;
+}
+
+:host>>>.blockForm .p-dropdown .p-dropdown-label {
+    padding-top: 4px;
 }

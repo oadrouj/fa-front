@@ -20,3 +20,8 @@ import 'zone.js/dist/zone';
 import 'classlist.js';
 import 'web-animations-js';
 import 'custom-event-polyfill';
+/***************************************************************************************************
+* SCULLY IMPORTS
+*/
+// tslint:disable-next-line: align
+import 'zone.js/dist/task-tracking';

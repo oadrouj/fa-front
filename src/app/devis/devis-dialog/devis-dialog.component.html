@@ -1,10 +1,11 @@
 <p-toast [style]="{marginTop: 'marginTop'}" [baseZIndex]="2500" styleClass="styleClass"></p-toast>
-<p-dialog #dialog [(visible)]="visible" [style]="{'width': '100vw'}" [closable]="false">
+
+<p-dialog #dialog [(visible)]="visible" id="devisDialog" [style]="{'width': '100vw'}" [closable]="false">
     <ng-template pTemplate="header">
         <button pButton icon="pi pi-times" class="closeButton" (click)="closeDialog()"></button>
         <h2>{{dialogTitle}} {{title | lowercase}}</h2>
         <div class="flex">
-            <button pButton label="Enregistrer le brouillon" [ngClass]="'bg-' + secondaryColor" (click)="saveBrouillon()" class="bg-orange color-white border-none mx-2"></button>
+            <button pButton label="Enregistrer le brouillon" [hidden]="saveBrouillonHide" [ngClass]="'bg-' + secondaryColor" (click)="saveBrouillon()" class="bg-orange color-white border-none mx-2"></button>
             <button pButton label="Valider" class="mx-2 bg-turquoise" (click)="validateDevis()"></button>
             <button pButton label="Aperçu" class="bg-purple mx-2" (click)="preview()"></button>
         </div>
@@ -15,7 +16,7 @@
                 <div>
                     <label for="" class="mb-3 block">Client</label>
                     <p-autoComplete formControlName="client" class="autocomplete" [virtualScroll]="true" placeholder="Sélectionner un client" [suggestions]="clientSuggestions" [itemSize]="34" (completeMethod)="clientAutoCompleteSearch($event)" (change)="onSelectClientAutoComplete()"
-                        field="nom" [dropdown]="true">
+                        (onSelect)="onSelectClient($event)" field="nom" [dropdown]="true">
                     </p-autoComplete>
                 </div>
                 <h2>{{title}}</h2>
@@ -51,7 +52,7 @@
                                     <p>Date d'émission</p>
                                 </div>
                                 <div class="col-7">
-                                    <p-calendar formControlName="dateEmission" dateFormat="dd-mm-yy" icon="pi pi-calendar" [showIcon]="true">
+                                    <p-calendar formControlName="dateEmission" dateFormat="dd-mm-yy" icon="pi pi-calendar" [showIcon]="true" (onSelect)="onSelectIssueDateCalendar()">
                                     </p-calendar>
                                 </div>
                             </div>
@@ -89,11 +90,11 @@
                     </div>
 
                     <div formArrayName="devisItems">
-                        <p-table #myTable [columns]="cols" [value]="getFromArrayControl.controls" [id]="'newDevis'" [scrollable]="true" [rows]="100" scrollHeight="250px" [virtualRowHeight]="40" [class]="'table'">
+                        <p-table #myTable [columns]="cols" [value]="getFromArrayControl.controls" [id]="'newDevis'" [scrollable]="true" [rows]="100" scrollHeight="250px" [virtualRowHeight]="40" [class]="'table'" [autoLayout]="true">
                             <ng-template pTemplate="header" let-columns>
                                 <tr>
                                     <ng-container *ngFor="let col of columns; let i = index" indexo=i>
-                                        <th [colSpan]="col.colspan">
+                                        <th [colSpan]="col.colspan" [ngStyle]="{'transform': 'translate(' + i * 0.9 + 'vw)'}">
                                             {{col.header}}
                                         </th>
                                     </ng-container>
@@ -110,7 +111,7 @@
                                                 </td>
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'inputNumber'">
-                                                <td [colSpan]="col.colspan" class="w-20">
+                                                <td [colSpan]="col.colspan" class="w-20" [ngClass]="col.class">
                                                     <!-- <p-inputNumber *ngIf="!col.inputEvent" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="' ' + Currency">
                                                     </p-inputNumber> -->
                                                     <p-inputNumber (onInput)="calculateRowTotalHTAndTTC(i, $event, col.field)" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix">
@@ -218,3 +219,132 @@
     </form>
 
 </p-dialog>
+
+<p-dialog #dlg id="dialogClient" header="'NOUVEAU CLIENT'" [(visible)]="clientDialogDisplay" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
+
+    <p-selectButton [options]="categories2" [(ngModel)]="formClient.categorieClient" optionLabel="name" optionValue="code" (click)="onFormCategorySelected()">
+    </p-selectButton>
+
+    <div class="grid blockForm mx-3 mt-4 mb-2">
+        <div class="col-12">
+            <span class="title">PROFIL</span>
+        </div>
+        <div class="col-5 label" *ngIf="isFormProfetionnel">
+            <span>Secteur d’activité</span>
+        </div>
+        <div class="col-7" *ngIf="isFormProfetionnel">
+            <input type="text" pInputText placeholder="Text..." [(ngModel)]="formClient.secteurActivite" />
+        </div>
+        <div class="col-5 label" *ngIf="isFormProfetionnel">
+            <span>ICE</span>
+        </div>
+        <div class="col-7" *ngIf="isFormProfetionnel">
+            <input type="text" pInputText placeholder="123..." pKeyFilter="pint" [(ngModel)]="formClient.ice" />
+        </div>
+        <div class="col-5 label" *ngIf="!isFormProfetionnel">
+            <span>Nom <span class="red-color">*</span></span>
+        </div>
+        <div class="col-7" *ngIf="!isFormProfetionnel">
+            <input type="text" pInputText placeholder="Text" class="{{nomClass}}" [(ngModel)]="formClient.nom" />
+        </div>
+    </div>
+
+    <div class="grid blockForm mx-3 mt-4 mb-2">
+        <div class="col-12">
+            <span class="title">Coordonnées</span>
+        </div>
+        <div class="col-5 label" *ngIf="isFormProfetionnel">
+            <span>Raison sociale <span class="red-color">*</span></span>
+        </div>
+        <div class="col-7" *ngIf="isFormProfetionnel">
+            <input type="text" pInputText placeholder="Text" class="{{rSClass}}" [(ngModel)]="formClient.raisonSociale" />
+        </div>
+        <div class="col-5 label">
+            <span>Adresse</span>
+        </div>
+        <div class="col-7">
+            <input type="text" pInputText placeholder="Text" [(ngModel)]="formClient.adresse" />
+        </div>
+        <div class="col-5 label">
+            <span>Pays</span>
+        </div>
+        <div class="col-7">
+            <p-dropdown [options]="countries" [(ngModel)]="formClient.pays" optionLabel="paysName" optionValue="paysName" [virtualScroll]="true" [itemSize]="31" [filter]="false"></p-dropdown>
+
+            <!-- <p-dropdown [options]="countries" [(ngModel)]="formClient.pays" optionLabel="name" optionValue="isoCode" name="Pays"></p-dropdown> -->
+        </div>
+        <div class="col-5 label">
+            <span>Ville</span>
+        </div>
+        <div class="col-7">
+            <input type="text" pInputText placeholder="Text" [(ngModel)]="formClient.ville" />
+        </div>
+        <div class="col-5 label">
+            <span>Code postal</span>
+        </div>
+        <div class="col-7">
+            <input type="text" pInputText placeholder="123..." pKeyFilter="pint" [(ngModel)]="formClient.codePostal" />
+        </div>
+        <div class="col-5 label">
+            <span>E-mail</span>
+        </div>
+        <div class="col-7">
+            <input type="text" pInputText placeholder="Text@Text.Text" pKeyFilter="email" [(ngModel)]="formClient.email" />
+        </div>
+        <div class="col-5 label">
+            <span>Téléphone fixe</span>
+        </div>
+        <div class="col-7">
+            <input type="text" pInputText placeholder="212 699 99 99 99" pKeyFilter="pint" [(ngModel)]="formClient.telFix" />
+        </div>
+        <div class="col-5 label">
+            <span>Téléphone portable</span>
+        </div>
+        <div class="col-7">
+            <input type="text" pInputText placeholder="212 699 99 99 99" pKeyFilter="pint" [(ngModel)]="formClient.telPortable" />
+        </div>
+        <div class="col-5 label" *ngIf="isFormProfetionnel">
+            <span>Site Web</span>
+        </div>
+        <div class="col-7" *ngIf="isFormProfetionnel">
+            <input type="text" pInputText placeholder="Text" [(ngModel)]="formClient.siteWeb" />
+        </div>
+    </div>
+
+
+    <div class="grid blockForm mx-3 mt-4 mb-2">
+        <div class="col-12">
+            <span class="title">MODALITÉS DE FACTURATION</span>
+        </div>
+        <div class="col-5 label">
+            <span>Devise de facturation</span>
+        </div>
+        <div class="col-7">
+            <p-dropdown [options]="devises" [(ngModel)]="formClient.deviseFacturation">
+            </p-dropdown>
+        </div>
+        <div class="col-5 label">
+            <span>Remise permanente</span>
+        </div>
+        <div class="col-7">
+            <p-inputNumber placeholder="00,00%" mode="decimal" suffix="%" :min="0" :max="100" [minFractionDigits]="2" [maxFractionDigits]="2" [(ngModel)]="formClient.remisePermanente"></p-inputNumber>
+        </div>
+        <div class="col-5 label">
+            <span>Délai de paiement</span>
+        </div>
+        <div class="col-7">
+            <p-dropdown [options]="echeancePayementOptions" [(ngModel)]="formClient.delaiPaiement" suffix=" Jours" [appendTo]="dlg" [showClear]="false">
+
+            </p-dropdown>
+            <!-- <p-inputNumber placeholder="123..." mode="decimal" suffix=" Jours" :min="0" [(ngModel)]="formClient.delaiPaiement"></p-inputNumber> -->
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <span><span class="red-color">*</span> Champ(s) obligatoire(s)</span>
+        <p-button id="buttonValider" (click)="valider()" label="Valider"></p-button>
+    </ng-template>
+</p-dialog>
+
+
+<p-confirmDialog #cd id="cdDevis" [baseZIndex]="10000" icon="pi pi-exclamation-triangle">
+</p-confirmDialog>

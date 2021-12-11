@@ -44,13 +44,13 @@ export class CatalogueComponent implements OnInit {
     
     this.favIcon.href = "assets/img/CatalogueLogo.png"
 
-    this.formGroup = this.initiateFormGroup();
+    this.initiateFormGroup();
 
   }
 
   @ViewChild(TableComponent, { static: false })
   tableChild: TableComponent
-  title = 'Catalogue'
+  title = 'Item'
   imageSrc = 'assets/img/CatalogueLogo.png'
   primaryColor = 'purple'
   secondaryColor = ''
@@ -113,59 +113,23 @@ export class CatalogueComponent implements OnInit {
   Currency = 'MAD'
   dialogDisplay = false
   catalogueOptions = ['produit', 'prestation']
-  dialogSelectedType = 'produit'
   formGroup: FormGroup
   tvaOptions = [10, 15, 20]
   unityOptions = ['Heures', 'Kg']
 
   initiateFormGroup(){
-    return this.formBuilder.group({
-      'designation': ['', Validators.required],
-      'description': [''],
-      'unity': [''],
-      'htPrice': [0],
-      'tva': [0],
-      'minimalQuantity': [1],
-
+    this.formGroup =  this.formBuilder.group({
+      designation: ['', Validators.required],
+      description: [''],
+      unity: ['Heures'],
+      htPrice: [0],
+      tva: [0],
+      minimalQuantity: [1],
+      dialogSelectedType: ['produit']
     })
   }
+
   getListApi(event, data) {
-  //   let items = [
-  //     {
-  //     reference: 1,
-  //     referencePrefix: 'P',
-  //     catalogueType: 'produit',
-  //   addedDate: moment(),
-  //     designation: 'Consultation',
-  //     description: 'Consultation IT',
-  //     htPrice: 100,
-  //     ttcPrice: 120,
-  //     unity: 'Heures',
-  //     tva: 20,
-  //     minimalQuantity: 8,
-  //     totalSalesTTC: 720,
-  //     totalUnitsSold: 8
-  //   },
-  //   {
-  //     reference: 2,
-  //     referencePrefix: 'G',
-  //     catalogueType: 'prestation',
-  //     addedDate: moment(),
-  //     designation: 'Consultation',
-  //     description: 'Consultation IT',
-  //     htPrice: 1000,
-  //     ttcPrice: 1200,
-  //     unity: 'Heures',
-  //     tva: 20,
-  //     minimalQuantity: 10,
-  //     totalSalesTTC: 1200,
-  //     totalUnitsSold: 8
-  //   }
-    
-  // ]
-  //   return of(
-  //     { items, length: items.length, montantTotalAllDevis : 0 }
-  //   )
 
   let typeFilter = event.filters.type && event.filters.type.value
     return this._catalogueServiceProxy.getAllCatalogues(
@@ -246,20 +210,19 @@ export class CatalogueComponent implements OnInit {
   }
 
   newCatalogue() {
-    this.formGroup.value && this.formGroup.reset()
     this.dialogTitle = 'NOUVEL'
     this.dialogDisplay = true
   }
 
   closeDialog() {
     this.dialogDisplay = false
+    this.formGroup.reset()
   }
 
   editCatalogue() {
     if(this.selectedItem) {
 
       this.dialogTitle = 'MODIFIER'
-      this.dialogSelectedType = this.selectedItem.catalogueType
       this.formGroup.setValue({
         'designation': this.selectedItem.designation,
         'description': this.selectedItem.description,
@@ -324,7 +287,7 @@ export class CatalogueComponent implements OnInit {
         let createCatalogInput = new CreateCatalogueInput({
           designation: this.formGroup.value.designation,
           description: this.formGroup.value.description,
-          catalogueType: this.dialogSelectedType,
+          catalogueType: this.formGroup.value.dialogSelectedType,
           unity: this.formGroup.value.unity,
           htPrice: this.formGroup.value.htPrice || 0,
           tva: this.formGroup.value.tva || 0,
@@ -334,7 +297,7 @@ export class CatalogueComponent implements OnInit {
           if(res){
             this._toastService.success({
               summary: 'Opértion réussie',
-              detail: 'Vous avez ajouté un nouveau catalogue',
+              detail: 'Vous avez ajouté un nouvel item',
             })
 
             this.selectedItem = {
@@ -362,18 +325,18 @@ export class CatalogueComponent implements OnInit {
             id: this.selectedItem.id,
             designation: this.formGroup.value.designation,
             description: this.formGroup.value.description,
-            catalogueType: this.dialogSelectedType,
+            catalogueType:this.formGroup.value.dialogSelectedType,
             unity: this.formGroup.value.unity,
             htPrice: this.formGroup.value.htPrice || 0,
             tva: this.formGroup.value.tva || 0,
             minimalQuantity: this.formGroup.value.minimalQuantity || 1,
-          }
-          )
+          })
+          
           this._catalogueServiceProxy.updateCatalogue(updateCatalogInput).subscribe(res => {
             if(res){
               this._toastService.success({
                 summary: 'Opértion réussie',
-                detail: 'Vous avez modifié ce catalogue avec succès',
+                detail: 'Vous avez modifié ce item avec succès',
               })
               this.selectedItem = {
                 ...this.selectedItem,

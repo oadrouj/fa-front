@@ -34,13 +34,14 @@
                 </div>
             </div>
 
-            <app-table #dt1 [cols]="cols" [currency]="Currency" [styleClass]="'table'" (selectionChange)="selectionChange($event)" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [rowDeletedEvent]="rowDeletedSubject.asObservable()" [filterEvent]="filterSubject.asObservable()"
+            <app-table #dt1 [cols]="cols" [styleClass]="'table'" (selectionChange)="selectionChange($event)" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [rowDeletedEvent]="rowDeletedSubject.asObservable()" [filterEvent]="filterSubject.asObservable()"
                 [getListApi$]="getListDevisApi$" [SelectItemEvent]="notifySelectedDevisChanged.asObservable()" [globalFilterFields]="['reference','client','dateEmission','echeancePaiement', 'montantTtc','statut']">
             </app-table>
 
             <div class="devisTotal flex justify-content-between align-items-center w-100">
                 <span class="color-gray ">Total TTC</span>
-                <span class="color-gray">{{montantTotalAllDevis | number:'1.2-2' }} {{' ' + Currency}}</span>
+                <span class="color-gray">{{montantTotalAllDevis | number:'1.2-2' }}
+                    {{' ' + (selectedDevisItem && selectedDevisItem.currency)}}</span>
             </div>
         </div>
 
@@ -62,7 +63,8 @@
                             <img src="assets/img/logo.png" alt="">
                         </div>
                         <div class="col-7 text-right">
-                            <h1>{{title}} {{selectedDevisItem && factureFormatReferenceNumber(selectedDevisItem.reference, selectedDevisItem.referencePrefix)}}</h1>
+                            <h1>{{title}} {{selectedDevisItem && selectedDevisItem.reference}}
+                            </h1>
                             <p class="date my-2">Date d'émission: {{selectedDevisItem && selectedDevisItem.dateEmission | date:'shortDate'}}
                             </p>
                             <p class="date my-1">
@@ -110,7 +112,7 @@
                                     </ng-container>
                                     <ng-container *ngSwitchCase="'currency'">
                                         <td [colSpan]="colVar.colspan" mode="decimal">
-                                            {{yourRowVaraible[colVar.field] | number:'1.2-2' }} {{' ' + Currency}}
+                                            {{yourRowVaraible[colVar.field] | number:'1.2-2' }} {{' ' + (selectedDevisItem && selectedDevisItem.currency)}}
                                         </td>
                                     </ng-container>
                                     <ng-container *ngSwitchCase="'pourcentage'">
@@ -138,7 +140,8 @@
                                 <span>MONTANT TOTAL HT</span>
                             </div>
                             <div class="col-xl-5">
-                                <span>{{this.summaryTotalHT | number:'1.2-2' }} {{' ' + Currency}}</span>
+                                <span>{{this.summaryTotalHT | number:'1.2-2' }}
+                                    {{' ' + (selectedDevisItem && selectedDevisItem.currency)}}</span>
                             </div>
                         </div>
 
@@ -148,7 +151,7 @@
                             </div>
                             <div class="col-5">
                                 <span>{{(selectedDevisItem ? this.remiseAmount : 0) | number:'1.2-2' }}
-                                    {{' ' + Currency}}</span>
+                                    {{' ' +  (selectedDevisItem && selectedDevisItem.currency)}}</span>
                             </div>
                         </div>
 
@@ -157,7 +160,8 @@
                                 <span>TVA</span>
                             </div>
                             <div class="col-md-5">
-                                <span>{{this.summaryTVA | number:'1.2-2' }} {{' ' + Currency}}</span>
+                                <span>{{this.summaryTVA | number:'1.2-2' }}
+                                    {{' ' + (selectedDevisItem && selectedDevisItem.currency)}}</span>
                             </div>
                         </div>
 
@@ -168,8 +172,8 @@
                                 <span>TOTAL ESTIME TTC</span>
                             </div>
                             <div class="col-md-5">
-                                <span>{{(selectedDevisItem ? this.selectedDevisItem.montantTtc : 0) | number:'1.2-2' }}
-                                    {{' ' + Currency}}</span>
+                                <span>{{(selectedDevisItem ? selectedDevisItem.montantTtc : 0) | number:'1.2-2' }}
+                                    {{' ' +  (selectedDevisItem && selectedDevisItem.currency)}}</span>
                             </div>
                         </div>
                     </ng-template>

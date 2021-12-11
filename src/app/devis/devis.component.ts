@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core'
+import { AfterViewInit, Component, ComponentFactoryResolver, OnInit, ViewChild, ViewContainerRef } from '@angular/core'
 import { BehaviorSubject, Subject, zip } from 'rxjs'
 import { DevisItem } from '../../shared/models/DevisItem'
 import { DialogStatus } from '../../shared/enums/DialogState.enum'
@@ -22,19 +22,27 @@ import { ToastService } from '@shared/services/toast.service'
 import { Moment } from 'moment'
 import { DevisDialogComponent } from './devis-dialog/devis-dialog.component'
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog'
 import { ConfirmEventType } from 'primeng/api'
 import { map } from 'rxjs/operators'
 import { TableComponent } from '@app/table/table.component'
 import { ConvertDevisToFactureService } from '@shared/services/ConvertDevisToFacture.service'
 import * as printJS from 'print-js'
+import { FacturesDialogComponent } from '@app/factures/factures-dialog/factures-dialog.component'
+import { AppConsts } from '@shared/AppConsts'
 
 @Component({
   selector: 'app-devis',
   templateUrl: './devis.component.html',
   styleUrls: ['./devis.component.css'],
+  providers:[DialogService]
 })
 export class DevisComponent implements OnInit, AfterViewInit {
   remiseAmount: number
+  @ViewChild('factureDialog', {  
+    
+}) sample: DynamicDialogRef;  
+sampleComponent = FacturesDialogComponent
   constructor(
     private _formatService: FormatService,
     public _fakeService: FakeService,
@@ -42,18 +50,22 @@ export class DevisComponent implements OnInit, AfterViewInit {
     private _clientServiceProxy: ClientServiceProxy,
     private _toastService: ToastService,
     private _confirmDialogService: ConfirmDialogService,
+    public dialogService: DialogService,
     public globalEventsService: GlobalEventsService,
     private _convertDevisToFactureService: ConvertDevisToFactureService,
+    private componentFactoryResolver: ComponentFactoryResolver
   ) {}
 
   favIcon: HTMLLinkElement = document.querySelector('#favIcon');
   ngOnInit() {
+    console.log(AppConsts.userManagement.defaultAdminUserName)
     this.globalEventsService.announcedThePageChangedColorSubject(
       `var(--${this.primaryColor}-color`,
     )
     
     this.favIcon.href = "assets/img/DevisLogo.png"
-  }
+    }
+   
 
   ngAfterViewInit() {
     if (window.history.state.clientId) {
@@ -90,12 +102,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
     {
       header: 'REFERENCE',
       field: 'reference',
-      type: 'text',
-      format: (number, customPrefix) =>
-      this._formatService.formatReferenceNumber(
-        number,
-        customPrefix ? customPrefix : ReferencePrefix.Devis,
-      ),
+      type: 'text'
     },
     {
       header: 'CLIENT',
@@ -129,7 +136,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
   DevisContentItemsCols = [
     { header: 'DESIGNATION', field: 'designation', type: 'text', colspan: 2 },
     { header: 'DATE', field: 'date', type: 'date', colspan: 0 },
-    { header: 'quantity', field: 'quantity', type: 'text' },
+    { header: 'QTÉ', field: 'quantity', type: 'text' },
     { header: 'UNITE', field: 'unit', type: 'text' },
     { header: 'PU HT', field: 'unitPriceHT', type: 'currency' },
     { header: 'TVA', field: 'tva', type: 'pourcentage' },
@@ -173,6 +180,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       command: () => {
         this.emitDialogStatus(DialogStatus.Edit, 'devis')
         this.child.validateDevis(true).subscribe((res) => {
+          console.log(res)
           if (res.success) {
             this._toastService.success({ detail: 'Le devis est devient valide' })
             this.selectedDevisItem = {
@@ -199,7 +207,6 @@ export class DevisComponent implements OnInit, AfterViewInit {
   summaryTVA = 0
   summaryTotalTTC = 0
   montantTotalAllDevis = 0
-  Currency = 'MAD'
 
   //#endregion
 
@@ -354,6 +361,12 @@ export class DevisComponent implements OnInit, AfterViewInit {
         // }
       },
     })
+
+    let element = document.body.querySelector('#cd') as HTMLElement
+    element.style.display = 'none'
+
+    let element2 = document.body.querySelector('#cdDevis') as HTMLElement
+    element2.style.display = 'none'
   }
 
   firstTimeCharged = true
@@ -718,6 +731,19 @@ export class DevisComponent implements OnInit, AfterViewInit {
         base64: true
       })
     })
+  }
+
+  //TODO:Create a service for these two methods
+  isNullOrEmpty(str: string): boolean {
+    return str == undefined || str.toString().trim() == ''
+  }
+
+  replaceIfIsNullOrEmpty(str: string): string {
+    if (!str || this.isNullOrEmpty(str)) {
+      return '...'
+    } else {
+      return str
+    }
   }
 
 }

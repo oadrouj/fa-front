@@ -14,6 +14,8 @@ import {
   // Client,
   ClientDto,
   ClientServiceProxy,
+  CountryDto,
+  CountryServiceAppServiceProxy,
   DevisDto,
   DevisServiceProxy,
   DevisStatutEnum,
@@ -111,11 +113,11 @@ export class ClientsComponent extends AppComponentBase
   selectedCategory: string
   selectedType: string
 
-  countries: ICountry[]
+  countries: CountryDto[]
   Currency = 'MAD'
   telRegEx: RegExp = /^[^<>*!]+$/
 
-  devises: Devise[]
+  devises: string[]
 
   isFormProfetionnel: boolean = true
   isInsert: boolean
@@ -140,6 +142,7 @@ export class ClientsComponent extends AppComponentBase
     private _toastService: ToastService,
     private _confirmDialogService: ConfirmDialogService,
     private _router: Router,
+    private _countryService: CountryServiceAppServiceProxy,
   ) {
     super(injector)
   }
@@ -149,6 +152,10 @@ export class ClientsComponent extends AppComponentBase
 
   ngOnInit(): void {
     this._globalEventsService.announcedThePageChangedColorSubject('#2A95D1')
+
+    if (window.history.state.clientCreationFromDevis) {
+      this.showDialogNouveau();
+    }
 
     this.favIcon.href = '../../assets/img/ClientsTitreIcon.png'
     this.factureList = [new FactureDto()]
@@ -166,13 +173,11 @@ export class ClientsComponent extends AppComponentBase
       { name: 'Client', code: 'client' },
       { name: 'Prospect', code: 'prospect' },
     ]
-    this.devises = [
-      { name: 'MAD', code: 'MAD' },
-      { name: 'EUR', code: 'EUR' },
-      { name: 'DOL', code: 'DOL' },
-    ]
+  
+    this.getAllCountries();
 
-    this.countries = csc.getAllCountries()
+    this.getAllCurrencies();
+
     this.initialiseForm()
 
     var height = Math.max(document.body.offsetHeight, 770)
@@ -264,6 +269,8 @@ export class ClientsComponent extends AppComponentBase
       format: this._formatService.formatFactureStatut,
     },
   ]
+
+  delaiPaiementOptions = [30, 60, 90]
   
   //#region Subject Events
   notifySelectedDevisChanged = new Subject<any>()
@@ -327,6 +334,17 @@ export class ClientsComponent extends AppComponentBase
           }
         }),
       )
+  }
+
+  getAllCountries(){
+    this._countryService.getAllCountries().subscribe(res => {
+      this.countries = res.items;
+    })
+  }
+
+  getAllCurrencies(){
+    fetch('/assets/json/currencies.json').then(res => res.json())
+      .then(res => this.devises = Object.keys(res))
   }
 
   getFiveLastFacturesOrDevisElements(element: string) {
@@ -450,9 +468,10 @@ export class ClientsComponent extends AppComponentBase
 
   initialiseForm(): void {
     this.formClient = new ClientDto()
-    this.formClient.pays = 'MA'
+    this.formClient.pays = 'MAROC'
     this.formClient.deviseFacturation = 'MAD'
     this.formClient.categorieClient = 'PRFS'
+    this.formClient.delaiPaiement = 30
     this.onFormCategorySelected()
   }
 
@@ -487,7 +506,9 @@ export class ClientsComponent extends AppComponentBase
     this.clientApercu = client
   }
 
+  //TODO: remove this method
   getPaysFromIsoCode(): string {
+    console.log(this.client.pays, csc.getCountryByCode(this.client.pays).name)
     return csc.getCountryByCode(this.client.pays).name
   }
 
@@ -526,7 +547,7 @@ export class ClientsComponent extends AppComponentBase
     } else {
       return str
     }
-  }
+  } 
 
   isFormValid: boolean
   validateForm(): void {
@@ -547,6 +568,7 @@ export class ClientsComponent extends AppComponentBase
         severity: 'error',
         summary: 'Champs requis !',
         detail: 'Veuillez remplir le champs : Raison sociale',
+        life: 1600,
       })
     } else if (!isNomValide) {
       this.messageService.add({
@@ -554,6 +576,7 @@ export class ClientsComponent extends AppComponentBase
         severity: 'error',
         summary: 'Champs requis !',
         detail: 'Veuillez remplir le champs : Nom',
+        life: 1600,
       })
     } else {
       this.formClient.raisonSociale = this.isFormProfetionnel
@@ -588,16 +611,19 @@ export class ClientsComponent extends AppComponentBase
     return client.creationTime.toDate().toLocaleDateString()
   }
 
+  closeDialog(){
+    this.display = false
+  }
+
   valider() {
     this.validateForm()
     if (this.isFormValid) {
       if (this.isInsert) {
-
         this._clientServiceProxy
           .createClient(this.formClient)
           .subscribe((result) => {
             if (result != undefined) {
-              this.display = false
+              this.closeDialog()
               var referenceClient = this.getReferenceFromReferenceNumber(
                 result.reference,
               )
@@ -608,15 +634,11 @@ export class ClientsComponent extends AppComponentBase
                 summary: 'Opération réussie !',
                 detail:
                   'Le client est ajouté avec la référence : ' + referenceClient,
+                life: 1600,
               })
-
-              result = {
-                ...result,
-                nom:
-                  result.categorieClient == 'PRFS' &&
-                  (result.nom = result.raisonSociale),
-              } as any
-
+             
+              result.categorieClient == 'PRFS' && (result.nom = result.raisonSociale)
+              result.clientType = "Prospect"
               this.tableChild.tableData = [
                 ...this.tableChild.tableData,
                 { ...result },
@@ -637,6 +659,7 @@ export class ClientsComponent extends AppComponentBase
                 summary: 'Opération échouée !',
                 detail:
                   'Une erreur serveur est parvenue ! Veuillez reessayer plutard.',
+                life: 1600,
               })
             }
           })
@@ -653,21 +676,17 @@ export class ClientsComponent extends AppComponentBase
               let index = this.tableChild.tableData.findIndex(
                 (item) => item.id == this.client.id,
               )
+              result.categorieClient == 'PRFS' && (result.nom = result.raisonSociale)
+              result.clientType = this.client.clientType
 
-              result = {
-                ...result,
-                nom:
-                  result.categorieClient == 'PRFS' &&
-                  (result.nom = result.raisonSociale),
-              } as any
               this.tableChild.tableData[index] = {
                 ...result,
               }
               this.tableChild.tableData = [...this.tableChild.tableData]
 
-              this.tableChild.tableData.sort((a, b) =>
-                a.reference < b.reference ? 1 : -1,
-              )
+              // this.tableChild.tableData.sort((a, b) =>
+              //   a.reference < b.reference ? 1 : -1,
+              // )
 
               this.client = new ClientDto({ ...result })
               this.emitNotificationSelectedDevisChanged({
@@ -680,6 +699,7 @@ export class ClientsComponent extends AppComponentBase
                 summary: 'Opération réussie !',
                 detail:
                   'Le client ' + referenceClient + ' est modifié avec succès.',
+                life: 1600,
               })
             } else {
               this.messageService.add({
@@ -688,6 +708,7 @@ export class ClientsComponent extends AppComponentBase
                 summary: 'Opération échouée !',
                 detail:
                   'Une erreur serveur est parvenue ! Veuillez reessayer plutard.',
+                life: 1600,
               })
             }
           })
@@ -714,7 +735,7 @@ export class ClientsComponent extends AppComponentBase
           this._toastService.success({
             summary: 'Opération réussie',
             detail:
-              'Le client ' + referenceClient + ' est supprimé avec succès.',
+              'Le client ' + referenceClient + ' est supprimé avec succès.'
           })
         })
       },

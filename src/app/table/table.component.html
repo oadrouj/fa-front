@@ -1,5 +1,5 @@
 <p-table #tbl [columns]="cols" [value]="tableData" [rowTrackBy]="trackByFunction" selectionMode="single" [(selection)]="defaultRowToBeSelected" dataKey="reference" (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect()" [id]="styleId" [scrollable]="true"
-    [rows]="10" scrollHeight="250px" [lazy]="true" (onLazyLoad)="loadTableLazy($event)" [virtualScroll]="true" [globalFilterFields]="globalFilterFields" [virtualRowHeight]="40" [class]="styleClass">
+    [rows]="10" scrollHeight="400px" [lazy]="true" (onLazyLoad)="loadTableLazy($event)" [virtualScroll]="true" [globalFilterFields]="globalFilterFields" [virtualRowHeight]="40" [class]="styleClass">
     <ng-template pTemplate="header" let-columns>
         <tr>
             <th *ngFor="let col of columns" [pSortableColumn]="col.field">
@@ -21,7 +21,7 @@
 
                     <ng-container *ngSwitchCase="'currency'">
                         <td [colSpan]="colVar.colspan" mode="decimal">
-                            {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + currency}}
+                            {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + (rowData['currency'] ? rowData['currency'] : currency)}}
                         </td>
                     </ng-container>
 

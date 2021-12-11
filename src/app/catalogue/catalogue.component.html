@@ -17,7 +17,7 @@
                             <h1 class="title" [ngClass]="'color-' + primaryColor">{{title}}</h1>
                         </div>
 
-                        <button pButton (click)="newCatalogue()" class="btn-new-devis text-normal" [ngClass]="'bg-' + primaryColor" [label]="'Nouveau ' + title"></button>
+                        <button pButton (click)="newCatalogue()" class="btn-new-devis text-normal" [ngClass]="'bg-' + primaryColor" [label]="'Nouvel ' + title"></button>
 
                     </div>
 
@@ -60,7 +60,7 @@
                         <h2>{{replaceIfIsNullOrEmpty('designation')}}</h2>
                         <h2 class="lineHeight-18">{{replaceIfIsNullOrEmpty('description')}}</h2>
                         <span class="color-purple text-xl">{{catalogueFormatReferenceNumber(selectedItem)}} -
-                            {{replaceIfIsNullOrEmpty('catalogueType')}}</span>
+                            {{replaceIfIsNullOrEmpty('catalogueType') | titlecase}} </span>
                         <div class="grid pt-3 w-25rem">
                             <div class="col-7">Unité</div>
                             <div class="col-5">{{replaceIfIsNullOrEmpty('unity')}}</div>
@@ -69,7 +69,7 @@
                             <div class="col-5">{{Currency}}</div>
 
                             <div class="col-7">Prix HT</div>
-                            <div class="col-5">{{replaceIfIsNullOrEmpty('htPrice')}}</div>
+                            <div class="col-5">{{replaceIfIsNullOrEmpty('htPrice')}} {{Currency}}</div>
 
                             <div class="col-7">TVA</div>
                             <div class="col-5">{{replaceIfIsNullOrEmpty('tva')}}%</div>
@@ -78,10 +78,12 @@
                             <div class="col-5">{{replaceIfIsNullOrEmpty('ttcPrice')}} {{Currency}}</div>
 
                             <div class="col-7">Quantité minimale</div>
-                            <div class="col-5">{{replaceIfIsNullOrEmpty('minimalQuantity')}} Heures</div>
+                            <div class="col-5">{{replaceIfIsNullOrEmpty('minimalQuantity')}} {{replaceIfIsNullOrEmpty('unity')}}
+                            </div>
 
                             <div class="col-7">Total Ventes TTC</div>
-                            <div class="col-5 color-purple">{{replaceIfIsNullOrEmpty('totalSalesTTC')}} {{Currency}}</div>
+                            <div class="col-5 color-purple">{{replaceIfIsNullOrEmpty('totalSalesTTC')}} {{Currency}}
+                            </div>
 
                             <div class="col-7">Total Unités vendues</div>
                             <div class="col-5 color-purple">
@@ -98,12 +100,12 @@
 
 <p-dialog #dialog id="dialogCatalogue" header="{{dialogTitle}} ITEM" [(visible)]="dialogDisplay" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
 
-    <p-selectButton [options]="catalogueOptions" [(ngModel)]="dialogSelectedType" class="uppercase">
-    </p-selectButton>
     <form [formGroup]="formGroup">
-        <div class="grid blockForm mx-3 mt-3 mb-2" #container>
+        <p-selectButton [options]="catalogueOptions" formControlName="dialogSelectedType" class="uppercase">
+        </p-selectButton>
+        <div class="grid blockForm mx-3 mt-3 mb-2">
             <div class="col-5 label">
-                <span>Désignation</span>
+                <span>Désignation <span class="red-color">*</span></span>
             </div>
             <div class="col-7">
                 <input type="text" pInputText placeholder="Text" formControlName="designation" />
@@ -120,7 +122,7 @@
                 <span>Unité</span>
             </div>
             <div class="col-7">
-                <p-dropdown formControlName="unity" [options]="unityOptions" placeholder="Liste">
+                <p-dropdown formControlName="unity" [options]="unityOptions">
                 </p-dropdown>
             </div>
 
@@ -128,27 +130,30 @@
                 <span>Prix HT</span>
             </div>
             <div class="col-7">
-                <input type="text" pInputText placeholder="Text" formControlName="htPrice" />
+                <input type="text" pInputText formControlName="htPrice" />
             </div>
 
             <div class="col-5 label">
                 <span>TVA</span>
             </div>
             <div class="col-7">
-                <p-dropdown formControlName="tva" [options]="tvaOptions" id="tva" placeholder="Liste">
-                </p-dropdown>
+                <p-inputNumber formControlName="tva" id="tva" [suffix]="' %'">
+                </p-inputNumber>
             </div>
 
             <div class="col-5 label">
                 <span>Quantité minimale</span>
             </div>
             <div class="col-7">
-                <input type="text" pInputText placeholder="Text" formControlName="minimalQuantity" />
+                <p-inputNumber formControlName="minimalQuantity" [suffix]="' ' + formGroup.get('unity').value">
+                </p-inputNumber>
+
             </div>
         </div>
     </form>
 
     <ng-template pTemplate="footer">
+        <span><span class="red-color">*</span> Champ(s) obligatoire(s)</span>
         <p-button id="buttonValider" (click)="submit()" label="Valider"></p-button>
     </ng-template>
 </p-dialog>

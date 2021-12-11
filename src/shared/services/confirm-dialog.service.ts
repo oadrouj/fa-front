@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 
 
-interface ConfirmDialogArgs {message?: string, acceptCallback: () => void, rejectCallback: (type: any) => void}
 
 @Injectable({
   providedIn: 'root'
@@ -26,4 +25,20 @@ constructor(
       },
     })
   }
+
+  confirm({message, acceptCallback, rejectCallback}: ConfirmDialogArgs){
+    this.confirmationService.confirm({
+      message: message,
+      header: 'Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        acceptCallback();
+      },
+      reject: (type: any) => {
+       rejectCallback(type);
+      },
+    })
+  }
 }
+
+interface ConfirmDialogArgs {message?: string, acceptCallback: () => void, rejectCallback: (type: any) => void}

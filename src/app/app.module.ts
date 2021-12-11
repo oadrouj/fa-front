@@ -69,6 +69,7 @@ import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
 import {DynamicDialogModule} from 'primeng/dynamicdialog';
 import { FacturePayementComponent } from './factures/facture-payement/facture-payement.component';
 import { CatalogueComponent } from './catalogue/catalogue.component';
+import { ScullyLibModule } from '@scullyio/ng-lib';
 
 
 @NgModule({
@@ -134,6 +135,8 @@ import { CatalogueComponent } from './catalogue/catalogue.component';
     ToggleButtonModule,
     SkeletonModule,
     DynamicDialogModule,
+    ScullyLibModule,
+    ConfirmDialogModule
     
   ],
   providers: [MessageService, ConfirmationService, ToastService, ConfirmDialogService],
