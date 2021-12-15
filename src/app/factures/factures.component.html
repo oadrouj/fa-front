@@ -63,17 +63,17 @@
                             <img src="assets/img/logo.png" alt="">
                         </div>
                         <div class="col-7 text-right">
-                            <h1>{{title}} {{selectedDevisItem && selectedDevisItem.reference}}
-                            </h1>
-                            <p class="date my-2">Date d'émission: {{selectedDevisItem && selectedDevisItem.dateEmission | date:'shortDate'}}
-                            </p>
-                            <p class="date my-1">
+                            <h2>{{title}} {{selectedDevisItem && selectedDevisItem.reference}}
+                            </h2>
+                            <span class="date block line-height-1">Date d'émission: {{selectedDevisItem && selectedDevisItem.dateEmission | date:'shortDate'}}
+                            </span>
+                            <span class="date block line-height-1">
                                 Date d'échéance: {{selectedDevisItem && getDateEcheance(selectedDevisItem.dateEmission, selectedDevisItem.echeancePaiement) | date:'shortDate'}}
-                            </p>
+                            </span>
                         </div>
                     </div>
-                    <div class="grid px-2 py-4">
-                        <div class="col-6 grid flex-column">
+                    <div class="grid px-2 pt-3">
+                        <div class="col-8 flex flex-column">
                             <span class="color-gray">Pour:</span>
                             <span>{{selectedDevisItem && selectedDevisItem.client.nom}}</span>
                             <span>{{selectedDevisItem && selectedDevisItem.client.adresse}}</span>
@@ -82,9 +82,9 @@
                             <span>{{selectedDevisItem && selectedDevisItem.client.pays}}</span>
                             <span class="mt-3">{{selectedDevisItem && selectedDevisItem.client.telPortable}}</span>
                         </div>
-                        <div class="col-6 align-items-center grid flex-column">
-                            <span class="color-gray fromSocietyPrefix">De</span>
-                            <span>{{selectedDevisItem && (selectedDevisItem.client.raisonSociale || selectedDevisItem.client.nom) }}</span>
+                        <div class="col-4">
+                            <span class="block color-gray">De</span>
+                            <span>{{selectedDevisItem && getUserName()}}</span>
                         </div>
                     </div>
 

@@ -1,4 +1,12 @@
-import { AfterViewInit, Component, ComponentFactoryResolver, OnInit, ViewChild, ViewContainerRef } from '@angular/core'
+import {
+  AfterViewInit,
+  Component,
+  ComponentFactoryResolver,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  ViewContainerRef,
+} from '@angular/core'
 import { BehaviorSubject, Subject, zip } from 'rxjs'
 import { DevisItem } from '../../shared/models/DevisItem'
 import { DialogStatus } from '../../shared/enums/DialogState.enum'
@@ -12,6 +20,7 @@ import {
   ClientForAutoCompleteDto,
   ClientForAutoCompleteDtoListResultDto,
   ClientServiceProxy,
+  DevisItemDto,
   DevisServiceProxy,
   DevisStatutEnum,
 } from '@shared/service-proxies/service-proxies'
@@ -30,19 +39,28 @@ import { ConvertDevisToFactureService } from '@shared/services/ConvertDevisToFac
 import * as printJS from 'print-js'
 import { FacturesDialogComponent } from '@app/factures/factures-dialog/factures-dialog.component'
 import { AppConsts } from '@shared/AppConsts'
+import { AppSessionService } from '@shared/session/app-session.service'
+
+import jsPDF from 'jspdf'
+import pdfMake from 'pdfmake/build/pdfMake'
+import pdfFonts from 'pdfmake/build/vfs_fonts'
+pdfMake.vfs = pdfFonts.pdfMake.vfs
+import htmlToPdfmake from 'html-to-pdfmake'
+import html2canvas from 'html2canvas'
+import jspdf from 'jspdf'
+import domtoimage from 'dom-to-image';
 
 @Component({
   selector: 'app-devis',
   templateUrl: './devis.component.html',
   styleUrls: ['./devis.component.css'],
-  providers:[DialogService]
+  providers: [DialogService],
 })
 export class DevisComponent implements OnInit, AfterViewInit {
   remiseAmount: number
-  @ViewChild('factureDialog', {  
-    
-}) sample: DynamicDialogRef;  
-sampleComponent = FacturesDialogComponent
+  @ViewChild('factureDialog', {})
+  sample: DynamicDialogRef
+  sampleComponent = FacturesDialogComponent
   constructor(
     private _formatService: FormatService,
     public _fakeService: FakeService,
@@ -52,24 +70,21 @@ sampleComponent = FacturesDialogComponent
     private _confirmDialogService: ConfirmDialogService,
     public dialogService: DialogService,
     public globalEventsService: GlobalEventsService,
-    private _convertDevisToFactureService: ConvertDevisToFactureService,
-    private componentFactoryResolver: ComponentFactoryResolver
+    private _sessionService: AppSessionService,
   ) {}
 
-  favIcon: HTMLLinkElement = document.querySelector('#favIcon');
+  favIcon: HTMLLinkElement = document.querySelector('#favIcon')
   ngOnInit() {
-    console.log(AppConsts.userManagement.defaultAdminUserName)
     this.globalEventsService.announcedThePageChangedColorSubject(
       `var(--${this.primaryColor}-color`,
     )
-    
-    this.favIcon.href = "assets/img/DevisLogo.png"
-    }
-   
+
+    this.favIcon.href = 'assets/img/DevisLogo.png'
+  }
 
   ngAfterViewInit() {
     if (window.history.state.clientId) {
-      this.newDevis(window.history.state.clientId);
+      this.newDevis(window.history.state.clientId)
     }
   }
 
@@ -102,7 +117,7 @@ sampleComponent = FacturesDialogComponent
     {
       header: 'REFERENCE',
       field: 'reference',
-      type: 'text'
+      type: 'text',
     },
     {
       header: 'CLIENT',
@@ -154,9 +169,10 @@ sampleComponent = FacturesDialogComponent
         this.emitNotificationSelectedDevisChanged({
           ...this.selectedDevisItem,
           factureItems: this.selectedDevisItem.factureItems,
-          dateEmission : this.selectedDevisItem.dateEmission instanceof Date 
-            ? this.selectedDevisItem.dateEmission
-          : moment(this.selectedDevisItem.dateEmission).toDate()
+          dateEmission:
+            this.selectedDevisItem.dateEmission instanceof Date
+              ? this.selectedDevisItem.dateEmission
+              : moment(this.selectedDevisItem.dateEmission).toDate(),
         })
         this.emitDialogStatus(DialogStatus.New, 'facture', true)
       },
@@ -182,7 +198,9 @@ sampleComponent = FacturesDialogComponent
         this.child.validateDevis(true).subscribe((res) => {
           console.log(res)
           if (res.success) {
-            this._toastService.success({ detail: 'Le devis est devient valide' })
+            this._toastService.success({
+              detail: 'Le devis est devient valide',
+            })
             this.selectedDevisItem = {
               ...this.selectedDevisItem,
               statut: res.result.statut,
@@ -216,33 +234,33 @@ sampleComponent = FacturesDialogComponent
   }
 
   formatStatut(statut?: DevisStatutEnum) {
-      switch (statut) {
-        case DevisStatutEnum.Cree:
-          return 'Brouillon'
-        case DevisStatutEnum.Valide:
-          return 'Validé'
-        case DevisStatutEnum.Converti:
-          return 'Convérti'
-        case DevisStatutEnum.Rejete:
-          return 'Rejeté'
-        case DevisStatutEnum.Expire:
-          return 'Expiré'
-        case DevisStatutEnum.Undefined:
-          return ' '
-      }
-  
+    switch (statut) {
+      case DevisStatutEnum.Cree:
+        return 'Brouillon'
+      case DevisStatutEnum.Valide:
+        return 'Validé'
+      case DevisStatutEnum.Converti:
+        return 'Convérti'
+      case DevisStatutEnum.Rejete:
+        return 'Rejeté'
+      case DevisStatutEnum.Expire:
+        return 'Expiré'
+      case DevisStatutEnum.Undefined:
+        return ' '
+    }
   }
 
   getDateEcheance(dateEmission: Date, echeance: number) {
     return moment(dateEmission).add(echeance, 'days').toDate()
   }
 
-  devisFormatReferenceNumber(reference: number, customPrefix ) {
-    return  this._formatService.formatReferenceNumber(
+  getUserName = () => this._sessionService.user.userName
+
+  devisFormatReferenceNumber(reference: number, customPrefix) {
+    return this._formatService.formatReferenceNumber(
       reference,
       customPrefix ? customPrefix : ReferencePrefix.Devis,
     )
-    
   }
 
   clientAutoCompleteSearch(event: any) {
@@ -333,16 +351,16 @@ sampleComponent = FacturesDialogComponent
               this.tableChild.tableData = this.tableChild.tableData.filter(
                 (devis) => !devis || devis.id != this.selectedDevisItem.id,
               )
-              this.calculateTotalMonatant();
-              this.summaryTotalHT = 0;
+              this.calculateTotalMonatant()
+              this.summaryTotalHT = 0
               this.summaryTVA = 0
-              
+
               // this.montantTotalAllDevis -= this.selectedDevisItem.montantTtc
-              this.selectedDevisItem = null;
+              this.selectedDevisItem = null
               this.emitRowDeletedEvent(this.tableChild.tableData[0])
               this._toastService.info({
                 summary: 'Opération réussie',
-                detail:  'Le devis est supprimé avec succès',
+                detail: 'Le devis est supprimé avec succès',
               })
             }
           })
@@ -371,29 +389,33 @@ sampleComponent = FacturesDialogComponent
 
   firstTimeCharged = true
   selectionChange(selectionEventObject) {
-    if (selectionEventObject.type == 'selectionChanged' || selectionEventObject.type == 'firstSelectionChanged') {
+    if (
+      selectionEventObject.type == 'selectionChanged' ||
+      selectionEventObject.type == 'firstSelectionChanged'
+    ) {
       this.selectedDevisItem = selectionEventObject.result
     } else if (selectionEventObject.type == 'delete') {
       this.selectedDevisItem = selectionEventObject.result
     }
-    this.calculateSummaryTotalHTAndTVA();
+    this.calculateSummaryTotalHTAndTVA()
     this.emitNotificationSelectedDevisChanged({
       ...this.selectedDevisItem,
-      dateEmission: new Date(this.selectedDevisItem.dateEmission._i)
-        // ? new Date(this.selectedDevisItem.dateEmission._i)
-        // : new Date(this.selectedDevisItem.dateEmission._d),
+      dateEmission: new Date(this.selectedDevisItem.dateEmission._i),
+      // ? new Date(this.selectedDevisItem.dateEmission._i)
+      // : new Date(this.selectedDevisItem.dateEmission._d),
     })
-    this.firstTimeCharged && (this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis);
+    this.firstTimeCharged &&
+      (this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis)
     this.firstTimeCharged = false
     // this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis
-  } 
+  }
 
-  onDialogClose(){
+  onDialogClose() {
     this.displayDialog = false
     document.body.style.overflow = 'auto'
-    this.calculateTotalMonatant();
+    this.calculateTotalMonatant()
   }
-  
+
   calculateSummaryTotalHTAndTVA() {
     if (this.selectedDevisItem) {
       this.summaryTotalHT = (this.selectedDevisItem as any).devisItems
@@ -402,42 +424,44 @@ sampleComponent = FacturesDialogComponent
       this.summaryTVA = this.selectedDevisItem.devisItems
         .map((item) => (item.unitPriceHT * item.quantity * item.tva) / 100)
         .reduce((accum, current) => accum + current)
-      
-      this.remiseAmount = this.calculateRemise( this.selectedDevisItem.remise, this.summaryTotalHT)
 
+      this.remiseAmount = this.calculateRemise(
+        this.selectedDevisItem.remise,
+        this.summaryTotalHT,
+      )
     }
   }
   calculateTotalMonatant() {
-    this.montantTotalAllDevis = 0;
+    this.montantTotalAllDevis = 0
     this.tableChild.tableData.forEach((item) => {
-      if(item) {
-        let totalHt =  item.devisItems 
-        .map((item) => item.unitPriceHT * item.quantity)
-        .reduce((accum, current) => accum + current)
+      if (item) {
+        let totalHt = item.devisItems
+          .map((item) => item.unitPriceHT * item.quantity)
+          .reduce((accum, current) => accum + current)
 
-        this.montantTotalAllDevis += item.devisItems
-        .map((item) => item.totalTtc)
-        .reduce((accum, current) => accum + current) -
-            item.remise * totalHt / 100
-            }
+        this.montantTotalAllDevis +=
+          item.devisItems
+            .map((item) => item.totalTtc)
+            .reduce((accum, current) => accum + current) -
+          (item.remise * totalHt) / 100
+      }
     })
-
-
   }
 
   calculateRemise(remise, totalHT) {
-    return totalHT * remise /100;
+    return (totalHT * remise) / 100
   }
 
   crudOperationTreatment(event) {
     if (event.crudOperation == 'create') {
-
       let newDevis = {
         ...event.result,
         client: {
           ...event.result.client,
-          nom: event.result.client.nom ? event.result.client.nom : event.result.client.raisonSociale
-          },
+          nom: event.result.client.nom
+            ? event.result.client.nom
+            : event.result.client.raisonSociale,
+        },
       }
       newDevis.devisItems = newDevis.devisItems.map((item: any) => {
         let total_ht = item.unitPriceHT * item.quantity
@@ -447,11 +471,12 @@ sampleComponent = FacturesDialogComponent
         }
       })
 
-      let remiseAmount = 
-      (newDevis.devisItems
-        .map((item) => item.unitPriceHT * item.quantity)
-        .reduce((accum, current) => accum + current) * newDevis.remise) /100
-      
+      let remiseAmount =
+        (newDevis.devisItems
+          .map((item) => item.unitPriceHT * item.quantity)
+          .reduce((accum, current) => accum + current) *
+          newDevis.remise) /
+        100
 
       newDevis.montantTtc =
         newDevis.devisItems
@@ -467,13 +492,13 @@ sampleComponent = FacturesDialogComponent
         a.reference < b.reference ? 1 : -1,
       )
 
-      this.selectedDevisItem && this.selectedDevisItem.devisItems.forEach(
-        (devisItem) => (devisItem.date = devisItem.date.toDate()),
-      )
+      this.selectedDevisItem &&
+        this.selectedDevisItem.devisItems.forEach(
+          (devisItem) => (devisItem.date = devisItem.date.toDate()),
+        )
       this.selectedDevisItem = {
         ...newDevis,
         dateEmission: newDevis.dateEmission.toDate(),
-       
       }
       this.emitNotificationSelectedDevisChanged({
         ...this.selectedDevisItem,
@@ -483,8 +508,10 @@ sampleComponent = FacturesDialogComponent
         ...event.result,
         client: {
           ...this.selectedDevisItem.client,
-          nom: event.result.client.nom ? event.result.client.nom : event.result.client.raisonSociale
-          },
+          nom: event.result.client.nom
+            ? event.result.client.nom
+            : event.result.client.raisonSociale,
+        },
       }
 
       //Calculate total montant
@@ -498,11 +525,13 @@ sampleComponent = FacturesDialogComponent
         },
       )
 
-      let remiseAmount = 
-      (this.selectedDevisItem.devisItems
-        .map((item) => item.unitPriceHT * item.quantity)
-        .reduce((accum, current) => accum + current) * this.selectedDevisItem.remise) /100
-        
+      let remiseAmount =
+        (this.selectedDevisItem.devisItems
+          .map((item) => item.unitPriceHT * item.quantity)
+          .reduce((accum, current) => accum + current) *
+          this.selectedDevisItem.remise) /
+        100
+
       this.selectedDevisItem.montantTtc =
         this.selectedDevisItem.devisItems
           .map((item) => item.totalTtc)
@@ -530,9 +559,12 @@ sampleComponent = FacturesDialogComponent
   getListDevisApi$(event, data) {
     console.log(event.filters.echeancePaiement)
     let clientFilter = event.filters.client && event.filters.client.value
-    let dateEmissionFilter = event.filters.dateEmission && event.filters.dateEmission.value
-    let echeancePaiementFilter = event.filters.echeancePaiement && event.filters.echeancePaiement.value
-    let montantTtcFilter = event.filters.montantTtc && event.filters.montantTtc.value
+    let dateEmissionFilter =
+      event.filters.dateEmission && event.filters.dateEmission.value
+    let echeancePaiementFilter =
+      event.filters.echeancePaiement && event.filters.echeancePaiement.value
+    let montantTtcFilter =
+      event.filters.montantTtc && event.filters.montantTtc.value
     let statutFilter = event.filters.statut && event.filters.statut.value
 
     return zip(
@@ -560,7 +592,7 @@ sampleComponent = FacturesDialogComponent
         montantTtcFilter,
         statutFilter,
       ),
-      this._devisServiceProxy.getAllDevisMontantTotal( 
+      this._devisServiceProxy.getAllDevisMontantTotal(
         event.first,
         event.rows,
         event.globalFilter,
@@ -576,7 +608,9 @@ sampleComponent = FacturesDialogComponent
       map(([length, res, montantTotalAllDevis]: any) => {
         data = [...res.items]
         data.forEach((devis: any) => {
-          devis.client.nom = !devis.client.nom ? devis.client.raisonSociale : devis.client.nom
+          devis.client.nom = !devis.client.nom
+            ? devis.client.raisonSociale
+            : devis.client.nom
           devis.devisItems = devis.devisItems.map((item: any) => {
             let totalHt = item.unitPriceHT * item.quantity
             return {
@@ -585,22 +619,19 @@ sampleComponent = FacturesDialogComponent
             }
           })
           devis.statut = moment().isAfter(
-            (moment(devis.dateEmission)).add(devis.echeancePaiement, 'days'),
+            moment(devis.dateEmission).add(devis.echeancePaiement, 'days'),
           )
             ? DevisStatutEnum.Expire
             : devis.statut
 
-          let montantTtc =
-            devis.devisItems
-              .map((item) => item.totalTtc)
-              .reduce((accum, current) => accum + current)
-          let montantHt =
-              devis.devisItems
-                .map((item) => item.unitPriceHT * item.quantity)
-                .reduce((accum, current) => accum + current)
+          let montantTtc = devis.devisItems
+            .map((item) => item.totalTtc)
+            .reduce((accum, current) => accum + current)
+          let montantHt = devis.devisItems
+            .map((item) => item.unitPriceHT * item.quantity)
+            .reduce((accum, current) => accum + current)
 
-          devis.montantTtc = montantTtc - ( montantHt * devis.remise / 100)
-          
+          devis.montantTtc = montantTtc - (montantHt * devis.remise) / 100
         })
         return { items: data, length, montantTotalAllDevis }
       }),
@@ -654,18 +685,19 @@ sampleComponent = FacturesDialogComponent
         }
       })
 
-      let remiseAmount = 
-      (newDevis.factureItems
-        .map((item) => item.unitPriceHT * item.quantity)
-        .reduce((accum, current) => accum + current) * newDevis.remise) /100
-        
+      let remiseAmount =
+        (newDevis.factureItems
+          .map((item) => item.unitPriceHT * item.quantity)
+          .reduce((accum, current) => accum + current) *
+          newDevis.remise) /
+        100
+
       newDevis.montantTtc =
         newDevis.factureItems
           .map((item) => item.totalTtc)
           .reduce((accum, current) => accum + current) - remiseAmount
- 
-      this.montantTotalAllDevis += newDevis.montantTtc
 
+      this.montantTotalAllDevis += newDevis.montantTtc
     } else if (event.crudOperation == 'update') {
       this.selectedDevisItem = {
         ...event.result,
@@ -681,12 +713,14 @@ sampleComponent = FacturesDialogComponent
           }
         },
       )
-        
-      let remiseAmount = 
-      (this.selectedDevisItem.factureItems
-        .map((item) => item.unitPriceHT * item.quantity)
-        .reduce((accum, current) => accum + current) * this.selectedDevisItem.remise) /100
-        
+
+      let remiseAmount =
+        (this.selectedDevisItem.factureItems
+          .map((item) => item.unitPriceHT * item.quantity)
+          .reduce((accum, current) => accum + current) *
+          this.selectedDevisItem.remise) /
+        100
+
       this.selectedDevisItem.montantTtc =
         this.selectedDevisItem.factureItems
           .map((item) => item.totalTtc)
@@ -711,26 +745,52 @@ sampleComponent = FacturesDialogComponent
   }
   //#endregion
 
-   downloadDevis() {
-    this._devisServiceProxy.getByIdDevisReport(this.selectedDevisItem.id).subscribe(res => {
-      const linkSource = `data:application/pdf;base64,${res}`;
-      const downloadLink = document.createElement("a");
-      const fileName = "Devis.pdf";
-  
-      downloadLink.href = linkSource;
-      downloadLink.download = fileName;
-      downloadLink.click();
-    })
+  downloadDevis() {
+    this._devisServiceProxy
+      .getByIdDevisReport(this.selectedDevisItem.id)
+      .subscribe((res) => {
+        const linkSource = `data:application/pdf;base64,${res}`
+        const downloadLink = document.createElement('a')
+        const fileName = 'Devis.pdf'
+
+        downloadLink.href = linkSource
+        downloadLink.download = fileName
+        downloadLink.click()
+      })
   }
 
-    print(){
-    this._devisServiceProxy.getByIdDevisReport(this.selectedDevisItem.id).subscribe(res => {
-      printJS({
-        printable: res,
-        type: "pdf",
-        base64: true
+  print() {
+    this._devisServiceProxy
+      .getByIdDevisReport(this.selectedDevisItem.id)
+      .subscribe((res) => {
+        console.log(res)
+        printJS({
+          printable: res,
+          type: 'pdf',
+          base64: true,
+        })
       })
-    })
+    // html2canvas(document.getElementById('contentToConvert') , {
+    //   scale: 5,
+    //   onclone: (dcm) => {
+    //     let data = dcm.getElementById('contentToConvert')
+    //     data.classList.add('html2canvas')
+    //     dcm.getElementById('pageFooter').innerText = this.selectedDevisItem.piedDePage
+
+    //   }
+    // }).then((canvas) => {
+    //   let docWidth = 205
+    //   let docHeight = (canvas.height * docWidth) / canvas.width
+     
+    //   const contentDataURL = canvas.toDataURL('image/png')
+    //   console.log(contentDataURL)
+    //   printJS({
+    //     printable: contentDataURL.replace('data:image/png;base64,', ''),
+    //     type: 'pdf',
+    //     base64: true,
+    //   })
+     
+    // })
   }
 
   //TODO:Create a service for these two methods
@@ -746,4 +806,49 @@ sampleComponent = FacturesDialogComponent
     }
   }
 
+
+  @ViewChild('pdfTable') pdfTable: ElementRef
+  downloadAsPDF() {
+    let data = document.getElementById('contentToConvert') 
+    this.convertToPDF(data)
+     
+
+  }
+
+  convertToPDF(element){
+    
+    html2canvas(element, {
+      scale: 5,
+      onclone: (dcm) => {
+        let data = dcm.getElementById('contentToConvert')
+        data.classList.add('html2canvas')
+        dcm.getElementById('pageFooter').innerText = this.selectedDevisItem.piedDePage
+
+      }
+    }).then((canvas) => {
+      let docWidth = 205
+      let docHeight = (canvas.height * docWidth) / canvas.width
+     
+      const contentDataURL = canvas.toDataURL('image/png')
+      let doc = new jsPDF('p', 'mm', 'a4')
+      let position = 0
+
+      const items = this.selectedDevisItem.devisItems
+      let table = document.querySelector('#contentToConvert p-table')
+      let rest = items.length % 5
+      let count = (items.length - rest) / 5 + +!!rest,
+      splittedItems: DevisItemDto
+      doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
+      // for(let i=0; i < count; i++){
+      //   splittedItems = items.slice(length, length + 4)
+      //   console.log(length)
+      //   doc.addPage()
+      //   doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
+     
+      // }
+       doc.save('exportedPdf.pdf')
+       
+    })
+  }
+   
 }
