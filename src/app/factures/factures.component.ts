@@ -39,6 +39,7 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog'
 import { FacturePayementComponent } from './facture-payement/facture-payement.component'
 import { AppConsts } from '@shared/AppConsts'
 import * as printJS from 'print-js'
+import { AppSessionService } from '@shared/session/app-session.service'
 
 @Component({
   selector: 'app-factures',
@@ -60,6 +61,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     public globalEventsService: GlobalEventsService,
     public dialogService: DialogService,
     private _convertDevisToFactureService: ConvertDevisToFactureService,
+    private _sessionService: AppSessionService
   ) {}
 
   ngOnInit() {
@@ -236,6 +238,8 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   getDateEcheance(dateEmission: Date, echeance: number) {
     return moment(dateEmission).add(echeance, 'days').toDate()
   }
+
+  getUserName = () => this._sessionService.user.userName
 
   factureFormatReferenceNumber(reference: number, customPrefix) {
     return this._formatService.formatReferenceNumber(

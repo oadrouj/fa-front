@@ -279,10 +279,21 @@ i.pi-search {
     width: 48%;
 }
 
-.fromSocietyPrefix {
-    margin-left: -40px;
-}
-
 :host>>>.filterContainer .p-datepicker {
     top: -198px !important;
+}
+
+
+/* Pdf generation region */
+
+.html2canvas {
+    transform: scale(0.9)
+}
+
+.html2canvas * {
+    color: black !important;
+}
+
+.html2canvas .content .date {
+    font-size: 1.15rem;
 }

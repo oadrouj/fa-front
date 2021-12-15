@@ -637,9 +637,10 @@ export class DevisDialogComponent implements OnInit {
   }
 
   updateApiCall(devisStatus: DevisStatutEnum) {
-    console.log(this.devisItem)
     
     let formValue = this.formGroup.value
+    console.log(formValue)
+
     let updateDevisInput = new UpdateDevisInput({
       ...this.devisItem,
       id: this.devisItem.id,
@@ -670,6 +671,9 @@ export class DevisDialogComponent implements OnInit {
       clientId: formValue.client.id,
       currency: this.Currency
     })
+
+    console.log(updateDevisInput)
+
     this._devisServiceProxy.updateDevis(updateDevisInput).subscribe((res) => {
       if (res) {
         this._clientServiceProxy

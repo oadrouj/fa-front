@@ -288,10 +288,6 @@ i.pi-search {
     width: 48%;
 }
 
-.fromSocietyPrefix {
-    margin-left: -40px;
-}
-
 :host>>>.filterContainer .p-datepicker {
     top: -198px !important;
 }

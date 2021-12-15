@@ -147,7 +147,7 @@
                                             <ng-container *ngSwitchCase="'autocomplete'">
                                                 <td [colSpan]="col.colspan" class="align-middle">
                                                     <p-autoComplete [formControlName]="col.field" [virtualScroll]="true" [suggestions]="filteredCatalogues" [itemSize]="34" (completeMethod)="filterCatalogues($event)" (onSelect)="onSelectCatalogAutoComplete($event, i)" (onClear)="onClearCatalogAutoComplete(i)"
-                                                        field="designation" [dropdown]="true" [appendTo]="myTable">
+                                                        (onDropdownClick)="onDropdownClick($event)" field="designation" [dropdown]="true" [appendTo]="myTable">
                                                     </p-autoComplete>
                                                 </td>
                                             </ng-container>

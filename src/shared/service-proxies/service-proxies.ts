@@ -2107,12 +2107,17 @@ export class DevisServiceProxy {
         else if (statut !== undefined)
             url_ += "Statut=" + encodeURIComponent("" + statut) + "&";
         if (devisItems !== undefined && devisItems !== null)
-            devisItems && devisItems.forEach((item, index) => {
-                for (let attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-        			}
-            });
+        devisItems && devisItems.forEach((item, index) => {
+            for (let attr in item){
+                if (item.hasOwnProperty(attr)) {
+                    if(attr != "date")
+                        url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
+                    else
+                        url_ += "DevisItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
+            
+                }
+                }
+        });
         if (clientId === null)
             throw new Error("The parameter 'clientId' cannot be null.");
         else if (clientId !== undefined)
@@ -2939,12 +2944,17 @@ export class FactureServiceProxy {
             throw new Error("The parameter 'statut' cannot be null.");
         else if (statut !== undefined)
             url_ += "Statut=" + encodeURIComponent("" + statut) + "&";
-        if (factureItems !== undefined && factureItems !== null)
+            if (factureItems !== undefined && factureItems !== null)
             factureItems && factureItems.forEach((item, index) => {
-                for (let attr in item)
-        			if (item.hasOwnProperty(attr)) {
-        				url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
-        			}
+                for (let attr in item){
+                    if (item.hasOwnProperty(attr)) {
+                        if(attr != "date")
+                            url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr]) + "&";
+                        else
+                            url_ += "FactureItems[" + index + "]." + attr + "=" + encodeURIComponent("" + (<any>item)[attr].toJSON()) + "&";
+                
+                    }
+                    }
             });
         if (clientId === null)
             throw new Error("The parameter 'clientId' cannot be null.");

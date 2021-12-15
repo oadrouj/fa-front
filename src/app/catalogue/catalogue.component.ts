@@ -230,6 +230,7 @@ export class CatalogueComponent implements OnInit {
         'htPrice': this.selectedItem.htPrice,
         'tva': this.selectedItem.tva,
         'minimalQuantity': this.selectedItem.minimalQuantity,
+        'dialogSelectedType': this.selectedItem.catalogueType
       })
 
       this.dialogDisplay = true
