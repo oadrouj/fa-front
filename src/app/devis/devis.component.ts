@@ -42,10 +42,7 @@ import { AppConsts } from '@shared/AppConsts'
 import { AppSessionService } from '@shared/session/app-session.service'
 
 import jsPDF from 'jspdf'
-import pdfMake from 'pdfmake/build/pdfMake'
-import pdfFonts from 'pdfmake/build/vfs_fonts'
-pdfMake.vfs = pdfFonts.pdfMake.vfs
-import htmlToPdfmake from 'html-to-pdfmake'
+
 import html2canvas from 'html2canvas'
 import jspdf from 'jspdf'
 import domtoimage from 'dom-to-image';
