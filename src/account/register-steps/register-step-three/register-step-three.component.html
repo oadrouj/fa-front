@@ -10,28 +10,28 @@
     </table>
     <p class="message text-center">Félicitations !</p>
     <p class="message text-center">Votre adresse e-mail a été validée.</p>
-    <p class="consigne mt-4 text-center">Dites-nous en plus à propos de entité pour nous permettre de
-        générer</p>
+    <p class="consigne mt-4 text-center">Dites-nous en plus à propos de entité pour nous permettre de générer
+    </p>
     <p class="consigne text-center">vos factures et devis personnalisés.</p>
     <div id="form" class="mx-auto">
 
         <div id="div-cards" class="text-center m-6 card-container d-flex">
-            <p-card class="m-6" (click)="select('pp')">
+            <p-card class="m-6" (click)="select('Professionnel particulier')">
                 <div [ngClass]="ppSelected ? 'card-selected' : ''" class="card-content" pRipple>
-                    Profetionnel particulier
+                    Professionnel particulier
                 </div>
             </p-card>
-            <p-card class="m-6" (click)="select('ae')">
+            <p-card class="m-6" (click)="select('Auto entrepreneur')">
                 <div [ngClass]="aeSelected ? 'card-selected' : ''" class="card-content" pRipple>
-                    auto entrepreneur
+                    Auto entrepreneur
                 </div>
             </p-card>
-            <p-card class="m-6" (click)="select('sarl')">
+            <p-card class="m-6" (click)="select('SARL')">
                 <div [ngClass]="sarlSelected ? 'card-selected' : ''" class="card-content" pRipple>
-                    SARL 
+                    SARL
                 </div>
             </p-card>
-            <p-card class="m-6" (click)="select('sa')">
+            <p-card class="m-6" (click)="select('SA')">
                 <div [ngClass]="saSelected ? 'card-selected' : ''" class="card-content" pRipple>
                     SA
                 </div>

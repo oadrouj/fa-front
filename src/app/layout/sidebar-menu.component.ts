@@ -49,7 +49,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             new MenuItem("Catalogue", '/app/Catalogue', '../assets/img/CatalogueIcon.png'),
             new MenuItem("Devis", '/app/Devis', '../assets/img/DevisIcon.png'),
             new MenuItem("Factures", '/app/Factures', '../assets/img/FactureIcon.png'),
-            new MenuItem("Mon profil", '/app/MonProfil', '../assets/img/MonProfilIcon.png'),
+            new MenuItem("Mon profil", '/app/Profil', '../assets/img/MonProfilIcon.png'),
             new MenuItem("Paramètres", '/app/Parametres', '../assets/img/ParametreIcon.png')
             // ,
             // new MenuItem(

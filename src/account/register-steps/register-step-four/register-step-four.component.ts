@@ -63,6 +63,7 @@ export class RegisterStepFourComponent implements OnInit {
 
   save() {
     if(this.validateRaisonSociale()) {
+      this.model.statutJuridique = this.status
       this._infosEntrepriseService.createInfosEntreprise(this.model).subscribe(() => {
         this._router.navigate(['/account/redirect'], { state: { route: '/account/reister', step: '5', userId: this.code} });
       });

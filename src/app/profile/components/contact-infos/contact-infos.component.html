@@ -1,0 +1,28 @@
+<div class="profile-content " [formGroup]="formGroup">
+    <div class="grid">
+        <div class="col-6">
+            <app-input-group [control]="this.formGroup.get('addres')" [labelText]="'Adresse'" [placeholder]="'104 rue de la convention'">
+            </app-input-group>
+            <div class="pt-3"></div>
+            <app-dropdown-group [control]="this.formGroup.get('country')" [labelText]="'Pays'" [placeholder]="'Choisissez votre pays'" [options]="countries">
+            </app-dropdown-group>
+            <div class="pt-3"></div>
+            <app-input-group [control]="this.formGroup.get('telephone')" [labelText]="'Téléphone'" [placeholder]="'21200112233'">
+            </app-input-group>
+        </div>
+
+        <div class="col-6">
+            <app-dropdown-group [control]="this.formGroup.get('city')" [labelText]="'Ville'" [placeholder]="'Paris'" [options]="['Rabat', 'Tunisie', 'Paris']">
+            </app-dropdown-group>
+            <div class="pt-3"></div>
+            <app-input-group [control]="this.formGroup.get('postalCode')" [labelText]="'Code postal'" [placeholder]="'29000'">
+            </app-input-group>
+            <div class="pt-3"></div>
+            <app-input-group [control]="this.formGroup.get('email')" [labelText]="'E-mail'" [placeholder]="'utilisateur@gmail.com'">
+            </app-input-group>
+        </div>
+    </div>
+    <p-button label="Enregistrer" (click)="save()" styleClass="bg-dark-orange block ml-auto border-0 mt-3">
+    </p-button>
+
+</div>

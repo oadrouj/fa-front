@@ -1,0 +1,39 @@
+.profilWrapper {
+    height: 80.9vh;
+    padding-top: 6vh;
+    padding-left: 8vw;
+}
+
+:host>>>.p-tabview {
+    background: transparent;
+}
+
+:host>>>.p-tabview .p-tabview-nav li .p-tabview-nav-link,
+:host>>>.p-tabview .p-tabview-nav,
+:host>>>.p-tabview .p-tabview-panels,
+:host>>>.p-tabview .p-tabview-nav li:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link {
+    background-color: transparent;
+}
+
+:host>>>.p-tabview .p-tabview-nav li {
+    box-shadow: none;
+}
+
+:host>>>.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    /* background: #ffffff; */
+    color: #999999;
+    border-color: var(--dark-orange-color);
+    border-bottom-width: 3px;
+}
+
+:host>>>.p-tabview .p-tabview-panels {
+    padding-left: 0;
+}
+
+:host>>>.p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+    box-shadow: none;
+}
+
+:host>>>.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    color: #000;
+}

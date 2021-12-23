@@ -23,6 +23,8 @@ import {
   FactureInfosPaiementDto,
   ModePaiementEnum,
   FactureStatutEnum,
+  FileApiServiceProxy,
+  FactureItemDto,
 } from '@shared/service-proxies/service-proxies'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
 import * as moment from 'moment'
@@ -40,6 +42,10 @@ import { FacturePayementComponent } from './facture-payement/facture-payement.co
 import { AppConsts } from '@shared/AppConsts'
 import * as printJS from 'print-js'
 import { AppSessionService } from '@shared/session/app-session.service'
+import { DomSanitizer } from '@angular/platform-browser'
+import { ItemPreviewComponent } from '@shared/components/item-preview/item-preview.component'
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
 
 @Component({
   selector: 'app-factures',
@@ -49,7 +55,8 @@ import { AppSessionService } from '@shared/session/app-session.service'
 })
 export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   remiseAmount: number
-  favIcon: HTMLLinkElement = document.querySelector('#favIcon');
+  favIcon: HTMLLinkElement = document.querySelector('#favIcon')
+  logoSrc: string
 
   constructor(
     private _formatService: FormatService,
@@ -61,24 +68,30 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     public globalEventsService: GlobalEventsService,
     public dialogService: DialogService,
     private _convertDevisToFactureService: ConvertDevisToFactureService,
-    private _sessionService: AppSessionService
+    private _sessionService: AppSessionService,
+    private _fileApiServiceProxy: FileApiServiceProxy,
+    private _sanitizer: DomSanitizer,
   ) {}
 
   ngOnInit() {
     this.globalEventsService.announcedThePageChangedColorSubject(
       `var(--${this.primaryColor}-color`,
     )
-    
-    this.favIcon.href = "assets/img/FacturesLogo.png"
-    
+
+    this.favIcon.href = 'assets/img/FacturesLogo.png'
+
+    this._fileApiServiceProxy.download().subscribe((res) => {
+      let objectURL = this._sanitizer.bypassSecurityTrustUrl(
+        URL.createObjectURL(res.data),
+      )
+      this.logoSrc = objectURL as string
+    })
   }
 
   ngAfterViewInit() {
     if (window.history.state.clientId) {
-     this.newDevis(window.history.state.clientId) 
-     
+      this.newDevis(window.history.state.clientId)
     }
-
   }
 
   ngOnDestroy() {
@@ -88,8 +101,8 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   //#region Properties
   @ViewChild(FacturesDialogComponent, { static: false })
   child: FacturesDialogComponent
-  @ViewChild(TableComponent, { static: false })
-  tableChild: TableComponent
+  @ViewChild(TableComponent, { static: false }) tableChild: TableComponent
+  @ViewChild('prv', { static: true }) template: ItemPreviewComponent
   title = 'Facture'
   imageSrc = 'assets/img/FacturesLogo.png'
   primaryColor = 'orange'
@@ -116,7 +129,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       header: 'REFERENCE',
       field: 'reference',
       type: 'text',
-     
     },
     {
       header: 'CLIENT',
@@ -144,7 +156,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       header: 'STATUT',
       field: 'statut',
       type: 'text',
-      format: this.formatStatut, 
+      format: this.formatStatut,
     },
   ]
   DevisContentItemsCols = [
@@ -185,7 +197,10 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
             this._toastService.info({ detail: 'La facture est devient valide' })
             this.selectedDevisItem = {
               ...this.selectedDevisItem,
-              statut: this.parseStatutForStatutValide(res.result.dateEmission, res.result.echeancePaiement)
+              statut: this.parseStatutForStatutValide(
+                res.result.dateEmission,
+                res.result.echeancePaiement,
+              ),
             }
             this.tableChild.tableData.find(
               (item) => item.id == this.selectedDevisItem.id,
@@ -239,6 +254,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     return moment(dateEmission).add(echeance, 'days').toDate()
   }
 
+  //TODO:remove this method
   getUserName = () => this._sessionService.user.userName
 
   factureFormatReferenceNumber(reference: number, customPrefix) {
@@ -246,7 +262,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       reference,
       customPrefix ? customPrefix : ReferencePrefix.Facture,
     )
-   
   }
 
   clientAutoCompleteSearch(event: any) {
@@ -326,8 +341,8 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
                 (devis) => !devis || devis.id != this.selectedDevisItem.id,
               )
               this.calculateTotalMonatant()
-              this.selectedDevisItem = null;
-              this.summaryTotalHT = 0;
+              this.selectedDevisItem = null
+              this.summaryTotalHT = 0
               this.summaryTVA = 0
 
               this.emitRowDeletedEvent(this.tableChild.tableData[0])
@@ -356,7 +371,10 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   firstTimeCharged = true
   selectionChange(selectionEventObject) {
-    if (selectionEventObject.type == 'selectionChanged' || selectionEventObject.type == 'firstSelectionChanged') {
+    if (
+      selectionEventObject.type == 'selectionChanged' ||
+      selectionEventObject.type == 'firstSelectionChanged'
+    ) {
       this.selectedDevisItem = selectionEventObject.result
     } else if (selectionEventObject.type == 'delete') {
       this.selectedDevisItem = selectionEventObject.result
@@ -368,9 +386,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       // ? new Date(this.selectedDevisItem.dateEmission._i)
       // : new Date(this.selectedDevisItem.dateEmission._d),
     })
-    this.firstTimeCharged && (this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis);
+    this.firstTimeCharged &&
+      (this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis)
     this.firstTimeCharged = false
-    
   }
 
   onDialogClose() {
@@ -395,17 +413,18 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   calculateTotalMonatant() {
-    this.montantTotalAllDevis = 0;
+    this.montantTotalAllDevis = 0
     this.tableChild.tableData.forEach((item) => {
-      if(item) {
-        let totalHt =  item.factureItems 
-        .map((item) => item.unitPriceHT * item.quantity)
-        .reduce((accum, current) => accum + current)
+      if (item) {
+        let totalHt = item.factureItems
+          .map((item) => item.unitPriceHT * item.quantity)
+          .reduce((accum, current) => accum + current)
 
-        this.montantTotalAllDevis += item.factureItems 
-        .map((item) => item.totalTtc)
-        .reduce((accum, current) => accum + current) -
-            item.remise * totalHt / 100
+        this.montantTotalAllDevis +=
+          item.factureItems
+            .map((item) => item.totalTtc)
+            .reduce((accum, current) => accum + current) -
+          (item.remise * totalHt) / 100
       }
     })
   }
@@ -436,19 +455,25 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       newDevis.factureItems = newDevis.factureItems.map((item: any) => {
         let total_ht = item.unitPriceHT * item.quantity
-        return { ...item, totalTtc: total_ht + (item.tva * total_ht) / 100}
+        return { ...item, totalTtc: total_ht + (item.tva * total_ht) / 100 }
       })
 
-      let remiseAmount = (newDevis.factureItems
+      let remiseAmount =
+        (newDevis.factureItems
           .map((item) => item.unitPriceHT * item.quantity)
-          .reduce((accum, current) => accum + current) * newDevis.remise) / 100
+          .reduce((accum, current) => accum + current) *
+          newDevis.remise) /
+        100
 
-      newDevis.montantTtc = newDevis.factureItems
+      newDevis.montantTtc =
+        newDevis.factureItems
           .map((item) => item.totalTtc)
           .reduce((accum, current) => accum + current) - remiseAmount
-          this.montantTotalAllDevis += newDevis.montantTtc
+      this.montantTotalAllDevis += newDevis.montantTtc
 
-      this.tableChild.tableData = [...this.tableChild.tableData, { ...newDevis },
+      this.tableChild.tableData = [
+        ...this.tableChild.tableData,
+        { ...newDevis },
       ]
 
       this.tableChild.tableData.sort((a, b) =>
@@ -465,7 +490,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       })
 
       console.log(newDevis)
-      
     } else if (event.crudOperation == 'update') {
       this.selectedDevisItem = {
         ...event.result,
@@ -591,10 +615,10 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
                 ? FactureStatutEnum.PaiementRetard
                 : FactureStatutEnum.PaiementAttente
               : devis.statut
-        
-          let montantTtc = devis.factureItems.map((item) => item.totalTtc).reduce(
-            (accum, current) => accum + current,
-          )
+
+          let montantTtc = devis.factureItems
+            .map((item) => item.totalTtc)
+            .reduce((accum, current) => accum + current)
           let montantHt = devis.factureItems
             .map((item) => item.unitPriceHT * item.quantity)
             .reduce((accum, current) => accum + current)
@@ -604,7 +628,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         return { items: data, length, montantTotalAllDevis }
       }),
     )
-
   }
 
   updateApiCall(devisId: number, devisStatut: FactureStatutEnum, detail) {
@@ -742,34 +765,99 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   print() {
-    this._factureServiceProxy
-      .getByIdFactureReport(this.selectedDevisItem.id)
-      .subscribe((res) => {
-        printJS({
-          printable: res,
-          type: 'pdf',
-          base64: true,
-        })
+    // this._factureServiceProxy
+    //   .getByIdFactureReport(this.selectedDevisItem.id)
+    //   .subscribe((res) => {
+    //     printJS({
+    //       printable: res,
+    //       type: 'pdf',
+    //       base64: true,
+    //     })
+    //   })
+    html2canvas(document.getElementById('contentToConvert'), {
+      scale: 5,
+      onclone: (dcm) => {
+        let data = dcm.getElementById('contentToConvert')
+        data.classList.add('html2canvas')
+        dcm.getElementById(
+          'pageFooter',
+        ).innerText = this.selectedDevisItem.piedDePage
+      },
+    }).then((canvas) => {
+      let docWidth = 205
+      let docHeight = (canvas.height * docWidth) / canvas.width
+
+      const contentDataURL = canvas.toDataURL('image/png')
+
+      console.log(contentDataURL)
+      printJS({
+        printable: contentDataURL,
+        type: 'image',
+        base64: true,
       })
+    })
   }
 
-  downloadFacture() {
+  downloadAsPDF() {
+    let data = document.getElementById('contentToConvert') 
+    this.convertToPDF(data)
+    
+  }
+
+  convertToPDF(element){
+    html2canvas(element, {
+      scale: 5,
+      onclone: (dcm) => {
+        let data = dcm.getElementById('contentToConvert')
+        data.classList.add('html2canvas')
+        dcm.getElementById('pageFooter').innerText = this.selectedDevisItem.piedDePage
+
+      }
+    }).then((canvas) => {
+      let docWidth = 205
+      let docHeight = (canvas.height * docWidth) / canvas.width
+     
+      const contentDataURL = canvas.toDataURL('image/png')
+      let doc = new jsPDF('p', 'mm', 'a4')
+      let position = 0
+
+      const items = this.selectedDevisItem.devisItems || this.selectedDevisItem.factureItems
+      let table = document.querySelector('#contentToConvert p-table')
+      let rest = items.length % 5
+      let count = (items.length - rest) / 5 + +!!rest,
+      splittedItems: FactureItemDto
+      doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
+      // for(let i=0; i < count; i++){
+      //   splittedItems = items.slice(length, length + 4)
+      //   console.log(length)
+      //   doc.addPage()
+      //   doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
+     
+      // }
+       doc.save('exportedPdf.pdf')
+       
+    })
+  }
+
+  // downloadFacture() {
     // window.open(
     //   AppConsts.remoteServiceBaseUrl + '/FileLoader/GetFacture/0',
     //   '_blank',
     // )
-    this._factureServiceProxy
-      .getByIdFactureReport(this.selectedDevisItem.id)
-      .subscribe((res) => {
-        const linkSource = `data:application/pdf;base64,${res}`
-        const downloadLink = document.createElement('a')
-        const fileName = 'facture_template.pdf'
+    // this._factureServiceProxy
+    //   .getByIdFactureReport(this.selectedDevisItem.id)
+    //   .subscribe((res) => {
+    //     const linkSource = `data:application/pdf;base64,${res}`
+    //     const downloadLink = document.createElement('a')
+    //     const fileName = 'facture_template.pdf'
 
-        downloadLink.href = linkSource
-        downloadLink.download = fileName
-        downloadLink.click()
-      })
-  }
+    //     downloadLink.href = linkSource
+    //     downloadLink.download = fileName
+    //     downloadLink.click()
+    //   })
+  // }
+
+
 
   viewUpdateSelectedItemStatut(statut: any) {
     this.selectedDevisItem = {

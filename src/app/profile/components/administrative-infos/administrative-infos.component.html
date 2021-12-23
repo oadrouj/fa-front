@@ -1,0 +1,24 @@
+<div class="profile-content " [formGroup]="formGroup">
+    <div class="grid">
+        <div class="col-6">
+
+            <app-dropdown-group [control]="this.formGroup.get('legalStatus')" [labelText]="'Statut juridique'" [placeholder]="'Sélectionnez un type d’entreprise'" [options]="legalStatusOptions">
+            </app-dropdown-group>
+            <div class="pt-3"></div>
+            <app-input-group [control]="this.formGroup.get('if')" [labelText]="'Identifiant Fiscal (IF)'" [placeholder]="'452233'">
+            </app-input-group>
+        </div>
+
+        <div class="col-6">
+            <app-input-group [control]="this.formGroup.get('ice')" [labelText]="'Identifiant Commun de l’Entreprise (ICE)'" [placeholder]="'343256545'">
+            </app-input-group>
+            <div class="pt-3"></div>
+            <app-input-group [control]="this.formGroup.get('tp')" [labelText]="'Numéro de la Taxe Professionnelle (TP)'" [placeholder]="'75015'">
+            </app-input-group>
+
+        </div>
+    </div>
+    <p-button label="Enregistrer" (click)="save()" styleClass="bg-dark-orange block ml-auto border-0 mt-3">
+    </p-button>
+
+</div>

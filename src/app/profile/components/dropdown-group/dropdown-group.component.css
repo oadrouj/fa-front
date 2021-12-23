@@ -1,0 +1,22 @@
+:host>>>.p-inputtext {
+    background: #F4F4F4;
+    color: #6C6C6C;
+    font-weight: 500;
+}
+
+:host>>>.p-dropdown {
+    width: 100%;
+}
+
+:host>>>.p-dropdown .p-dropdown-label {
+    font-size: .875rem;
+}
+
+:host>>>.p-dropdown .p-dropdown-trigger {
+    background: #F4F4F4;
+}
+
+:host>>>.p-dropdown .p-dropdown-trigger-icon {
+    border: 7px solid #F4F4F4;
+    border-top: 8px solid #7d86a9;
+}

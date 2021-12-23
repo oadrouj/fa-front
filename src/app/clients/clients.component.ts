@@ -142,7 +142,7 @@ export class ClientsComponent extends AppComponentBase
     private _toastService: ToastService,
     private _confirmDialogService: ConfirmDialogService,
     private _router: Router,
-    private _countryService: CountryServiceAppServiceProxy,
+  private _countryService: CountryServiceAppServiceProxy,
   ) {
     super(injector)
   }
@@ -468,7 +468,7 @@ export class ClientsComponent extends AppComponentBase
 
   initialiseForm(): void {
     this.formClient = new ClientDto()
-    this.formClient.pays = 'MAROC'
+    this.formClient.pays = 'Maroc'
     this.formClient.deviseFacturation = 'MAD'
     this.formClient.categorieClient = 'PRFS'
     this.formClient.delaiPaiement = 30

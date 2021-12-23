@@ -1,0 +1,97 @@
+.content h1 {
+    font-size: 2rem;
+}
+
+.content .date {
+    font-size: 1.3rem;
+    color: #898e99;
+}
+
+.border-radius-6 {
+    border-radius: 6px;
+}
+
+.header .p-button-text {
+    font-size: 0.85rem;
+    padding: 3px;
+    color: var(--green-color);
+}
+
+:host ::ng-deep .p-datatable {
+    margin-top: .6rem;
+}
+
+:host ::ng-deep .p-datatable tr>th,
+:host ::ng-deep .p-datatable tr,
+:host ::ng-deep .p-datatable .p-datatable-scrollable-header {
+    background: transparent;
+}
+
+:host ::ng-deep .p-datatable tr>th,
+:host ::ng-deep .p-datatable tr>td {
+    font-size: 0.75rem;
+    padding: 1rem .25rem;
+    text-align: center;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead {
+    border: 1px solid #e4e4e4;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead th {
+    color: var(--green-color);
+}
+
+:host ::ng-deep .p-datatable-footer {
+    width: 60%;
+    padding-top: 1.5rem;
+    padding-right: 16px;
+    margin-left: auto;
+    text-align: end;
+    background-color: transparent;
+    border: none;
+}
+
+:host ::ng-deep .p-datatable-footer .p-col-9 {
+    text-align: right;
+    padding-right: 30px;
+}
+
+:host ::ng-deep .p-datatable-footer .p-grid * {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+:host ::ng-deep .p-datatable-footer span {
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+:host ::ng-deep .p-datatable-footer hr {
+    width: 65%;
+    margin-right: 0;
+    margin-top: 0.8rem;
+    margin-bottom: 1.1rem;
+    border-color: var(--light-gray-color);
+    border-style: solid;
+}
+
+.content img {
+    max-width: 100px;
+    max-height: 90px;
+}
+
+
+/* Pdf generation region */
+
+.html2canvas {
+    transform: scale(0.9)
+}
+
+.html2canvas * {
+    color: black !important;
+}
+
+.html2canvas .content .date {
+    font-size: 1.15rem;
+}

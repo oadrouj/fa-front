@@ -23,7 +23,8 @@
     --gray-color: #9A9FA8;
     --light-gray-color: #DDDDDD;
     --purple-color: #5D3D7D;
-    --light-purple-color: #DDD7E3
+    --light-purple-color: #DDD7E3;
+    --dark-orange-color: #EF790D;
 }
 
 .w-80 {
@@ -65,6 +66,10 @@
     color: var(--purple-color) !important;
 }
 
+.color-dark-orange {
+    color: var(--dark-orange-color) !important;
+}
+
 .bg-green {
     background-color: var(--green-color) !important;
 }
@@ -92,6 +97,10 @@
 
 .bg-purple {
     background-color: var(--purple-color) !important;
+}
+
+.bg-dark-orange {
+    background-color: var(--dark-orange-color) !important;
 }
 
 .p-dropdown .pi.pi-chevron-down:before {
