@@ -46,6 +46,7 @@ import {
   ClientDto,
   FactureStatutEnum,
   FactureDto,
+  FactureStatutEnum,
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
@@ -190,6 +191,8 @@ export class FacturesDialogComponent
                 && (this.saveBrouillonHide =  true)
               
               this.setFormGroup()
+              this.formGroup.get('client').setValue(this.devisItem.client)
+
               this.devisOptionsFormGroup
                 .get('remise')
                 .setValue(this.devisItem.remise)
@@ -210,7 +213,6 @@ export class FacturesDialogComponent
               this.devisOptionsFormGroup.get('devise').setValue(this.devisItem.currency)
               this.Currency = this.devisItem.currency
               this.calculateSummaryTotalHTAndTTC()
-              this.formGroup.get('client').setValue(this.devisItem.client)
               break
 
             case DialogStatus.Duplicate:
@@ -742,32 +744,26 @@ export class FacturesDialogComponent
       detail: 'Vous avez ajouté cette facture en brouillon',
     })
   }
-
-  updateApiCall(devisStatus: FactureStatutEnum) {
-    
-    let formValue = this.formGroup.value
-    let updateDevisInput = new UpdateFactureInput({
+  
+  getUpdatedValue(formValue, factureStatus?: FactureStatutEnum){
+    return new UpdateFactureInput({
       id: this.devisItem.id,
       reference: this.manuelReference
         ? this.formGroup.get('reference').value
         : this.selectedDevisItem.reference,
      
-      dateEmission:
-        this.selectedDevisItem.dateEmission != formValue.dateEmission
-          ? moment(formValue.dateEmission).add(1, 'days')
-          : moment(formValue.dateEmission),
-
+      dateEmission: formValue.dateEmission,
       echeancePaiement: +formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
       remise: this.devisOptionsFormGroup.get('remise').value,
-      statut: devisStatus,
+      statut: factureStatus,
       factureItems: formValue.factureItems.map(
         (devisItem) => {
           return new FactureItemDto({
             catalogueId: devisItem.catalogueId,
             designation: devisItem.catalogue.designation,
-            date: this.getExactDate(devisItem.date, new Date()),
+            date: devisItem.date,
             quantity: devisItem.quantity ?? 0,
             unit: devisItem.unit,
             unitPriceHT: devisItem.unitPriceHT ?? 0,
@@ -777,8 +773,16 @@ export class FacturesDialogComponent
         },
       ),
       clientId: formValue.client.id,
-      currency: this.Currency
+      currency: this.Currency,
+      montantTtc: this.summaryTotalTTC
     })
+  }
+
+  updateApiCall(factureStatus: FactureStatutEnum) {
+    
+    let formValue = this.formGroup.value
+    let updateDevisInput = this.getUpdatedValue(formValue, factureStatus)
+    
     this._factureServiceProxy
       .updateFacture(updateDevisInput)
       .subscribe((res) => {
@@ -1119,7 +1123,15 @@ export class FacturesDialogComponent
     }
     
     else {
-      res = this.selectedDevisItem
+      res = this.getUpdatedValue(this.formGroup.value)
+      if(this.selectedClientId == this.devisItem.clientId){
+        res.client = this.devisItem.client
+      }
+      else{
+        res.client = await this._clientServiceProxy
+          .getByIdClient(this.formGroup.value.client.id).toPromise()
+      }
+
     }
     
     this.template.previewAsPDF({

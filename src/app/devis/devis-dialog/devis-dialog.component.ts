@@ -705,21 +705,14 @@ export class DevisDialogComponent implements OnInit {
     })
   }
 
-  updateApiCall(devisStatus: DevisStatutEnum) {
-    
-    let formValue = this.formGroup.value
-    console.log(formValue)
-
-    let updateDevisInput = new UpdateDevisInput({
+  getUpdatedValue(formValue, devisStatus?: DevisStatutEnum){
+    return  new UpdateDevisInput({
       ...this.devisItem,
       id: this.devisItem.id,
       reference: this.manuelReference
         ? this.formGroup.get('reference').value
         : this.selectedDevisItem.reference,
-      dateEmission:
-        this.selectedDevisItem.dateEmission != formValue.dateEmission
-          ? moment(formValue.dateEmission).add(1, 'days')
-          : moment(formValue.dateEmission),
+      dateEmission: formValue.dateEmission,
       echeancePaiement: +formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
@@ -729,7 +722,7 @@ export class DevisDialogComponent implements OnInit {
         return new DevisItemDto({
           catalogueId: devisItem.catalogueId,
           designation: devisItem.catalogue.designation,
-          date: this.getExactDate(devisItem.date, new Date()),
+          date: devisItem.date,
           quantity: devisItem.quantity ?? 0,
           unit: devisItem.unit,
           unitPriceHT: devisItem.unitPriceHT ?? 0,
@@ -738,10 +731,15 @@ export class DevisDialogComponent implements OnInit {
         })
       }),
       clientId: formValue.client.id,
-      currency: this.Currency
+      currency: this.Currency,
+      montantTtc: this.summaryTotalTTC
     })
+  }
 
-    console.log(updateDevisInput)
+  updateApiCall(devisStatus: DevisStatutEnum) {
+    
+    let formValue = this.formGroup.value
+    let updateDevisInput = this.getUpdatedValue(formValue, devisStatus)
 
     this._devisServiceProxy.updateDevis(updateDevisInput).subscribe((res) => {
       if (res) {
@@ -808,7 +806,6 @@ export class DevisDialogComponent implements OnInit {
             this.clientSuggestions = res.items
           else {
             this.clientSuggestions = [new ClientForAutoCompleteDto({id: 0, nom: 'Ajouter un nouveau client ?'})]
-
           }
         })
     }, 500)
@@ -1017,7 +1014,15 @@ export class DevisDialogComponent implements OnInit {
     }
     
     else {
-      res = this.selectedDevisItem
+      res = this.getUpdatedValue(this.formGroup.value)
+      if(this.selectedClientId == this.devisItem.clientId){
+        res.client = this.devisItem.client
+      }
+      else{
+        res.client = await this._clientServiceProxy
+          .getByIdClient(this.formGroup.value.client.id).toPromise()
+      }
+      
     }
     
     this.template.previewAsPDF({
