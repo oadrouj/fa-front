@@ -12,6 +12,7 @@ import html2canvas from 'html2canvas'
 import * as moment from 'moment'
 import { AppSessionService } from '../../session/app-session.service'
 import jsPDF from 'jspdf'
+import { URL } from 'url'
 
 export interface ItemPreviewComponentArgs {
   item: any
@@ -95,7 +96,8 @@ export class ItemPreviewComponent implements OnInit {
         splittedItems: any
 
       doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
-      window.open(doc.output('bloburl'), '_blank');
+      let url= doc.output('bloburl');
+      (window as any).open(url, '_blank');
 
 
       // win.document.write(
