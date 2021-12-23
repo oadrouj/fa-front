@@ -367,6 +367,10 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       },
     })
+    
+    let element = document.body.querySelector('#cd') as HTMLElement
+    element.style.display = 'none'
+
   }
 
   firstTimeCharged = true

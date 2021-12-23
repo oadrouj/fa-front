@@ -472,6 +472,8 @@ export class FacturesDialogComponent
           },
           rejectCallback:() => { this.closeDevisConfirmDialog.close(event)}
         })
+        let element = document.body.querySelector('#cd') as HTMLElement
+        element.style.display = 'none'
       }
       
       else {
