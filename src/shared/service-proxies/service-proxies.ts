@@ -4136,6 +4136,7 @@ export class ReportGeneratorServiceProxy {
      * @param client_CreatorUserId (optional) 
      * @param client_Id (optional) 
      * @param currency (optional) 
+     * @param montantTtc (optional) 
      * @param lastModificationTime (optional) 
      * @param lastModifierUserId (optional) 
      * @param creationTime (optional) 
@@ -4143,7 +4144,7 @@ export class ReportGeneratorServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    getByteDataFacture(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_PendingInvoicesAmount: number | undefined, client_OverdueInvoicesAmount: number | undefined, client_ClientType: string | null | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, currency: string | null | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
+    getByteDataFacture(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_PendingInvoicesAmount: number | undefined, client_OverdueInvoicesAmount: number | undefined, client_ClientType: string | null | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, currency: string | null | undefined, montantTtc: number | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/ReportGenerator/GetByteDataFacture?";
         if (reference !== undefined && reference !== null)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
@@ -4244,6 +4245,10 @@ export class ReportGeneratorServiceProxy {
             url_ += "Client.Id=" + encodeURIComponent("" + client_Id) + "&";
         if (currency !== undefined && currency !== null)
             url_ += "Currency=" + encodeURIComponent("" + currency) + "&";
+        if (montantTtc === null)
+            throw new Error("The parameter 'montantTtc' cannot be null.");
+        else if (montantTtc !== undefined)
+            url_ += "MontantTtc=" + encodeURIComponent("" + montantTtc) + "&";
         if (lastModificationTime !== undefined && lastModificationTime !== null)
             url_ += "LastModificationTime=" + encodeURIComponent(lastModificationTime ? "" + lastModificationTime.toJSON() : "") + "&";
         if (lastModifierUserId !== undefined && lastModifierUserId !== null)
@@ -4340,6 +4345,7 @@ export class ReportGeneratorServiceProxy {
      * @param client_CreatorUserId (optional) 
      * @param client_Id (optional) 
      * @param currency (optional) 
+     * @param montantTtc (optional) 
      * @param lastModificationTime (optional) 
      * @param lastModifierUserId (optional) 
      * @param creationTime (optional) 
@@ -4347,7 +4353,7 @@ export class ReportGeneratorServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    getByteDataDevis(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_PendingInvoicesAmount: number | undefined, client_OverdueInvoicesAmount: number | undefined, client_ClientType: string | null | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, currency: string | null | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
+    getByteDataDevis(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_PendingInvoicesAmount: number | undefined, client_OverdueInvoicesAmount: number | undefined, client_ClientType: string | null | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, currency: string | null | undefined, montantTtc: number | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/ReportGenerator/GetByteDataDevis?";
         if (reference !== undefined && reference !== null)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
@@ -4448,6 +4454,10 @@ export class ReportGeneratorServiceProxy {
             url_ += "Client.Id=" + encodeURIComponent("" + client_Id) + "&";
         if (currency !== undefined && currency !== null)
             url_ += "Currency=" + encodeURIComponent("" + currency) + "&";
+        if (montantTtc === null)
+            throw new Error("The parameter 'montantTtc' cannot be null.");
+        else if (montantTtc !== undefined)
+            url_ += "MontantTtc=" + encodeURIComponent("" + montantTtc) + "&";
         if (lastModificationTime !== undefined && lastModificationTime !== null)
             url_ += "LastModificationTime=" + encodeURIComponent(lastModificationTime ? "" + lastModificationTime.toJSON() : "") + "&";
         if (lastModifierUserId !== undefined && lastModifierUserId !== null)
@@ -7652,12 +7662,12 @@ export class DevisDto implements IDevisDto {
     clientId: number;
     client: ClientDto;
     currency: string | undefined;
+    montantTtc: number;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
     id: number;
-    montantTtc: number;
 
     constructor(data?: IDevisDto) {
         if (data) {
@@ -7685,6 +7695,7 @@ export class DevisDto implements IDevisDto {
             this.clientId = _data["clientId"];
             this.client = _data["client"] ? ClientDto.fromJS(_data["client"]) : <any>undefined;
             this.currency = _data["currency"];
+            this.montantTtc = _data["montantTtc"];
             this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
             this.lastModifierUserId = _data["lastModifierUserId"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
@@ -7717,6 +7728,7 @@ export class DevisDto implements IDevisDto {
         data["clientId"] = this.clientId;
         data["client"] = this.client ? this.client.toJSON() : <any>undefined;
         data["currency"] = this.currency;
+        data["montantTtc"] = this.montantTtc;
         data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
         data["lastModifierUserId"] = this.lastModifierUserId;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
@@ -7745,13 +7757,12 @@ export interface IDevisDto {
     clientId: number;
     client: ClientDto;
     currency: string | undefined;
+    montantTtc: number;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
     id: number;
-    montantTtc: number;
-
 }
 
 export class EstimationInitiationDto implements IEstimationInitiationDto {
@@ -8035,6 +8046,7 @@ export class UpdateFactureInput implements IUpdateFactureInput {
     statut: FactureStatutEnum;
     factureItems: FactureItemDto[] | undefined;
     clientId: number;
+    montantTtc: number;
     id: number;
 
     constructor(data?: IUpdateFactureInput) {
@@ -8062,6 +8074,7 @@ export class UpdateFactureInput implements IUpdateFactureInput {
                     this.factureItems.push(FactureItemDto.fromJS(item));
             }
             this.clientId = _data["clientId"];
+            this.montantTtc = _data["montantTtc"];
             this.id = _data["id"];
         }
     }
@@ -8089,6 +8102,7 @@ export class UpdateFactureInput implements IUpdateFactureInput {
                 data["factureItems"].push(item.toJSON());
         }
         data["clientId"] = this.clientId;
+        data["montantTtc"] = this.montantTtc;
         data["id"] = this.id;
         return data; 
     }
@@ -8112,6 +8126,7 @@ export interface IUpdateFactureInput {
     statut: FactureStatutEnum;
     factureItems: FactureItemDto[] | undefined;
     clientId: number;
+    montantTtc: number;
     id: number;
 }
 
@@ -8127,12 +8142,12 @@ export class FactureDto implements IFactureDto {
     clientId: number;
     client: ClientDto;
     currency: string | undefined;
+    montantTtc: number;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
     id: number;
-    montantTtc: number;
 
     constructor(data?: IFactureDto) {
         if (data) {
@@ -8160,6 +8175,7 @@ export class FactureDto implements IFactureDto {
             this.clientId = _data["clientId"];
             this.client = _data["client"] ? ClientDto.fromJS(_data["client"]) : <any>undefined;
             this.currency = _data["currency"];
+            this.montantTtc = _data["montantTtc"];
             this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
             this.lastModifierUserId = _data["lastModifierUserId"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
@@ -8192,6 +8208,7 @@ export class FactureDto implements IFactureDto {
         data["clientId"] = this.clientId;
         data["client"] = this.client ? this.client.toJSON() : <any>undefined;
         data["currency"] = this.currency;
+        data["montantTtc"] = this.montantTtc;
         data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
         data["lastModifierUserId"] = this.lastModifierUserId;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
@@ -8220,13 +8237,12 @@ export interface IFactureDto {
     clientId: number;
     client: ClientDto;
     currency: string | undefined;
+    montantTtc: number;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
     id: number;
-    montantTtc: number;
-
 }
 
 export class InvoiceInitiationDto implements IInvoiceInitiationDto {
