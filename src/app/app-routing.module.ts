@@ -38,6 +38,12 @@ import { AppRouteGuard } from '@shared/auth/auth-route-guard';
                         canActivate: [AppRouteGuard] 
 
                     },
+                    {
+                        path: 'Profil',
+                        loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule),
+                        data: { preload: true},
+                        canActivate: [AppRouteGuard]
+                    }
                     
                     // { path: 'home', component: HomeComponent,  canActivate: [AppRouteGuard] },
                     // { path: 'users', component: UsersComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },

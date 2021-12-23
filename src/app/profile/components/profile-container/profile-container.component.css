@@ -1,0 +1,11 @@
+.profilContainer {
+    margin-top: 5vh;
+    border-radius: 1.3rem;
+    padding-left: 2rem;
+    padding-right: 3rem;
+    width: 75%;
+}
+
+p-button[label=Enregistrer] {
+    margin-left: auto;
+}

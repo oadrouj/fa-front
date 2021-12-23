@@ -45,6 +45,7 @@ import {
   CountryServiceAppServiceProxy,
   ClientDto,
   FactureStatutEnum,
+  FactureDto,
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
@@ -86,6 +87,7 @@ export class FacturesDialogComponent
   countries: CountryDto[]
   devisIsSaved: any
   saveBrouillonHide = false
+  previousPreviewState: { item: any; title: any; summaryTotalHT: any; summaryTVA: any; remiseAmount: any; contentItemsCols: any }
   //#endregion
 
   constructor(
@@ -126,6 +128,8 @@ export class FacturesDialogComponent
       ({ statut, dialogComponent, isConvertedDevis }) => {
         document.body.style.overflow = 'hidden'
         this.manuelReference = false
+        this.saveBrouillonHide =  false
+
         if (dialogComponent == 'facture') {
           this.initiateSummaryValues()
           this.visible && (document.body.style.overflow = 'hidden')
@@ -133,7 +137,7 @@ export class FacturesDialogComponent
             case DialogStatus.New:
             this.devisIsSaved = false
               if (isConvertedDevis) {
-                this.getNewReference()
+                this.getNewReferenceWithIntroMessageAndFooter()
                 this.initiateFormGroupWithTableControls()
                 this.dialogTitle = 'Nouvelle'
                 this.selectedDevisItem = {
@@ -162,7 +166,7 @@ export class FacturesDialogComponent
               }
                else {
                 this.initiateFormGroupForNewDevis()
-                this.getNewReference()  
+                this.getNewReferenceWithIntroMessageAndFooter()  
 
                 this.dialogTitle = 'Nouvelle'
                 this.selectedClientId &&
@@ -180,11 +184,10 @@ export class FacturesDialogComponent
               this.initiateFormGroupWithTableControls()
               this.dialogTitle = 'Modifier'
               this.devisItem = this.selectedDevisItem
-              this.reference = this.devisItem.reference
+              this.reference = this.devisItem.reference;
 
-              this.saveBrouillonHide =  false
-              this.devisItem.statut == FactureStatutEnum.PaiementAttente ||
-              this.devisItem.statut == FactureStatutEnum.PaiementRetard && (this.saveBrouillonHide =  true)
+              (this.devisItem.statut == FactureStatutEnum.PaiementAttente || this.devisItem.statut == FactureStatutEnum.PaiementRetard) 
+                && (this.saveBrouillonHide =  true)
               
               this.setFormGroup()
               this.devisOptionsFormGroup
@@ -266,6 +269,7 @@ export class FacturesDialogComponent
     isConvertedDevis
   }>
   @Input() factureFormatReferenceNumber: (number) => string
+  @Input() template: any
   @Output() openDialogEvent = new EventEmitter()
   @Output() closeDialogEvent = new EventEmitter()
   @Output() crudOperationEvent = new EventEmitter()
@@ -298,7 +302,7 @@ export class FacturesDialogComponent
   cols = [
     {
       header: 'DESIGNATION',
-      field: 'designation',
+      field: 'catalogue',
       type: 'autocomplete',
       colspan: 2,
     },
@@ -387,11 +391,16 @@ export class FacturesDialogComponent
   setFormGroup() {
     let factureItems = this.selectedDevisItem.factureItems.map((item: any) => {
       this.getFromArrayControl.push(this.initiateTableForm())
+
       return {
-        ...item,
-        designation: {designation: item.designation},
+        catalogue: {designation: item.designation},
         date: item.date.toDate(),
+        quantity: item.quantity,
+        unit: item.unit,
+        unitPriceHT: item.unitPriceHT,
         tva: !item.tva ? 20 : item.tva,
+        totalTtc: item.totalTtc,
+        catalogueId: item.catalogueId
       }
     })
 
@@ -408,7 +417,7 @@ export class FacturesDialogComponent
   initiateTableForm() {
     return this.formBuilder.group({
       catalogueId: [null],
-      designation: ['', Validators.required],
+      catalogue: [{designation: '', id: 0}, Validators.required],
       date: [this.formGroup.get('dateEmission').value, Validators.required],
       quantity: [1, Validators.required],
       unit: ['Heures', Validators.required],
@@ -442,7 +451,14 @@ export class FacturesDialogComponent
 
     @ViewChild("cd") closeDevisConfirmDialog: ConfirmDialog
     closeDialog() {
-      console.log(this.devisIsSaved)
+      if(this.previousPreviewState)  {
+        this.template.item = this.previousPreviewState.item
+        this.template.title = this.previousPreviewState.title
+        this.template.summaryTotalHT = this.previousPreviewState.summaryTotalHT
+        this.template.summaryTVA - this.previousPreviewState.summaryTVA
+        this.template.remiseAmount = this.previousPreviewState.remiseAmount
+        this.template.contentItemsCols = this.previousPreviewState.contentItemsCols
+      }
       if((this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') && !this.devisIsSaved){
         this._confirmDialogService.confirm({
           message: 'Etes-vous sûr de vouloir quitter ? Toutes les données saisies seront perdues',
@@ -478,6 +494,15 @@ export class FacturesDialogComponent
     })
   }
 
+  getNewReferenceWithIntroMessageAndFooter() {
+    this._factureServiceProxy.getLastReferenceWithIntroMessageAndFooter().subscribe((res) => {
+      this.referenceCount = res.lastReference + 1
+      this.reference = this.factureFormatReferenceNumber(this.referenceCount)
+
+      this.formGroup.get('messageIntroduction').setValue(res.invoiceIntroMessage)
+      this.formGroup.get('piedDePage').setValue(res.invoiceFooter)
+    })
+  }
   changeReference() {
     this.manuelReference = true
     this.formGroup.addControl(
@@ -607,6 +632,45 @@ export class FacturesDialogComponent
   }
 
   //#endregion
+  async getNewItemValue(){
+    let formValue = this.formGroup.value
+    let result = await this._clientServiceProxy.getByIdClient(formValue.client.id).toPromise()
+
+     return this.template.item = new FactureDto({
+      reference: this.manuelReference
+        ? this.formGroup.get('reference').value
+        : this.factureFormatReferenceNumber( this.referenceCount),
+     
+      dateEmission: this.getExactDate(formValue.dateEmission, new Date()),
+      echeancePaiement: formValue.echeancePaiement,
+      messageIntroduction: formValue.messageIntroduction,
+      piedDePage: formValue.piedDePage,
+      remise: this.devisOptionsFormGroup.get('remise').value ?? 0,
+      statut: FactureStatutEnum.Undefined,
+      factureItems: formValue.factureItems.map((devisItem) => {
+        return new FactureItemDto({
+          catalogueId: devisItem.catalogueId,
+          designation: devisItem.catalogue.designation,
+          date: this.getExactDate(devisItem.date, new Date()),
+          quantity: devisItem.quantity ?? 0,
+          unit: devisItem.unit,
+          unitPriceHT: devisItem.unitPriceHT ?? 0,
+          tva: devisItem.tva || 0,
+          totalTtc: devisItem.totalTtc,
+        })
+      }),
+      clientId: formValue.client.id,
+      client: result,
+      currency: this.Currency,
+      montantTtc: this.summaryTotalTTC,
+      lastModificationTime: null,
+      lastModifierUserId: null,
+      creationTime: null, 
+      creatorUserId: null, 
+      id: null
+     })
+    
+}
 
   //#region Crud operations
   createApiCall(devisStatus: FactureStatutEnum) {
@@ -627,7 +691,7 @@ export class FacturesDialogComponent
         (devisItem) => {
           return new FactureItemDto({
             catalogueId: devisItem.catalogueId,
-            designation: devisItem.designation.designation || devisItem.designation,
+            designation: devisItem.catalogue.designation,
             date: this.getExactDate(devisItem.date, new Date()),
             quantity: devisItem.quantity ?? 0,
             unit: devisItem.unit,
@@ -700,7 +764,7 @@ export class FacturesDialogComponent
         (devisItem) => {
           return new FactureItemDto({
             catalogueId: devisItem.catalogueId,
-            designation: devisItem.designation.designation || devisItem.designation,
+            designation: devisItem.catalogue.designation,
             date: this.getExactDate(devisItem.date, new Date()),
             quantity: devisItem.quantity ?? 0,
             unit: devisItem.unit,
@@ -840,7 +904,7 @@ export class FacturesDialogComponent
     let factureItems = this.formGroup.get('factureItems') as FormArray
     factureItems.at(index).setValue({
       catalogueId: event.id,
-      designation: {designation: event.designation},
+      catalogue: {designation: event.designation},
       date: event.addedDate.toDate(),
       quantity: event.minimalQuantity,
       unit: event.unity || 'Heures',
@@ -1038,61 +1102,32 @@ export class FacturesDialogComponent
       })
   }
 
-  preview() {
-    let formValue = this.formGroup.value
-    let factureItems = formValue.factureItems.map(
-      (devisItem) => {
-        return new FactureItemDto({
-          catalogueId: devisItem.catalogueId,
-          designation: devisItem.designation.designation || devisItem.designation,
-          date: this.getExactDate(devisItem.date, new Date()),
-          quantity: devisItem.quantity ?? 0,
-          unit: devisItem.unit,
-          unitPriceHT: devisItem.unitPriceHT ?? 0,
-          tva: devisItem.tva,
-          totalTtc: devisItem.totalTtc,
-        })
-      },
-    )
-    let dateEmission = this.getExactDate(formValue.dateEmission, new Date())
-
-    let reference
-    if (this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') {
-      reference = this.manuelReference
-        ? this.formGroup.get('reference').value
-        : this.factureFormatReferenceNumber(this.referenceCount)
-      
-    } else {
-      reference = this.manuelReference
-        ? this.formGroup.get('reference').value
-        : this.selectedDevisItem.reference
+  async preview() {
+    this.previousPreviewState = {
+      item: {...this.template.item},
+      title: this.template.title,
+      summaryTotalHT: this.template.summaryTotalHT,
+      summaryTVA: this.template.summaryTVA,
+      remiseAmount: this.template.remiseAmount,
+      contentItemsCols: this.template.contentItemsCols
     }
-
-    this._factureServiceProxy
-      .getByteDataFactureReport(
-        reference,
-        dateEmission,
-        formValue.echeancePaiement,
-        formValue.messageIntroduction,
-        formValue.piedDePage,
-        this.devisOptionsFormGroup.get('remise').value,
-        this.Currency,
-        this.selectedDevisItem ? this.selectedDevisItem.statut : undefined,
-        factureItems,
-        formValue.client.id,
-        
-      )
-      .subscribe((res) => {
-        // window.open("data:application/pdf;base64," + res);
-        var win = window.open()
-        win.document.write(
-          '<iframe src="data:application/pdf;base64,' +
-            res +
-            '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>',
-        )
+    let res;
+    if(this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') {
+      res = await this.getNewItemValue()
+    }
+    
+    else {
+      res = this.selectedDevisItem
+    }
+    
+    this.template.previewAsPDF({
+      item : res,
+      remiseAmount: this.remiseAmount,
+      summaryTVA: this.summaryTVA,
+      summaryTotalHT: this.summaryTotalHT,
       })
-  }
 
+  }
   getExactDate(date1, date2, offset = 'add') {
     return date2
       ? DateHelper.initiateTimeFromDate(date1).getTime() ==

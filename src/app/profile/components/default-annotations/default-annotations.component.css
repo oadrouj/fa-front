@@ -1,0 +1,21 @@
+:host>>>.p-inputtext {
+    background: #F4F4F4;
+    color: #6C6C6C;
+    font-weight: 500;
+}
+
+.profile-content {
+    padding-top: 4vh;
+}
+
+:host>>>.profile-content .p-selectbutton .p-button {
+    background-color: #E4EDF2;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    box-shadow: none;
+}
+
+:host>>>.profile-content .p-selectbutton .p-button.p-highlight {
+    background-color: var(--dark-orange-color);
+}

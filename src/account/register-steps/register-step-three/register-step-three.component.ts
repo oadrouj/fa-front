@@ -31,13 +31,12 @@ export class RegisterStepThreeComponent implements OnInit {
     this.model.userId = this.code;
     this.primengConfig.ripple = true;
   }
-  
   select(selected): void {
     this.status = selected;
-    this.ppSelected = selected == 'pp';
-    this.aeSelected = selected == 'ae';
-    this.sarlSelected = selected == 'sarl';
-    this.saSelected = selected == 'sa';
+    this.ppSelected = selected == 'Professionnel particulier';
+    this.aeSelected = selected == 'Auto entrepreneur';
+    this.sarlSelected = selected == 'SARL';
+    this.saSelected = selected == 'SA';
   }
 
   save() {

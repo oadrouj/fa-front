@@ -37,6 +37,9 @@ import { DevisDialogComponent } from '../app/devis/devis-dialog/devis-dialog.com
 import { FacturePayementComponent } from '../app/factures/facture-payement/facture-payement.component';
 import { FacturesDialogComponent } from '../app/factures/factures-dialog/factures-dialog.component';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { ItemPreviewComponent} from './components/item-preview/item-preview.component'
+import {FileUploadModule} from 'primeng/fileupload';
+import { NgxdModule } from '@ngxd/core';
 
 
 @NgModule({
@@ -71,12 +74,15 @@ import { ConfirmationService, MessageService } from 'primeng/api';
     ToggleButtonModule,
     SkeletonModule,
     DynamicDialogModule,
+    FileUploadModule,
+    NgxdModule,
     
   ],
 
   declarations: [
     TableComponent,  
     FacturesDialogComponent,
+    ItemPreviewComponent,
   ],
   providers: [MessageService, ConfirmationService, ToastService, ConfirmDialogService],
   exports: [
@@ -112,6 +118,10 @@ import { ConfirmationService, MessageService } from 'primeng/api';
     DynamicDialogModule,
     TableComponent,  
     FacturesDialogComponent,
+    ItemPreviewComponent,
+    FileUploadModule,
+    NgxdModule,
+    
   ],
 })
 export class PrimengSharedModule { }

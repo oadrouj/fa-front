@@ -50,141 +50,21 @@
                 <div class="header flex justify-content-between">
                     <p-splitButton class=" border-radius-6" [label]="selectedDevisItem ? formatStatut(selectedDevisItem.statut) : ' '" [model]="getStatusOptions()"> </p-splitButton>
                     <div class="flex">
-                        <button pButton label="Télécharger" (click)="downloadFacture()" class="p-button-text"></button>
+                        <button pButton label="Télécharger" (click)="downloadAsPDF()" class="p-button-text"></button>
                         <button pButton label="Imprimer" class="p-button-text" (click)="print()"></button>
                         <button pButton label="Dupliquer" class="p-button-text" (click)="duplicateDevis()"></button>
                         <button pButton label="Modifier" class="p-button-text" (click)="editDevis()"></button>
                         <button pButton label="Supprimer" class="p-button-text" (click)="deleteDevis()"></button>
                     </div>
                 </div>
-                <div class="content pt-4 px-3">
-                    <div class="grid px-1">
-                        <div class="col-5 pt-1">
-                            <img src="assets/img/logo.png" alt="">
-                        </div>
-                        <div class="col-7 text-right">
-                            <h2>{{title}} {{selectedDevisItem && selectedDevisItem.reference}}
-                            </h2>
-                            <span class="date block line-height-1">Date d'émission: {{selectedDevisItem && selectedDevisItem.dateEmission | date:'shortDate'}}
-                            </span>
-                            <span class="date block line-height-1">
-                                Date d'échéance: {{selectedDevisItem && getDateEcheance(selectedDevisItem.dateEmission, selectedDevisItem.echeancePaiement) | date:'shortDate'}}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="grid px-2 pt-3">
-                        <div class="col-8 flex flex-column">
-                            <span class="color-gray">Pour:</span>
-                            <span>{{selectedDevisItem && selectedDevisItem.client.nom}}</span>
-                            <span>{{selectedDevisItem && selectedDevisItem.client.adresse}}</span>
-                            <span>{{selectedDevisItem && selectedDevisItem.client.ville}}
-                                {{selectedDevisItem && selectedDevisItem.client.codePostal}}</span>
-                            <span>{{selectedDevisItem && selectedDevisItem.client.pays}}</span>
-                            <span class="mt-3">{{selectedDevisItem && selectedDevisItem.client.telPortable}}</span>
-                        </div>
-                        <div class="col-4">
-                            <span class="block color-gray">De</span>
-                            <span>{{selectedDevisItem && getUserName()}}</span>
-                        </div>
-                    </div>
-
-                </div>
-
-                <p-table [columns]="DevisContentItemsCols" [value]="selectedDevisItem && selectedDevisItem.factureItems">
-                    <ng-template pTemplate="header" let-yourColumnArrayVaraible>
-                        <tr>
-                            <ng-container *ngFor="let colVar of yourColumnArrayVaraible">
-                                <th [colSpan]="colVar.colspan">
-                                    {{colVar.header}}
-                                </th>
-                            </ng-container>
-
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-yourRowVaraible let-yourColumnArrayVaraible="columns">
-                        <tr>
-                            <ng-container *ngFor="let colVar of yourColumnArrayVaraible">
-                                <ng-container [ngSwitch]="colVar.type">
-                                    <ng-container *ngSwitchCase="'date'">
-                                        <td [colSpan]="colVar.colspan">
-                                            {{yourRowVaraible[colVar.field] | date:'shortDate'}}
-                                        </td>
-                                    </ng-container>
-                                    <ng-container *ngSwitchCase="'currency'">
-                                        <td [colSpan]="colVar.colspan" mode="decimal">
-                                            {{yourRowVaraible[colVar.field] | number:'1.2-2' }} {{' ' + (selectedDevisItem && selectedDevisItem.currency)}}
-                                        </td>
-                                    </ng-container>
-                                    <ng-container *ngSwitchCase="'pourcentage'">
-                                        <td [colSpan]="colVar.colspan">
-                                            {{yourRowVaraible[colVar.field] + '%'}}
-                                        </td>
-                                    </ng-container>
-
-                                    <ng-container *ngSwitchDefault>
-                                        <td [colSpan]="colVar.colspan">
-                                            {{yourRowVaraible[colVar.field]}}
-                                        </td>
-                                    </ng-container>
-
-                                </ng-container>
-
-                            </ng-container>
-
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="summary" let-yourColumnArrayVaraible>
-
-                        <div class="grid">
-                            <div class="col-md-7">
-                                <span>MONTANT TOTAL HT</span>
-                            </div>
-                            <div class="col-xl-5">
-                                <span>{{this.summaryTotalHT | number:'1.2-2' }}
-                                    {{' ' + (selectedDevisItem && selectedDevisItem.currency)}}</span>
-                            </div>
-                        </div>
-
-                        <div class="grid">
-                            <div class="col-7">
-                                <span>REMISE</span>
-                            </div>
-                            <div class="col-5">
-                                <span>{{(selectedDevisItem ? this.remiseAmount : 0) | number:'1.2-2' }}
-                                    {{' ' +  (selectedDevisItem && selectedDevisItem.currency)}}</span>
-                            </div>
-                        </div>
-
-                        <div class="grid ">
-                            <div class="col-md-7">
-                                <span>TVA</span>
-                            </div>
-                            <div class="col-md-5">
-                                <span>{{this.summaryTVA | number:'1.2-2' }}
-                                    {{' ' + (selectedDevisItem && selectedDevisItem.currency)}}</span>
-                            </div>
-                        </div>
-
-                        <hr>
-
-                        <div class="grid">
-                            <div class="col-md-7">
-                                <span>TOTAL ESTIME TTC</span>
-                            </div>
-                            <div class="col-md-5">
-                                <span>{{(selectedDevisItem ? selectedDevisItem.montantTtc : 0) | number:'1.2-2' }}
-                                    {{' ' +  (selectedDevisItem && selectedDevisItem.currency)}}</span>
-                            </div>
-                        </div>
-                    </ng-template>
-                </p-table>
+                <app-item-preview #prv [item]="selectedDevisItem" [title]="title" [logoSrc]="logoSrc" [summaryTotalHT]="summaryTotalHT" [summaryTVA]="summaryTVA" [remiseAmount]="remiseAmount">
+                </app-item-preview>
             </div>
         </div>
     </div>
 </div>
 
-
 <!-- Dialog -->
 <app-factures-dialog #devisDialog [visible]="displayDialog" (openDialogEvent)="displayDialog=true" (closeDialogEvent)="onDialogClose()" (crudOperationEvent)="crudOperationTreatment($event)" [factureFormatReferenceNumber]="factureFormatReferenceNumber"
-    [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()" [dialogStatusEvent]="dialogStatusEvent.asObservable()">
+    [SelectDevisItemEvent]="notifySelectedDevisChanged.asObservable()" [dialogStatusEvent]="dialogStatusEvent.asObservable()" [template]="template">
 </app-factures-dialog>

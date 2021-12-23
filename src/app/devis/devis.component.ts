@@ -23,6 +23,7 @@ import {
   DevisItemDto,
   DevisServiceProxy,
   DevisStatutEnum,
+  FileApiServiceProxy,
 } from '@shared/service-proxies/service-proxies'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
 import * as moment from 'moment'
@@ -46,6 +47,8 @@ import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import jspdf from 'jspdf'
 import domtoimage from 'dom-to-image';
+import { ItemPreviewComponent } from '@shared/components/item-preview/item-preview.component'
+import { DomSanitizer } from '@angular/platform-browser'
 
 @Component({
   selector: 'app-devis',
@@ -56,8 +59,13 @@ import domtoimage from 'dom-to-image';
 export class DevisComponent implements OnInit, AfterViewInit {
   remiseAmount: number
   @ViewChild('factureDialog', {})
+  
   sample: DynamicDialogRef
+
+  @ViewChild('prv', {static: true}) template: ItemPreviewComponent
+
   sampleComponent = FacturesDialogComponent
+  logoSrc: string
   constructor(
     private _formatService: FormatService,
     public _fakeService: FakeService,
@@ -68,6 +76,8 @@ export class DevisComponent implements OnInit, AfterViewInit {
     public dialogService: DialogService,
     public globalEventsService: GlobalEventsService,
     private _sessionService: AppSessionService,
+    private _fileApiServiceProxy: FileApiServiceProxy,
+    private _sanitizer: DomSanitizer
   ) {}
 
   favIcon: HTMLLinkElement = document.querySelector('#favIcon')
@@ -77,6 +87,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
     )
 
     this.favIcon.href = 'assets/img/DevisLogo.png'
+    
+    this._fileApiServiceProxy.download().subscribe(res => {
+      let objectURL = this._sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(res.data))
+      this.logoSrc = objectURL as string
+    })
   }
 
   ngAfterViewInit() {
@@ -145,6 +160,8 @@ export class DevisComponent implements OnInit, AfterViewInit {
       format: this.formatStatut,
     },
   ]
+
+  //TODO: remove this property
   DevisContentItemsCols = [
     { header: 'DESIGNATION', field: 'designation', type: 'text', colspan: 2 },
     { header: 'DATE', field: 'date', type: 'date', colspan: 0 },
@@ -742,52 +759,29 @@ export class DevisComponent implements OnInit, AfterViewInit {
   }
   //#endregion
 
-  downloadDevis() {
-    this._devisServiceProxy
-      .getByIdDevisReport(this.selectedDevisItem.id)
-      .subscribe((res) => {
-        const linkSource = `data:application/pdf;base64,${res}`
-        const downloadLink = document.createElement('a')
-        const fileName = 'Devis.pdf'
-
-        downloadLink.href = linkSource
-        downloadLink.download = fileName
-        downloadLink.click()
-      })
-  }
-
   print() {
-    this._devisServiceProxy
-      .getByIdDevisReport(this.selectedDevisItem.id)
-      .subscribe((res) => {
-        console.log(res)
-        printJS({
-          printable: res,
-          type: 'pdf',
-          base64: true,
-        })
-      })
-    // html2canvas(document.getElementById('contentToConvert') , {
-    //   scale: 5,
-    //   onclone: (dcm) => {
-    //     let data = dcm.getElementById('contentToConvert')
-    //     data.classList.add('html2canvas')
-    //     dcm.getElementById('pageFooter').innerText = this.selectedDevisItem.piedDePage
+    html2canvas(document.getElementById('contentToConvert') , {
+      scale: 5,
+      onclone: (dcm) => {
+        let data = dcm.getElementById('contentToConvert')
+        data.classList.add('html2canvas')
+        dcm.getElementById('pageFooter').innerText = this.selectedDevisItem.piedDePage
 
-    //   }
-    // }).then((canvas) => {
-    //   let docWidth = 205
-    //   let docHeight = (canvas.height * docWidth) / canvas.width
+      }
+    }).then((canvas) => {
+      let docWidth = 205
+      let docHeight = (canvas.height * docWidth) / canvas.width
      
-    //   const contentDataURL = canvas.toDataURL('image/png')
-    //   console.log(contentDataURL)
-    //   printJS({
-    //     printable: contentDataURL.replace('data:image/png;base64,', ''),
-    //     type: 'pdf',
-    //     base64: true,
-    //   })
+      const contentDataURL = canvas.toDataURL('image/png')
+      
+      console.log(contentDataURL)
+      printJS({
+        printable: contentDataURL,
+        type: 'image',
+        base64: true,
+      })
      
-    // })
+    })
   }
 
   //TODO:Create a service for these two methods
@@ -808,8 +802,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
   downloadAsPDF() {
     let data = document.getElementById('contentToConvert') 
     this.convertToPDF(data)
-     
-
+    
   }
 
   convertToPDF(element){

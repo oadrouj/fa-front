@@ -1,0 +1,53 @@
+.profile-content {
+    padding-top: 7vh;
+}
+
+:host>>>.p-fileupload .p-button-label {
+    display: none;
+}
+
+:host>>>.p-fileupload {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+:host>>>.p-fileupload .p-fileupload-buttonbar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    border: none;
+    background: transparent;
+    padding-left: 1rem;
+}
+
+:host>>>.p-fileupload .p-fileupload-content {
+    padding-top: 0;
+    border: none;
+}
+
+:host>>>.p-fileupload .p-fileupload-choose,
+:host>>>.p-fileupload button.p-button {
+    background: transparent !important;
+    border-radius: 2rem !important;
+    border-color: #979797 !important;
+}
+
+:host>>>.p-fileupload .fa.fa-pen,
+:host>>>.p-fileupload .fa.fa-trash {
+    color: #979797;
+    margin-right: 0;
+    font-size: 0.8rem;
+}
+
+:host>>>.p-fileupload .p-fileupload-choose {
+    margin-top: 1rem;
+}
+
+:host>>>.p-fileupload button.p-button {
+    margin-bottom: 1rem;
+}
+
+:host>>>.p-fileupload p-progressbar {
+    display: none;
+}

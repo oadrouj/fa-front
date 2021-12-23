@@ -1,0 +1,32 @@
+<div class="profile-content " [formGroup]="formGroup">
+    <div class="grid">
+        <div class="col-6">
+            <p-fileUpload #fu name="demo" [customUpload]="true" (uploadHandler)="onUpload($event)" (onSelect)="onSelectFile($event)" [multiple]="false" iconaccept="image/*" maxFileSize="1000000" [showUploadButton]="false" [chooseLabel]="''" [cancelLabel]="''" chooseIcon="fa fa-pen"
+                cancelIcon="fa fa-trash" (onClear)="clear()" styleClass="pl-3">
+                <ng-template let-file pTemplate="file" class="dragdrop-area">
+                    <span class="block mb-3">Votre logo</span>
+                    <img [src]="displayedImage" height="150px" width="150px">
+                </ng-template>
+                <ng-template pTemplate="content">
+                    <div *ngIf="shouldShowDefaultImage">
+                        <span class="block mb-3">Votre logo</span>
+                        <img src='assets/img/Bitmap.png' height="150px" width="150px">
+                    </div>
+                </ng-template>
+            </p-fileUpload>
+        </div>
+        <div class="col-6">
+            <app-input-group [control]="this.formGroup.get('companyName')" [labelText]="'Nom de votre entreprise (Raison Sociale)'" [placeholder]="'Entreprise'">
+            </app-input-group>
+            <div class="pt-5"></div>
+            <app-input-group [control]="this.formGroup.get('activityArea')" [labelText]="'Secteur d’activité'" [placeholder]="'Choisissez votre secteur d’activité'">
+            </app-input-group>
+        </div>
+    </div>
+    <p-button label="Enregistrer" (click)="save()" styleClass="bg-dark-orange block ml-auto border-0 mt-3">
+    </p-button>
+
+</div>
+
+<p-confirmDialog id="cd" [baseZIndex]="10000" icon="pi pi-exclamation-triangle">
+</p-confirmDialog>
