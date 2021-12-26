@@ -27,7 +27,7 @@ import {
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 import { FormatService } from '@shared/services/format.service'
 import { ToastService } from '@shared/services/toast.service'
-import csc, { ICountry } from 'country-state-city'
+// import csc, { ICountry } from 'country-state-city'
 import { environment } from 'environments/environment'
 import * as moment from 'moment'
 import {
@@ -514,10 +514,10 @@ export class ClientsComponent extends AppComponentBase
   }
 
   //TODO: remove this method
-  getPaysFromIsoCode(): string {
-    console.log(this.client.pays, csc.getCountryByCode(this.client.pays).name)
-    return csc.getCountryByCode(this.client.pays).name
-  }
+  // getPaysFromIsoCode(): string {
+    // console.log(this.client.pays, csc.getCountryByCode(this.client.pays).name)
+    // return csc.getCountryByCode(this.client.pays).name
+  // }
 
   showDialogNouveau() {
     this.isInsert = true

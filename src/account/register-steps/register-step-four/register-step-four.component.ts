@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CreateInfosEntrepriseInput, InfosEntrepriseServiceProxy } from '@shared/service-proxies/service-proxies';
-import csc, { ICity, ICountry } from 'country-state-city';
+// import csc, { ICity, ICountry } from 'country-state-city';
 
 @Component({
   selector: 'app-register-step-four',
@@ -20,8 +20,8 @@ export class RegisterStepFourComponent implements OnInit {
 
   nomParticulier: boolean;
   nomEntreuprise: boolean;
-  countries: ICountry[];
-  cities: ICity[];
+  countries: any;
+  cities: any;
   pays: string;
 
   nameRequired: boolean = false;
@@ -35,16 +35,16 @@ export class RegisterStepFourComponent implements OnInit {
     this.nomEntreuprise = this.status.startsWith('s');
     this.nomParticulier = !this.status.startsWith('s');
 
-    this.countries = csc.getAllCountries();
+    // this.countries = csc.getAllCountries();
     this.pays = 'MA';
 
     this.countrySelected();
   }
 
   countrySelected(): void {
-    this.cities = csc.getCitiesOfCountry(this.pays);
-    this.model.pays = csc.getCountryByCode(this.pays).name;
-    this.model.ville = this.cities[0].name;
+    // this.cities = csc.getCitiesOfCountry(this.pays);
+    // this.model.pays = csc.getCountryByCode(this.pays).name;
+    // this.model.ville = this.cities[0].name;
   }
 
   validatePrenom(): boolean {

@@ -8,8 +8,8 @@
             <td><img src="../../../assets/img/EtapeQuatreBackground.png" /></td>
         </tr>
     </table>
-    <p class="consigne mt-4 text-center">Dites-nous en plus à propos de votre entreprise pour nous permettre de
-        générer</p>
+    <p class="consigne mt-4 text-center">Dites-nous en plus à propos de votre entreprise pour nous permettre de générer
+    </p>
     <p class="consigne text-center">vos factures et devis personnalisés.</p>
     <div id="form" class="mx-auto">
 
@@ -17,8 +17,7 @@
         <div *ngIf="nomEntreuprise">
             <p class="label text-left">Nom de l’entreprise / Raison Sociale *</p>
             <div class="input-block">
-                <input class="big-input" type="text" name="NomEntreprise" pInputText
-                    [(ngModel)]="model.raisonSociale" />
+                <input class="big-input" type="text" name="NomEntreprise" pInputText [(ngModel)]="model.raisonSociale" />
                 <img src="../../../assets/img/IconeEntreprise.png" />
             </div>
             <span class="validationMessage" *ngIf="raisonSocialeRequired">Ce champs est requis ! !</span>
@@ -27,8 +26,7 @@
         <div *ngIf="nomParticulier">
             <p class="label text-left">Nom et prénom *</p>
             <div class="input-block">
-                <input class="big-input" type="text" name="name" pInputText 
-                [(ngModel)]="model.raisonSociale" (change)="validatePrenom()" />
+                <input class="big-input" type="text" name="name" pInputText [(ngModel)]="model.raisonSociale" (change)="validatePrenom()" />
                 <img src="../../../assets/img/IconePrenom.png" />
             </div>
             <span class="validationMessage" *ngIf="nameRequired">Veuillez saisir votre prénom !</span>
@@ -60,8 +58,7 @@
                 <p class="label text-left">Pays *</p>
                 <div class="input-block">
                     <!-- <input type="text" name="Pays" pInputText [(ngModel)]="model.pays"> -->
-                    <p-dropdown [options]="countries" [(ngModel)]="pays" optionLabel="name" optionValue="isoCode"
-                         name="Pays" (click)="countrySelected()"></p-dropdown>
+                    <p-dropdown [options]="countries" [(ngModel)]="pays" optionLabel="name" optionValue="isoCode" name="Pays" (click)="countrySelected()"></p-dropdown>
                     <img src="../../../assets/img/IconePays.png" />
                 </div>
             </div>
