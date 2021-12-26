@@ -12,7 +12,8 @@
         "start": "ng serve --host 0.0.0.0 --port 4200",
         "test": "ng test",
         "scully": "npm scully --",
-        "scully:serve": "npx scully serve --"
+        "scully:serve": "npx scully serve --",
+        "build": "ng build && gzipper compress ./dist/outBuild ./dist/gzipped"
     },
     "dependencies": {
         "@angular/animations": "^11.0.2",
@@ -71,6 +72,7 @@
         "@types/moment-timezone": "^0.5.12",
         "@types/node": "^13.13.4",
         "codelyzer": "^6.0.0",
+        "gzipper": "^6.0.0",
         "jasmine-core": "~3.6.0",
         "jasmine-spec-reporter": "~5.0.0",
         "karma": "~5.1.1",
