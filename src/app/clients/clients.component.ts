@@ -27,7 +27,6 @@ import {
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 import { FormatService } from '@shared/services/format.service'
 import { ToastService } from '@shared/services/toast.service'
-// import csc, { ICountry } from 'country-state-city'
 import { environment } from 'environments/environment'
 import * as moment from 'moment'
 import {
@@ -59,6 +58,23 @@ interface Devise {
 })
 export class ClientsComponent extends AppComponentBase
   implements OnInit {
+
+    constructor(
+      injector: Injector,
+      private messageService: MessageService,
+      private confirmationService: ConfirmationService,
+      private _clientServiceProxy: ClientServiceProxy,
+      private _globalEventsService: GlobalEventsService,
+      private _formatService: FormatService,
+      private _factureServiceProxy: FactureServiceProxy,
+      private _devisServiceProxy: DevisServiceProxy,
+      private _toastService: ToastService,
+      private _confirmDialogService: ConfirmDialogService,
+      private _router: Router,
+      private _countryService: CountryServiceAppServiceProxy,
+    ) {
+      super(injector)
+    }
   display: boolean = false
   nouveau: boolean = true
   titreFormulaire: string = ''
@@ -130,23 +146,6 @@ export class ClientsComponent extends AppComponentBase
   localDevisList: {clientId: number, items: DevisDto[]}[] = []
   totalAmountPendingFactures: number
   totalAmountOverdueFactures: number
-
-  constructor(
-    injector: Injector,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
-    private _clientServiceProxy: ClientServiceProxy,
-    private _globalEventsService: GlobalEventsService,
-    private _formatService: FormatService,
-    private _factureServiceProxy: FactureServiceProxy,
-    private _devisServiceProxy: DevisServiceProxy,
-    private _toastService: ToastService,
-    private _confirmDialogService: ConfirmDialogService,
-    private _router: Router,
-  private _countryService: CountryServiceAppServiceProxy,
-  ) {
-    super(injector)
-  }
 
   scrollHeight: string = '0px'
   favIcon: HTMLLinkElement = document.querySelector('#favIcon')
@@ -512,12 +511,6 @@ export class ClientsComponent extends AppComponentBase
   fillClientApercu(client): void {
     this.clientApercu = client
   }
-
-  //TODO: remove this method
-  // getPaysFromIsoCode(): string {
-    // console.log(this.client.pays, csc.getCountryByCode(this.client.pays).name)
-    // return csc.getCountryByCode(this.client.pays).name
-  // }
 
   showDialogNouveau() {
     this.isInsert = true
