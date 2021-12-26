@@ -29,14 +29,11 @@ import {
   ClientForAutoCompleteDtoListResultDto,
   ClientServiceProxy,
   CreateFactureInput,
-  DevisDto,
-  DevisItemDto,
   DevisServiceProxy,
   UpdateFactureInput,
   FactureServiceProxy,
   FactureItemDto,
   DevisStatutEnum,
-  ReportGeneratorServiceProxy,
   CatalogueServiceProxy,
   CatalogueForAutoCompleteDto,
   CatalogueForAutoCompleteDtoListResultDto,
@@ -44,9 +41,9 @@ import {
   CountryDto,
   CountryServiceAppServiceProxy,
   ClientDto,
-  FactureStatutEnum,
   FactureDto,
   FactureStatutEnum,
+  CreateCatalogueInput,
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
@@ -69,7 +66,7 @@ import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
   providers: [ToastService],
 })
 export class FacturesDialogComponent
-  implements OnInit, AfterViewInit, OnDestroy {
+  implements OnInit, AfterViewInit {
   remiseValue: number
   filteredCatalogues: CatalogueForAutoCompleteDto[]
 
@@ -89,6 +86,7 @@ export class FacturesDialogComponent
   devisIsSaved: any
   saveBrouillonHide = false
   previousPreviewState: { item: any; title: any; summaryTotalHT: any; summaryTVA: any; remiseAmount: any; contentItemsCols: any }
+  devisItemRowIndex: number
   //#endregion
 
   constructor(
@@ -105,7 +103,6 @@ export class FacturesDialogComponent
     private _countryService: CountryServiceAppServiceProxy,
     private _confirmDialogService: ConfirmDialogService,
   ) {}
-  test = false
   ngOnInit() {
     this.devisIsSaved = false;
     this.initiateFormGroup()
@@ -114,6 +111,7 @@ export class FacturesDialogComponent
     //ClientDialog: 
     this.initialiseClientForm()
     //
+    this.initiateCatalogueFormGroup()
 
     this.eventsSubscription = this.SelectDevisItemEvent.subscribe(
       (devisItem: any) => {
@@ -255,8 +253,7 @@ export class FacturesDialogComponent
   ngAfterViewInit() {
     
   }
-  ngOnDestroy(): void {
-  }
+ 
   //#region properties
 
   title = 'Facture'
@@ -870,7 +867,21 @@ export class FacturesDialogComponent
       this._catalogueServiceProxy
         .getCatalogueForAutoComplete(event.query)
         .subscribe((res) => {
-          this.filteredCatalogues = res.items
+          if (res.items.length) {
+            this.filteredCatalogues = res.items
+          } else {
+            this.filteredCatalogues = [
+              new CatalogueForAutoCompleteDto({
+                designation: 'Ajouter un nouvel item',
+                addedDate: moment(this.formGroup.get('dateEmission').value),
+                htPrice: 0,
+                unity: undefined,
+                tva: undefined,
+                minimalQuantity: 1,
+                id: 0,
+              }),
+            ]
+          }
         })
     }, 500)
   }
@@ -908,10 +919,16 @@ export class FacturesDialogComponent
   
   onSelectCatalogAutoComplete(event: CatalogueForAutoCompleteDto, index) {
     let factureItems = this.formGroup.get('factureItems') as FormArray
+    if (this.filteredCatalogues[0].id == 0) {
+      this.devisItemRowIndex = index
+      factureItems.at(index).get('catalogue').setValue({ designation: null })
+      this.catalogueDialogDisplay = true
+      return
+    }
     factureItems.at(index).setValue({
       catalogueId: event.id,
       catalogue: {designation: event.designation},
-      date: event.addedDate.toDate(),
+      date: this.formGroup.get('dateEmission').value,
       quantity: event.minimalQuantity,
       unit: event.unity || 'Heures',
       unitPriceHT: event.htPrice,
@@ -1274,5 +1291,77 @@ valider() {
 }
 
 //#endregion
+catalogueDialogDisplay = false
+catalogueOptions = ['produit', 'prestation']
+catalogueFormGroup: FormGroup
+tvaOptions = [10, 15, 20]
+unityOptions = ['Heures', 'Kg']
 
+initiateCatalogueFormGroup() {
+  this.catalogueFormGroup = this.formBuilder.group({
+    designation: ['', Validators.required],
+    description: [''],
+    unity: ['Heures'],
+    htPrice: [0],
+    tva: [0],
+    minimalQuantity: [1],
+    dialogSelectedType: ['produit'],
+  })
 }
+
+closeCatalogueDialog() {
+  this.catalogueDialogDisplay = false
+  this.catalogueFormGroup.reset()
+}
+
+submitCatalogue() {
+  if (this.catalogueFormGroup.valid) {
+    let createCatalogInput = new CreateCatalogueInput({
+      designation: this.catalogueFormGroup.value.designation,
+      description: this.catalogueFormGroup.value.description,
+      catalogueType: this.catalogueFormGroup.value.dialogSelectedType,
+      unity: this.catalogueFormGroup.value.unity,
+      htPrice: this.catalogueFormGroup.value.htPrice || 0,
+      tva: this.catalogueFormGroup.value.tva || 0,
+      minimalQuantity: this.catalogueFormGroup.value.minimalQuantity || 1,
+    })
+    this._catalogueServiceProxy
+      .createCatalogue(createCatalogInput)
+      .subscribe((res) => {
+        if (res) {
+          let factureItems = this.formGroup.get('factureItems') as FormArray
+          factureItems.at(this.devisItemRowIndex).setValue({
+            catalogueId: res.id,
+            catalogue: { designation: res.designation },
+            date: this.formGroup.get('dateEmission').value,
+            quantity: res.minimalQuantity,
+            unit: res.unity || 'Heures',
+            unitPriceHT: res.htPrice,
+            tva: res.tva || 20,
+            totalTtc: this._calculationsService.calculateTTCWithQuantity(
+              res.htPrice,
+              res.tva,
+              res.minimalQuantity,
+            ),
+          })
+         
+          this._toastService.success({
+            summary: 'Opértion réussie',
+            detail: 'Vous avez ajouté un nouvel item',
+          })
+
+          this.closeCatalogueDialog()
+        } else {
+          this._toastService.internalError()
+        }
+      })
+  } else {
+    this._toastService.error({
+      summary: 'Erreur',
+      detail: 'Veuillez remplir le chemps Désignation',
+    })
+  }
+}
+ 
+}
+

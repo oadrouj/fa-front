@@ -40,7 +40,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ItemPreviewComponent} from './components/item-preview/item-preview.component'
 import {FileUploadModule} from 'primeng/fileupload';
 import { NgxdModule } from '@ngxd/core';
-
+import { EstimateInvoiceStatusComponent } from './components/estimate-invoice-status/estimate-invoice-status.component'
+import { EstimateInvoiceStatusStateService } from './services/estimate-invoice-status-state.service'
 
 @NgModule({
   imports: [
@@ -83,8 +84,9 @@ import { NgxdModule } from '@ngxd/core';
     TableComponent,  
     FacturesDialogComponent,
     ItemPreviewComponent,
+    EstimateInvoiceStatusComponent,
   ],
-  providers: [MessageService, ConfirmationService, ToastService, ConfirmDialogService],
+  providers: [MessageService, ConfirmationService, ToastService, ConfirmDialogService, EstimateInvoiceStatusStateService],
   exports: [
     CommonModule,
     FormsModule,
@@ -119,6 +121,7 @@ import { NgxdModule } from '@ngxd/core';
     TableComponent,  
     FacturesDialogComponent,
     ItemPreviewComponent,
+    EstimateInvoiceStatusComponent,
     FileUploadModule,
     NgxdModule,
     

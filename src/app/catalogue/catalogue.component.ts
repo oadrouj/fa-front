@@ -102,7 +102,7 @@ export class CatalogueComponent implements OnInit {
         suffix: '%'
       },
       {
-        header: 'TOTAL VENTES TTC',
+        header: 'TOTAL VENTES',
         field: 'totalSalesTTC',
         type: 'currency',
       },
@@ -131,7 +131,7 @@ export class CatalogueComponent implements OnInit {
 
   getListApi(event, data) {
 
-  let typeFilter = event.filters.type && event.filters.type.value
+  let typeFilter = event.filters && event.filters.type && (event.filters.type.value)
     return this._catalogueServiceProxy.getAllCatalogues(
         event.first,
         event.rows,
@@ -147,22 +147,19 @@ export class CatalogueComponent implements OnInit {
           // )
           return {
             items: res.items,
-            length: res.items.length,
+            length: res.totalEntityItems,
             montantTotalAllDevis: 0,
           }
         }),
       )
   }  
 
-  // firstTimeCharged = true
   selectionChange(selectionEventObject) {
     this.selectedItem = selectionEventObject.result ? {...selectionEventObject.result}
       : null
       
       this.emitNotificationSelectedDevisChanged(this.selectedItem)
       console.log(this.selectedItem)
-  //   this.firstTimeCharged && (this.montantTotalAll = this.tableChild.montantTotalAllDevis);
-  //   this.firstTimeCharged = false
   } 
 
   //Subject events:
@@ -190,16 +187,9 @@ export class CatalogueComponent implements OnInit {
     }
   }
   
-  addToTable(newItem){
-    this.tableChild.tableData = [...this.tableChild.tableData, newItem]
-    this.tableChild.tableData.sort((a, b) =>
-      a.reference < b.reference ? 1 : -1,
-    )
-
-    this.tableChild.defaultRowToBeSelected = {
-      ...this.selectedItem ,
-      rowId: 0
-    }
+  resetFilterFields(){
+    this.selectedType = '';
+    this.emitFilterEvent('filterByButton', null)
   }
 
   refreshTable(item){
@@ -253,6 +243,8 @@ export class CatalogueComponent implements OnInit {
                 detail:  'Le catalogue est supprimé avec succès',
               })
 
+              //Todo: Review this code and see if should to be moved to table component
+
               this.tableChild.tableData = this.tableChild.tableData.filter(
                 (item) => !item || item.id != this.selectedItem.id,
               )
@@ -262,6 +254,8 @@ export class CatalogueComponent implements OnInit {
                 ...this.selectedItem,
                 rowId: 0
               }
+
+              this.tableChild.loadTableLazy()
 
             }
     
@@ -311,9 +305,10 @@ export class CatalogueComponent implements OnInit {
               totalUnitsSold: 0
             }
 
-            this.addToTable(this.selectedItem)
+            this.tableChild.loadTableLazy()
+
            this.updateTtcPrice('ttcPrice')
-            this.dialogDisplay = false;
+            this.closeDialog() 
           }
             else {
               this._toastService.internalError()
@@ -345,7 +340,7 @@ export class CatalogueComponent implements OnInit {
               
               }    
               this.refreshTable({...this.selectedItem})
-              this.dialogDisplay = false;
+              this.closeDialog() 
             }
               else {
                 this._toastService.internalError()

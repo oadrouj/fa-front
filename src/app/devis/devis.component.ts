@@ -33,7 +33,7 @@ import { Moment } from 'moment'
 import { DevisDialogComponent } from './devis-dialog/devis-dialog.component'
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog'
-import { ConfirmEventType } from 'primeng/api'
+import { ConfirmEventType, LazyLoadEvent } from 'primeng/api'
 import { map } from 'rxjs/operators'
 import { TableComponent } from '@app/table/table.component'
 import { ConvertDevisToFactureService } from '@shared/services/ConvertDevisToFacture.service'
@@ -46,9 +46,10 @@ import jsPDF from 'jspdf'
 
 import html2canvas from 'html2canvas'
 import jspdf from 'jspdf'
-import domtoimage from 'dom-to-image';
+import domtoimage from 'dom-to-image'
 import { ItemPreviewComponent } from '@shared/components/item-preview/item-preview.component'
 import { DomSanitizer } from '@angular/platform-browser'
+import { EstimateInvoiceStatusStateService } from '@shared/services/estimate-invoice-status-state.service'
 
 @Component({
   selector: 'app-devis',
@@ -59,10 +60,9 @@ import { DomSanitizer } from '@angular/platform-browser'
 export class DevisComponent implements OnInit, AfterViewInit {
   remiseAmount: number
   @ViewChild('factureDialog', {})
-  
   sample: DynamicDialogRef
 
-  @ViewChild('prv', {static: true}) template: ItemPreviewComponent
+  @ViewChild('prv', { static: true }) template: ItemPreviewComponent
 
   sampleComponent = FacturesDialogComponent
   logoSrc: string
@@ -77,7 +77,8 @@ export class DevisComponent implements OnInit, AfterViewInit {
     public globalEventsService: GlobalEventsService,
     private _sessionService: AppSessionService,
     private _fileApiServiceProxy: FileApiServiceProxy,
-    private _sanitizer: DomSanitizer
+    private _sanitizer: DomSanitizer,
+    private _estimateInvoiceStatusStateService: EstimateInvoiceStatusStateService,
   ) {}
 
   favIcon: HTMLLinkElement = document.querySelector('#favIcon')
@@ -87,9 +88,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
     )
 
     this.favIcon.href = 'assets/img/DevisLogo.png'
-    
-    this._fileApiServiceProxy.download().subscribe(res => {
-      let objectURL = this._sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(res.data))
+
+    this._fileApiServiceProxy.download().subscribe((res) => {
+      let objectURL = this._sanitizer.bypassSecurityTrustUrl(
+        URL.createObjectURL(res.data),
+      )
       this.logoSrc = objectURL as string
     })
   }
@@ -98,6 +101,51 @@ export class DevisComponent implements OnInit, AfterViewInit {
     if (window.history.state.clientId) {
       this.newDevis(window.history.state.clientId)
     }
+
+    this._estimateInvoiceStatusStateService.statusModifier$.subscribe((res) => {
+      if (res.target == 'Estimate') {
+        switch (res.statusAction) {
+          case 'Validate':
+            this.emitDialogStatus(DialogStatus.Edit, 'devis')
+            this.child.validateDevis(true).subscribe((res) => {
+              if (res.success) {
+                this._toastService.success({
+                  detail: 'Le devis est devient valide',
+                })
+                this.selectedDevisItem = {
+                  ...this.selectedDevisItem,
+                  statut: res.result.statut,
+                }
+                this.tableChild.tableData.find(
+                  (item) => item.id == this.selectedDevisItem.id,
+                ).statut = res.result.statut
+              }
+            })
+            break
+
+          case 'Convert':
+            this.showFactureDialog()
+            this.emitNotificationSelectedDevisChanged({
+              ...this.selectedDevisItem,
+              factureItems: this.selectedDevisItem.factureItems,
+              dateEmission:
+                this.selectedDevisItem.dateEmission instanceof Date
+                  ? this.selectedDevisItem.dateEmission
+                  : moment(this.selectedDevisItem.dateEmission).toDate(),
+            })
+            this.emitDialogStatus(DialogStatus.New, 'facture', true)
+            break
+
+          case 'Reject':
+            this.updateApiCall(
+              this.selectedDevisItem.id,
+              DevisStatutEnum.Rejete,
+              'Le devis est rejeté',
+            )
+            break
+        }
+      }
+    })
   }
 
   //#region Properties
@@ -156,7 +204,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
     {
       header: 'STATUT',
       field: 'statut',
-      type: 'text',
+      type: 'estimate-invoice-status-component',
       format: this.formatStatut,
     },
   ]
@@ -287,7 +335,16 @@ export class DevisComponent implements OnInit, AfterViewInit {
     }, 500)
   }
 
-  //#region events
+  resetFilterFields() {
+    this.selectedClient = null
+    this.selectedDate = null
+    this.selectedEcheance = null
+    this.selectedMontant = null
+    this.selectedStatut = null
+
+    this.emitFilterEvent('filterByButton', null)
+  }
+
   filterSubject = new Subject<any>()
   emitFilterEvent(filterType: string, value: any) {
     if (filterType == 'filterByInput') {
@@ -337,7 +394,6 @@ export class DevisComponent implements OnInit, AfterViewInit {
   emitNotificationSelectedDevisChanged(devisItem: DevisItem) {
     this.notifySelectedDevisChanged.next(devisItem)
   }
-  //#endregion
 
   newDevis(clientId?) {
     this.displayDialog = true
@@ -415,13 +471,10 @@ export class DevisComponent implements OnInit, AfterViewInit {
     this.emitNotificationSelectedDevisChanged({
       ...this.selectedDevisItem,
       dateEmission: new Date(this.selectedDevisItem.dateEmission._i),
-      // ? new Date(this.selectedDevisItem.dateEmission._i)
-      // : new Date(this.selectedDevisItem.dateEmission._d),
     })
     this.firstTimeCharged &&
       (this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis)
     this.firstTimeCharged = false
-    // this.montantTotalAllDevis = this.tableChild.montantTotalAllDevis
   }
 
   onDialogClose() {
@@ -445,6 +498,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       )
     }
   }
+
   calculateTotalMonatant() {
     this.montantTotalAllDevis = 0
     this.tableChild.tableData.forEach((item) => {
@@ -468,55 +522,63 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
   crudOperationTreatment(event) {
     if (event.crudOperation == 'create') {
-      let newDevis = {
-        ...event.result,
-        client: {
-          ...event.result.client,
-          nom: event.result.client.nom
-            ? event.result.client.nom
-            : event.result.client.raisonSociale,
-        },
-      }
-      newDevis.devisItems = newDevis.devisItems.map((item: any) => {
-        let total_ht = item.unitPriceHT * item.quantity
-        return {
-          ...item,
-          totalTtc: total_ht + (item.tva * total_ht) / 100,
-        }
-      })
+      this.tableChild.loadTableLazy()
 
-      let remiseAmount =
-        (newDevis.devisItems
-          .map((item) => item.unitPriceHT * item.quantity)
-          .reduce((accum, current) => accum + current) *
-          newDevis.remise) /
-        100
+      //Todo: remove this code
+      // let newDevis = {
+      //   ...event.result,
+      //   client: {
+      //     ...event.result.client,
+      //     nom: event.result.client.nom
+      //       ? event.result.client.nom
+      //       : event.result.client.raisonSociale,
+      //   },
+      // }
+      // newDevis.devisItems = newDevis.devisItems.map((item: any) => {
+      //   let total_ht = item.unitPriceHT * item.quantity
+      //   return {
+      //     ...item,
+      //     totalTtc: total_ht + (item.tva * total_ht) / 100,
+      //   }
+      // })
 
-      newDevis.montantTtc =
-        newDevis.devisItems
-          .map((item) => item.totalTtc)
-          .reduce((accum, current) => accum + current) - remiseAmount
-      this.montantTotalAllDevis += newDevis.montantTtc
+      // let remiseAmount =
+      //   (newDevis.devisItems
+      //     .map((item) => item.unitPriceHT * item.quantity)
+      //     .reduce((accum, current) => accum + current) *
+      //     newDevis.remise) /
+      //   100
 
-      this.tableChild.tableData = [
-        ...this.tableChild.tableData,
-        { ...newDevis },
-      ]
-      this.tableChild.tableData.sort((a, b) =>
-        a.reference < b.reference ? 1 : -1,
-      )
+      // newDevis.montantTtc =
+      //   newDevis.devisItems
+      //     .map((item) => item.totalTtc)
+      //     .reduce((accum, current) => accum + current) - remiseAmount
+      // this.montantTotalAllDevis += newDevis.montantTtc
 
-      this.selectedDevisItem &&
-        this.selectedDevisItem.devisItems.forEach(
-          (devisItem) => (devisItem.date = devisItem.date.toDate()),
-        )
-      this.selectedDevisItem = {
-        ...newDevis,
-        dateEmission: newDevis.dateEmission.toDate(),
-      }
-      this.emitNotificationSelectedDevisChanged({
-        ...this.selectedDevisItem,
-      })
+      // this.tableChild.totalRecords += 1
+
+      // this.tableChild.tableData = [
+      //   ...this.tableChild.tableData,
+      //   { ...newDevis },
+      // ]
+
+      // this.tableChild.tableData = [...this.tableChild.tableData]
+
+      // this.tableChild.tableData.sort((a, b) =>
+      //   a.echeancePaiement < b.echeancePaiement ? 1 : -1,
+      // )
+
+      // this.selectedDevisItem &&
+      //   this.selectedDevisItem.devisItems.forEach(
+      //     (devisItem) => (devisItem.date = devisItem.date.toDate()),
+      //   )
+      // this.selectedDevisItem = {
+      //   ...newDevis,
+      //   dateEmission: newDevis.dateEmission.toDate(),
+      // }
+      // this.emitNotificationSelectedDevisChanged({
+      //   ...this.selectedDevisItem,
+      // })
     } else if (event.crudOperation == 'update') {
       this.selectedDevisItem = {
         ...event.result,
@@ -532,10 +594,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       this.selectedDevisItem.devisItems = this.selectedDevisItem.devisItems.map(
         (item: any) => {
           let total_ht = item.unitPriceHT * item.quantity
-          return {
-            ...item,
-            totalTtc: total_ht + (item.tva * total_ht) / 100,
-          }
+          return { ...item, totalTtc: total_ht + (item.tva * total_ht) / 100 }
         },
       )
 
@@ -555,6 +614,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
         ...this.selectedDevisItem,
         dateEmission: this.selectedDevisItem.dateEmission.toDate(),
       }
+
       this.child.selectedDevisItem = { ...this.selectedDevisItem }
       let index = this.tableChild.tableData.findIndex(
         (item) => item.id == this.selectedDevisItem.id,
@@ -570,16 +630,22 @@ export class DevisComponent implements OnInit, AfterViewInit {
   }
 
   //#region Api Calls
-  getListDevisApi$(event, data) {
-    console.log(event.filters.echeancePaiement)
-    let clientFilter = event.filters.client && event.filters.client.value
-    let dateEmissionFilter =
-      event.filters.dateEmission && event.filters.dateEmission.value
-    let echeancePaiementFilter =
-      event.filters.echeancePaiement && event.filters.echeancePaiement.value
-    let montantTtcFilter =
-      event.filters.montantTtc && event.filters.montantTtc.value
-    let statutFilter = event.filters.statut && event.filters.statut.value
+  getListDevisApi$(event) {
+    let clientFilter,
+      dateEmissionFilter,
+      echeancePaiementFilter,
+      montantTtcFilter,
+      statutFilter
+    if (event.filters) {
+      clientFilter = event.filters.client && event.filters.client.value
+      dateEmissionFilter =
+        event.filters.dateEmission && event.filters.dateEmission.value
+      echeancePaiementFilter =
+        event.filters.echeancePaiement && event.filters.echeancePaiement.value
+      montantTtcFilter =
+        event.filters.montantTtc && event.filters.montantTtc.value
+      statutFilter = event.filters.statut && event.filters.statut.value
+    }
 
     return zip(
       this._devisServiceProxy.getAllDevisTotalRecords(
@@ -620,7 +686,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       ),
     ).pipe(
       map(([length, res, montantTotalAllDevis]: any) => {
-        data = [...res.items]
+        let data = [...res.items]
         data.forEach((devis: any) => {
           devis.client.nom = !devis.client.nom
             ? devis.client.raisonSociale
@@ -651,6 +717,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       }),
     )
   }
+
   updateApiCall(devisId: number, devisStatut: DevisStatutEnum, detail) {
     this._devisServiceProxy
       .changeDevisStatut(devisId, devisStatut)
@@ -687,31 +754,32 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
   factureCrudOperationTreatment(event) {
     if (event.crudOperation == 'create') {
-      let newDevis = {
-        ...event.result,
-        remise: 0,
-      }
-      newDevis.factureItems = newDevis.factureItems.map((item: any) => {
-        let total_ht = item.unitPriceHT * item.quantity
-        return {
-          ...item,
-          totalTtc: total_ht + (item.tva * total_ht) / 100,
-        }
-      })
+      this.tableChild.loadTableLazy()
+      // let newDevis = {
+      //   ...event.result,
+      //   remise: 0,
+      // }
+      // newDevis.factureItems = newDevis.factureItems.map((item: any) => {
+      //   let total_ht = item.unitPriceHT * item.quantity
+      //   return {
+      //     ...item,
+      //     totalTtc: total_ht + (item.tva * total_ht) / 100,
+      //   }
+      // })
 
-      let remiseAmount =
-        (newDevis.factureItems
-          .map((item) => item.unitPriceHT * item.quantity)
-          .reduce((accum, current) => accum + current) *
-          newDevis.remise) /
-        100
+      // let remiseAmount =
+      //   (newDevis.factureItems
+      //     .map((item) => item.unitPriceHT * item.quantity)
+      //     .reduce((accum, current) => accum + current) *
+      //     newDevis.remise) /
+      //   100
 
-      newDevis.montantTtc =
-        newDevis.factureItems
-          .map((item) => item.totalTtc)
-          .reduce((accum, current) => accum + current) - remiseAmount
+      // newDevis.montantTtc =
+      //   newDevis.factureItems
+      //     .map((item) => item.totalTtc)
+      //     .reduce((accum, current) => accum + current) - remiseAmount
 
-      this.montantTotalAllDevis += newDevis.montantTtc
+      // this.montantTotalAllDevis += newDevis.montantTtc
     } else if (event.crudOperation == 'update') {
       this.selectedDevisItem = {
         ...event.result,
@@ -760,27 +828,27 @@ export class DevisComponent implements OnInit, AfterViewInit {
   //#endregion
 
   print() {
-    html2canvas(document.getElementById('contentToConvert') , {
+    html2canvas(document.getElementById('contentToConvert'), {
       scale: 5,
       onclone: (dcm) => {
         let data = dcm.getElementById('contentToConvert')
         data.classList.add('html2canvas')
-        dcm.getElementById('pageFooter').innerText = this.selectedDevisItem.piedDePage
-
-      }
+        dcm.getElementById(
+          'pageFooter',
+        ).innerText = this.selectedDevisItem.piedDePage
+      },
     }).then((canvas) => {
       let docWidth = 205
       let docHeight = (canvas.height * docWidth) / canvas.width
-     
+
       const contentDataURL = canvas.toDataURL('image/png')
-      
+
       console.log(contentDataURL)
       printJS({
         printable: contentDataURL,
         type: 'image',
         base64: true,
       })
-     
     })
   }
 
@@ -797,28 +865,30 @@ export class DevisComponent implements OnInit, AfterViewInit {
     }
   }
 
-
   @ViewChild('pdfTable') pdfTable: ElementRef
   downloadAsPDF() {
-    let data = document.getElementById('contentToConvert') 
+    let data = document.getElementById('contentToConvert')
     this.convertToPDF(data)
-    
   }
 
-  convertToPDF(element){
-    
+  convertToPDF(element) {
     html2canvas(element, {
       scale: 5,
       onclone: (dcm) => {
         let data = dcm.getElementById('contentToConvert')
         data.classList.add('html2canvas')
-        dcm.getElementById('pageFooter').innerText = this.selectedDevisItem.piedDePage
+        let imageElement = dcm.querySelector('.content img ') as HTMLElement
+        // imageElement.style.width = '350px'
+        // imageElement.style.height = '130px'
 
-      }
+        dcm.getElementById(
+          'pageFooter',
+        ).innerText = this.selectedDevisItem.piedDePage
+      },
     }).then((canvas) => {
       let docWidth = 205
       let docHeight = (canvas.height * docWidth) / canvas.width
-     
+
       const contentDataURL = canvas.toDataURL('image/png')
       let doc = new jsPDF('p', 'mm', 'a4')
       let position = 0
@@ -827,18 +897,16 @@ export class DevisComponent implements OnInit, AfterViewInit {
       let table = document.querySelector('#contentToConvert p-table')
       let rest = items.length % 5
       let count = (items.length - rest) / 5 + +!!rest,
-      splittedItems: DevisItemDto
+        splittedItems: DevisItemDto
       doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
       // for(let i=0; i < count; i++){
       //   splittedItems = items.slice(length, length + 4)
       //   console.log(length)
       //   doc.addPage()
       //   doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
-     
+
       // }
-       doc.save('exportedPdf.pdf')
-       
+      doc.save('exportedPdf.pdf')
     })
   }
-   
 }

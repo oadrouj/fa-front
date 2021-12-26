@@ -36,6 +36,7 @@ import {
   ClientDto,
   CountryServiceAppServiceProxy,
   CountryDto,
+  CreateCatalogueInput,
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
@@ -50,7 +51,7 @@ import { CalculationsService } from '@shared/services/calculations.service'
 import { Router } from '@angular/router'
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 import { ConfirmDialog } from 'primeng/confirmdialog'
-import { PreviewService} from '@shared/services/preview.service'
+import { PreviewService } from '@shared/services/preview.service'
 import { ItemPreviewComponent } from '@shared/components/item-preview/item-preview.component'
 @Component({
   selector: 'app-devis-dialog',
@@ -79,7 +80,14 @@ export class DevisDialogComponent implements OnInit {
   countries: CountryDto[]
   devisIsSaved: boolean
   saveBrouillonHide: boolean
-  previousPreviewState: { item: any; title: string; summaryTotalHT: number; summaryTVA: number; remiseAmount: number; contentItemsCols: any[] }
+  previousPreviewState: {
+    item: any
+    title: string
+    summaryTotalHT: number
+    summaryTVA: number
+    remiseAmount: number
+    contentItemsCols: any[]
+  }
   //#endregion
 
   constructor(
@@ -99,11 +107,10 @@ export class DevisDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    
     this.initiateFormGroup()
     this.devisOptionsFormGroup = this.initiateDevisOptionsGroup()
 
-    //ClientDialog: 
+    //ClientDialog:
     this.initialiseClientForm()
     //
 
@@ -116,7 +123,7 @@ export class DevisDialogComponent implements OnInit {
     this.dialogStatusEvent.subscribe(({ statut, dialogComponent }) => {
       document.body.style.overflow = 'hidden'
       this.manuelReference = false
-      this.saveBrouillonHide =  false
+      this.saveBrouillonHide = false
 
       if (dialogComponent == 'devis') {
         this.initiateSummaryValues()
@@ -142,13 +149,14 @@ export class DevisDialogComponent implements OnInit {
             this.initiateFormGroupWithTableControls()
             this.dialogTitle = 'Modifier'
             this.devisItem = this.selectedDevisItem
-            
-            this.devisItem.statut == DevisStatutEnum.Valide && (this.saveBrouillonHide =  true)
-           
+
+            this.devisItem.statut == DevisStatutEnum.Valide &&
+              (this.saveBrouillonHide = true)
+
             this.reference = this.devisItem.reference
             this.setFormGroup()
             this.formGroup.get('client').setValue(this.devisItem.client)
-            
+
             this.devisOptionsFormGroup
               .get('remise')
               .setValue(this.devisItem.remise)
@@ -165,7 +173,9 @@ export class DevisDialogComponent implements OnInit {
             this.devisOptionsFormGroup.get('tva').setValue(!tvaIsDesactivated)
             tvaIsDesactivated && this.toggleTVAOption(false)
 
-            this.devisOptionsFormGroup.get('devise').setValue(this.devisItem.currency)
+            this.devisOptionsFormGroup
+              .get('devise')
+              .setValue(this.devisItem.currency)
             this.Currency = this.devisItem.currency
 
             this.calculateSummaryTotalHTAndTTC()
@@ -195,7 +205,9 @@ export class DevisDialogComponent implements OnInit {
             this.devisOptionsFormGroup.get('tva').setValue(!tvaIsDesactivated)
             tvaIsDesactivated && this.toggleTVAOption(false)
 
-            this.devisOptionsFormGroup.get('devise').setValue(this.devisItem.currency)
+            this.devisOptionsFormGroup
+              .get('devise')
+              .setValue(this.devisItem.currency)
             this.Currency = this.devisItem.currency
             this.calculateSummaryTotalHTAndTTC()
             break
@@ -206,6 +218,7 @@ export class DevisDialogComponent implements OnInit {
       }
     })
 
+    this.initiateCatalogueFormGroup()
   }
 
   //#region properties
@@ -288,12 +301,12 @@ export class DevisDialogComponent implements OnInit {
       type: 'inputNumber',
       colspan: 2,
       disabled: true,
-      class: 'lastElement'
+      class: 'lastElement',
       // suffix: ' ' + this.Currency
     },
     { header: '', field: 'delete', type: 'button', label: '', icon: 'trash' },
   ]
-  
+
   defaultIssueDate = new Date('10-10-2021')
 
   get getFromArrayControl() {
@@ -346,14 +359,14 @@ export class DevisDialogComponent implements OnInit {
       this.getFromArrayControl.push(this.initiateTableForm())
 
       return {
-        catalogue: {designation: item.designation},
+        catalogue: { designation: item.designation },
         date: item.date.toDate(),
         quantity: item.quantity,
         unit: item.unit,
         unitPriceHT: item.unitPriceHT,
         tva: !item.tva ? 20 : item.tva,
         totalTtc: item.totalTtc,
-        catalogueId: item.catalogueId
+        catalogueId: item.catalogueId,
       }
     })
 
@@ -370,20 +383,22 @@ export class DevisDialogComponent implements OnInit {
   initiateTableForm() {
     return this.formBuilder.group({
       catalogueId: [null],
-      catalogue: [{designation: '', id: 0}, Validators.required],
+      catalogue: [{ designation: '', id: 0 }, Validators.required],
       date: [this.formGroup.get('dateEmission').value, Validators.required],
       quantity: [1, Validators.required],
       unit: ['Heures', Validators.required],
       unitPriceHT: [0, Validators.required],
-      tva: [{ value: 20, disabled: !this.devisOptionsFormGroup.get('tva').value }, Validators.required],
+      tva: [
+        { value: 20, disabled: !this.devisOptionsFormGroup.get('tva').value },
+        Validators.required,
+      ],
       totalTtc: [0],
     })
-
   }
-  
-  onSelectIssueDateCalendar(){
-    this.getFromArrayControl.controls.forEach(x => {
-      x.patchValue({date : this.formGroup.get('dateEmission').value})
+
+  onSelectIssueDateCalendar() {
+    this.getFromArrayControl.controls.forEach((x) => {
+      x.patchValue({ date: this.formGroup.get('dateEmission').value })
     })
   }
 
@@ -403,9 +418,9 @@ export class DevisDialogComponent implements OnInit {
 
   //#endregion
 
-  @ViewChild("cd") closeDevisConfirmDialog: ConfirmDialog
+  @ViewChild('cd') closeDevisConfirmDialog: ConfirmDialog
   closeDialog() {
-    if(this.previousPreviewState)  {
+    if (this.previousPreviewState) {
       this.template.item = this.previousPreviewState.item
       this.template.title = this.previousPreviewState.title
       this.template.summaryTotalHT = this.previousPreviewState.summaryTotalHT
@@ -413,33 +428,35 @@ export class DevisDialogComponent implements OnInit {
       this.template.remiseAmount = this.previousPreviewState.remiseAmount
       this.template.contentItemsCols = this.previousPreviewState.contentItemsCols
     }
-    
-    if((this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') && !this.devisIsSaved){
+
+    if (
+      (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') &&
+      !this.devisIsSaved
+    ) {
       this._confirmDialogService.confirm({
-        message: 'Etes-vous sûr de vouloir quitter ? Toutes les données saisies seront perdues',
+        message:
+          'Etes-vous sûr de vouloir quitter ? Toutes les données saisies seront perdues',
         acceptCallback: () => {
           this.closeDialogEvent.emit()
           this.clearTableControl()
           this.disableValidationClass()
           document.body.style.overflow = 'auto'
-          this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(false)  
+          this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(false)
           console.log(this.closeDevisConfirmDialog)
           this.closeDevisConfirmDialog.close(event)
         },
-        rejectCallback:() => { 
+        rejectCallback: () => {
           this.closeDevisConfirmDialog.close(event)
-        }
+        },
       })
       let element = document.body.querySelector('#cd') as HTMLElement
       element.style.display = 'none'
-
-    }
-    else {
+    } else {
       this.closeDialogEvent.emit()
       this.clearTableControl()
       this.disableValidationClass()
       document.body.style.overflow = 'auto'
-      this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(false)  
+      this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(false)
       this.closeDevisConfirmDialog.close(event)
     }
   }
@@ -452,13 +469,17 @@ export class DevisDialogComponent implements OnInit {
   }
 
   getNewReferenceWithIntroMessageAndFooter() {
-    this._devisServiceProxy.getLastReferenceWithIntroMessageAndFooter().subscribe((res) => {
-      this.referenceCount = res.lastReference + 1
-      this.reference = this.devisFormatReferenceNumber(this.referenceCount)
+    this._devisServiceProxy
+      .getLastReferenceWithIntroMessageAndFooter()
+      .subscribe((res) => {
+        this.referenceCount = res.lastReference + 1
+        this.reference = this.devisFormatReferenceNumber(this.referenceCount)
 
-      this.formGroup.get('messageIntroduction').setValue(res.estimateIntroMessage)
-      this.formGroup.get('piedDePage').setValue(res.estimateFooter)
-    })
+        this.formGroup
+          .get('messageIntroduction')
+          .setValue(res.estimateIntroMessage)
+        this.formGroup.get('piedDePage').setValue(res.estimateFooter)
+      })
   }
 
   changeReference() {
@@ -502,7 +523,7 @@ export class DevisDialogComponent implements OnInit {
     let total_ttc = total_ht
 
     if (this.devisOptionsFormGroup.get('tva').value) {
-      total_ttc = total_ht + (total_ht * row.tva) / 100 
+      total_ttc = total_ht + (total_ht * row.tva) / 100
     }
 
     this.getFromArrayControl.controls[rowIndex].patchValue({
@@ -545,10 +566,9 @@ export class DevisDialogComponent implements OnInit {
       this.remiseValue,
       this.summaryTotalHT,
     )
-    
+
     this.summaryTotalTTC =
       this.summaryTotalHT + this.summaryTVA - (this.remiseAmount || 0)
-
   }
 
   remiseAmountChanged(value: number) {
@@ -600,15 +620,17 @@ export class DevisDialogComponent implements OnInit {
   //#endregion
 
   //#region Crud operations
-  async getNewItemValue(){
+  async getNewItemValue() {
     let formValue = this.formGroup.value
-    let result = await this._clientServiceProxy.getByIdClient(formValue.client.id).toPromise()
+    let result = await this._clientServiceProxy
+      .getByIdClient(formValue.client.id)
+      .toPromise()
 
-     return this.template.item = new DevisDto({
+    return (this.template.item = new DevisDto({
       reference: this.manuelReference
         ? this.formGroup.get('reference').value
-        : this.devisFormatReferenceNumber( this.referenceCount),
-     
+        : this.devisFormatReferenceNumber(this.referenceCount),
+
       dateEmission: this.getExactDate(formValue.dateEmission, new Date()),
       echeancePaiement: formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
@@ -633,12 +655,11 @@ export class DevisDialogComponent implements OnInit {
       montantTtc: this.summaryTotalTTC,
       lastModificationTime: null,
       lastModifierUserId: null,
-      creationTime: null, 
-      creatorUserId: null, 
-      id: null
-     })
-    
-}
+      creationTime: null,
+      creatorUserId: null,
+      id: null,
+    }))
+  }
 
   createApiCall(devisStatus: DevisStatutEnum) {
     let formValue = this.formGroup.value
@@ -646,8 +667,8 @@ export class DevisDialogComponent implements OnInit {
     let createDevisInput = new CreateDevisInput({
       reference: this.manuelReference
         ? this.formGroup.get('reference').value
-        : this.devisFormatReferenceNumber( this.referenceCount),
-     
+        : this.devisFormatReferenceNumber(this.referenceCount),
+
       dateEmission: this.getExactDate(formValue.dateEmission, new Date()),
       echeancePaiement: formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
@@ -667,7 +688,7 @@ export class DevisDialogComponent implements OnInit {
         })
       }),
       clientId: formValue.client.id,
-      currency: this.Currency
+      currency: this.Currency,
     })
 
     this._devisServiceProxy.createDevis(createDevisInput).subscribe((id) => {
@@ -675,7 +696,7 @@ export class DevisDialogComponent implements OnInit {
         this._clientServiceProxy
           .getByIdClient(formValue.client.id)
           .subscribe((res) => {
-            this.devisIsSaved = true;
+            this.devisIsSaved = true
             this.crudOperationEvent.emit({
               crudOperation: 'create',
               result: {
@@ -691,12 +712,11 @@ export class DevisDialogComponent implements OnInit {
                   ...item,
                   date: this.getExactDate(item.date, new Date(), 'subtract'),
                 })),
-                currency: this.Currency
+                currency: this.Currency,
               },
             })
             this.closeDialog()
           })
-        
       }
     })
     this._toastService.info({
@@ -705,8 +725,8 @@ export class DevisDialogComponent implements OnInit {
     })
   }
 
-  getUpdatedValue(formValue, devisStatus?: DevisStatutEnum){
-    return  new UpdateDevisInput({
+  getUpdatedValue(formValue, devisStatus?: DevisStatutEnum) {
+    return new UpdateDevisInput({
       ...this.devisItem,
       id: this.devisItem.id,
       reference: this.manuelReference
@@ -732,12 +752,11 @@ export class DevisDialogComponent implements OnInit {
       }),
       clientId: formValue.client.id,
       currency: this.Currency,
-      montantTtc: this.summaryTotalTTC
+      montantTtc: this.summaryTotalTTC,
     })
   }
 
   updateApiCall(devisStatus: DevisStatutEnum) {
-    
     let formValue = this.formGroup.value
     let updateDevisInput = this.getUpdatedValue(formValue, devisStatus)
 
@@ -782,11 +801,11 @@ export class DevisDialogComponent implements OnInit {
                     ...item,
                     date: this.getExactDate(item.date, new Date(), 'subtract'),
                   })),
-                  currency: this.Currency
+                  currency: this.Currency,
                 },
               })
             }
-            this.closeDialog();
+            this.closeDialog()
           })
       }
     })
@@ -802,10 +821,14 @@ export class DevisDialogComponent implements OnInit {
       this._clientServiceProxy
         .getClientForAutoComplete(event.query)
         .subscribe((res: ClientForAutoCompleteDtoListResultDto) => {
-          if(res.items.length)
-            this.clientSuggestions = res.items
+          if (res.items.length) this.clientSuggestions = res.items
           else {
-            this.clientSuggestions = [new ClientForAutoCompleteDto({id: 0, nom: 'Ajouter un nouveau client ?'})]
+            this.clientSuggestions = [
+              new ClientForAutoCompleteDto({
+                id: 0,
+                nom: 'Ajouter un nouveau client ?',
+              }),
+            ]
           }
         })
     }, 500)
@@ -813,69 +836,94 @@ export class DevisDialogComponent implements OnInit {
 
   onSelectClientAutoComplete() {
     this.selectedClientId = this.formGroup.get('client').value['id']
-    
   }
 
-  onSelectClient(event){
-    if(this.clientSuggestions[0].id == 0){
+  onSelectClient(event) {
+    if (this.clientSuggestions[0].id == 0) {
       this.formGroup.get('client').setValue(null)
-      this.showDialogNouveau();
-      return;
+      this.showDialogNouveau()
+      return
     }
-    this._clientServiceProxy.getClientDefaults(event.id).subscribe(res => {
-      this.setClientDefaults(res);
+
+    this._clientServiceProxy.getClientDefaults(event.id).subscribe((res) => {
+      this.setClientDefaults(res)
     })
   }
 
-  setClientDefaults(clientDefaultsDto: ClientDefaultsDto){
-      this.formGroup.patchValue({
-        echeancePaiement: clientDefaultsDto.paymentPeriod,
-      })
+  setClientDefaults(clientDefaultsDto: ClientDefaultsDto) {
+    this.formGroup.patchValue({
+      echeancePaiement: clientDefaultsDto.paymentPeriod,
+    })
 
-      this.devisOptionsFormGroup.patchValue({
-        devise: clientDefaultsDto.currency,
-        remiseBtnIsChecked: !!clientDefaultsDto.permanentDiscount,
-        remise: clientDefaultsDto.permanentDiscount
-      })
+    this.devisOptionsFormGroup.patchValue({
+      devise: clientDefaultsDto.currency,
+      remiseBtnIsChecked: !!clientDefaultsDto.permanentDiscount,
+      remise: clientDefaultsDto.permanentDiscount,
+    })
 
-      this.remiseAmountChanged(clientDefaultsDto.permanentDiscount)
-      this.Currency = clientDefaultsDto.currency;
+    this.remiseAmountChanged(clientDefaultsDto.permanentDiscount)
+    this.Currency = clientDefaultsDto.currency
   }
 
-  filterCatalogues(event){
+  filterCatalogues(event) {
     setTimeout(() => {
       this._catalogueServiceProxy
         .getCatalogueForAutoComplete(event.query)
         .subscribe((res) => {
-          this.filteredCatalogues = res.items
+          if (res.items.length) {
+            this.filteredCatalogues = res.items
+          } else {
+            this.filteredCatalogues = [
+              new CatalogueForAutoCompleteDto({
+                designation: 'Ajouter un nouvel item',
+                addedDate: moment(this.formGroup.get('dateEmission').value),
+                htPrice: 0,
+                unity: undefined,
+                tva: undefined,
+                minimalQuantity: 1,
+                id: 0,
+              }),
+            ]
+          }
         })
     }, 500)
   }
 
+  devisItemRowIndex: number
   onSelectCatalogAutoComplete(event: CatalogueForAutoCompleteDto, index) {
-    let factureItems = this.formGroup.get('devisItems') as FormArray
-    factureItems.at(index).setValue({
+    let devisItems = this.formGroup.get('devisItems') as FormArray
+    if (this.filteredCatalogues[0].id == 0) {
+      this.devisItemRowIndex = index
+      devisItems.at(index).get('catalogue').setValue({ designation: null })
+      this.catalogueDialogDisplay = true
+      return
+    }
+
+    devisItems.at(index).setValue({
       catalogueId: event.id,
-      catalogue: {designation: event.designation},
-      date: event.addedDate.toDate(),
+      catalogue: { designation: event.designation },
+      date: this.formGroup.get('dateEmission').value,
       quantity: event.minimalQuantity,
       unit: event.unity || 'Heures',
       unitPriceHT: event.htPrice,
       tva: event.tva || 20,
-      totalTtc: this._calculationsService
-        .calculateTTCWithQuantity(event.htPrice, event.tva, event.minimalQuantity),
+      totalTtc: this._calculationsService.calculateTTCWithQuantity(
+        event.htPrice,
+        event.tva,
+        event.minimalQuantity,
+      ),
     })
 
     this.calculateSummaryTotalHTAndTTC()
     this.RecalculateRows()
   }
 
-  onClearCatalogAutoComplete(index){
+  onClearCatalogAutoComplete(index) {
     let factureItems = this.formGroup.get('devisItems') as FormArray
     factureItems.at(index).patchValue({
       catalogueId: 0,
     })
-    console.log(factureItems.at(index).value);
+    console.log(factureItems.at(index).value)
   }
 
   saveBrouillon() {
@@ -886,7 +934,6 @@ export class DevisDialogComponent implements OnInit {
           reference = this.manuelReference
             ? this.formGroup.get('reference').value
             : this.devisFormatReferenceNumber(this.referenceCount)
-          
         } else {
           reference = this.manuelReference
             ? this.formGroup.get('reference').value
@@ -898,19 +945,18 @@ export class DevisDialogComponent implements OnInit {
           .subscribe((res) => {
             if (
               (!res && !this.selectedDevisItem) ||
-              !res || this.dialogTitle == 'Modifier' && 
-                (
-                  reference == this.selectedDevisItem.reference 
-                )
+              !res ||
+              (this.dialogTitle == 'Modifier' &&
+                reference == this.selectedDevisItem.reference)
             ) {
-                if (
-                  this.dialogTitle == 'Nouveau' ||
-                  this.dialogTitle == 'Dupliquer'
-                ) {
-                  this.createApiCall(DevisStatutEnum.Cree)
-                } else {
-                  this.updateApiCall(DevisStatutEnum.Cree)
-                }
+              if (
+                this.dialogTitle == 'Nouveau' ||
+                this.dialogTitle == 'Dupliquer'
+              ) {
+                this.createApiCall(DevisStatutEnum.Cree)
+              } else {
+                this.updateApiCall(DevisStatutEnum.Cree)
+              }
             } else {
               this._toastService.error({
                 detail: 'Cette référence est déjà existe',
@@ -945,46 +991,45 @@ export class DevisDialogComponent implements OnInit {
         controlsNames = controlsNames.concat(conrtolsObj[control])
     }
 
-    if(this.formGroup.valid) {
+    if (this.formGroup.valid) {
       let reference
       if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
         reference = this.manuelReference
           ? this.formGroup.get('reference').value
           : this.devisFormatReferenceNumber(this.referenceCount)
-      
       } else {
         reference = this.manuelReference
-        ? this.formGroup.get('reference').value
-        : this.selectedDevisItem.reference
+          ? this.formGroup.get('reference').value
+          : this.selectedDevisItem.reference
       }
 
       if (isDevisStatusUpdate) {
         returnValue = this.validateStatusApi()
       } else {
         this._devisServiceProxy
-        .checkIfReferenceIsExist(reference)
-        .subscribe((res) => {
-          if (!res || this.dialogTitle == 'Modifier' && (reference == this.selectedDevisItem.reference)) {   
-                if (
-                  this.dialogTitle == 'Nouveau' ||
-                  this.dialogTitle == 'Dupliquer'
-                ) {
-                  this.createApiCall(DevisStatutEnum.Valide)
-
-                } else {
-                  this.updateApiCall(DevisStatutEnum.Valide)
-                }
-          
-          } else {
-            this._toastService.error({
-              detail: 'Cette référence est déjà existe',
-            })
-          }
-        })
+          .checkIfReferenceIsExist(reference)
+          .subscribe((res) => {
+            if (
+              !res ||
+              (this.dialogTitle == 'Modifier' &&
+                reference == this.selectedDevisItem.reference)
+            ) {
+              if (
+                this.dialogTitle == 'Nouveau' ||
+                this.dialogTitle == 'Dupliquer'
+              ) {
+                this.createApiCall(DevisStatutEnum.Valide)
+              } else {
+                this.updateApiCall(DevisStatutEnum.Valide)
+              }
+            } else {
+              this._toastService.error({
+                detail: 'Cette référence est déjà existe',
+              })
+            }
+          })
       }
-    
-    }
-    else {
+    } else {
       !this.visible && this.openDialogEvent.emit()
       this._toastService.error({
         detail:
@@ -994,44 +1039,39 @@ export class DevisDialogComponent implements OnInit {
     }
 
     return returnValue
-
   }
 
   //#endregion
 
   async preview() {
     this.previousPreviewState = {
-      item: {...this.template.item},
+      item: { ...this.template.item },
       title: this.template.title,
       summaryTotalHT: this.template.summaryTotalHT,
       summaryTVA: this.template.summaryTVA,
       remiseAmount: this.template.remiseAmount,
-      contentItemsCols: this.template.contentItemsCols
+      contentItemsCols: this.template.contentItemsCols,
     }
-    let res;
-    if(this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
+    let res
+    if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
       res = await this.getNewItemValue()
-    }
-    
-    else {
+    } else {
       res = this.getUpdatedValue(this.formGroup.value)
-      if(this.selectedClientId == this.devisItem.clientId){
+      if (this.selectedClientId == this.devisItem.clientId) {
         res.client = this.devisItem.client
-      }
-      else{
+      } else {
         res.client = await this._clientServiceProxy
-          .getByIdClient(this.formGroup.value.client.id).toPromise()
+          .getByIdClient(this.formGroup.value.client.id)
+          .toPromise()
       }
-      
     }
-    
+
     this.template.previewAsPDF({
-      item : res,
+      item: res,
       remiseAmount: this.remiseAmount,
       summaryTVA: this.summaryTVA,
       summaryTotalHT: this.summaryTotalHT,
-      })
-
+    })
   }
 
   validateStatusApi(): Observable<any> {
@@ -1078,119 +1118,193 @@ export class DevisDialogComponent implements OnInit {
   disableValidationClass = () =>
     ValidationHelper.disableCssValidationClass(this.frm)
 
+  //#region Client dialog
 
-//#region Client dialog
-
-initialiseClientForm(): void {
-  this.formClient = new ClientDto()
-  this.formClient.pays = 'MAROC'
-  this.formClient.deviseFacturation = 'MAD'
-  this.formClient.categorieClient = 'PRFS'
-  this.formClient.delaiPaiement = 30
-  this.onFormCategorySelected()
-}
-
-showDialogNouveau() {
-  this.initialiseClientForm()
-  this.getAllCountries()
-  this.getAllCurrencies()
-  this.clientDialogDisplay = true
-}
-getAllCurrencies(){
-  fetch('/assets/json/currencies.json').then(res => res.json())
-    .then(res => this.devises = Object.keys(res))
-}
-
-getAllCountries(){
-  this._countryService.getAllCountries().subscribe(res => {
-    this.countries = res.items;
-  })
-}
-
-closeClientDialog(){
-  this.clientDialogDisplay = false
-  
-}
-
-onFormCategorySelected(): void {
-  this.isFormProfetionnel = this.formClient.categorieClient == 'PRFS'
-}
-
-isNullOrEmpty(str: string): boolean {
-  return str == undefined || str.toString().trim() == ''
-}
-
-isFormValid: boolean
-validateForm(): void {
-  this.isFormValid = false
-
-  var isRaisonSocialeValide =
-    !this.isFormProfetionnel ||
-    !this.isNullOrEmpty(this.formClient.raisonSociale)
-  var isNomValide =
-    this.isFormProfetionnel || !this.isNullOrEmpty(this.formClient.nom)
-
-  this.rSClass = isRaisonSocialeValide ? '' : 'rSClass'
-  this.nomClass = isNomValide ? '' : 'nomClass'
-
-  if (!isRaisonSocialeValide) {
-    this._toastService.error({
-      summary: 'Champs requis !',
-      detail: 'Veuillez remplir le champs : Raison sociale',
-    })
-  } else if (!isNomValide) {
-    this._toastService.error({
-      summary: 'Champs requis !',
-      detail: 'Veuillez remplir le champs : Nom',
-      
-    })
-  } else {
-    this.formClient.raisonSociale = this.isFormProfetionnel
-      ? this.formClient.raisonSociale
-      : ''
-    this.formClient.ice = this.isFormProfetionnel ? this.formClient.ice : ''
-    this.formClient.secteurActivite = this.isFormProfetionnel
-      ? this.formClient.secteurActivite
-      : ''
-    this.formClient.nom = !this.isFormProfetionnel ? this.formClient.nom : ''
-    this.isFormValid = true
+  initialiseClientForm(): void {
+    this.formClient = new ClientDto()
+    this.formClient.pays = 'MAROC'
+    this.formClient.deviseFacturation = 'MAD'
+    this.formClient.categorieClient = 'PRFS'
+    this.formClient.delaiPaiement = 30
+    this.onFormCategorySelected()
   }
-}
 
-valider() {
-  this.validateForm()
-  if (this.isFormValid) {
+  showDialogNouveau() {
+    this.initialiseClientForm()
+    this.getAllCountries()
+    this.getAllCurrencies()
+    this.clientDialogDisplay = true
+  }
+  getAllCurrencies() {
+    fetch('/assets/json/currencies.json')
+      .then((res) => res.json())
+      .then((res) => (this.devises = Object.keys(res)))
+  }
+
+  getAllCountries() {
+    this._countryService.getAllCountries().subscribe((res) => {
+      this.countries = res.items
+    })
+  }
+
+  closeClientDialog() {
+    this.clientDialogDisplay = false
+  }
+
+  onFormCategorySelected(): void {
+    this.isFormProfetionnel = this.formClient.categorieClient == 'PRFS'
+  }
+
+  isNullOrEmpty(str: string): boolean {
+    return str == undefined || str.toString().trim() == ''
+  }
+
+  isFormValid: boolean
+  validateForm(): void {
+    this.isFormValid = false
+
+    var isRaisonSocialeValide =
+      !this.isFormProfetionnel ||
+      !this.isNullOrEmpty(this.formClient.raisonSociale)
+    var isNomValide =
+      this.isFormProfetionnel || !this.isNullOrEmpty(this.formClient.nom)
+
+    this.rSClass = isRaisonSocialeValide ? '' : 'rSClass'
+    this.nomClass = isNomValide ? '' : 'nomClass'
+
+    if (!isRaisonSocialeValide) {
+      this._toastService.error({
+        summary: 'Champs requis !',
+        detail: 'Veuillez remplir le champs : Raison sociale',
+      })
+    } else if (!isNomValide) {
+      this._toastService.error({
+        summary: 'Champs requis !',
+        detail: 'Veuillez remplir le champs : Nom',
+      })
+    } else {
+      this.formClient.raisonSociale = this.isFormProfetionnel
+        ? this.formClient.raisonSociale
+        : ''
+      this.formClient.ice = this.isFormProfetionnel ? this.formClient.ice : ''
+      this.formClient.secteurActivite = this.isFormProfetionnel
+        ? this.formClient.secteurActivite
+        : ''
+      this.formClient.nom = !this.isFormProfetionnel ? this.formClient.nom : ''
+      this.isFormValid = true
+    }
+  }
+
+  valider() {
+    this.validateForm()
+    if (this.isFormValid) {
       this._clientServiceProxy
         .createClient(this.formClient)
         .subscribe((result) => {
           if (result != undefined) {
-            let clientForAutoCompleteDto = new ClientForAutoCompleteDto({id: result.id, nom: result.nom || result.raisonSociale})
-            this.clientSuggestions = [...this.clientSuggestions, clientForAutoCompleteDto]
+            let clientForAutoCompleteDto = new ClientForAutoCompleteDto({
+              id: result.id,
+              nom: result.nom || result.raisonSociale,
+            })
+            this.clientSuggestions = [
+              ...this.clientSuggestions,
+              clientForAutoCompleteDto,
+            ]
             this.formGroup.get('client').setValue(clientForAutoCompleteDto)
             this.closeClientDialog()
             var referenceClient = this._formatService.formatReferenceNumber(
               result.reference,
-              ReferencePrefix.Client
+              ReferencePrefix.Client,
             )
 
             this._toastService.success({
               summary: 'Opération réussie !',
               detail:
-                'Le client est ajouté avec la référence : ' + referenceClient
+                'Le client est ajouté avec la référence : ' + referenceClient,
             })
-           
           } else {
             this._toastService.error({
               summary: 'Opération échouée !',
               detail:
-                'Une erreur serveur est parvenue ! Veuillez reessayer plutard.'
+                'Une erreur serveur est parvenue ! Veuillez reessayer plutard.',
             })
           }
         })
+    }
+  }
+
+  //#endregion
+
+  //Catalogue dialog
+  catalogueDialogDisplay = false
+  catalogueOptions = ['produit', 'prestation']
+  catalogueFormGroup: FormGroup
+  tvaOptions = [10, 15, 20]
+  unityOptions = ['Heures', 'Kg']
+
+  initiateCatalogueFormGroup() {
+    this.catalogueFormGroup = this.formBuilder.group({
+      designation: ['', Validators.required],
+      description: [''],
+      unity: ['Heures'],
+      htPrice: [0],
+      tva: [0],
+      minimalQuantity: [1],
+      dialogSelectedType: ['produit'],
+    })
+  }
+
+  closeCatalogueDialog() {
+    this.catalogueDialogDisplay = false
+    this.catalogueFormGroup.reset()
+  }
+
+  submitCatalogue() {
+    if (this.catalogueFormGroup.valid) {
+      let createCatalogInput = new CreateCatalogueInput({
+        designation: this.catalogueFormGroup.value.designation,
+        description: this.catalogueFormGroup.value.description,
+        catalogueType: this.catalogueFormGroup.value.dialogSelectedType,
+        unity: this.catalogueFormGroup.value.unity,
+        htPrice: this.catalogueFormGroup.value.htPrice || 0,
+        tva: this.catalogueFormGroup.value.tva || 0,
+        minimalQuantity: this.catalogueFormGroup.value.minimalQuantity || 1,
+      })
+      this._catalogueServiceProxy
+        .createCatalogue(createCatalogInput)
+        .subscribe((res) => {
+          if (res) {
+            let factureItems = this.formGroup.get('devisItems') as FormArray
+            factureItems.at(this.devisItemRowIndex).setValue({
+              catalogueId: res.id,
+              catalogue: { designation: res.designation },
+              date: this.formGroup.get('dateEmission').value,
+              quantity: res.minimalQuantity,
+              unit: res.unity || 'Heures',
+              unitPriceHT: res.htPrice,
+              tva: res.tva || 20,
+              totalTtc: this._calculationsService.calculateTTCWithQuantity(
+                res.htPrice,
+                res.tva,
+                res.minimalQuantity,
+              ),
+            })
+           
+            this._toastService.success({
+              summary: 'Opértion réussie',
+              detail: 'Vous avez ajouté un nouvel item',
+            })
+
+            this.closeCatalogueDialog()
+          } else {
+            this._toastService.internalError()
+          }
+        })
+    } else {
+      this._toastService.error({
+        summary: 'Erreur',
+        detail: 'Veuillez remplir le chemps Désignation',
+      })
+    }
   }
 }
-
-//#endregion
-}
-
-

@@ -1,0 +1,40 @@
+<ng-container *ngIf="currentComponent == 'Estimate'; else elseTemplate">
+    <ng-container [ngSwitch]="status">
+        <ng-container *ngSwitchCase="2">
+            <span>{{this.formatStatut.formatDevisStatut(2)}}</span>
+        </ng-container>
+        <ng-container *ngSwitchCase="3">
+            <span>{{this.formatStatut.formatDevisStatut(3)}}</span>
+        </ng-container>
+        <ng-container *ngSwitchCase="4">
+            <span>{{this.formatStatut.formatDevisStatut(4)}}</span>
+        </ng-container>
+        <ng-container *ngSwitchCase="0">
+            <p-splitButton class=" border-radius-6" [label]="'Brouillon'" [model]="getStatusOptions()"> </p-splitButton>
+        </ng-container>
+        <ng-container *ngSwitchCase="1">
+            <p-splitButton class=" border-radius-6" [label]="'Validé'" [model]="getStatusOptions()"> </p-splitButton>
+        </ng-container>
+    </ng-container>
+</ng-container>
+
+<ng-template #elseTemplate>
+    <ng-container [ngSwitch]="status">
+        <ng-container *ngSwitchCase="3">
+            <span>{{this.formatStatut.formatFactureStatut(3)}}</span>
+        </ng-container>
+        <ng-container *ngSwitchCase="5">
+            <span>{{this.formatStatut.formatFactureStatut(5)}}</span>
+        </ng-container>
+        <ng-container *ngSwitchCase="0">
+            <p-splitButton class=" border-radius-6" [label]="'Brouillon'" [model]="getStatusOptions()"> </p-splitButton>
+        </ng-container>
+        <ng-container *ngSwitchCase="4">
+            <p-splitButton class=" border-radius-6" [label]="'En attente'" [model]="getStatusOptions()"> </p-splitButton>
+        </ng-container>
+        <ng-container *ngSwitchCase="2">
+            <p-button icon="" label="Ajouter un payement" (click)="addPayement()" class="bg-orange"></p-button>
+            <!-- <p-splitButton [label]="'Ajouter un payement'" [model]="getStatusOptions()"> </p-splitButton> -->
+        </ng-container>
+    </ng-container>
+</ng-template>
