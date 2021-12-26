@@ -33,7 +33,7 @@ import { ToastService } from '@shared/services/toast.service'
 import { Moment } from 'moment'
 import { FacturesDialogComponent } from './factures-dialog/factures-dialog.component'
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
-import { ConfirmEventType } from 'primeng/api'
+import { ConfirmEventType, LazyLoadEvent } from 'primeng/api'
 import { map } from 'rxjs/operators'
 import { TableComponent } from '@app/table/table.component'
 import { ConvertDevisToFactureService } from '@shared/services/ConvertDevisToFacture.service'
@@ -46,6 +46,7 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { ItemPreviewComponent } from '@shared/components/item-preview/item-preview.component'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+import { EstimateInvoiceStatusStateService } from '@shared/services/estimate-invoice-status-state.service'
 
 @Component({
   selector: 'app-factures',
@@ -70,6 +71,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     private _convertDevisToFactureService: ConvertDevisToFactureService,
     private _sessionService: AppSessionService,
     private _fileApiServiceProxy: FileApiServiceProxy,
+    private _estimateInvoiceStatusStateService: EstimateInvoiceStatusStateService,
     private _sanitizer: DomSanitizer,
   ) {}
 
@@ -92,6 +94,40 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     if (window.history.state.clientId) {
       this.newDevis(window.history.state.clientId)
     }
+
+    this._estimateInvoiceStatusStateService.statusModifier$.subscribe(async(res) => {
+      if (res.target == 'Invoice') {
+        switch (res.statusAction) {
+          case 'Validate':
+            this.emitDialogStatus(DialogStatus.Edit, 'facture')
+            this.child.validateDevis(true).subscribe((res) => {
+              if (res.success) {
+                this._toastService.info({ detail: 'La facture est devient valide' })
+                this.selectedDevisItem = {
+                  ...this.selectedDevisItem,
+                  statut: this.parseStatutForStatutValide(
+                    res.result.dateEmission,
+                    res.result.echeancePaiement,
+                  ),
+                }
+                this.tableChild.tableData.find(
+                  (item) => item.id == this.selectedDevisItem.id,
+                ).statut = this.selectedDevisItem.statut
+              }
+            })
+            break
+
+          case 'Settle':
+            await this.showFacturePayementDialog()
+            break
+
+          case 'PartiallySettle':
+            await this.showFacturePayementDialog(true)
+            break
+
+        }
+      }
+    })
   }
 
   ngOnDestroy() {
@@ -140,6 +176,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       field: 'dateEmission',
       type: 'date',
       format: (date) => (date._i ? new Date(date._i) : new Date(date._d)),
+      colspan: 2
     },
     {
       header: 'ECHEANCE',
@@ -151,12 +188,14 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       header: 'MONTANT TTC',
       field: 'montantTtc',
       type: 'currency',
+      
     },
     {
       header: 'STATUT',
       field: 'statut',
-      type: 'text',
+      type: 'estimate-invoice-status-component',
       format: this.formatStatut,
+      colspan: 2
     },
   ]
   DevisContentItemsCols = [
@@ -168,6 +207,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     { header: 'TVA', field: 'tva', type: 'pourcentage' },
     { header: 'TOTAL TTC', field: 'totalTtc', type: 'currency', colspan: 0 },
   ]
+  
   statusItems = [
     {
       actualStatus: FactureStatutEnum.ReglePartiellemt,
@@ -210,6 +250,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       },
     },
   ]
+
   displayDialog = false
   dialogState!: DialogStatus
   autoCompleteText = ''
@@ -254,9 +295,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     return moment(dateEmission).add(echeance, 'days').toDate()
   }
 
-  //TODO:remove this method
-  getUserName = () => this._sessionService.user.userName
-
   factureFormatReferenceNumber(reference: number, customPrefix) {
     return this._formatService.formatReferenceNumber(
       reference,
@@ -274,7 +312,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 500)
   }
 
-  //#region events
   filterSubject = new Subject<any>()
   emitFilterEvent(filterType: string, value: any) {
     if (filterType == 'filterByInput') {
@@ -298,6 +335,15 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  resetFilterFields() {
+    this.selectedClient = null
+    this.selectedDate = null
+    this.selectedEcheance = null
+    this.selectedMontant = null
+    this.selectedStatut = null
+
+    this.emitFilterEvent('filterByButton', null)
+  }
   dialogStatusEvent = new Subject<{ statut: DialogStatus; dialogComponent }>()
   emitDialogStatus(dialogStatus: DialogStatus, dialogComponent) {
     this.dialogStatusEvent.next({ statut: dialogStatus, dialogComponent })
@@ -312,7 +358,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   emitNotificationSelectedDevisChanged(deviItem: any) {
     this.notifySelectedDevisChanged.next(deviItem)
   }
-  //#endregion
 
   newDevis(clientId?) {
     clientId && (this.child.selectedClientId = clientId)
@@ -367,10 +412,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       },
     })
-    
+
     let element = document.body.querySelector('#cd') as HTMLElement
     element.style.display = 'none'
-
   }
 
   firstTimeCharged = true
@@ -447,53 +491,55 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         : event.result.statut
 
     if (event.crudOperation == 'create') {
-      let newDevis = {
-        ...event.result,
-        statut,
-        client: {
-          ...event.result.client,
-          nom: event.result.client.nom
-            ? event.result.client.nom
-            : event.result.client.raisonSociale,
-        },
-      }
-      newDevis.factureItems = newDevis.factureItems.map((item: any) => {
-        let total_ht = item.unitPriceHT * item.quantity
-        return { ...item, totalTtc: total_ht + (item.tva * total_ht) / 100 }
-      })
+      this.tableChild.loadTableLazy()
 
-      let remiseAmount =
-        (newDevis.factureItems
-          .map((item) => item.unitPriceHT * item.quantity)
-          .reduce((accum, current) => accum + current) *
-          newDevis.remise) /
-        100
+      // let newDevis = {
+      //   ...event.result,
+      //   statut,
+      //   client: {
+      //     ...event.result.client,
+      //     nom: event.result.client.nom
+      //       ? event.result.client.nom
+      //       : event.result.client.raisonSociale,
+      //   },
+      // }
+      // newDevis.factureItems = newDevis.factureItems.map((item: any) => {
+      //   let total_ht = item.unitPriceHT * item.quantity
+      //   return { ...item, totalTtc: total_ht + (item.tva * total_ht) / 100 }
+      // })
 
-      newDevis.montantTtc =
-        newDevis.factureItems
-          .map((item) => item.totalTtc)
-          .reduce((accum, current) => accum + current) - remiseAmount
-      this.montantTotalAllDevis += newDevis.montantTtc
+      // let remiseAmount =
+      //   (newDevis.factureItems
+      //     .map((item) => item.unitPriceHT * item.quantity)
+      //     .reduce((accum, current) => accum + current) *
+      //     newDevis.remise) /
+      //   100
 
-      this.tableChild.tableData = [
-        ...this.tableChild.tableData,
-        { ...newDevis },
-      ]
+      // newDevis.montantTtc =
+      //   newDevis.factureItems
+      //     .map((item) => item.totalTtc)
+      //     .reduce((accum, current) => accum + current) - remiseAmount
+      // this.montantTotalAllDevis += newDevis.montantTtc
 
-      this.tableChild.tableData.sort((a, b) =>
-        a.reference < b.reference ? 1 : -1,
-      )
+      // this.tableChild.tableData = [
+      //   ...this.tableChild.tableData,
+      //   { ...newDevis },
+      // ]
 
-      this.selectedDevisItem = {
-        ...newDevis,
-        dateEmission: newDevis.dateEmission.toDate(),
-      }
+      // this.tableChild.tableData.sort((a, b) =>
+      //   a.reference < b.reference ? 1 : -1,
+      // )
 
-      this.emitNotificationSelectedDevisChanged({
-        ...this.selectedDevisItem,
-      })
+      // this.selectedDevisItem = {
+      //   ...newDevis,
+      //   dateEmission: newDevis.dateEmission.toDate(),
+      // }
 
-      console.log(newDevis)
+      // this.emitNotificationSelectedDevisChanged({
+      //   ...this.selectedDevisItem,
+      // })
+
+      // console.log(newDevis)
     } else if (event.crudOperation == 'update') {
       this.selectedDevisItem = {
         ...event.result,
@@ -547,15 +593,18 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   //#region Api Calls
-  getListDevisApi$(event, data) {
-    let clientFilter = event.filters.client && event.filters.client.value
-    let dateEmissionFilter =
-      event.filters.dateEmission && event.filters.dateEmission.value
-    let echeancePaiementFilter =
-      event.filters.echeancePaiement && event.filters.echeancePaiement.value
-    let montantTtcFilter =
-      event.filters.montantTtc && event.filters.montantTtc.value
-    let statutFilter = event.filters.statut && event.filters.statut.value
+  getListDevisApi$(event) {
+    let clientFilter, dateEmissionFilter, echeancePaiementFilter, montantTtcFilter, statutFilter
+    if (event.filters) {
+      clientFilter = event.filters.client && event.filters.client.value
+      dateEmissionFilter =
+        event.filters.dateEmission && event.filters.dateEmission.value
+      echeancePaiementFilter =
+        event.filters.echeancePaiement && event.filters.echeancePaiement.value
+      montantTtcFilter =
+        event.filters.montantTtc && event.filters.montantTtc.value
+      statutFilter = event.filters.statut && event.filters.statut.value
+    }
 
     return zip(
       this._factureServiceProxy.getAllFactureTotalRecords(
@@ -596,7 +645,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       ),
     ).pipe(
       map(([length, res, montantTotalAllDevis]: any) => {
-        data = [...res.items]
+        let data = [...res.items]
         data.forEach((devis: any) => {
           devis.client.nom = !devis.client.nom
             ? devis.client.raisonSociale
@@ -803,65 +852,63 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   downloadAsPDF() {
-    let data = document.getElementById('contentToConvert') 
+    let data = document.getElementById('contentToConvert')
     this.convertToPDF(data)
-    
   }
 
-  convertToPDF(element){
+  convertToPDF(element) {
     html2canvas(element, {
       scale: 5,
       onclone: (dcm) => {
         let data = dcm.getElementById('contentToConvert')
         data.classList.add('html2canvas')
-        dcm.getElementById('pageFooter').innerText = this.selectedDevisItem.piedDePage
-
-      }
+        dcm.getElementById(
+          'pageFooter',
+        ).innerText = this.selectedDevisItem.piedDePage
+      },
     }).then((canvas) => {
       let docWidth = 205
       let docHeight = (canvas.height * docWidth) / canvas.width
-     
+
       const contentDataURL = canvas.toDataURL('image/png')
       let doc = new jsPDF('p', 'mm', 'a4')
       let position = 0
 
-      const items = this.selectedDevisItem.devisItems || this.selectedDevisItem.factureItems
+      const items =
+        this.selectedDevisItem.devisItems || this.selectedDevisItem.factureItems
       let table = document.querySelector('#contentToConvert p-table')
       let rest = items.length % 5
       let count = (items.length - rest) / 5 + +!!rest,
-      splittedItems: FactureItemDto
+        splittedItems: FactureItemDto
       doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
       // for(let i=0; i < count; i++){
       //   splittedItems = items.slice(length, length + 4)
       //   console.log(length)
       //   doc.addPage()
       //   doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
-     
+
       // }
-       doc.save('exportedPdf.pdf')
-       
+      doc.save('exportedPdf.pdf')
     })
   }
 
   // downloadFacture() {
-    // window.open(
-    //   AppConsts.remoteServiceBaseUrl + '/FileLoader/GetFacture/0',
-    //   '_blank',
-    // )
-    // this._factureServiceProxy
-    //   .getByIdFactureReport(this.selectedDevisItem.id)
-    //   .subscribe((res) => {
-    //     const linkSource = `data:application/pdf;base64,${res}`
-    //     const downloadLink = document.createElement('a')
-    //     const fileName = 'facture_template.pdf'
+  // window.open(
+  //   AppConsts.remoteServiceBaseUrl + '/FileLoader/GetFacture/0',
+  //   '_blank',
+  // )
+  // this._factureServiceProxy
+  //   .getByIdFactureReport(this.selectedDevisItem.id)
+  //   .subscribe((res) => {
+  //     const linkSource = `data:application/pdf;base64,${res}`
+  //     const downloadLink = document.createElement('a')
+  //     const fileName = 'facture_template.pdf'
 
-    //     downloadLink.href = linkSource
-    //     downloadLink.download = fileName
-    //     downloadLink.click()
-    //   })
+  //     downloadLink.href = linkSource
+  //     downloadLink.download = fileName
+  //     downloadLink.click()
+  //   })
   // }
-
-
 
   viewUpdateSelectedItemStatut(statut: any) {
     this.selectedDevisItem = {

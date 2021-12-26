@@ -1,5 +1,5 @@
 <div class="grid grid-nogutter ">
-    <div id="blockLeft" class="col-6 pt-5">
+    <div id="blockLeft" class="pt-5">
         <div class="pl-2">
             <div class="grid p-2">
                 <div class="col-8" id="titreBlock">
@@ -20,11 +20,17 @@
                     </span>
                 </div>
                 <div class="col-7" id="filtreRightBlock">
-                    <p-button class="content" label="Filtrer" (click)="emitFilterEvent('filterByButton', null)" icon="pi pi-filter" iconPos="left"></p-button>
-                    <p-dropdown class="content" [options]="types" placeholder="Type" [(ngModel)]="selectedType" optionLabel="name" optionValue="code">
-                    </p-dropdown>
-                    <p-dropdown class="content" [options]="categories" placeholder="Catégorie" [(ngModel)]="selectedCategory" optionLabel="name" optionValue="code">
-                    </p-dropdown>
+                    <!-- <p-button class="content" label="Filtrer" (click)="emitFilterEvent('filterByButton', null)"
+                        icon="pi pi-filter" iconPos="left"></p-button> -->
+                    <div class="ml-auto w-max">
+                        <p-dropdown class="" [options]="types" placeholder="Type" [(ngModel)]="selectedType" optionLabel="name" optionValue="code">
+                        </p-dropdown>
+                        <p-dropdown class="" [options]="categories" placeholder="Catégorie" [(ngModel)]="selectedCategory" optionLabel="name" optionValue="code">
+                        </p-dropdown>
+
+                        <button pButton pRipple type="button" icon="pi pi-filter-slash" (click)="emitFilterEvent('filterByButton', null)" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor "></button>
+                        <button pButton pRipple type="button" icon="fa fa-undo" (click)="resetFilterFields()" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor "></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -33,48 +39,14 @@
             [getListApi$]="chargerListeClients" [SelectItemEvent]="notifySelectedDevisChanged.asObservable()" [globalFilterFields]="['categorie','type']">
         </app-table>
 
-        <!-- <p-table id="tableClients" [value]="clients" [rows]="5" selectionMode="single" [(selection)]="client" dataKey="id" 
-            (onRowSelect)="onRowSelect($event)" (onSort)="customSort($event)" [customSort]="true" [lazy]="true" [scrollable]="true" 
-            [virtualScroll]="true" [virtualRowHeight]="54" [totalRecords]="300" >
-            <ng-template pTemplate="header">
-                <tr>
-                    <th pSortableColumn="reference">RéFERENCE
-                        <p-sortIcon field="reference"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="creationTime">DATE D'AJOUT
-                        <p-sortIcon field="creationTime"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="nom">CLIENT
-                        <p-sortIcon field="nom"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="telFix">fACTURES EN ATTENTE
-                        <p-sortIcon field="telFix"></p-sortIcon>
-                    </th>
-                    <th pSortableColumn="telFix2">FACTURES PAYéES
-                        <p-sortIcon field="telFix2"></p-sortIcon>
-                    </th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-client>
-                <tr [pSelectableRow]="client">
-                    <td>{{getReferenceFromReferenceNumber(client.reference)}}</td>
-                    <td>{{getCreationDateFromClient(client)}}</td>
-                    <td>{{getNomFromClient(client)}}</td>
-                    <td>0 MAD</td>
-                    <td>0 MAD</td>
-                </tr>
-            </ng-template>
-        </p-table> -->
-
         <div id="footerTable" class="grid mx-2">
             <div id="totalTTC">Total TTC</div>
             <div id="totalEnAttente">{{ this.totalAmountPendingFactures | number:'1.2-2' }} {{' ' + Currency}}</div>
             <div id="totalPayees">{{ this.totalAmountOverdueFactures | number:'1.2-2' }} {{' ' + Currency}}</div>
         </div>
 
-
     </div>
-    <div id="blockApercu" class="col-6 pt-5 px-3 pb-3">
+    <div id="blockApercu" class="pt-5 pr-3 pb-3">
         <div id="apercu" class="shadow-4">
             <div id="headerApercu">
                 <div>
@@ -348,8 +320,6 @@
         </div>
         <div class="col-7">
             <p-dropdown [options]="countries" [(ngModel)]="formClient.pays" optionLabel="paysName" optionValue="paysName" [virtualScroll]="true" [itemSize]="31" [filter]="false"></p-dropdown>
-
-            <!-- <p-dropdown [options]="countries" [(ngModel)]="formClient.pays" optionLabel="name" optionValue="isoCode" name="Pays"></p-dropdown> -->
         </div>
         <div class="col-5 label">
             <span>Ville</span>

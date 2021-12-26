@@ -94,7 +94,7 @@ i.pi-search {
 
 :host ::ng-deep #devisList .p-datatable {
     margin-top: 1rem;
-    padding-right: 1.5rem;
+    padding-right: .8rem;
 }
 
 :host>>>#devisList .p-datatable .p-datatable-tbody>tr {
@@ -120,6 +120,7 @@ i.pi-search {
     font-size: 0.85rem;
     color: #898e99;
     text-align: center;
+    padding: .8rem .1rem;
 }
 
 
@@ -155,7 +156,7 @@ i.pi-search {
 }
 
 .devis-details .header {
-    padding: 20px 20px;
+    padding: 20px .75rem;
     border-bottom: 1px solid #d8d8d8;
 }
 
@@ -195,11 +196,9 @@ i.pi-search {
     font-size: 0.8rem;
 }
 
-:host ::ng-deep .p-splitbutton * {}
-
 :host ::ng-deep .p-splitbutton-defaultbutton {
-    padding: 8px;
-    font-size: 0.875rem;
+    /* padding: 8px; */
+    font-size: 0.8rem;
 }
 
 :host ::ng-deep .p-splitbutton-menubutton {
@@ -272,11 +271,11 @@ i.pi-search {
 }
 
 .leftSection {
-    width: 52%;
+    width: 56%;
 }
 
 .rightSection {
-    width: 48%;
+    width: 44%;
 }
 
 :host>>>.filterContainer .p-datepicker {

@@ -110,6 +110,7 @@ i.pi-search {
     font-size: 0.85rem;
     color: #898e99;
     text-align: center;
+    padding: .8rem .1rem;
 }
 
 
@@ -160,11 +161,11 @@ i.pi-search {
 }
 
 .leftSection {
-    width: 52%;
+    width: 56%;
 }
 
 .rightSection {
-    width: 48%;
+    width: 44%;
 }
 
 .lineHeight-18 {

@@ -43,7 +43,6 @@ import { PrimengSharedModule } from '@shared/primeng-shared.module';
 
 @NgModule({
   imports: [
-    CommonModule,
     RouterModule.forChild([
       { path: '', component: FacturesComponent}
   ]),

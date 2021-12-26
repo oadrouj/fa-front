@@ -25,6 +25,7 @@
     --purple-color: #5D3D7D;
     --light-purple-color: #DDD7E3;
     --dark-orange-color: #EF790D;
+    --blue-color: #2A95D1;
 }
 
 .w-80 {
@@ -70,6 +71,10 @@
     color: var(--dark-orange-color) !important;
 }
 
+.color-blue {
+    color: var(--blue-color) !important;
+}
+
 .bg-green {
     background-color: var(--green-color) !important;
 }
@@ -101,6 +106,10 @@
 
 .bg-dark-orange {
     background-color: var(--dark-orange-color) !important;
+}
+
+.bg-blue {
+    background-color: var(--blue-color) !important;
 }
 
 .p-dropdown .pi.pi-chevron-down:before {

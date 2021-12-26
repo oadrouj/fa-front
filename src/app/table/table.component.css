@@ -22,3 +22,41 @@
 :host>>>.p-datatable .p-sortable-column-icon.pi {
     font-size: .9rem;
 }
+
+:host>>>.p-datatable .p-datatable-wrapper {
+    /* height: 52vh; */
+}
+
+:host>>>.p-paginator-bottom {
+    background: transparent;
+    margin-bottom: 3rem;
+}
+
+:host>>>.p-paginator-bottom .p-link {
+    background: #fff !important;
+    font-weight: 500 !important;
+    color: #898e99 !important;
+    margin-left: .2rem;
+    margin-right: .2rem;
+}
+
+:host>>>.p-paginator-bottom .p-link.p-highlight {
+    background: #403233 !important;
+    color: #fff !important;
+}
+
+:host>>>.p-datatable-thead {
+    height: 6.2vh;
+}
+
+:host>>>.pi-sort-alt:before {
+    content: '\e903 \A \e902';
+}
+
+:host>>>.pi-sort-amount-up-alt:before {
+    content: '\e903';
+}
+
+:host>>>.pi-sort-amount-down:before {
+    content: '\e902';
+}

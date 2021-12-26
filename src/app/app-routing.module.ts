@@ -20,14 +20,14 @@ import { AppRouteGuard } from '@shared/auth/auth-route-guard';
                     {   
                         path: 'Devis',
                         loadChildren: () => import('./devis/devis.module').then(m => m.DevisModule), // Lazy load account module
-                        data: { preload: true },
+                        data: { preload: true, currentComponent: 'Estimate' },
                         canActivate: [AppRouteGuard] 
 
                     },
                     {   
                         path: 'Factures',
                         loadChildren: () => import('./factures/factures.module').then(m => m.FacturesModule), // Lazy load account module
-                        data: { preload: true },
+                        data: { preload: true, currentComponent: 'Invoice'},
                         canActivate: [AppRouteGuard] 
 
                     },

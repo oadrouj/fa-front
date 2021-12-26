@@ -65,6 +65,7 @@ export class ClientsComponent extends AppComponentBase
   rSClass: string = ''
   nomClass: string = ''
   tableSelectionColor = 'var(--light-green-color)'
+  primaryColor = 'blue';
   formClient: ClientDto = new ClientDto()
   @ViewChild(TableComponent, { static: false })
   tableChild: TableComponent
@@ -303,12 +304,18 @@ export class ClientsComponent extends AppComponentBase
       })
     }
   }
-  //#endregion
 
-  chargerListeClients(event, data) {
+  resetFilterFields(){
+    this.selectedCategory = '';
+    this.selectedType = '';
+
+    this.emitFilterEvent('filterByButton', null)
+  }
+
+  chargerListeClients(event) {
     
-    let categorieFilter = event.filters.category && event.filters.category.value
-    let typeFilter = event.filters.type && event.filters.type.value
+    let categorieFilter = event.filters && event.filters.category && (event.filters.category.value)
+    let typeFilter = event.filters && event.filters.type && event.filters.type.value
     return this._clientServiceProxy
       .getAllClients(
         event.first,
@@ -329,7 +336,7 @@ export class ClientsComponent extends AppComponentBase
        
           return {
             items: data.items,
-            length: data.items.length,
+            length: data.totalEntityItems,
             montantTotalAllDevis: 0,
           }
         }),
@@ -627,7 +634,6 @@ export class ClientsComponent extends AppComponentBase
               var referenceClient = this.getReferenceFromReferenceNumber(
                 result.reference,
               )
-              // this.chargerListeClients();
               this.messageService.add({
                 key: 'default',
                 severity: 'success',
@@ -637,21 +643,8 @@ export class ClientsComponent extends AppComponentBase
                 life: 1600,
               })
              
-              result.categorieClient == 'PRFS' && (result.nom = result.raisonSociale)
-              result.clientType = "Prospect"
-              this.tableChild.tableData = [
-                ...this.tableChild.tableData,
-                { ...result },
-              ]
-
-              this.tableChild.tableData.sort((a, b) =>
-                a.reference < b.reference ? 1 : -1,
-              )
-
-              this.client = new ClientDto({ ...result })
-              this.emitNotificationSelectedDevisChanged({
-                ...this.client,
-              })
+              this.tableChild.loadTableLazy();
+              
             } else {
               this.messageService.add({
                 key: 'default',
@@ -717,8 +710,7 @@ export class ClientsComponent extends AppComponentBase
   }
 
   supprimerClient(): void {
-    // this.messageService.add({ key: 'default', severity: 'success', summary: 'Opération réussie !', detail: 'Le client ' + referenceClient + ' a été supprimé avec succès.' });
-
+   
     this._confirmDialogService.deleteConfirm({
       acceptCallback: () => {
         this._clientServiceProxy.deleteClient(this.client.id).subscribe(() => {

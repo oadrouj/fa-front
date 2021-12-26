@@ -30,7 +30,10 @@
                     <p-inputNumber [(ngModel)]="selectedEcheance" placeholder="Echéance"></p-inputNumber>
                     <p-inputNumber [(ngModel)]="selectedMontant" placeholder="Montant" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
                     <p-dropdown [options]="statutOptions" [(ngModel)]="selectedStatut" placeholder="Statut" optionLabel="label" optionValue="value" [showClear]="false"></p-dropdown>
-                    <button pButton pRipple (click)="emitFilterEvent('filterByButton', null)" class="filterBtn p-button-rounded  ml-2" [ngClass]="'bg-' + primaryColor" label="Filtrer" icon="pi pi-filter"></button>
+
+                    <button pButton pRipple type="button" icon="pi pi-filter-slash" (click)="emitFilterEvent('filterByButton', null)" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor "></button>
+                    <button pButton pRipple type="button" icon="fa fa-undo" (click)="resetFilterFields()" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor "></button>
+
                 </div>
             </div>
 
@@ -47,8 +50,7 @@
 
         <div class="rightSection md:col-12 p-0">
             <div class="devis-details">
-                <div class="header flex justify-content-between">
-                    <p-splitButton class=" border-radius-6" [label]="selectedDevisItem ? formatStatut(selectedDevisItem.statut) : ' '" [model]="getStatusOptions()"> </p-splitButton>
+                <div class="header flex justify-content-end">
                     <div class="flex">
                         <button pButton label="Télécharger" (click)="downloadAsPDF()" class="p-button-text"></button>
                         <button pButton label="Imprimer" class="p-button-text" (click)="print()"></button>

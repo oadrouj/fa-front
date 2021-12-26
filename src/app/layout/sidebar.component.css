@@ -1,13 +1,15 @@
-:host >>> .main-sidebar {
-    width: 16% !important;
+:host>>>.main-sidebar {
+    width: 14% !important;
     overflow-y: hidden !important;
 }
-:host >>> .sidebar {
+
+:host>>>.sidebar {
     overflow-y: hidden !important;
     position: relative;
     min-height: 100%;
 }
-:host >>> .main-sidebar > img {
+
+:host>>>.main-sidebar>img {
     position: absolute;
     bottom: 20px;
     left: 50%;

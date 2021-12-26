@@ -155,7 +155,7 @@ export class CatalogueServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    createCatalogue(body: CreateCatalogueInput | undefined): Observable<CreateCatalogueResult> {
+    createCatalogue(body: CreateCatalogueInput | undefined): Observable<CatalogueDto> {
         let url_ = this.baseUrl + "/api/services/app/Catalogue/CreateCatalogue";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -178,14 +178,14 @@ export class CatalogueServiceProxy {
                 try {
                     return this.processCreateCatalogue(<any>response_);
                 } catch (e) {
-                    return <Observable<CreateCatalogueResult>><any>_observableThrow(e);
+                    return <Observable<CatalogueDto>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<CreateCatalogueResult>><any>_observableThrow(response_);
+                return <Observable<CatalogueDto>><any>_observableThrow(response_);
         }));
     }
 
-    protected processCreateCatalogue(response: HttpResponseBase): Observable<CreateCatalogueResult> {
+    protected processCreateCatalogue(response: HttpResponseBase): Observable<CatalogueDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -196,7 +196,7 @@ export class CatalogueServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = CreateCatalogueResult.fromJS(resultData200);
+            result200 = CatalogueDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -204,7 +204,7 @@ export class CatalogueServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<CreateCatalogueResult>(<any>null);
+        return _observableOf<CatalogueDto>(<any>null);
     }
 
     /**
@@ -438,7 +438,7 @@ export class CatalogueServiceProxy {
      * @param filtres_CatalogueType (optional) 
      * @return Success
      */
-    getAllCatalogues(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_CatalogueType: string | null | undefined): Observable<CatalogueDtoListResultDto> {
+    getAllCatalogues(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, filtres_CatalogueType: string | null | undefined): Observable<CatalogueDtoListResultWithTotalEntityItemsDto> {
         let url_ = this.baseUrl + "/api/services/app/Catalogue/GetAllCatalogues?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -473,14 +473,14 @@ export class CatalogueServiceProxy {
                 try {
                     return this.processGetAllCatalogues(<any>response_);
                 } catch (e) {
-                    return <Observable<CatalogueDtoListResultDto>><any>_observableThrow(e);
+                    return <Observable<CatalogueDtoListResultWithTotalEntityItemsDto>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<CatalogueDtoListResultDto>><any>_observableThrow(response_);
+                return <Observable<CatalogueDtoListResultWithTotalEntityItemsDto>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetAllCatalogues(response: HttpResponseBase): Observable<CatalogueDtoListResultDto> {
+    protected processGetAllCatalogues(response: HttpResponseBase): Observable<CatalogueDtoListResultWithTotalEntityItemsDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -491,7 +491,7 @@ export class CatalogueServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = CatalogueDtoListResultDto.fromJS(resultData200);
+            result200 = CatalogueDtoListResultWithTotalEntityItemsDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -499,7 +499,7 @@ export class CatalogueServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<CatalogueDtoListResultDto>(<any>null);
+        return _observableOf<CatalogueDtoListResultWithTotalEntityItemsDto>(<any>null);
     }
 }
 
@@ -746,7 +746,7 @@ export class ClientServiceProxy {
      * @param clientFilter_Type (optional) 
      * @return Success
      */
-    getAllClients(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, clientFilter_Category: string | null | undefined, clientFilter_Type: string | null | undefined): Observable<ClientDtoListResultDto> {
+    getAllClients(first: number | undefined, rows: number | undefined, globalFilter: string | null | undefined, sortField: string | null | undefined, sortOrder: string | null | undefined, clientFilter_Category: string | null | undefined, clientFilter_Type: string | null | undefined): Observable<ClientDtoListResultWithTotalEntityItemsDto> {
         let url_ = this.baseUrl + "/api/services/app/Client/GetAllClients?";
         if (first === null)
             throw new Error("The parameter 'first' cannot be null.");
@@ -783,14 +783,14 @@ export class ClientServiceProxy {
                 try {
                     return this.processGetAllClients(<any>response_);
                 } catch (e) {
-                    return <Observable<ClientDtoListResultDto>><any>_observableThrow(e);
+                    return <Observable<ClientDtoListResultWithTotalEntityItemsDto>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<ClientDtoListResultDto>><any>_observableThrow(response_);
+                return <Observable<ClientDtoListResultWithTotalEntityItemsDto>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetAllClients(response: HttpResponseBase): Observable<ClientDtoListResultDto> {
+    protected processGetAllClients(response: HttpResponseBase): Observable<ClientDtoListResultWithTotalEntityItemsDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -801,7 +801,7 @@ export class ClientServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = ClientDtoListResultDto.fromJS(resultData200);
+            result200 = ClientDtoListResultWithTotalEntityItemsDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -809,7 +809,7 @@ export class ClientServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<ClientDtoListResultDto>(<any>null);
+        return _observableOf<ClientDtoListResultWithTotalEntityItemsDto>(<any>null);
     }
 
     /**
@@ -1099,6 +1099,120 @@ export class CountryServiceAppServiceProxy {
             }));
         }
         return _observableOf<CountryDtoListResultDto>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getAllDBCountries(): Observable<Country[]> {
+        let url_ = this.baseUrl + "/api/services/app/CountryServiceApp/GetAllDBCountries";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllDBCountries(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllDBCountries(<any>response_);
+                } catch (e) {
+                    return <Observable<Country[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Country[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAllDBCountries(response: HttpResponseBase): Observable<Country[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(Country.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<Country[]>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    insertManyCountries(body: Country[] | null | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/CountryServiceApp/InsertManyCountries";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processInsertManyCountries(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processInsertManyCountries(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processInsertManyCountries(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
     }
 }
 
@@ -6411,128 +6525,6 @@ export interface ICreateCatalogueInput {
     minimalQuantity: number;
 }
 
-export class CreateCatalogueResult implements ICreateCatalogueResult {
-    id: number;
-    reference: number;
-    addedDate: moment.Moment;
-
-    constructor(data?: ICreateCatalogueResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.reference = _data["reference"];
-            this.addedDate = _data["addedDate"] ? moment(_data["addedDate"].toString()) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): CreateCatalogueResult {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateCatalogueResult();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["reference"] = this.reference;
-        data["addedDate"] = this.addedDate ? this.addedDate.toISOString() : <any>undefined;
-        return data; 
-    }
-
-    clone(): CreateCatalogueResult {
-        const json = this.toJSON();
-        let result = new CreateCatalogueResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface ICreateCatalogueResult {
-    id: number;
-    reference: number;
-    addedDate: moment.Moment;
-}
-
-export class UpdateCatalogueInput implements IUpdateCatalogueInput {
-    catalogueType: string | undefined;
-    designation: string | undefined;
-    description: string | undefined;
-    htPrice: number;
-    unity: string | undefined;
-    tva: number;
-    minimalQuantity: number;
-    id: number;
-
-    constructor(data?: IUpdateCatalogueInput) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.catalogueType = _data["catalogueType"];
-            this.designation = _data["designation"];
-            this.description = _data["description"];
-            this.htPrice = _data["htPrice"];
-            this.unity = _data["unity"];
-            this.tva = _data["tva"];
-            this.minimalQuantity = _data["minimalQuantity"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): UpdateCatalogueInput {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateCatalogueInput();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["catalogueType"] = this.catalogueType;
-        data["designation"] = this.designation;
-        data["description"] = this.description;
-        data["htPrice"] = this.htPrice;
-        data["unity"] = this.unity;
-        data["tva"] = this.tva;
-        data["minimalQuantity"] = this.minimalQuantity;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): UpdateCatalogueInput {
-        const json = this.toJSON();
-        let result = new UpdateCatalogueInput();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IUpdateCatalogueInput {
-    catalogueType: string | undefined;
-    designation: string | undefined;
-    description: string | undefined;
-    htPrice: number;
-    unity: string | undefined;
-    tva: number;
-    minimalQuantity: number;
-    id: number;
-}
-
 export class CatalogueDto implements ICatalogueDto {
     reference: number;
     catalogueType: string | undefined;
@@ -6637,6 +6629,77 @@ export interface ICatalogueDto {
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
     creatorUserId: number | undefined;
+    id: number;
+}
+
+export class UpdateCatalogueInput implements IUpdateCatalogueInput {
+    catalogueType: string | undefined;
+    designation: string | undefined;
+    description: string | undefined;
+    htPrice: number;
+    unity: string | undefined;
+    tva: number;
+    minimalQuantity: number;
+    id: number;
+
+    constructor(data?: IUpdateCatalogueInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.catalogueType = _data["catalogueType"];
+            this.designation = _data["designation"];
+            this.description = _data["description"];
+            this.htPrice = _data["htPrice"];
+            this.unity = _data["unity"];
+            this.tva = _data["tva"];
+            this.minimalQuantity = _data["minimalQuantity"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): UpdateCatalogueInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateCatalogueInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["catalogueType"] = this.catalogueType;
+        data["designation"] = this.designation;
+        data["description"] = this.description;
+        data["htPrice"] = this.htPrice;
+        data["unity"] = this.unity;
+        data["tva"] = this.tva;
+        data["minimalQuantity"] = this.minimalQuantity;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): UpdateCatalogueInput {
+        const json = this.toJSON();
+        let result = new UpdateCatalogueInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdateCatalogueInput {
+    catalogueType: string | undefined;
+    designation: string | undefined;
+    description: string | undefined;
+    htPrice: number;
+    unity: string | undefined;
+    tva: number;
+    minimalQuantity: number;
     id: number;
 }
 
@@ -6758,10 +6821,11 @@ export interface ICatalogueForAutoCompleteDtoListResultDto {
     items: CatalogueForAutoCompleteDto[] | undefined;
 }
 
-export class CatalogueDtoListResultDto implements ICatalogueDtoListResultDto {
+export class CatalogueDtoListResultWithTotalEntityItemsDto implements ICatalogueDtoListResultWithTotalEntityItemsDto {
     items: CatalogueDto[] | undefined;
+    totalEntityItems: number;
 
-    constructor(data?: ICatalogueDtoListResultDto) {
+    constructor(data?: ICatalogueDtoListResultWithTotalEntityItemsDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -6777,12 +6841,13 @@ export class CatalogueDtoListResultDto implements ICatalogueDtoListResultDto {
                 for (let item of _data["items"])
                     this.items.push(CatalogueDto.fromJS(item));
             }
+            this.totalEntityItems = _data["totalEntityItems"];
         }
     }
 
-    static fromJS(data: any): CatalogueDtoListResultDto {
+    static fromJS(data: any): CatalogueDtoListResultWithTotalEntityItemsDto {
         data = typeof data === 'object' ? data : {};
-        let result = new CatalogueDtoListResultDto();
+        let result = new CatalogueDtoListResultWithTotalEntityItemsDto();
         result.init(data);
         return result;
     }
@@ -6794,19 +6859,21 @@ export class CatalogueDtoListResultDto implements ICatalogueDtoListResultDto {
             for (let item of this.items)
                 data["items"].push(item.toJSON());
         }
+        data["totalEntityItems"] = this.totalEntityItems;
         return data; 
     }
 
-    clone(): CatalogueDtoListResultDto {
+    clone(): CatalogueDtoListResultWithTotalEntityItemsDto {
         const json = this.toJSON();
-        let result = new CatalogueDtoListResultDto();
+        let result = new CatalogueDtoListResultWithTotalEntityItemsDto();
         result.init(json);
         return result;
     }
 }
 
-export interface ICatalogueDtoListResultDto {
+export interface ICatalogueDtoListResultWithTotalEntityItemsDto {
     items: CatalogueDto[] | undefined;
+    totalEntityItems: number;
 }
 
 export class ClientDto implements IClientDto {
@@ -6997,6 +7064,61 @@ export class ClientDtoListResultDto implements IClientDtoListResultDto {
 
 export interface IClientDtoListResultDto {
     items: ClientDto[] | undefined;
+}
+
+export class ClientDtoListResultWithTotalEntityItemsDto implements IClientDtoListResultWithTotalEntityItemsDto {
+    items: ClientDto[] | undefined;
+    totalEntityItems: number;
+
+    constructor(data?: IClientDtoListResultWithTotalEntityItemsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(ClientDto.fromJS(item));
+            }
+            this.totalEntityItems = _data["totalEntityItems"];
+        }
+    }
+
+    static fromJS(data: any): ClientDtoListResultWithTotalEntityItemsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ClientDtoListResultWithTotalEntityItemsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalEntityItems"] = this.totalEntityItems;
+        return data; 
+    }
+
+    clone(): ClientDtoListResultWithTotalEntityItemsDto {
+        const json = this.toJSON();
+        let result = new ClientDtoListResultWithTotalEntityItemsDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IClientDtoListResultWithTotalEntityItemsDto {
+    items: ClientDto[] | undefined;
+    totalEntityItems: number;
 }
 
 export class ClientForAutoCompleteDto implements IClientForAutoCompleteDto {
@@ -7289,6 +7411,73 @@ export interface ICountryDtoListResultDto {
     items: CountryDto[] | undefined;
 }
 
+export class Country implements ICountry {
+    paysName: string | undefined;
+    paysCode: string | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+
+    constructor(data?: ICountry) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paysName = _data["paysName"];
+            this.paysCode = _data["paysCode"];
+            this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierUserId = _data["lastModifierUserId"];
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorUserId = _data["creatorUserId"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): Country {
+        data = typeof data === 'object' ? data : {};
+        let result = new Country();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paysName"] = this.paysName;
+        data["paysCode"] = this.paysCode;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierUserId"] = this.lastModifierUserId;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorUserId"] = this.creatorUserId;
+        data["id"] = this.id;
+        return data; 
+    }
+
+    clone(): Country {
+        const json = this.toJSON();
+        let result = new Country();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICountry {
+    paysName: string | undefined;
+    paysCode: string | undefined;
+    lastModificationTime: moment.Moment | undefined;
+    lastModifierUserId: number | undefined;
+    creationTime: moment.Moment;
+    creatorUserId: number | undefined;
+    id: number;
+}
+
 export class UserDto implements IUserDto {
     userName: string;
     name: string;
@@ -7554,6 +7743,7 @@ export class UpdateDevisInput implements IUpdateDevisInput {
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
+    montantTtc: number;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
@@ -7585,6 +7775,7 @@ export class UpdateDevisInput implements IUpdateDevisInput {
                     this.devisItems.push(DevisItemDto.fromJS(item));
             }
             this.clientId = _data["clientId"];
+            this.montantTtc = _data["montantTtc"];
             this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
             this.lastModifierUserId = _data["lastModifierUserId"];
             this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
@@ -7616,6 +7807,7 @@ export class UpdateDevisInput implements IUpdateDevisInput {
                 data["devisItems"].push(item.toJSON());
         }
         data["clientId"] = this.clientId;
+        data["montantTtc"] = this.montantTtc;
         data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
         data["lastModifierUserId"] = this.lastModifierUserId;
         data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
@@ -7643,6 +7835,7 @@ export interface IUpdateDevisInput {
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
+    montantTtc: number;
     lastModificationTime: moment.Moment | undefined;
     lastModifierUserId: number | undefined;
     creationTime: moment.Moment;
@@ -8351,9 +8544,8 @@ export enum ModePaiementEnum {
     Cheque = 0,
     Virement = 1,
     Liquide = 2,
-    Effet = 3,
+    Effet = 3
 }
-
 export class FactureInfosPaiementDto implements IFactureInfosPaiementDto {
     datePaiement: moment.Moment;
     montantPaye: number;

@@ -147,7 +147,7 @@
                                             <ng-container *ngSwitchCase="'autocomplete'">
                                                 <td [colSpan]="col.colspan" class="align-middle">
                                                     <p-autoComplete [formControlName]="col.field" [virtualScroll]="true" [suggestions]="filteredCatalogues" [itemSize]="34" (completeMethod)="filterCatalogues($event)" (onSelect)="onSelectCatalogAutoComplete($event, i)" (onClear)="onClearCatalogAutoComplete(i)"
-                                                        (onDropdownClick)="onDropdownClick($event)" field="designation" [dropdown]="true" [appendTo]="myTable">
+                                                        field="designation" [dropdown]="true" [appendTo]="myTable">
                                                     </p-autoComplete>
                                                 </td>
                                             </ng-container>
@@ -345,6 +345,66 @@
     </ng-template>
 </p-dialog>
 
+<!-- catalogue component -->
+<p-dialog #dialog id="dialogCatalogue" header="NOUVEL ITEM" [(visible)]="catalogueDialogDisplay" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
+
+    <form [formGroup]="catalogueFormGroup">
+        <p-selectButton [options]="catalogueOptions" formControlName="dialogSelectedType" class="uppercase">
+        </p-selectButton>
+        <div class="grid blockForm mx-3 mt-3 mb-2">
+            <div class="col-5 label">
+                <span>Désignation <span class="red-color">*</span></span>
+            </div>
+            <div class="col-7">
+                <input type="text" pInputText placeholder="Text" formControlName="designation" />
+            </div>
+
+            <div class="col-5 label">
+                <span>Description</span>
+            </div>
+            <div class="col-7">
+                <input type="text" pInputText placeholder="Text" formControlName="description" />
+            </div>
+
+            <div class="col-5 label">
+                <span>Unité</span>
+            </div>
+            <div class="col-7">
+                <p-dropdown formControlName="unity" [options]="unityOptions">
+                </p-dropdown>
+            </div>
+
+            <div class="col-5 label">
+                <span>Prix HT</span>
+            </div>
+            <div class="col-7">
+                <input type="text" pInputText formControlName="htPrice" />
+            </div>
+
+            <div class="col-5 label">
+                <span>TVA</span>
+            </div>
+            <div class="col-7">
+                <p-inputNumber formControlName="tva" id="tva" [suffix]="' %'">
+                </p-inputNumber>
+            </div>
+
+            <div class="col-5 label">
+                <span>Quantité minimale</span>
+            </div>
+            <div class="col-7">
+                <p-inputNumber formControlName="minimalQuantity" [suffix]="' ' + catalogueFormGroup.get('unity').value">
+                </p-inputNumber>
+
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <span><span class="red-color">*</span> Champ(s) obligatoire(s)</span>
+        <p-button id="buttonValider" (click)="submitCatalogue()" label="Valider"></p-button>
+    </ng-template>
+</p-dialog>
 
 <p-confirmDialog #cd id="cdDevis" [baseZIndex]="10000" icon="pi pi-exclamation-triangle">
 </p-confirmDialog>

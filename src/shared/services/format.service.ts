@@ -48,9 +48,9 @@ formatFactureStatut(statut?: FactureStatutEnum) {
     case FactureStatutEnum.ReglePartiellemt:
       return 'Réglé Partiellement'
     case FactureStatutEnum.PaiementAttente:
-      return 'Paiement en attente'
+      return 'En attente'
     case FactureStatutEnum.PaiementRetard:
-      return 'Paiement en retard'
+      return 'En retard'
     default:
       return ''
   }
