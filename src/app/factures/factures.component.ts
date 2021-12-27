@@ -740,7 +740,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       width: '35%',
       showHeader: false,
       contentStyle: {
-        height: '380px',
+        height: '62vh',
         overflow: 'auto',
         padding: '0',
         borderRadius: '20px',
@@ -772,7 +772,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
           this._factureServiceProxy
             .deleteByFactureIdFactureInfosPaiement(this.selectedDevisItem.id)
             .subscribe((res) => {})
-        } else if (result.montant >= this.selectedDevisItem.montantTtc) {
+        } else if (result.montant == this.selectedDevisItem.montantTtc) {
           this._factureServiceProxy
             .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
             .subscribe((res) => {

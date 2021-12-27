@@ -15,7 +15,7 @@
                     "builder": "@angular-devkit/build-angular:browser",
                     "options": {
                         "aot": true,
-                        "outputPath": "dist",
+                        "outputPath": "dist/outBuild",
                         "index": "src/index.html",
                         "main": "src/main.ts",
                         "tsConfig": "src/tsconfig.json",
@@ -35,8 +35,6 @@
                             }
                         ],
                         "styles": [
-                            "node_modules/famfamfam-flags/dist/sprite/famfamfam-flags.css",
-                            "node_modules/sweetalert2/dist/sweetalert2.css",
                             "src/assets/freeze-ui/freeze-ui.css",
                             "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
                             "node_modules/admin-lte-css-only/css/adminlte.min.css",
@@ -51,11 +49,9 @@
                         "scripts": [
                             "node_modules/moment/min/moment.min.js",
                             "node_modules/@aspnet/signalr/dist/browser/signalr.min.js",
-                            "node_modules/sweetalert2/dist/sweetalert2.js",
                             "src/assets/freeze-ui/freeze-ui.js",
                             "node_modules/push.js/bin/push.min.js",
                             "node_modules/abp-web-resources/Abp/Framework/scripts/abp.js",
-                            "src/assets/abp-web-resources/abp.sweet-alert.js",
                             "src/assets/abp-web-resources/abp.freeze-ui.js",
                             "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.moment.js"
                         ]
@@ -66,7 +62,16 @@
                                 "type": "anyComponentStyle",
                                 "maximumWarning": "6kb"
                             }],
-                            "optimization": true,
+                            "optimization": {
+                                "scripts": true,
+                                "fonts": {
+                                    "inline": true
+                                },
+                                "styles": {
+                                    "minify": true,
+                                    "inlineCritical": true
+                                }
+                            },
                             "outputHashing": "all",
                             "sourceMap": false,
                             "namedChunks": false,
