@@ -52,7 +52,7 @@ import { EstimateInvoiceStatusStateService } from '@shared/services/estimate-inv
   selector: 'app-factures',
   templateUrl: './factures.component.html',
   styleUrls: ['./factures.component.css'],
-  providers: [DialogService],
+  providers: [DialogService, EstimateInvoiceStatusStateService],
 })
 export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   remiseAmount: number
@@ -413,7 +413,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       },
     })
 
-    let element = document.body.querySelector('#cd') as HTMLElement
+    let element = document.body.querySelector('.cd') as HTMLElement
     element.style.display = 'none'
   }
 
@@ -491,6 +491,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         : event.result.statut
 
     if (event.crudOperation == 'create') {
+    
       this.tableChild.loadTableLazy()
 
       // let newDevis = {

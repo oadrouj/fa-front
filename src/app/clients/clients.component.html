@@ -381,10 +381,16 @@
             <span>Délai de paiement</span>
         </div>
         <div class="col-7">
-            <p-dropdown [options]="delaiPaiementOptions" [(ngModel)]="formClient.delaiPaiement" suffix=" Jours" [appendTo]="dlg" [showClear]="false">
-
+            <p-dropdown [options]="delaiPaiementOptions" [(ngModel)]="formClient.delaiPaiement" [appendTo]="dlg" [showClear]="false">
+                <ng-template pTemplate="selectedItem" let-option>
+                    <div>
+                        {{formClient.delaiPaiement}} jours
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="item" let-option>
+                    {{option}} jours
+                </ng-template>
             </p-dropdown>
-            <!-- <p-inputNumber placeholder="123..." mode="decimal" suffix=" Jours" :min="0" [(ngModel)]="formClient.delaiPaiement"></p-inputNumber> -->
         </div>
     </div>
     <ng-template pTemplate="footer">

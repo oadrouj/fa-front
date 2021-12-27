@@ -86,7 +86,7 @@ import { EstimateInvoiceStatusStateService } from './services/estimate-invoice-s
     ItemPreviewComponent,
     EstimateInvoiceStatusComponent,
   ],
-  providers: [MessageService, ConfirmationService, ToastService, ConfirmDialogService, EstimateInvoiceStatusStateService],
+  providers: [MessageService, ConfirmationService, ToastService, ConfirmDialogService],
   exports: [
     CommonModule,
     FormsModule,

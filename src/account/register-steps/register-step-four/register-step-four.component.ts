@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CreateInfosEntrepriseInput, InfosEntrepriseServiceProxy } from '@shared/service-proxies/service-proxies';
-// import csc, { ICity, ICountry } from 'country-state-city';
+import { CountryDto, CountryServiceAppServiceProxy, CreateInfosEntrepriseInput, InfosEntrepriseServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @Component({
   selector: 'app-register-step-four',
@@ -27,23 +26,29 @@ export class RegisterStepFourComponent implements OnInit {
   nameRequired: boolean = false;
   raisonSocialeRequired: boolean = false;
 
-  constructor(private _infosEntrepriseService: InfosEntrepriseServiceProxy,
-    private _router: Router) { }
+  constructor(
+    private _infosEntrepriseService: InfosEntrepriseServiceProxy,
+    private _router: Router,
+    private _countryService: CountryServiceAppServiceProxy,
+  ) { }
 
   ngOnInit(): void { 
     this.model.userId = this.code;
     this.nomEntreuprise = this.status.startsWith('s');
     this.nomParticulier = !this.status.startsWith('s');
 
-    // this.countries = csc.getAllCountries();
-    this.pays = 'MA';
+    this._countryService.getAllCountries().subscribe(res => {
+      this.countries = res.items;
+    })
+
+    this.pays = 'Maroc';
 
     this.countrySelected();
   }
 
   countrySelected(): void {
-    // this.cities = csc.getCitiesOfCountry(this.pays);
-    // this.model.pays = csc.getCountryByCode(this.pays).name;
+    this.cities = ['Rabat', 'Tunisie', 'Paris'];
+    this.model.pays = this.pays;
     // this.model.ville = this.cities[0].name;
   }
 

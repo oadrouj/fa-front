@@ -55,7 +55,7 @@ import { EstimateInvoiceStatusStateService } from '@shared/services/estimate-inv
   selector: 'app-devis',
   templateUrl: './devis.component.html',
   styleUrls: ['./devis.component.css'],
-  providers: [DialogService],
+  providers: [DialogService, EstimateInvoiceStatusStateService],
 })
 export class DevisComponent implements OnInit, AfterViewInit {
   remiseAmount: number
@@ -103,6 +103,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
     }
 
     this._estimateInvoiceStatusStateService.statusModifier$.subscribe((res) => {
+      console.log('yo', res)
       if (res.target == 'Estimate') {
         switch (res.statusAction) {
           case 'Validate':
@@ -450,11 +451,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
       },
     })
 
-    let element = document.body.querySelector('#cd') as HTMLElement
+    let element = document.body.querySelector('.cd') as HTMLElement
     element.style.display = 'none'
 
-    let element2 = document.body.querySelector('#cdDevis') as HTMLElement
-    element2.style.display = 'none'
+    // let element2 = document.body.querySelector('#cdDevis') as HTMLElement
+    // element2.style.display = 'none'
   }
 
   firstTimeCharged = true

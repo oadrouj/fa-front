@@ -58,7 +58,7 @@
                 <p class="label text-left">Pays *</p>
                 <div class="input-block">
                     <!-- <input type="text" name="Pays" pInputText [(ngModel)]="model.pays"> -->
-                    <p-dropdown [options]="countries" [(ngModel)]="pays" optionLabel="name" optionValue="isoCode" name="Pays" (click)="countrySelected()"></p-dropdown>
+                    <p-dropdown [options]="countries" [(ngModel)]="pays" optionLabel="paysName" optionValue="paysName" (click)="countrySelected()"></p-dropdown>
                     <img src="../../../assets/img/IconePays.png" />
                 </div>
             </div>
@@ -66,7 +66,8 @@
                 <p class="label text-left">Ville *</p>
                 <div class="input-block">
                     <!-- <input type="text" name="Ville" pInputText [(ngModel)]="model.ville"> -->
-                    <p-dropdown [options]="cities" [(ngModel)]="model.ville" optionLabel="name" optionValue="name" name="Ville"></p-dropdown>
+                    <!-- <p-dropdown [options]="cities" [(ngModel)]="model.ville" optionLabel="name" optionValue="name" name="Ville"></p-dropdown> -->
+                    <p-dropdown [options]="cities" [(ngModel)]="model.ville" name="Ville"></p-dropdown>
                     <img src="../../../assets/img/IconeVille.png" />
                 </div>
             </div>
