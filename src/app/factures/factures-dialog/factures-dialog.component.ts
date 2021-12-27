@@ -471,7 +471,7 @@ export class FacturesDialogComponent
           },
           rejectCallback:() => { this.closeDevisConfirmDialog.close(event)}
         })
-        let element = document.body.querySelector('#cd') as HTMLElement
+        let element = document.body.querySelector('.cd') as HTMLElement
         element.style.display = 'none'
       }
       
@@ -973,6 +973,7 @@ export class FacturesDialogComponent
           ) {
             if (this.devisItem && this.devisItem.isConverted) {
               this.createApiCall(FactureStatutEnum.Cree)
+              this.devisIsSaved = true
               this._router.navigate(['/app/Factures'])
               this.updateConvertedDevisStatus()
               document.body.style.overflow = 'auto'
@@ -1049,6 +1050,7 @@ export class FacturesDialogComponent
               
                 if (this.devisItem && this.devisItem.isConverted) {
                   this.createApiCall(FactureStatutEnum.Valide)
+                  this.devisIsSaved = true
                   this._router.navigate(['/app/Factures'])
                   this.updateConvertedDevisStatus()
                   document.body.style.overflow = 'auto'

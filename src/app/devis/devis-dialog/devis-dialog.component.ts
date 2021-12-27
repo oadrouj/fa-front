@@ -449,7 +449,7 @@ export class DevisDialogComponent implements OnInit {
           this.closeDevisConfirmDialog.close(event)
         },
       })
-      let element = document.body.querySelector('#cd') as HTMLElement
+      let element = document.body.querySelector('.cd') as HTMLElement
       element.style.display = 'none'
     } else {
       this.closeDialogEvent.emit()
