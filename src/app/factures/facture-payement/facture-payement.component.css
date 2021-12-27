@@ -1,5 +1,6 @@
-form {
-    padding: 0 1.5rem 2rem 1.5rem;
+:host>>>.p-tabview {
+    padding: 0 1.5rem 0rem 1.5rem;
+    margin-top: 1.5rem;
 }
 
 :host>>>form .p-dropdown,
@@ -60,4 +61,8 @@ form a {
 :host>>>.p-dropdown-panel {
     top: 281.5px !important;
     left: 248px !important;
+}
+
+.grid {
+    margin-top: -0.3rem !important;
 }
