@@ -20,15 +20,13 @@
                     </span>
                 </div>
                 <div class="col-7" id="filtreRightBlock">
-                    <!-- <p-button class="content" label="Filtrer" (click)="emitFilterEvent('filterByButton', null)"
-                        icon="pi pi-filter" iconPos="left"></p-button> -->
+
                     <div class="ml-auto w-max">
-                        <p-dropdown class="" [options]="types" placeholder="Type" [(ngModel)]="selectedType" optionLabel="name" optionValue="code">
+                        <p-dropdown class="" [options]="types" placeholder="Type" [(ngModel)]="selectedType" optionLabel="name" optionValue="code" (onChange)="emitFilterEvent('filterByButton', null)">
                         </p-dropdown>
-                        <p-dropdown class="" [options]="categories" placeholder="Catégorie" [(ngModel)]="selectedCategory" optionLabel="name" optionValue="code">
+                        <p-dropdown class="" [options]="categories" placeholder="Catégorie" [(ngModel)]="selectedCategory" optionLabel="name" optionValue="code" (onChange)="emitFilterEvent('filterByButton', null)">
                         </p-dropdown>
 
-                        <button pButton pRipple type="button" icon="pi pi-filter-slash" (click)="emitFilterEvent('filterByButton', null)" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor "></button>
                         <button pButton pRipple type="button" icon="fa fa-undo" (click)="resetFilterFields()" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor "></button>
                     </div>
                 </div>

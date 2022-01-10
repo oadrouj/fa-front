@@ -15,7 +15,7 @@
                     "builder": "@angular-devkit/build-angular:browser",
                     "options": {
                         "aot": true,
-                        "outputPath": "dist/outBuild",
+                        "outputPath": "dist/Facturi/browser",
                         "index": "src/index.html",
                         "main": "src/main.ts",
                         "tsConfig": "src/tsconfig.json",
@@ -62,16 +62,7 @@
                                 "type": "anyComponentStyle",
                                 "maximumWarning": "6kb"
                             }],
-                            "optimization": {
-                                "scripts": true,
-                                "fonts": {
-                                    "inline": true
-                                },
-                                "styles": {
-                                    "minify": true,
-                                    "inlineCritical": true
-                                }
-                            },
+                            "optimization": true,
                             "outputHashing": "all",
                             "sourceMap": false,
                             "namedChunks": false,
@@ -162,9 +153,55 @@
                     "builder": "@angular-devkit/build-angular:tslint",
                     "options": {
                         "tsConfig": [
-                            "src/tsconfig.json"
+                            "src/tsconfig.json",
+                            "src/tsconfig.server.json"
                         ],
                         "exclude": []
+                    }
+                },
+                "server": {
+                    "builder": "@angular-devkit/build-angular:server",
+                    "options": {
+                        "outputPath": "dist/Facturi/server",
+                        "main": "server.ts",
+                        "tsConfig": "src/tsconfig.server.json"
+                    },
+                    "configurations": {
+                        "production": {
+                            "outputHashing": "media",
+                            "fileReplacements": [{
+                                "replace": "src/environments/environment.ts",
+                                "with": "src/environments/environment.prod.ts"
+                            }],
+                            "sourceMap": false,
+                            "optimization": true
+                        }
+                    }
+                },
+                "serve-ssr": {
+                    "builder": "@nguniversal/builders:ssr-dev-server",
+                    "options": {
+                        "browserTarget": "Facturi:build",
+                        "serverTarget": "Facturi:server"
+                    },
+                    "configurations": {
+                        "production": {
+                            "browserTarget": "Facturi:build:production",
+                            "serverTarget": "Facturi:server:production"
+                        }
+                    }
+                },
+                "prerender": {
+                    "builder": "@nguniversal/builders:prerender",
+                    "options": {
+                        "browserTarget": "Facturi:build:production",
+                        "serverTarget": "Facturi:server:production",
+                        "routes": [
+                            "/"
+                        ]
+                    },
+                    "configurations": {
+                        "production": {}
                     }
                 }
             }

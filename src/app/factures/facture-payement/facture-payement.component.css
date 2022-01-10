@@ -1,6 +1,10 @@
 :host>>>.p-tabview {
-    padding: 0 1.5rem 0rem 1.5rem;
-    margin-top: 1.5rem;
+    padding: 0rem 1rem;
+    margin-top: 1rem;
+}
+
+:host>>>.p-tabview .p-tabview-panels {
+    padding: 0.75rem 1.75rem 1rem;
 }
 
 :host>>>form .p-dropdown,
@@ -46,7 +50,7 @@
 }
 
 form a {
-    background: #4C9D8A;
+    background: #4EB58D;
     color: #fff;
     text-align: center;
     padding: 9px 20px;
@@ -65,4 +69,16 @@ form a {
 
 .grid {
     margin-top: -0.3rem !important;
+}
+
+:host>>>.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    color: #000;
+    border-color: var(--orange-color);
+    border-width: 0 0 4px 0;
+    box-shadow: none;
+}
+
+:host>>>ul.p-tabview-nav {
+    margin-bottom: 1rem;
+    justify-content: center;
 }

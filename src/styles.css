@@ -4,14 +4,14 @@
     font-family: 'Frutiger';
     font-style: normal;
     font-weight: normal;
-    src: local('Frutiger'), url('assets/fonts/Frutiger.woff') format('woff');
+    src: url('assets/fonts/Frutiger.ttf') format('truetype');
 }
 
 @font-face {
     font-family: 'Frutiger Bold';
     font-style: normal;
     font-weight: normal;
-    src: local('Frutiger Bold'), url('assets/fonts/Frutiger_bold.woff') format('woff');
+    src: url('assets/fonts/Frutiger_bold.ttf') format('truetype');
 }
 
 :root {
@@ -26,6 +26,7 @@
     --light-purple-color: #DDD7E3;
     --dark-orange-color: #EF790D;
     --blue-color: #2A95D1;
+    --border-radius: .4rem;
 }
 
 .w-80 {
@@ -128,10 +129,7 @@
 
 .submitted .ng-invalid:not(form,
 div,
-tr)
-/* .ng-invalid .p-autocomplete-input */
-
-{
+tr) {
     border: 1px red solid !important;
 }
 
@@ -141,4 +139,8 @@ tr)
 
 .red-color {
     color: red !important;
+}
+
+.word-wrap-break {
+    word-break: break-all;
 }

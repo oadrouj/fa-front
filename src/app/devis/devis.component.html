@@ -25,13 +25,14 @@
                 </span>
 
                 <div class="flex align-items-center pt-4 filterContainer">
-                    <p-autoComplete [(ngModel)]="selectedClient" placeholder="Client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)" field="nom"></p-autoComplete>
-                    <p-calendar [(ngModel)]="selectedDate" selectionMode="range" placeholder="Date"></p-calendar>
-                    <p-inputNumber [(ngModel)]="selectedEcheance" placeholder="Echéance"></p-inputNumber>
-                    <p-inputNumber [(ngModel)]="selectedMontant" placeholder="Montant" mode="decimal" [minFractionDigits]="2"></p-inputNumber>
-                    <p-dropdown [options]="statutOptions" [(ngModel)]="selectedStatut" placeholder="Statut" optionLabel="label" optionValue="value" [showClear]="false"></p-dropdown>
+                    <p-autoComplete [(ngModel)]="selectedClient" placeholder="Client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)" field="nom" (onSelect)="emitFilterEvent('filterByButton', null)"></p-autoComplete>
+                    <p-calendar [(ngModel)]="selectedDate" selectionMode="range" placeholder="Date" (onSelect)="emitDateFilterEvent($event)"></p-calendar>
+                    <p-inputNumber [(ngModel)]="selectedEcheance" placeholder="Echéance" (onInput)="selectedEcheance = $event.value; emitFilterEvent('filterByButton', null)">
+                    </p-inputNumber>
+                    <p-inputNumber [(ngModel)]="selectedMontant" placeholder="Montant" mode="decimal" [minFractionDigits]="2" (onInput)="selectedMontant = $event.value; emitFilterEvent('filterByButton', null)">
+                    </p-inputNumber>
+                    <p-dropdown [options]="statutOptions" [(ngModel)]="selectedStatut" placeholder="Statut" optionLabel="label" optionValue="value" [showClear]="false" (onChange)="emitFilterEvent('filterByButton', null)"></p-dropdown>
 
-                    <button pButton pRipple type="button" icon="pi pi-filter-slash" (click)="emitFilterEvent('filterByButton', null)" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor "></button>
                     <button pButton pRipple type="button" icon="fa fa-undo" (click)="resetFilterFields()" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor "></button>
 
                 </div>

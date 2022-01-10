@@ -291,6 +291,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
   //#endregion
 
+  emitDateFilterEvent(event){
+    if(this.selectedDate.every(x => x != null))
+      this.emitFilterEvent('filterByButton', null)
+  }
+
   getStatusOptions() {
     let actualStatus = this.selectedDevisItem && this.selectedDevisItem.statut
     return this.statusItems.filter((item) => item.actualStatus == actualStatus)
@@ -648,6 +653,13 @@ export class DevisComponent implements OnInit, AfterViewInit {
       statutFilter = event.filters.statut && event.filters.statut.value
     }
 
+    let shouldReturnExpiredEstimates: boolean
+    
+    if(statutFilter == DevisStatutEnum.Expire){
+      statutFilter = DevisStatutEnum.Cree
+      shouldReturnExpiredEstimates = true
+    }
+
     return zip(
       this._devisServiceProxy.getAllDevisTotalRecords(
         0,
@@ -699,11 +711,9 @@ export class DevisComponent implements OnInit, AfterViewInit {
               // totalTtc: total_ht + (item.tva * total_ht) / 100,
             }
           })
-          devis.statut = moment().isAfter(
-            moment(devis.dateEmission).add(devis.echeancePaiement, 'days'),
-          )
-            ? DevisStatutEnum.Expire
-            : devis.statut
+
+          devis.statut = moment().isAfter(moment(devis.dateEmission).add(devis.echeancePaiement, 'days'))
+            ? DevisStatutEnum.Expire : devis.statut
 
           let montantTtc = devis.devisItems
             .map((item) => item.totalTtc)
@@ -714,8 +724,15 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
           devis.montantTtc = montantTtc - (montantHt * devis.remise) / 100
         })
+
+        if(shouldReturnExpiredEstimates) 
+          data = data.filter(x => x.statut == DevisStatutEnum.Expire)
+        else if(!shouldReturnExpiredEstimates && !statutFilter)
+          data = data.filter(x => x.statut != DevisStatutEnum.Expire)
+
         return { items: data, length, montantTotalAllDevis }
       }),
+
     )
   }
 

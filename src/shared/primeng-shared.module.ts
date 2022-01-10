@@ -28,7 +28,7 @@ import {AutoCompleteModule} from 'primeng/autocomplete';
 import { CalendarModule } from 'primeng/calendar';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import {SkeletonModule} from 'primeng/skeleton';
-
+import {VirtualScrollerModule} from 'primeng/virtualscroller';
 import { TableComponent } from '../app/table/table.component';
 import { ToastService } from './services/toast.service';
 import { ConfirmDialogService } from './services/confirm-dialog.service';
@@ -42,6 +42,8 @@ import {FileUploadModule} from 'primeng/fileupload';
 import { NgxdModule } from '@ngxd/core';
 import { EstimateInvoiceStatusComponent } from './components/estimate-invoice-status/estimate-invoice-status.component'
 import { EstimateInvoiceStatusStateService } from './services/estimate-invoice-status-state.service'
+import { DataViewModule } from 'primeng/dataview';
+
 
 @NgModule({
   imports: [
@@ -77,7 +79,8 @@ import { EstimateInvoiceStatusStateService } from './services/estimate-invoice-s
     DynamicDialogModule,
     FileUploadModule,
     NgxdModule,
-    
+    VirtualScrollerModule,
+    DataViewModule
   ],
 
   declarations: [
@@ -124,7 +127,8 @@ import { EstimateInvoiceStatusStateService } from './services/estimate-invoice-s
     EstimateInvoiceStatusComponent,
     FileUploadModule,
     NgxdModule,
-    
+    VirtualScrollerModule,
+    DataViewModule
   ],
 })
 export class PrimengSharedModule { }

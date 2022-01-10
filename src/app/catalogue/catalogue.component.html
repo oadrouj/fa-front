@@ -32,9 +32,9 @@
                         </span>
 
                         <div class="flex align-items-center filterContainer">
-                            <p-dropdown [options]="typeOptions" [(ngModel)]="selectedType" optionLabel="label" optionValue="value" placeholder="Type" [showClear]="false"></p-dropdown>
+                            <p-dropdown [options]="typeOptions" [(ngModel)]="selectedType" optionLabel="label" optionValue="value" placeholder="Type" [showClear]="false" (onChange)="this.emitFilterEvent('filterByButton', null)">
+                            </p-dropdown>
 
-                            <button pButton pRipple type="button" icon="pi pi-filter-slash" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor " (click)="this.emitFilterEvent('filterByButton', null)"></button>
                             <button pButton pRipple type="button" icon="fa fa-undo" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor " (click)="resetFilterFields()"></button>
                         </div>
                     </div>

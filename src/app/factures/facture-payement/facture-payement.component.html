@@ -9,37 +9,38 @@
     </div>
     <p-tabView>
         <p-tabPanel header="Ajouter un payement">
-            <form [formGroup]="formGroup" class="mt-3">
+            <form [formGroup]="formGroup" class="mt-1">
                 <!-- <div class="grid ">
                     <div class="col-6"><span>Référence</span></div>
                     <div class="col-6"><input pInputText formControlName="reference" readonly="true"></div>
                 </div> -->
-                <div class="grid mt-0 align-items-center">
-                    <div class="col-6"><span>Montant</span></div>
-                    <div class="col-6">
-                        <p-inputNumber formControlName="montant" mode="decimal" [minFractionDigits]="2" placeholder=""></p-inputNumber>
-                    </div>
+                <div *ngIf="this.config.data.status == 2" class="flex justify-content-center align-items-center ">
+                    <span class="mr-1 text-xl font-bold text-black">Reste à payer:</span>
+                    <span class="ml-1 text-3xl font-bold color-orange">{{this.config.data.restAmount | number:'1.2-2' }}
+                        {{currency | uppercase}}</span>
                 </div>
-                <div class="grid mt-0 align-items-center">
-                    <div class="col-6"><span>Date de paiement</span></div>
-                    <div class="col-6">
-                        <p-calendar formControlName="datePaiement" [appendTo]="container"></p-calendar>
-                    </div>
+                <div class="flex justify-content-between mt-4 align-items-center">
+                    <span>Montant</span>
+                    <p-inputNumber formControlName="montant" mode="decimal" [minFractionDigits]="2" placeholder="">
+                    </p-inputNumber>
                 </div>
-                <div class="grid mt-0 align-items-center">
-                    <div class="col-6"><span>Mode de paiement</span></div>
-                    <div class="col-6">
-                        <p-dropdown formControlName="modePaiement" [appendTo]="container" [options]="payementOptions" optionLabel="label" optionValue="value"></p-dropdown>
-                    </div>
+                <div class="flex justify-content-between mt-3 align-items-center">
+                    <span>Date de paiement</span>
+                    <p-calendar formControlName="datePaiement" [appendTo]="container" dateFormat="dd/mm/yy"></p-calendar>
                 </div>
-                <div class="flex mt-3">
-                    <a pButton pRipple (click)="closeDialogAndGetValue()" class="ml-auto mr-3">Términer</a>
+                <div class="flex justify-content-between mt-3 align-items-center">
+                    <span>Mode de paiement</span>
+                    <p-dropdown formControlName="modePaiement" [appendTo]="container" [options]="payementOptions" optionLabel="label" optionValue="value"></p-dropdown>
+                </div>
+                <div class="flex mt-4">
+                    <a pButton pRipple (click)="closeDialogAndGetValue()" class="ml-auto ">Términer</a>
                 </div>
 
             </form>
         </p-tabPanel>
-        <p-tabPanel header="Voir tous les payament">
-            your content
+        <p-tabPanel header="Voir tous les payament" *ngIf="this.config.data.status == 2">
+            <app-payment-history [factureId]="this.config.data.factureId" [currency]="currency"></app-payment-history>
+
         </p-tabPanel>
     </p-tabView>
 </div>

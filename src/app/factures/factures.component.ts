@@ -267,6 +267,11 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //#endregion
 
+  emitDateFilterEvent(event){
+    if(this.selectedDate.every(x => x != null))
+      this.emitFilterEvent('filterByButton', null)
+  }
+
   getStatusOptions() {
     let actualStatus = this.selectedDevisItem && this.selectedDevisItem.statut
     return this.statusItems.filter((item) => item.actualStatus == actualStatus)
@@ -540,7 +545,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       //   ...this.selectedDevisItem,
       // })
 
-      // console.log(newDevis)
     } else if (event.crudOperation == 'update') {
       this.selectedDevisItem = {
         ...event.result,
@@ -723,24 +727,23 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       },
     )
 
-    if (isPartiallySettled) {
-      facturePayementInfo = await this._factureServiceProxy
-        .getByFactureIdFactureInfosPaiement(this.selectedDevisItem.id)
-        .toPromise()
-    }
+    let restAmount = this.selectedDevisItem.montantTtc - (await this._factureServiceProxy
+      .getRestOfAmount(this.selectedDevisItem.id).toPromise());
 
     this.ref = this.dialogService.open(FacturePayementComponent, {
       data: {
-        reference: this.selectedDevisItem.reference,
-        montantPaye: facturePayementInfo.montantPaye,
-        modePaiement: facturePayementInfo.modePaiement,
-        datePaiement: facturePayementInfo.datePaiement.toDate(),
+       
+        factureId: this.selectedDevisItem.id,
+        status: this.selectedDevisItem.statut,
+        restAmount: restAmount,
+        currency:  this.selectedDevisItem.currency
       },
       header: 'Réler le payement',
-      width: '35%',
+      width: '34vw',
       showHeader: false,
       contentStyle: {
-        height: '62vh',
+        height: '31.56rem',
+
         overflow: 'auto',
         padding: '0',
         borderRadius: '20px',
@@ -748,31 +751,25 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       baseZIndex: 10000,
     })
 
-    this.ref.onClose.subscribe((result) => {
-      if (result) {
+    this.ref.onClose.subscribe(async(result) => {
+      if (result && result.montant != 0) {
         let factureInfosPaiementDto = new FactureInfosPaiementDto({
-          datePaiement: moment(result.datePaiement),
+          datePaiement: moment(result.datePaiement).add('day', 1),
           montantPaye: result.montant,
           modePaiement: result.modePaiement,
           factureId: this.selectedDevisItem.id,
           id: facturePayementInfo.id,
         })
 
-        if (result.montant == 0) {
-          this._factureServiceProxy
-            .changeFactureStatut(
-              this.selectedDevisItem.id,
-              FactureStatutEnum.Valide,
-            )
-            .subscribe((res) => {
-              this.viewUpdateSelectedItemStatut(
-                FactureStatutEnum.PaiementAttente,
-              )
-            })
-          this._factureServiceProxy
-            .deleteByFactureIdFactureInfosPaiement(this.selectedDevisItem.id)
-            .subscribe((res) => {})
-        } else if (result.montant == this.selectedDevisItem.montantTtc) {
+        let payedAmount = 0
+        if(this.selectedDevisItem.statut == FactureStatutEnum.ReglePartiellemt){
+          payedAmount = restAmount + result.montant
+        }
+        else {
+          payedAmount = result.montant
+        }
+       
+        if (payedAmount == this.selectedDevisItem.montantTtc) {
           this._factureServiceProxy
             .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
             .subscribe((res) => {
@@ -791,7 +788,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.viewUpdateSelectedItemStatut(FactureStatutEnum.Regle)
               }
             })
-        } else if (result.montant <= this.selectedDevisItem.montantTtc) {
+        } else if (payedAmount <= this.selectedDevisItem.montantTtc) {
           this._factureServiceProxy
             .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
             .subscribe((res) => {
@@ -843,7 +840,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
 
       const contentDataURL = canvas.toDataURL('image/png')
 
-      console.log(contentDataURL)
       printJS({
         printable: contentDataURL,
         type: 'image',
@@ -884,7 +880,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
       // for(let i=0; i < count; i++){
       //   splittedItems = items.slice(length, length + 4)
-      //   console.log(length)
       //   doc.addPage()
       //   doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
 
