@@ -727,8 +727,8 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       },
     )
 
-    let restAmount = this.selectedDevisItem.montantTtc - (await this._factureServiceProxy
-      .getRestOfAmount(this.selectedDevisItem.id).toPromise());
+    let totalPayments = (await this._factureServiceProxy.getRestOfAmount(this.selectedDevisItem.id).toPromise())
+    let restAmount = this.selectedDevisItem.montantTtc - totalPayments;
 
     this.ref = this.dialogService.open(FacturePayementComponent, {
       data: {
@@ -763,32 +763,28 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
 
         let payedAmount = 0
         if(this.selectedDevisItem.statut == FactureStatutEnum.ReglePartiellemt){
-          payedAmount = restAmount + result.montant
+          payedAmount = totalPayments + result.montant
         }
         else {
           payedAmount = result.montant
         }
        
-        if (payedAmount == this.selectedDevisItem.montantTtc) {
+        if (payedAmount.toFixed(2) == this.selectedDevisItem.montantTtc) {
           this._factureServiceProxy
             .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
             .subscribe((res) => {
               if (res) {
                 this._toastService.info({ detail: 'La facture est réglée' })
+                this._factureServiceProxy.changeFactureStatut(this.selectedDevisItem.id, FactureStatutEnum.Regle)
+                .subscribe((res) => {
+                  if (res) {
+                    this.viewUpdateSelectedItemStatut(FactureStatutEnum.Regle)
+                  }
+                })
               }
             })
 
-          this._factureServiceProxy
-            .changeFactureStatut(
-              this.selectedDevisItem.id,
-              FactureStatutEnum.Regle,
-            )
-            .subscribe((res) => {
-              if (res) {
-                this.viewUpdateSelectedItemStatut(FactureStatutEnum.Regle)
-              }
-            })
-        } else if (payedAmount <= this.selectedDevisItem.montantTtc) {
+        } else if (payedAmount.toFixed(2) <= this.selectedDevisItem.montantTtc) {
           this._factureServiceProxy
             .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
             .subscribe((res) => {
@@ -796,20 +792,18 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
                 this._toastService.info({
                   detail: 'La facture est partiellement réglée',
                 })
+
+                this._factureServiceProxy.changeFactureStatut(this.selectedDevisItem.id, FactureStatutEnum.ReglePartiellemt)
+                .subscribe((res) => {
+                  if (res) {
+                    this.viewUpdateSelectedItemStatut(
+                      FactureStatutEnum.ReglePartiellemt,
+                    )
+                  }
+                })
               }
             })
-          this._factureServiceProxy
-            .changeFactureStatut(
-              this.selectedDevisItem.id,
-              FactureStatutEnum.ReglePartiellemt,
-            )
-            .subscribe((res) => {
-              if (res) {
-                this.viewUpdateSelectedItemStatut(
-                  FactureStatutEnum.ReglePartiellemt,
-                )
-              }
-            })
+        
         }
       }
     })
