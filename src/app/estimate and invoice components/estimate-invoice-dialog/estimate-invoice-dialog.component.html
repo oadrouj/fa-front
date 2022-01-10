@@ -40,9 +40,11 @@
                                     </div>
                                 </ng-template>
 
+
+
                                 <div class="col text-center" *ngIf="!manuelReference">
                                     <button pButton label="Changer" (click)="changeReference()" class="p-button-text" [ngClass]="'color-' + primaryColor">
-                                    </button>
+                  </button>
                                 </div>
                             </div>
                             <div class="grid align-items-center">
@@ -110,6 +112,8 @@
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'inputNumber'">
                                                 <td [colSpan]="col.colspan" class="w-20" [ngClass]="col.class">
+                                                    <!-- <p-inputNumber *ngIf="!col.inputEvent" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="' ' + Currency">
+                                                    </p-inputNumber> -->
                                                     <p-inputNumber (onInput)="calculateRowTotalHTAndTTC(i, $event, col.field)" [formControlName]="col.field" [disabled]="col.disabled" mode="decimal" [minFractionDigits]="2" [suffix]="col.suffix">
                                                     </p-inputNumber>
                                                 </td>
@@ -160,22 +164,22 @@
                                             <div class="col-7 color-gray"><span>TOTAL HT</span></div>
                                             <div class="col-5" [ngClass]="'color-' + primaryColor">
                                                 <span>{{summaryTotalHT | number:'1.2-2' }}
-                                                    {{' ' + Currency}}</span></div>
+                          {{' ' + Currency}}</span></div>
                                         </div>
                                         <div class="grid my-1">
                                             <div class="col-7 color-gray"><span>REMISE</span></div>
                                             <div class="col-5 " [ngClass]="'color-' + primaryColor">
                                                 <span>
-                                                    {{remiseAmount || 0 | number:'1.2-2' }}{{' ' + Currency}}
-                                                </span>
+                          {{remiseAmount || 0 | number:'1.2-2' }}{{' ' + Currency}}
+                        </span>
                                             </div>
                                         </div>
                                         <div class="grid my-1">
                                             <div class="col-7 color-gray"><span>TVA</span></div>
                                             <div class="col-5 " [ngClass]="'color-' + primaryColor">
                                                 <span>
-                                                    {{summaryTVA | number:'1.2-2' }} {{' ' + Currency}}
-                                                </span>
+                          {{summaryTVA | number:'1.2-2' }} {{' ' + Currency}}
+                        </span>
                                             </div>
                                         </div>
                                         <hr>
@@ -183,8 +187,8 @@
                                             <div class="col-7 color-gray"><span>TOTAL ESTIME TTC</span></div>
                                             <div class="col-5" [ngClass]="'color-' + primaryColor">
                                                 <span>
-                                                    {{summaryTotalTTC || 0 | number:'1.2-2' }} {{' ' + Currency}}
-                                                </span>
+                          {{summaryTotalTTC || 0 | number:'1.2-2' }} {{' ' + Currency}}
+                        </span>
                                             </div>
                                         </div>
                                     </div>
@@ -392,8 +396,8 @@
                 <p-inputNumber formControlName="minimalQuantity" [suffix]="' ' + catalogueFormGroup.get('unity').value">
                 </p-inputNumber>
 
+                </diav>
             </div>
-        </div>
     </form>
 
     <ng-template pTemplate="footer">

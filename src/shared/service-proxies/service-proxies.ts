@@ -3270,14 +3270,24 @@ export class FactureServiceProxy {
 
     /**
      * @param factureId (optional) 
+     * @param first (optional) 
+     * @param rows (optional) 
      * @return Success
      */
-    getByFactureIdFactureInfosPaiement(factureId: number | undefined): Observable<FactureInfosPaiementDto> {
+    getByFactureIdFactureInfosPaiement(factureId: number | undefined, first: number | undefined, rows: number | undefined): Observable<FactureInfosPaiementDtoListResultWithTotalEntityItemsDto> {
         let url_ = this.baseUrl + "/api/services/app/Facture/GetByFactureIdFactureInfosPaiement?";
         if (factureId === null)
             throw new Error("The parameter 'factureId' cannot be null.");
         else if (factureId !== undefined)
-            url_ += "factureId=" + encodeURIComponent("" + factureId) + "&";
+            url_ += "FactureId=" + encodeURIComponent("" + factureId) + "&";
+        if (first === null)
+            throw new Error("The parameter 'first' cannot be null.");
+        else if (first !== undefined)
+            url_ += "First=" + encodeURIComponent("" + first) + "&";
+        if (rows === null)
+            throw new Error("The parameter 'rows' cannot be null.");
+        else if (rows !== undefined)
+            url_ += "Rows=" + encodeURIComponent("" + rows) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -3295,14 +3305,14 @@ export class FactureServiceProxy {
                 try {
                     return this.processGetByFactureIdFactureInfosPaiement(<any>response_);
                 } catch (e) {
-                    return <Observable<FactureInfosPaiementDto>><any>_observableThrow(e);
+                    return <Observable<FactureInfosPaiementDtoListResultWithTotalEntityItemsDto>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<FactureInfosPaiementDto>><any>_observableThrow(response_);
+                return <Observable<FactureInfosPaiementDtoListResultWithTotalEntityItemsDto>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetByFactureIdFactureInfosPaiement(response: HttpResponseBase): Observable<FactureInfosPaiementDto> {
+    protected processGetByFactureIdFactureInfosPaiement(response: HttpResponseBase): Observable<FactureInfosPaiementDtoListResultWithTotalEntityItemsDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3313,7 +3323,7 @@ export class FactureServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = FactureInfosPaiementDto.fromJS(resultData200);
+            result200 = FactureInfosPaiementDtoListResultWithTotalEntityItemsDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -3321,7 +3331,63 @@ export class FactureServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<FactureInfosPaiementDto>(<any>null);
+        return _observableOf<FactureInfosPaiementDtoListResultWithTotalEntityItemsDto>(<any>null);
+    }
+
+    /**
+     * @param factureId (optional) 
+     * @return Success
+     */
+    getRestOfAmount(factureId: number | undefined): Observable<number> {
+        let url_ = this.baseUrl + "/api/services/app/Facture/GetRestOfAmount?";
+        if (factureId === null)
+            throw new Error("The parameter 'factureId' cannot be null.");
+        else if (factureId !== undefined)
+            url_ += "factureId=" + encodeURIComponent("" + factureId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetRestOfAmount(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetRestOfAmount(<any>response_);
+                } catch (e) {
+                    return <Observable<number>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<number>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetRestOfAmount(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<number>(<any>null);
     }
 
     /**
@@ -8544,8 +8610,9 @@ export enum ModePaiementEnum {
     Cheque = 0,
     Virement = 1,
     Liquide = 2,
-    Effet = 3
+    Effet = 3,
 }
+
 export class FactureInfosPaiementDto implements IFactureInfosPaiementDto {
     datePaiement: moment.Moment;
     montantPaye: number;
@@ -8603,6 +8670,61 @@ export interface IFactureInfosPaiementDto {
     modePaiement: ModePaiementEnum;
     factureId: number;
     id: number;
+}
+
+export class FactureInfosPaiementDtoListResultWithTotalEntityItemsDto implements IFactureInfosPaiementDtoListResultWithTotalEntityItemsDto {
+    items: FactureInfosPaiementDto[] | undefined;
+    totalEntityItems: number;
+
+    constructor(data?: IFactureInfosPaiementDtoListResultWithTotalEntityItemsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(FactureInfosPaiementDto.fromJS(item));
+            }
+            this.totalEntityItems = _data["totalEntityItems"];
+        }
+    }
+
+    static fromJS(data: any): FactureInfosPaiementDtoListResultWithTotalEntityItemsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FactureInfosPaiementDtoListResultWithTotalEntityItemsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalEntityItems"] = this.totalEntityItems;
+        return data; 
+    }
+
+    clone(): FactureInfosPaiementDtoListResultWithTotalEntityItemsDto {
+        const json = this.toJSON();
+        let result = new FactureInfosPaiementDtoListResultWithTotalEntityItemsDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IFactureInfosPaiementDtoListResultWithTotalEntityItemsDto {
+    items: FactureInfosPaiementDto[] | undefined;
+    totalEntityItems: number;
 }
 
 export class CreateInfosEntrepriseInput implements ICreateInfosEntrepriseInput {

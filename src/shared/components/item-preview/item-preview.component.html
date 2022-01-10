@@ -26,10 +26,9 @@
             </div>
             <div class="col-4">
                 <span class="block color-gray">De</span>
-                <span>{{item && getUserName()}}</span>
+                <span class="word-wrap-break">{{item && getUserName()}}</span>
             </div>
         </div>
-
     </div>
 
     <p-table [columns]="contentItemsCols" [value]="item && (item.devisItems || item.factureItems)">

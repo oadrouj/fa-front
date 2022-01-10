@@ -51,14 +51,14 @@ export class EstimateInvoiceStatusComponent implements OnInit {
   ]
 
   factureStatusItems = [
-    // {
-    //   actualStatus: FactureStatutEnum.ReglePartiellemt,
-    //   label: 'Régler',
-    //   icon: 'pi pi-check',
-    //   command: async () => {
-    //     this._estimateInvoiceStatusStateService.statusModifier = {statusAction: 'PartiallySettle',target: 'Invoice'}
-    //   },
-    // },
+    {
+      actualStatus: FactureStatutEnum.ReglePartiellemt,
+      label: 'Ajouter un paiement',
+      icon: 'pi pi-check',
+      command: async () => {
+        this._estimateInvoiceStatusStateService.statusModifier = {statusAction: 'PartiallySettle',target: 'Invoice'}
+      },
+    },
     {
       actualStatus: FactureStatutEnum.PaiementAttente,
       label: 'Régler',

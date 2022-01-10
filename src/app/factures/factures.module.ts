@@ -39,7 +39,7 @@ import { FacturePayementComponent } from '@app/factures/facture-payement/facture
 import { FacturesDialogComponent } from '@app/factures/factures-dialog/factures-dialog.component';
 import { RouterModule } from '@angular/router';
 import { PrimengSharedModule } from '@shared/primeng-shared.module';
-
+import { PaymentHistoryComponent } from './facture-payement/payment-history/payment-history.component'
 
 @NgModule({
   imports: [
@@ -48,9 +48,6 @@ import { PrimengSharedModule } from '@shared/primeng-shared.module';
   ]),
   PrimengSharedModule
   ],
-
-
-  declarations: [FacturesComponent,
-    FacturePayementComponent,]
+  declarations: [FacturesComponent, FacturePayementComponent, PaymentHistoryComponent]
 })
 export class FacturesModule { }

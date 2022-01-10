@@ -67,6 +67,7 @@ import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 })
 export class FacturesDialogComponent
   implements OnInit, AfterViewInit {
+    
   remiseValue: number
   filteredCatalogues: CatalogueForAutoCompleteDto[]
 

@@ -201,6 +201,11 @@ i.pi-search {
     width: 1.357rem;
 }
 
+:host>>>.p-splitbutton .p-menuitem-link {
+    padding-left: .5rem;
+    padding-right: .5rem;
+}
+
 :host ::ng-deep .p-splitbutton .pi-chevron-down {
     font-size: 0.8rem;
 }
