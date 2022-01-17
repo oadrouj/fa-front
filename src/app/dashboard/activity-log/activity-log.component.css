@@ -1,0 +1,31 @@
+:host>>>.p-dataview-header {
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+    background: transparent;
+    border: none;
+}
+
+:host>>>.p-dataview-header .p-button {
+    background: #ECEFF2;
+}
+
+:host>>>.p-dataview-header .p-button-icon {
+    color: #5CBCA6;
+    font-weight: bold;
+}
+
+.logoContainer {
+    width: 2rem;
+    background-color: #F1F3F8;
+    padding: 0.35rem 0.5rem;
+    border-radius: 1.2rem;
+}
+
+.color-dashboard {
+    color: #5CBCA6;
+}
+
+.date {
+    color: #C7CFE4;
+}

@@ -1,0 +1,28 @@
+<div class="px-3 text-lg">
+    <h4>Statistiques Totale</h4>
+    <div class="total-statistics flex pt-2">
+        <div class="flex flex-column align-items-center flex-1 color-green">
+            <span>{{(issuedInvoices | number:'1.2-2') + ' MAD' }}</span>
+            <span>Factures EMISES</span>
+            <img src="assets/img/total-statistics-invoice.png" alt="" class="mt-2">
+        </div>
+
+        <div class="flex flex-column align-items-center flex-1 color-blue">
+            <span>{{(issuedEstimates  | number:'1.2-2') + ' MAD' }}</span>
+            <span>DEVIS EMISES</span>
+            <img src="assets/img/total-statistics-estimate.png" alt="" class="mt-2">
+        </div>
+
+        <div class="flex flex-column align-items-center flex-1 color-purple">
+            <span>{{clients}}</span>
+            <span>CLIENTS</span>
+            <img src="assets/img/total-statistics-client.png" alt="" class="mt-2">
+        </div>
+
+        <div class="flex flex-column align-items-center flex-1 color-red">
+            <span>{{products}}</span>
+            <span>PRODUITS</span>
+            <img src="assets/img/total-statistics-product.png" alt="" class="mt-2">
+        </div>
+    </div>
+</div>

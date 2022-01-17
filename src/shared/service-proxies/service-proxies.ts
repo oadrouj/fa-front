@@ -5220,6 +5220,284 @@ export class SessionServiceProxy {
 }
 
 @Injectable()
+export class StatisticsServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param amount (optional) 
+     * @return Success
+     */
+    createOrUpdateMonthTargetAmount(amount: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/Statistics/CreateOrUpdateMonthTargetAmount?";
+        if (amount === null)
+            throw new Error("The parameter 'amount' cannot be null.");
+        else if (amount !== undefined)
+            url_ += "amount=" + encodeURIComponent("" + amount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdateMonthTargetAmount(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdateMonthTargetAmount(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreateOrUpdateMonthTargetAmount(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getActivityLog(): Observable<ActivityLogDtoListResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Statistics/GetActivityLog";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetActivityLog(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetActivityLog(<any>response_);
+                } catch (e) {
+                    return <Observable<ActivityLogDtoListResultDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ActivityLogDtoListResultDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetActivityLog(response: HttpResponseBase): Observable<ActivityLogDtoListResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ActivityLogDtoListResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ActivityLogDtoListResultDto>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getMonthTargetInfos(): Observable<MonthTargetInfosDto> {
+        let url_ = this.baseUrl + "/api/services/app/Statistics/GetMonthTargetInfos";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetMonthTargetInfos(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetMonthTargetInfos(<any>response_);
+                } catch (e) {
+                    return <Observable<MonthTargetInfosDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<MonthTargetInfosDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetMonthTargetInfos(response: HttpResponseBase): Observable<MonthTargetInfosDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = MonthTargetInfosDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<MonthTargetInfosDto>(<any>null);
+    }
+
+    /**
+     * @param dateStart (optional) 
+     * @param dateEnd (optional) 
+     * @return Success
+     */
+    getPeriodicTrackingInfos(dateStart: moment.Moment | null | undefined, dateEnd: moment.Moment | null | undefined): Observable<PeriodicTrackingDto> {
+        let url_ = this.baseUrl + "/api/services/app/Statistics/GetPeriodicTrackingInfos?";
+        if (dateStart !== undefined && dateStart !== null)
+            url_ += "DateStart=" + encodeURIComponent(dateStart ? "" + dateStart.toJSON() : "") + "&";
+        if (dateEnd !== undefined && dateEnd !== null)
+            url_ += "DateEnd=" + encodeURIComponent(dateEnd ? "" + dateEnd.toJSON() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPeriodicTrackingInfos(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPeriodicTrackingInfos(<any>response_);
+                } catch (e) {
+                    return <Observable<PeriodicTrackingDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PeriodicTrackingDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetPeriodicTrackingInfos(response: HttpResponseBase): Observable<PeriodicTrackingDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PeriodicTrackingDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PeriodicTrackingDto>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getTotalStatistics(): Observable<TotalStatisticsDto> {
+        let url_ = this.baseUrl + "/api/services/app/Statistics/GetTotalStatistics";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTotalStatistics(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTotalStatistics(<any>response_);
+                } catch (e) {
+                    return <Observable<TotalStatisticsDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<TotalStatisticsDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetTotalStatistics(response: HttpResponseBase): Observable<TotalStatisticsDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TotalStatisticsDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<TotalStatisticsDto>(<any>null);
+    }
+}
+
+@Injectable()
 export class TenantServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -10032,6 +10310,489 @@ export interface IGetCurrentLoginInformationsOutput {
     application: ApplicationInfoDto;
     user: UserLoginInfoDto;
     tenant: TenantLoginInfoDto;
+}
+
+export class ActivityLogDto implements IActivityLogDto {
+    logType: string | undefined;
+    reference: string | undefined;
+    clientName: string | undefined;
+    date: moment.Moment;
+    amount: number;
+    currency: string | undefined;
+
+    constructor(data?: IActivityLogDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.logType = _data["logType"];
+            this.reference = _data["reference"];
+            this.clientName = _data["clientName"];
+            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.amount = _data["amount"];
+            this.currency = _data["currency"];
+        }
+    }
+
+    static fromJS(data: any): ActivityLogDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ActivityLogDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["logType"] = this.logType;
+        data["reference"] = this.reference;
+        data["clientName"] = this.clientName;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["amount"] = this.amount;
+        data["currency"] = this.currency;
+        return data; 
+    }
+
+    clone(): ActivityLogDto {
+        const json = this.toJSON();
+        let result = new ActivityLogDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IActivityLogDto {
+    logType: string | undefined;
+    reference: string | undefined;
+    clientName: string | undefined;
+    date: moment.Moment;
+    amount: number;
+    currency: string | undefined;
+}
+
+export class ActivityLogDtoListResultDto implements IActivityLogDtoListResultDto {
+    items: ActivityLogDto[] | undefined;
+
+    constructor(data?: IActivityLogDtoListResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(ActivityLogDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ActivityLogDtoListResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ActivityLogDtoListResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): ActivityLogDtoListResultDto {
+        const json = this.toJSON();
+        let result = new ActivityLogDtoListResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IActivityLogDtoListResultDto {
+    items: ActivityLogDto[] | undefined;
+}
+
+export class MonthTargetInfosDto implements IMonthTargetInfosDto {
+    monthTargetAmount: number;
+    accomplishedAmount: number;
+
+    constructor(data?: IMonthTargetInfosDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.monthTargetAmount = _data["monthTargetAmount"];
+            this.accomplishedAmount = _data["accomplishedAmount"];
+        }
+    }
+
+    static fromJS(data: any): MonthTargetInfosDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new MonthTargetInfosDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["monthTargetAmount"] = this.monthTargetAmount;
+        data["accomplishedAmount"] = this.accomplishedAmount;
+        return data; 
+    }
+
+    clone(): MonthTargetInfosDto {
+        const json = this.toJSON();
+        let result = new MonthTargetInfosDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IMonthTargetInfosDto {
+    monthTargetAmount: number;
+    accomplishedAmount: number;
+}
+
+export class InvoicePeriodicTrackingDto implements IInvoicePeriodicTrackingDto {
+    totalInvoicesAmount: number;
+    cashedInvoicesAmount: number;
+    pendingInvoicesAmount: number;
+    lateInvoicesAmount: number;
+
+    constructor(data?: IInvoicePeriodicTrackingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalInvoicesAmount = _data["totalInvoicesAmount"];
+            this.cashedInvoicesAmount = _data["cashedInvoicesAmount"];
+            this.pendingInvoicesAmount = _data["pendingInvoicesAmount"];
+            this.lateInvoicesAmount = _data["lateInvoicesAmount"];
+        }
+    }
+
+    static fromJS(data: any): InvoicePeriodicTrackingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new InvoicePeriodicTrackingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalInvoicesAmount"] = this.totalInvoicesAmount;
+        data["cashedInvoicesAmount"] = this.cashedInvoicesAmount;
+        data["pendingInvoicesAmount"] = this.pendingInvoicesAmount;
+        data["lateInvoicesAmount"] = this.lateInvoicesAmount;
+        return data; 
+    }
+
+    clone(): InvoicePeriodicTrackingDto {
+        const json = this.toJSON();
+        let result = new InvoicePeriodicTrackingDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IInvoicePeriodicTrackingDto {
+    totalInvoicesAmount: number;
+    cashedInvoicesAmount: number;
+    pendingInvoicesAmount: number;
+    lateInvoicesAmount: number;
+}
+
+export class EstimatePeriodicTrackingDto implements IEstimatePeriodicTrackingDto {
+    totalEstimatesAmount: number;
+    transformedInvoicesAmount: number;
+
+    constructor(data?: IEstimatePeriodicTrackingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalEstimatesAmount = _data["totalEstimatesAmount"];
+            this.transformedInvoicesAmount = _data["transformedInvoicesAmount"];
+        }
+    }
+
+    static fromJS(data: any): EstimatePeriodicTrackingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new EstimatePeriodicTrackingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalEstimatesAmount"] = this.totalEstimatesAmount;
+        data["transformedInvoicesAmount"] = this.transformedInvoicesAmount;
+        return data; 
+    }
+
+    clone(): EstimatePeriodicTrackingDto {
+        const json = this.toJSON();
+        let result = new EstimatePeriodicTrackingDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IEstimatePeriodicTrackingDto {
+    totalEstimatesAmount: number;
+    transformedInvoicesAmount: number;
+}
+
+export class BestsellerPeriodicTrackingDto implements IBestsellerPeriodicTrackingDto {
+    catalogName: string | undefined;
+    amount: number;
+
+    constructor(data?: IBestsellerPeriodicTrackingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.catalogName = _data["catalogName"];
+            this.amount = _data["amount"];
+        }
+    }
+
+    static fromJS(data: any): BestsellerPeriodicTrackingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BestsellerPeriodicTrackingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["catalogName"] = this.catalogName;
+        data["amount"] = this.amount;
+        return data; 
+    }
+
+    clone(): BestsellerPeriodicTrackingDto {
+        const json = this.toJSON();
+        let result = new BestsellerPeriodicTrackingDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IBestsellerPeriodicTrackingDto {
+    catalogName: string | undefined;
+    amount: number;
+}
+
+export class TopClientsPeriodicTrackingDto implements ITopClientsPeriodicTrackingDto {
+    clientName: string | undefined;
+    amount: number;
+
+    constructor(data?: ITopClientsPeriodicTrackingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.clientName = _data["clientName"];
+            this.amount = _data["amount"];
+        }
+    }
+
+    static fromJS(data: any): TopClientsPeriodicTrackingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TopClientsPeriodicTrackingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["clientName"] = this.clientName;
+        data["amount"] = this.amount;
+        return data; 
+    }
+
+    clone(): TopClientsPeriodicTrackingDto {
+        const json = this.toJSON();
+        let result = new TopClientsPeriodicTrackingDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ITopClientsPeriodicTrackingDto {
+    clientName: string | undefined;
+    amount: number;
+}
+
+export class PeriodicTrackingDto implements IPeriodicTrackingDto {
+    invoicePeriodicTrackingDto: InvoicePeriodicTrackingDto;
+    estimatePeriodicTrackingDto: EstimatePeriodicTrackingDto;
+    bestsellerPeriodicTrackingDto: BestsellerPeriodicTrackingDto[] | undefined;
+    topClientsPeriodicTrackingDto: TopClientsPeriodicTrackingDto[] | undefined;
+
+    constructor(data?: IPeriodicTrackingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.invoicePeriodicTrackingDto = _data["invoicePeriodicTrackingDto"] ? InvoicePeriodicTrackingDto.fromJS(_data["invoicePeriodicTrackingDto"]) : <any>undefined;
+            this.estimatePeriodicTrackingDto = _data["estimatePeriodicTrackingDto"] ? EstimatePeriodicTrackingDto.fromJS(_data["estimatePeriodicTrackingDto"]) : <any>undefined;
+            if (Array.isArray(_data["bestsellerPeriodicTrackingDto"])) {
+                this.bestsellerPeriodicTrackingDto = [] as any;
+                for (let item of _data["bestsellerPeriodicTrackingDto"])
+                    this.bestsellerPeriodicTrackingDto.push(BestsellerPeriodicTrackingDto.fromJS(item));
+            }
+            if (Array.isArray(_data["topClientsPeriodicTrackingDto"])) {
+                this.topClientsPeriodicTrackingDto = [] as any;
+                for (let item of _data["topClientsPeriodicTrackingDto"])
+                    this.topClientsPeriodicTrackingDto.push(TopClientsPeriodicTrackingDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PeriodicTrackingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PeriodicTrackingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["invoicePeriodicTrackingDto"] = this.invoicePeriodicTrackingDto ? this.invoicePeriodicTrackingDto.toJSON() : <any>undefined;
+        data["estimatePeriodicTrackingDto"] = this.estimatePeriodicTrackingDto ? this.estimatePeriodicTrackingDto.toJSON() : <any>undefined;
+        if (Array.isArray(this.bestsellerPeriodicTrackingDto)) {
+            data["bestsellerPeriodicTrackingDto"] = [];
+            for (let item of this.bestsellerPeriodicTrackingDto)
+                data["bestsellerPeriodicTrackingDto"].push(item.toJSON());
+        }
+        if (Array.isArray(this.topClientsPeriodicTrackingDto)) {
+            data["topClientsPeriodicTrackingDto"] = [];
+            for (let item of this.topClientsPeriodicTrackingDto)
+                data["topClientsPeriodicTrackingDto"].push(item.toJSON());
+        }
+        return data; 
+    }
+
+    clone(): PeriodicTrackingDto {
+        const json = this.toJSON();
+        let result = new PeriodicTrackingDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPeriodicTrackingDto {
+    invoicePeriodicTrackingDto: InvoicePeriodicTrackingDto;
+    estimatePeriodicTrackingDto: EstimatePeriodicTrackingDto;
+    bestsellerPeriodicTrackingDto: BestsellerPeriodicTrackingDto[] | undefined;
+    topClientsPeriodicTrackingDto: TopClientsPeriodicTrackingDto[] | undefined;
+}
+
+export class TotalStatisticsDto implements ITotalStatisticsDto {
+    issuedInvoices: number;
+    issuedEstimates: number;
+    clients: number;
+    products: number;
+
+    constructor(data?: ITotalStatisticsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.issuedInvoices = _data["issuedInvoices"];
+            this.issuedEstimates = _data["issuedEstimates"];
+            this.clients = _data["clients"];
+            this.products = _data["products"];
+        }
+    }
+
+    static fromJS(data: any): TotalStatisticsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TotalStatisticsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["issuedInvoices"] = this.issuedInvoices;
+        data["issuedEstimates"] = this.issuedEstimates;
+        data["clients"] = this.clients;
+        data["products"] = this.products;
+        return data; 
+    }
+
+    clone(): TotalStatisticsDto {
+        const json = this.toJSON();
+        let result = new TotalStatisticsDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ITotalStatisticsDto {
+    issuedInvoices: number;
+    issuedEstimates: number;
+    clients: number;
+    products: number;
 }
 
 export class CreateTenantDto implements ICreateTenantDto {

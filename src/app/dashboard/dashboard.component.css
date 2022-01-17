@@ -1,0 +1,21 @@
+.dashboard-wrapper {
+    background: #fff;
+    min-height: calc(100vh - 60px);
+}
+
+.grid {
+    gap: 0;
+}
+
+.color-dashboard {
+    color: #5CBCA6;
+}
+
+h4 {
+    font-weight: normal;
+}
+
+.dashboard-wrapper .p-button:enabled:hover {
+    color: #ffffff;
+    background: #808A9F !important;
+}

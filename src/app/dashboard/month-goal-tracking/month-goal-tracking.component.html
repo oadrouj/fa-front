@@ -1,0 +1,33 @@
+<div class="px-2">
+    <h4>Objectif du mois</h4>
+    <div class="grid pt-2">
+        <div class="col-8">
+            <p-inplace #inplace [closable]="false" closeIcon="pi pi-check" class="block">
+                <ng-template pTemplate="display">
+                    <p-button [label]="monthTargetAmount + ' MAD'" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg"></p-button>
+                </ng-template>
+                <ng-template pTemplate="content" [display]="displayContent">
+                    <!-- <input type="text" [(ngModel)]="newMonthTargetAmount" pInputText> -->
+                    <p-inputNumber [(ngModel)]="newMonthTargetAmount" mode="decimal" [minFractionDigits]="2" placeholder="">
+                    </p-inputNumber>
+                    <button pButton pRipple type="button" class="ml-3" label="Enregistrer" (click)="createOrUpdateMonthTargetAmount()"></button>
+                </ng-template>
+            </p-inplace>
+
+            <div class="grid pt-3 text-2xl ">
+                <div class="col-6 color-dashboard">
+                    <span class="block">ACCOMPLI</span>
+                    <span>{{accomplishedAmount | number:'1.2-2' }} {{'MAD'}}</span>
+                </div>
+                <div class="col-6 color-yellow">
+                    <span class="block">RESTANT</span>
+                    <span>{{ monthTargetAmount - accomplishedAmount | number:'1.2-2' }} {{'MAD'}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div id="slider1"></div>
+        </div>
+    </div>
+
+</div>

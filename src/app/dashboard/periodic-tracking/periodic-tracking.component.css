@@ -1,0 +1,96 @@
+.color-dashboard {
+    color: #5CBCA6 !important;
+}
+
+.color-yellow {
+    color: #F8B849 !important;
+}
+
+.color-red {
+    color: #E8523F !important;
+}
+
+:host>>>.p-calendar .p-inputtext {
+    display: none;
+}
+
+:host>>>.p-calendar {
+    position: absolute;
+    right: 0;
+    top: 110%;
+}
+
+:host>>>.p-button {
+    background-color: #EFF3FB !important;
+    color: #4D4D4D;
+    border: none;
+}
+
+.invoice-circular-chart {
+    display: block;
+    max-width: 80%;
+    height: 12rem;
+    text-anchor: middle;
+    transform: rotate(22.5deg);
+}
+
+.estimate-circular-chart {
+    display: block;
+    width: 11rem;
+    height: 11rem;
+    text-anchor: middle;
+    transform: rotate(22.5deg);
+}
+
+.circle {
+    fill: none;
+    stroke-width: .75;
+    stroke-linecap: square;
+    animation: progress 1s ease-out forwards;
+}
+
+@keyframes progress {
+    0% {
+        stroke-dasharray: 0 100;
+    }
+}
+
+.circle-text {
+    font-size: 0.2rem;
+    transform: rotate(-22.5deg);
+}
+
+.estimate-circle-text {
+    fill: #898E99 !important;
+    font-size: 0.2rem;
+    transform: rotate(-22.5deg);
+}
+
+.estimate-circle-percentage-text {
+    font-size: 0.45rem;
+    transform: rotate(-22.5deg);
+}
+
+:host>>>.p-progressbar {
+    display: inline-flex;
+    width: 50%;
+    background: transparent;
+    height: .35rem;
+}
+
+:host>>>.p-progressbar-value {
+    background-color: #5CBCA6;
+    border-radius: 1rem;
+}
+
+.product-price {
+    color: #7D86A9;
+}
+
+.order {
+    color: #ff7700;
+}
+
+:host>>>.p-calendar {
+    z-index: 1000;
+}

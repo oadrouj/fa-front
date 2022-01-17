@@ -43,7 +43,8 @@ import { NgxdModule } from '@ngxd/core';
 import { EstimateInvoiceStatusComponent } from './components/estimate-invoice-status/estimate-invoice-status.component'
 import { EstimateInvoiceStatusStateService } from './services/estimate-invoice-status-state.service'
 import { DataViewModule } from 'primeng/dataview';
-
+import {InplaceModule} from 'primeng/inplace';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 @NgModule({
   imports: [
@@ -80,7 +81,9 @@ import { DataViewModule } from 'primeng/dataview';
     FileUploadModule,
     NgxdModule,
     VirtualScrollerModule,
-    DataViewModule
+    DataViewModule,
+    InplaceModule,
+    ProgressBarModule
   ],
 
   declarations: [
@@ -128,7 +131,9 @@ import { DataViewModule } from 'primeng/dataview';
     FileUploadModule,
     NgxdModule,
     VirtualScrollerModule,
-    DataViewModule
+    DataViewModule,
+    InplaceModule, 
+    ProgressBarModule
   ],
 })
 export class PrimengSharedModule { }

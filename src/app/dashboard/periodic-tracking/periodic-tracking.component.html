@@ -1,0 +1,122 @@
+<div class="px-3 text-lg">
+    <div class="header flex justify-content-between align-items-baseline">
+        <h4>[Période, mois courant par défaut]</h4>
+        <div class="flex">
+            <div class="position-relative mr-4">
+                <button pButton pRipple type="button" [label]="'Début'" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg" (click)="startDateInline=!startDateInline">
+                    <img src="assets/img/dashbord-date.png" alt="" class="mr-2">
+                </button>
+                <p-calendar [(ngModel)]="startDate" [inline]="startDateInline" (onSelect)="selectStartDate()"></p-calendar>
+            </div>
+            <div class="position-relative">
+                <button pButton pRipple type="button" [label]="'Fin'" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg" (click)="endDateInline=!endDateInline">
+                    <img src="assets/img/dashbord-date.png" alt="" class="mr-2">
+                </button>
+                <p-calendar [(ngModel)]="endDate" [inline]="endDateInline" (onSelect)="selectEndDate()"></p-calendar>
+            </div>
+        </div>
+
+    </div>
+    <div class="grid pt-4">
+        <div class="col-3">
+            <h4>Factures</h4>
+            <div>
+                <svg viewBox="0 0 36 36" class="invoice-circular-chart text-an">
+
+                    <path id="path" class="circle" stroke='#F8B849'
+                    [attr.stroke-dasharray]="[pendingInvoicesAmountPercentage + cashedInvoicesAmountPercentage + lateInvoicesAmountPercentage, totalLength]"
+                     d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831" />
+
+                    <path class="circle" stroke="#4CC790"
+                        [attr.stroke-dasharray]="[cashedInvoicesAmountPercentage + lateInvoicesAmountPercentage, totalLength]" d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  
+                    <path class="circle" stroke='#E8523F'
+                        [attr.stroke-dasharray]="[lateInvoicesAmountPercentage, totalLength]" d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831" />
+
+                    <text x="25%" y="23" class="circle-text">Total Factures</text>
+                    <text x="25%" y="28" class="circle-text">{{ totalInvoicesAmount | number:'1.2-2' }} {{'MAD'}}</text>
+                </svg>
+            </div>
+
+            <div class="pt-2 ">
+                <div class="flex justify-content-between">
+                    <span class="">Encaissées</span>
+                    <span class="color-dashboard font-medium">{{cashedInvoicesAmount | number:'1.2-2' }}
+                        {{'MAD'}}</span>
+                </div>
+                <div class="flex justify-content-between mt-2">
+                    <span class="">En attente</span>
+                    <span class="color-yellow font-medium">{{pendingInvoicesAmount | number:'1.2-2' }} {{'MAD'}}</span>
+                </div>
+                <div class="flex justify-content-between mt-2">
+                    <span class="">En retard</span>
+                    <span class="color-red font-medium">{{lateInvoicesAmount | number:'1.2-2' }} {{'MAD'}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 ml-4">
+            <div class="grid">
+                <div class="col-5">
+                    <h4>Devis</h4>
+                    <div class="flex justify-content-between mt-5">
+                        <span class="">Total</span>
+                        <span class="font-medium">{{totalEstimatesAmount | number:'1.2-2' }} {{'MAD'}}</span>
+                    </div>
+                    <div class="flex justify-content-between mt-2">
+                        <span class="">Transformé</span>
+                        <span class="color-dashboard font-medium">{{transformedInvoicesAmount | number:'1.2-2' }} {{'MAD'}}</span>
+                    </div>
+                </div>
+                <div class="col-1"></div>
+                <div class="col-6 pt-0">
+                    <svg viewBox="0 0 36 36" class="estimate-circular-chart">
+                        <path class="circle" stroke='#F1F3F8' [attr.stroke-dasharray]="[100, 100]" d="M18 2.0845
+                            a 15.9155 15.9155 0 0 1 0 31.831
+                            a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" stroke="#4CC790" [attr.stroke-dasharray]="[transformationPercentage, 100]" d="M18 2.0845
+                            a 15.9155 15.9155 0 0 1 0 31.831
+                            a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <text x="25%" y="18" class="estimate-circle-text ">Taux de </text>
+                        <text x="25%" y="22" class="estimate-circle-text ">transformation</text>
+                        <text x="25%" y="31" class="estimate-circle-percentage-text ">{{(transformationPercentage || 0) | number:'1.2-2' }}%</text>
+                    </svg>
+                </div>
+            </div>
+            <div>
+                <h4>Top Ventes</h4>
+                <div>
+                    <div *ngFor="let item of bestsellerList;" class="">
+                        <div class="w-6rem inline-flex">
+                            <span class="">{{item.catalogName}}</span>
+                        </div>
+                        <p-progressBar [value]="getBestsellerPercentage(item.amount)" [showValue]="false"></p-progressBar>
+                        <div class="product-price text-xl text-right inline-flex ml-3">
+                            <span>{{item.amount | number:'1.2-2' }} {{'MAD'}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="">
+            <h4>Top Clients</h4>
+            <div>
+                <div *ngFor="let item of topClientsList; let i=index" class="mt-2" [ngClass]="'text-' + topClientFontSizesList[i]">
+                    <div>
+                        <span class="order font-semibold">{{i + 1}} . </span>
+                        <span>{{item.clientName}}</span>
+                    </div>
+                    <span class="client-amount color-dashboard">{{item.amount}} {{'MAD'}}</span>
+                </div>
+
+            </div>
+        </div>
+    </div>

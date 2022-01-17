@@ -79,6 +79,7 @@ export class ItemPreviewComponent implements OnInit {
       onclone: (dcm) => {
         let data = dcm.getElementById('contentToConvert')
         data.classList.add('html2canvas')
+        dcm.getElementById('pageHeader').innerHTML = "<span class='font-semibold'>Objet: </span>" + this.item.messageIntroduction
         dcm.getElementById('pageFooter').innerText = this.item.piedDePage
       },
     }).then((canvas) => {
@@ -114,4 +115,6 @@ export class ItemPreviewComponent implements OnInit {
       // }
     })
   }
+
+
 }

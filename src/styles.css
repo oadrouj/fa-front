@@ -14,6 +14,14 @@
     src: url('assets/fonts/Frutiger_bold.ttf') format('truetype');
 }
 
+.font-frutiger {
+    font-family: 'Frutiger' !important;
+}
+
+.font-frutiger-bold {
+    font-family: 'Frutiger Bold' !important;
+}
+
 :root {
     --green-color: #0D6939;
     --light-green-color: #C3EAD6;
@@ -26,6 +34,7 @@
     --light-purple-color: #DDD7E3;
     --dark-orange-color: #EF790D;
     --blue-color: #2A95D1;
+    --dashboard-color: #5CBCA6;
     --border-radius: .4rem;
 }
 
@@ -76,6 +85,10 @@
     color: var(--blue-color) !important;
 }
 
+.color-dashboard {
+    color: #5CBCA6 !important;
+}
+
 .bg-green {
     background-color: var(--green-color) !important;
 }
@@ -111,6 +124,10 @@
 
 .bg-blue {
     background-color: var(--blue-color) !important;
+}
+
+.bg-dashboard {
+    background: var(--dashboard-color) !important;
 }
 
 .p-dropdown .pi.pi-chevron-down:before {
