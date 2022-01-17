@@ -10,10 +10,7 @@
     <p-tabView>
         <p-tabPanel header="Ajouter un payement">
             <form [formGroup]="formGroup" class="mt-1">
-                <!-- <div class="grid ">
-                    <div class="col-6"><span>Référence</span></div>
-                    <div class="col-6"><input pInputText formControlName="reference" readonly="true"></div>
-                </div> -->
+
                 <div *ngIf="this.config.data.status == 2" class="flex justify-content-center align-items-center ">
                     <span class="mr-1 text-xl font-bold text-black">Reste à payer:</span>
                     <span class="ml-1 text-3xl font-bold color-orange">{{this.config.data.restAmount | number:'1.2-2' }}

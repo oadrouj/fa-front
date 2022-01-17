@@ -43,8 +43,14 @@ import { AppRouteGuard } from '@shared/auth/auth-route-guard';
                         loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule),
                         data: { preload: true},
                         canActivate: [AppRouteGuard]
+                    },
+                    {
+                        path: 'Dashboard',
+                        loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
+                        data: { preload: true},
+                        canActivate: [AppRouteGuard]
                     }
-                    
+
                     // { path: 'home', component: HomeComponent,  canActivate: [AppRouteGuard] },
                     // { path: 'users', component: UsersComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },
                     // { path: 'roles', component: RolesComponent, data: { permission: 'Pages.Roles' }, canActivate: [AppRouteGuard] },

@@ -1,0 +1,29 @@
+    .color-dashboard {
+        color: #5CBCA6;
+    }
+    
+    .color-yellow {
+        color: #F8B849;
+    }
+    
+     :host>>>.p-button {
+        background-color: #EFF3FB !important;
+        color: #4D4D4D;
+        border: none;
+        font-weight: 600;
+    }
+    
+     :host>>>.p-inplace-display {
+        padding: 0;
+    }
+    /* Not applied */
+    
+    .rs-tooltip-extra {
+        font-size: 2rem;
+        transform: translate(-50%, -50%);
+        line-height: 2.5rem;
+        top: 43%;
+        margin-top: 0;
+        margin-left: 0;
+    }
+    /*  */

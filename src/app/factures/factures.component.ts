@@ -810,23 +810,15 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   print() {
-    // this._factureServiceProxy
-    //   .getByIdFactureReport(this.selectedDevisItem.id)
-    //   .subscribe((res) => {
-    //     printJS({
-    //       printable: res,
-    //       type: 'pdf',
-    //       base64: true,
-    //     })
-    //   })
+   
     html2canvas(document.getElementById('contentToConvert'), {
-      scale: 5,
+      scale: 2,
       onclone: (dcm) => {
         let data = dcm.getElementById('contentToConvert')
         data.classList.add('html2canvas')
-        dcm.getElementById(
-          'pageFooter',
-        ).innerText = this.selectedDevisItem.piedDePage
+        dcm.getElementById('pageHeader').innerHTML = "<span class='font-semibold'>Objet: </span>" + (this.selectedDevisItem.messageIntroduction || '')
+        dcm.getElementById('pageFooter').innerText = this.selectedDevisItem.piedDePage
+
       },
     }).then((canvas) => {
       let docWidth = 205
@@ -849,13 +841,13 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
 
   convertToPDF(element) {
     html2canvas(element, {
-      scale: 5,
+      scale: 2,
       onclone: (dcm) => {
         let data = dcm.getElementById('contentToConvert')
         data.classList.add('html2canvas')
-        dcm.getElementById(
-          'pageFooter',
-        ).innerText = this.selectedDevisItem.piedDePage
+        dcm.getElementById('pageHeader').innerHTML = "<span class='font-semibold'>Objet: </span>" + (this.selectedDevisItem.messageIntroduction || '')
+        dcm.getElementById('pageFooter').innerText = this.selectedDevisItem.piedDePage
+
       },
     }).then((canvas) => {
       let docWidth = 205

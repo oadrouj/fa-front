@@ -1,0 +1,15 @@
+.color-green {
+    color: #4AA892 !important;
+}
+
+.color-red {
+    color: #E8523F !important;
+}
+
+.total-statistics span {
+    font-size: 1.75rem;
+}
+
+.total-statistics img {
+    width: fit-content;
+}

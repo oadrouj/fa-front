@@ -1,0 +1,30 @@
+<div class="px-4">
+    <p-dataView #dv [value]="activityLogItems" [rows]="5">
+        <ng-template pTemplate="header">
+            <div class="flex justify-content-between align-items-center">
+                <h4 class="">Activité récente</h4>
+                <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded border-none shadow-none"></button>
+            </div>
+        </ng-template>
+        <ng-template let-log pTemplate="listItem">
+            <div class="flex justify-content-between mb-3">
+                <div class="flex align-items-center">
+                    <div class="logoContainer flex justify-content-center mr-4">
+                        <img [src]="log.logoSrc" alt="">
+                    </div>
+                    <div class="">
+                        <span class="block">{{parseTitle(log.logType) + '-' + log.reference}}</span>
+                        <span class="color-dashboard mr-3">{{log.clientName || '-'}}</span>
+                        <span class="date">{{log.date.toDate() | date:'medium'}}</span>
+                    </div>
+                </div>
+                <div>
+                    <h6 class="block">{{log.amount ? ((log.amount | number:'1.2-2') + ' ' + log.currency | uppercase) : '-' }} </h6>
+                </div>
+            </div>
+        </ng-template>
+
+
+
+    </p-dataView>
+</div>

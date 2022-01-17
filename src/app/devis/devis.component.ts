@@ -847,13 +847,13 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
   print() {
     html2canvas(document.getElementById('contentToConvert'), {
-      scale: 5,
+      scale: 2,
       onclone: (dcm) => {
         let data = dcm.getElementById('contentToConvert')
         data.classList.add('html2canvas')
-        dcm.getElementById(
-          'pageFooter',
-        ).innerText = this.selectedDevisItem.piedDePage
+        dcm.getElementById('pageHeader').innerHTML = "<span class='font-semibold'>Objet: </span>" + (this.selectedDevisItem.messageIntroduction || '')
+        dcm.getElementById('pageFooter').innerText = this.selectedDevisItem.piedDePage
+
       },
     }).then((canvas) => {
       let docWidth = 205
@@ -889,19 +889,16 @@ export class DevisComponent implements OnInit, AfterViewInit {
     this.convertToPDF(data)
   }
 
+  
   convertToPDF(element) {
     html2canvas(element, {
-      scale: 5,
+      scale: 2,
       onclone: (dcm) => {
         let data = dcm.getElementById('contentToConvert')
         data.classList.add('html2canvas')
-        let imageElement = dcm.querySelector('.content img ') as HTMLElement
-        // imageElement.style.width = '350px'
-        // imageElement.style.height = '130px'
+        dcm.getElementById('pageHeader').innerHTML = "<span class='font-semibold'>Objet: </span>" + (this.selectedDevisItem.messageIntroduction || '')
+        dcm.getElementById('pageFooter').innerText = this.selectedDevisItem.piedDePage
 
-        dcm.getElementById(
-          'pageFooter',
-        ).innerText = this.selectedDevisItem.piedDePage
       },
     }).then((canvas) => {
       let docWidth = 205
