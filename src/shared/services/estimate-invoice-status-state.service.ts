@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-type StatusAction = 'Convert' | 'Reject' | 'Validate' | 'Settle' | 'PartiallySettle'
+type StatusAction = 'Convert' | 'Reject' | 'Validate' | 'Settle' | 'PartiallySettle' | 'Historic'
 type TargetComponent = 'Estimate' | 'Invoice'
  type StatusState = {statusAction: StatusAction, target: TargetComponent}
 

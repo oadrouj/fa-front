@@ -8,6 +8,10 @@ import { MonthGoalTrackingComponent } from './month-goal-tracking/month-goal-tra
 import { PeriodicTrackingComponent } from './periodic-tracking/periodic-tracking.component'
 import { TotalStatisticsComponent } from './total-statistics/total-statistics.component'
 import { MonthlyEvolutionComponent } from './monthly-evolution/monthly-evolution.component';
+import { ProgressBarModule } from 'primeng/progressbar';
+import {ChartModule} from 'primeng/chart';
+import { AnnualTrackingComponent } from './annual-tracking/annual-tracking.component';
+import { DropdownButtonComponent } from './dropdown-button/dropdown-button.component';
 
 @NgModule({
   imports: [
@@ -15,7 +19,9 @@ import { MonthlyEvolutionComponent } from './monthly-evolution/monthly-evolution
       {path: '', component: DashboardComponent}
     ]),
     PrimengSharedModule,
-    
+    ChartModule,
+    ProgressBarModule,
+
   ],
   declarations: [
     DashboardComponent,
@@ -24,6 +30,8 @@ import { MonthlyEvolutionComponent } from './monthly-evolution/monthly-evolution
     PeriodicTrackingComponent,
     TotalStatisticsComponent,
     MonthlyEvolutionComponent,
+    AnnualTrackingComponent,
+    DropdownButtonComponent
   ]
 })
 export class DashboardModule { }

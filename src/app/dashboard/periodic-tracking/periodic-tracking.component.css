@@ -10,6 +10,9 @@
     color: #E8523F !important;
 }
 
+
+/*  */
+
 :host>>>.p-calendar .p-inputtext {
     display: none;
 }
@@ -45,7 +48,7 @@
 .circle {
     fill: none;
     stroke-width: .75;
-    stroke-linecap: square;
+    /* stroke-linecap: square; */
     animation: progress 1s ease-out forwards;
 }
 
@@ -76,6 +79,7 @@
     width: 50%;
     background: transparent;
     height: .35rem;
+    background: rgba(92, 188, 166, .45);
 }
 
 :host>>>.p-progressbar-value {

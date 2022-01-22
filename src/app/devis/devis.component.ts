@@ -221,23 +221,14 @@ export class DevisComponent implements OnInit, AfterViewInit {
     { header: 'TOTAL TTC', field: 'totalTtc', type: 'currency', colspan: 0 },
   ]
   devisList: any
-  statusItems = [
+
+  devisStatusItems = [
     {
       actualStatus: DevisStatutEnum.Valide,
       label: 'Convertir',
       icon: 'pi pi-check',
       command: () => {
-        console.log('selected', this.selectedDevisItem)
-        this.showFactureDialog()
-        this.emitNotificationSelectedDevisChanged({
-          ...this.selectedDevisItem,
-          factureItems: this.selectedDevisItem.factureItems,
-          dateEmission:
-            this.selectedDevisItem.dateEmission instanceof Date
-              ? this.selectedDevisItem.dateEmission
-              : moment(this.selectedDevisItem.dateEmission).toDate(),
-        })
-        this.emitDialogStatus(DialogStatus.New, 'facture', true)
+        this._estimateInvoiceStatusStateService.statusModifier = {statusAction: 'Convert',target: 'Estimate'}
       },
     },
     {
@@ -245,11 +236,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       label: 'Rejeter',
       icon: 'pi pi-times',
       command: () => {
-        this.updateApiCall(
-          this.selectedDevisItem.id,
-          DevisStatutEnum.Rejete,
-          'Le devis est rejeté',
-        )
+        this._estimateInvoiceStatusStateService.statusModifier = {statusAction: 'Reject',target: 'Estimate'}
       },
     },
     {
@@ -257,25 +244,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
       label: 'Valider',
       icon: 'pi pi-check',
       command: () => {
-        this.emitDialogStatus(DialogStatus.Edit, 'devis')
-        this.child.validateDevis(true).subscribe((res) => {
-          console.log(res)
-          if (res.success) {
-            this._toastService.success({
-              detail: 'Le devis est devient valide',
-            })
-            this.selectedDevisItem = {
-              ...this.selectedDevisItem,
-              statut: res.result.statut,
-            }
-            this.tableChild.tableData.find(
-              (item) => item.id == this.selectedDevisItem.id,
-            ).statut = res.result.statut
-          }
-        })
+        this._estimateInvoiceStatusStateService.statusModifier = {statusAction: 'Validate',target: 'Estimate'}
       },
     },
   ]
+  
   displayDialog = false
   dialogState!: DialogStatus
   autoCompleteText = ''
@@ -294,11 +267,6 @@ export class DevisComponent implements OnInit, AfterViewInit {
   emitDateFilterEvent(event){
     if(this.selectedDate.every(x => x != null))
       this.emitFilterEvent('filterByButton', null)
-  }
-
-  getStatusOptions() {
-    let actualStatus = this.selectedDevisItem && this.selectedDevisItem.statut
-    return this.statusItems.filter((item) => item.actualStatus == actualStatus)
   }
 
   formatStatut(statut?: DevisStatutEnum) {
@@ -653,12 +621,12 @@ export class DevisComponent implements OnInit, AfterViewInit {
       statutFilter = event.filters.statut && event.filters.statut.value
     }
 
-    let shouldReturnExpiredEstimates: boolean
+    let shouldReturnExpiredEstimates = false
     
-    if(statutFilter == DevisStatutEnum.Expire){
-      statutFilter = DevisStatutEnum.Cree
-      shouldReturnExpiredEstimates = true
-    }
+    // if(statutFilter == DevisStatutEnum.Expire){
+    //   statutFilter = DevisStatutEnum.Valide
+    //   shouldReturnExpiredEstimates = true
+    // }
 
     return zip(
       this._devisServiceProxy.getAllDevisTotalRecords(
@@ -708,11 +676,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
             let totalHt = item.unitPriceHT * item.quantity
             return {
               ...item,
-              // totalTtc: total_ht + (item.tva * total_ht) / 100,
+              
             }
           })
 
-          devis.statut = moment().isAfter(moment(devis.dateEmission).add(devis.echeancePaiement, 'days'))
+          devis.statut =  (devis.statut == DevisStatutEnum.Valide) && moment().isAfter(moment(devis.dateEmission).add(devis.echeancePaiement, 'days'))
             ? DevisStatutEnum.Expire : devis.statut
 
           let montantTtc = devis.devisItems
@@ -725,10 +693,10 @@ export class DevisComponent implements OnInit, AfterViewInit {
           devis.montantTtc = montantTtc - (montantHt * devis.remise) / 100
         })
 
-        if(shouldReturnExpiredEstimates) 
-          data = data.filter(x => x.statut == DevisStatutEnum.Expire)
-        else if(!shouldReturnExpiredEstimates && !statutFilter)
-          data = data.filter(x => x.statut != DevisStatutEnum.Expire)
+        // if(shouldReturnExpiredEstimates || !statutFilter) 
+        //   data = data.filter(x => x.statut == DevisStatutEnum.Expire)
+        // else if(!shouldReturnExpiredEstimates)
+        //   data = data.filter(x => x.statut != DevisStatutEnum.Expire)
 
         return { items: data, length, montantTotalAllDevis }
       }),

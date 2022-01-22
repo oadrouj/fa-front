@@ -52,6 +52,7 @@ export class TableComponent implements OnInit {
   @Input() filterEvent!: Observable<any>
   @Input() SelectItemEvent!: Observable<any>
   @Input() getListApi$: (event) => Observable<any>
+  @Input() statusItems = []
   @ViewChild('tbl') table: Table
 
   tableData: any
@@ -162,5 +163,9 @@ export class TableComponent implements OnInit {
 
   trackByFunction = (index, item) => {
     return item.id
+  }
+
+  getStatusItems(status){
+    return this.statusItems.filter(item => item.actualStatus == status)
   }
 }

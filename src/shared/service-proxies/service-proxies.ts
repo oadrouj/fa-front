@@ -5264,6 +5264,7 @@ export class StatisticsServiceProxy {
         }));
     }
 
+    
     protected processCreateOrUpdateMonthTargetAmount(response: HttpResponseBase): Observable<boolean> {
         const status = response.status;
         const responseBlob =
@@ -5335,6 +5336,118 @@ export class StatisticsServiceProxy {
             }));
         }
         return _observableOf<ActivityLogDtoListResultDto>(<any>null);
+    }
+
+    /**
+     * @param year (optional) 
+     * @return Success
+     */
+    getAnnualEstimatesTracking(year: number | undefined): Observable<AnnualEstimatesTrackingDto> {
+        let url_ = this.baseUrl + "/api/services/app/Statistics/GetAnnualEstimatesTracking?";
+        if (year === null)
+            throw new Error("The parameter 'year' cannot be null.");
+        else if (year !== undefined)
+            url_ += "Year=" + encodeURIComponent("" + year) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAnnualEstimatesTracking(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAnnualEstimatesTracking(<any>response_);
+                } catch (e) {
+                    return <Observable<AnnualEstimatesTrackingDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<AnnualEstimatesTrackingDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAnnualEstimatesTracking(response: HttpResponseBase): Observable<AnnualEstimatesTrackingDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AnnualEstimatesTrackingDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<AnnualEstimatesTrackingDto>(<any>null);
+    }
+
+    /**
+     * @param year (optional) 
+     * @return Success
+     */
+    getAnnualInvoicesTracking(year: number | undefined): Observable<AnnualInvoicesTrackingDto> {
+        let url_ = this.baseUrl + "/api/services/app/Statistics/GetAnnualInvoicesTracking?";
+        if (year === null)
+            throw new Error("The parameter 'year' cannot be null.");
+        else if (year !== undefined)
+            url_ += "Year=" + encodeURIComponent("" + year) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAnnualInvoicesTracking(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAnnualInvoicesTracking(<any>response_);
+                } catch (e) {
+                    return <Observable<AnnualInvoicesTrackingDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<AnnualInvoicesTrackingDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAnnualInvoicesTracking(response: HttpResponseBase): Observable<AnnualInvoicesTrackingDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AnnualInvoicesTrackingDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<AnnualInvoicesTrackingDto>(<any>null);
     }
 
     /**
@@ -5494,6 +5607,57 @@ export class StatisticsServiceProxy {
             }));
         }
         return _observableOf<TotalStatisticsDto>(<any>null);
+    }
+
+    /**
+     * @return Success
+     */
+    getMonthEvolution(): Observable<MonthEvolutionDto> {
+        let url_ = this.baseUrl + "/api/services/app/Statistics/GetMonthEvolution";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetMonthEvolution(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetMonthEvolution(<any>response_);
+                } catch (e) {
+                    return <Observable<MonthEvolutionDto>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<MonthEvolutionDto>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetMonthEvolution(response: HttpResponseBase): Observable<MonthEvolutionDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = MonthEvolutionDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<MonthEvolutionDto>(<any>null);
     }
 }
 
@@ -7918,6 +8082,23 @@ export enum DevisStatutEnum {
     Undefined = -1
 }
 
+export enum FactureStatutEnum {
+    Cree = 0,
+    Valide = 1,
+    ReglePartiellemt = 2,
+    Regle = 3,
+    PaiementAttente = 4,
+    PaiementRetard = 5,
+    Undefined = -1
+}
+
+export enum ModePaiementEnum {
+    Cheque = 0,
+    Virement = 1,
+    Liquide = 2,
+    Effet = 3,
+}
+
 export class DevisItemDto implements IDevisItemDto {
     designation: string | undefined;
     date: moment.Moment;
@@ -8404,15 +8585,6 @@ export interface IDevisDtoListResultDto {
     items: DevisDto[] | undefined;
 }
 
-export enum FactureStatutEnum {
-    Cree = 0,
-    Valide = 1,
-    ReglePartiellemt = 2,
-    Regle = 3,
-    PaiementAttente = 4,
-    PaiementRetard = 5,
-    Undefined = -1
-}
 
 export class FactureItemDto implements IFactureItemDto {
     designation: string | undefined;
@@ -8884,12 +9056,6 @@ export interface IFactureDtoListResultDto {
     items: FactureDto[] | undefined;
 }
 
-export enum ModePaiementEnum {
-    Cheque = 0,
-    Virement = 1,
-    Liquide = 2,
-    Effet = 3,
-}
 
 export class FactureInfosPaiementDto implements IFactureInfosPaiementDto {
     datePaiement: moment.Moment;
@@ -10426,6 +10592,144 @@ export interface IActivityLogDtoListResultDto {
     items: ActivityLogDto[] | undefined;
 }
 
+export class AnnualEstimatesTrackingDto implements IAnnualEstimatesTrackingDto {
+    validatedEstimatesSerie: number[] | undefined;
+    transformedEstimatesSerie: number[] | undefined;
+
+    constructor(data?: IAnnualEstimatesTrackingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["validatedEstimatesSerie"])) {
+                this.validatedEstimatesSerie = [] as any;
+                for (let item of _data["validatedEstimatesSerie"])
+                    this.validatedEstimatesSerie.push(item);
+            }
+            if (Array.isArray(_data["transformedEstimatesSerie"])) {
+                this.transformedEstimatesSerie = [] as any;
+                for (let item of _data["transformedEstimatesSerie"])
+                    this.transformedEstimatesSerie.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): AnnualEstimatesTrackingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AnnualEstimatesTrackingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.validatedEstimatesSerie)) {
+            data["validatedEstimatesSerie"] = [];
+            for (let item of this.validatedEstimatesSerie)
+                data["validatedEstimatesSerie"].push(item);
+        }
+        if (Array.isArray(this.transformedEstimatesSerie)) {
+            data["transformedEstimatesSerie"] = [];
+            for (let item of this.transformedEstimatesSerie)
+                data["transformedEstimatesSerie"].push(item);
+        }
+        return data; 
+    }
+
+    clone(): AnnualEstimatesTrackingDto {
+        const json = this.toJSON();
+        let result = new AnnualEstimatesTrackingDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAnnualEstimatesTrackingDto {
+    validatedEstimatesSerie: number[] | undefined;
+    transformedEstimatesSerie: number[] | undefined;
+}
+
+export class AnnualInvoicesTrackingDto implements IAnnualInvoicesTrackingDto {
+    cashedInvoicesSerie: number[] | undefined;
+    lateInvoicesSerie: number[] | undefined;
+    waitingInvoicesSerie: number[] | undefined;
+
+    constructor(data?: IAnnualInvoicesTrackingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["cashedInvoicesSerie"])) {
+                this.cashedInvoicesSerie = [] as any;
+                for (let item of _data["cashedInvoicesSerie"])
+                    this.cashedInvoicesSerie.push(item);
+            }
+            if (Array.isArray(_data["lateInvoicesSerie"])) {
+                this.lateInvoicesSerie = [] as any;
+                for (let item of _data["lateInvoicesSerie"])
+                    this.lateInvoicesSerie.push(item);
+            }
+            if (Array.isArray(_data["waitingInvoicesSerie"])) {
+                this.waitingInvoicesSerie = [] as any;
+                for (let item of _data["waitingInvoicesSerie"])
+                    this.waitingInvoicesSerie.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): AnnualInvoicesTrackingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AnnualInvoicesTrackingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.cashedInvoicesSerie)) {
+            data["cashedInvoicesSerie"] = [];
+            for (let item of this.cashedInvoicesSerie)
+                data["cashedInvoicesSerie"].push(item);
+        }
+        if (Array.isArray(this.lateInvoicesSerie)) {
+            data["lateInvoicesSerie"] = [];
+            for (let item of this.lateInvoicesSerie)
+                data["lateInvoicesSerie"].push(item);
+        }
+        if (Array.isArray(this.waitingInvoicesSerie)) {
+            data["waitingInvoicesSerie"] = [];
+            for (let item of this.waitingInvoicesSerie)
+                data["waitingInvoicesSerie"].push(item);
+        }
+        return data; 
+    }
+
+    clone(): AnnualInvoicesTrackingDto {
+        const json = this.toJSON();
+        let result = new AnnualInvoicesTrackingDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAnnualInvoicesTrackingDto {
+    cashedInvoicesSerie: number[] | undefined;
+    lateInvoicesSerie: number[] | undefined;
+    waitingInvoicesSerie: number[] | undefined;
+}
+
 export class MonthTargetInfosDto implements IMonthTargetInfosDto {
     monthTargetAmount: number;
     accomplishedAmount: number;
@@ -10793,6 +11097,61 @@ export interface ITotalStatisticsDto {
     issuedEstimates: number;
     clients: number;
     products: number;
+}
+
+export class MonthEvolutionDto implements IMonthEvolutionDto {
+    totalInvoicedAmountEvolved: number;
+    totaEstimatedAmountEvolved: number;
+    totalClientsEvolved: number;
+    totalCatalogsEvolved: number;
+
+    constructor(data?: IMonthEvolutionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalInvoicedAmountEvolved = _data["totalInvoicedAmountEvolved"];
+            this.totaEstimatedAmountEvolved = _data["totaEstimatedAmountEvolved"];
+            this.totalClientsEvolved = _data["totalClientsEvolved"];
+            this.totalCatalogsEvolved = _data["totalCatalogsEvolved"];
+        }
+    }
+
+    static fromJS(data: any): MonthEvolutionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new MonthEvolutionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalInvoicedAmountEvolved"] = this.totalInvoicedAmountEvolved;
+        data["totaEstimatedAmountEvolved"] = this.totaEstimatedAmountEvolved;
+        data["totalClientsEvolved"] = this.totalClientsEvolved;
+        data["totalCatalogsEvolved"] = this.totalCatalogsEvolved;
+        return data; 
+    }
+
+    clone(): MonthEvolutionDto {
+        const json = this.toJSON();
+        let result = new MonthEvolutionDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IMonthEvolutionDto {
+    totalInvoicedAmountEvolved: number;
+    totaEstimatedAmountEvolved: number;
+    totalClientsEvolved: number;
+    totalCatalogsEvolved: number;
 }
 
 export class CreateTenantDto implements ICreateTenantDto {

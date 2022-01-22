@@ -95,4 +95,11 @@ export class PeriodicTrackingComponent implements OnInit {
     this.endDateInline = false
   }
   
+  parseDate(){
+    let string = (this.startDate || this.endDate) ?
+       ((this.startDate ? this.startDate.toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR')) + 
+      ' - ' + (this.endDate ? this.endDate.toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR'))) : ' mois courant par défaut'
+
+      return string
+  }
 }

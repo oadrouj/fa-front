@@ -8,9 +8,8 @@
         </div>
     </div>
     <p-tabView>
-        <p-tabPanel header="Ajouter un payement">
+        <p-tabPanel header="Ajouter un payement" *ngIf="this.config.data.tabPanelShowMode == 'both' || this.config.data.tabPanelShowMode == 'addPayement'">
             <form [formGroup]="formGroup" class="mt-1">
-
                 <div *ngIf="this.config.data.status == 2" class="flex justify-content-center align-items-center ">
                     <span class="mr-1 text-xl font-bold text-black">Reste à payer:</span>
                     <span class="ml-1 text-3xl font-bold color-orange">{{this.config.data.restAmount | number:'1.2-2' }}
@@ -35,7 +34,7 @@
 
             </form>
         </p-tabPanel>
-        <p-tabPanel header="Voir tous les payament" *ngIf="this.config.data.status == 2">
+        <p-tabPanel header="Voir tous les payaments" *ngIf="this.config.data.tabPanelShowMode == 'both' || this.config.data.tabPanelShowMode == 'historic'">
             <app-payment-history [factureId]="this.config.data.factureId" [currency]="currency"></app-payment-history>
 
         </p-tabPanel>

@@ -15,7 +15,7 @@ h4 {
     font-weight: normal;
 }
 
-.dashboard-wrapper .p-button:enabled:hover {
+:host>>>.p-button:enabled:hover {
     color: #ffffff;
     background: #808A9F !important;
 }

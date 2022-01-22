@@ -1,0 +1,6 @@
+<ng-container *ngIf="items.length; else elseTemplate">
+    <p-splitButton class=" border-radius-6" [label]="label" [model]="items"> </p-splitButton>
+</ng-container>
+<ng-template #elseTemplate>
+    <span>{{label}}</span>
+</ng-template>

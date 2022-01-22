@@ -25,17 +25,6 @@ export class ActivityLogComponent implements OnInit {
   ) { }
 
   activityLogItems : ActivityLog[]
-  // [
-  //   {
-  //     logType: 'estimate',
-  //     logoSrc: 'assets/img/DevisLogo.png',
-  //     reference: 'D00001',
-  //     clientName: 'Client1',
-  //     date: moment(),
-  //     amount: 1200.50,
-  //     currency: 'MAD'
-  //   }
-  // ]
 
   ngOnInit() {
     this._statisticsServiceProxy.getActivityLog().subscribe(res => {

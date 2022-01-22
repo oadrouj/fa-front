@@ -34,7 +34,6 @@ export class FacturePayementComponent implements OnInit {
   ngOnInit(): void {
     
     this.initiateForm();
-    // this.formGroup.get('reference').setValue(this.config.data.reference)
     this.currency = this.config.data.currency
   }
 
@@ -51,7 +50,6 @@ export class FacturePayementComponent implements OnInit {
     if(this.formGroup.valid){
       this.ref.close(this.formGroup.value)
     }
-
   }
 
   closeDialog(){
