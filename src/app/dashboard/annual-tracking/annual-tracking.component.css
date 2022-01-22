@@ -1,0 +1,33 @@
+.legend-circle {
+    width: 1rem;
+    height: 1rem;
+    border: #fff 2.95px solid;
+}
+
+.legend-circle-late-invoices {
+    outline: #E8523F 1px solid;
+}
+
+.legend-circle-waiting-invoices {
+    outline: #F8B849 1px solid;
+}
+
+.legend-circle-cashed-invoices {
+    outline: #5CBCA6 1px solid;
+}
+
+.bg-red {
+    background: #E8523F;
+}
+
+.bg-yellow {
+    background: #F8B849;
+}
+
+.bg-green {
+    background: #5CBCA6;
+}
+
+:host>>>.legend-buttons button:hover {
+    color: #fff !important;
+}

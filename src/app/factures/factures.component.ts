@@ -118,12 +118,15 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
             break
 
           case 'Settle':
-            await this.showFacturePayementDialog()
+            await this.showFacturePayementDialog('addPayement')
             break
 
           case 'PartiallySettle':
-            await this.showFacturePayementDialog(true)
+            await this.showFacturePayementDialog('both')
             break
+          
+          case 'Historic':
+            await this.showFacturePayementDialog('historic')
 
         }
       }
@@ -154,7 +157,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   echeanceOptions = [15, 20, 30]
   statutOptions = [
     { value: FactureStatutEnum.Cree, label: 'Créé' },
-    { value: FactureStatutEnum.Valide, label: 'Validé' },
     { value: FactureStatutEnum.Regle, label: 'Réglé' },
     { value: FactureStatutEnum.ReglePartiellemt, label: 'Réglé Partiellement' },
     { value: FactureStatutEnum.PaiementAttente, label: 'Paiement en attente' },
@@ -208,13 +210,13 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     { header: 'TOTAL TTC', field: 'totalTtc', type: 'currency', colspan: 0 },
   ]
   
-  statusItems = [
+  factureStatusItems = [
     {
       actualStatus: FactureStatutEnum.ReglePartiellemt,
-      label: 'Régler',
+      label: 'Ajouter un paiement',
       icon: 'pi pi-check',
       command: async () => {
-        await this.showFacturePayementDialog(true)
+        this._estimateInvoiceStatusStateService.statusModifier = {statusAction: 'PartiallySettle',target: 'Invoice'}
       },
     },
     {
@@ -222,7 +224,16 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       label: 'Régler',
       icon: 'pi pi-check',
       command: async () => {
-        await this.showFacturePayementDialog()
+        this._estimateInvoiceStatusStateService.statusModifier = {statusAction: 'Settle',target: 'Invoice'}
+      },
+    },
+
+    {
+      actualStatus: FactureStatutEnum.PaiementRetard,
+      label: 'Régler',
+      icon: 'pi pi-check',
+      command: async () => {
+        this._estimateInvoiceStatusStateService.statusModifier = {statusAction: 'Settle',target: 'Invoice'}
       },
     },
 
@@ -231,22 +242,15 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       label: 'Valider',
       icon: 'pi pi-check',
       command: () => {
-        this.emitDialogStatus(DialogStatus.Edit, 'facture')
-        this.child.validateDevis(true).subscribe((res) => {
-          if (res.success) {
-            this._toastService.info({ detail: 'La facture est devient valide' })
-            this.selectedDevisItem = {
-              ...this.selectedDevisItem,
-              statut: this.parseStatutForStatutValide(
-                res.result.dateEmission,
-                res.result.echeancePaiement,
-              ),
-            }
-            this.tableChild.tableData.find(
-              (item) => item.id == this.selectedDevisItem.id,
-            ).statut = this.selectedDevisItem.statut
-          }
-        })
+        this._estimateInvoiceStatusStateService.statusModifier = {statusAction: 'Validate',target: 'Invoice'}
+      },
+    },
+    {
+      actualStatus: FactureStatutEnum.Regle,
+      label: 'Voir l\'historique',
+      icon: 'pi pi-check',
+      command: async () => {
+        this._estimateInvoiceStatusStateService.statusModifier = {statusAction: 'Historic',target: 'Invoice'}
       },
     },
   ]
@@ -270,11 +274,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   emitDateFilterEvent(event){
     if(this.selectedDate.every(x => x != null))
       this.emitFilterEvent('filterByButton', null)
-  }
-
-  getStatusOptions() {
-    let actualStatus = this.selectedDevisItem && this.selectedDevisItem.statut
-    return this.statusItems.filter((item) => item.actualStatus == actualStatus)
   }
 
   formatStatut(statut?: FactureStatutEnum) {
@@ -716,7 +715,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     )
   }
 
-  async showFacturePayementDialog(isPartiallySettled = false) {
+  async showFacturePayementDialog(tabPanelShowMode: 'both' | 'addPayement' | 'historic') {
     let facturePayementInfo: FactureInfosPaiementDto = new FactureInfosPaiementDto(
       {
         factureId: this.selectedDevisItem.id,
@@ -736,7 +735,8 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         factureId: this.selectedDevisItem.id,
         status: this.selectedDevisItem.statut,
         restAmount: restAmount,
-        currency:  this.selectedDevisItem.currency
+        currency:  this.selectedDevisItem.currency,
+        tabPanelShowMode: tabPanelShowMode
       },
       header: 'Réler le payement',
       width: '34vw',

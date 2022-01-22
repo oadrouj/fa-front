@@ -45,6 +45,7 @@
                             "./node_modules/primeflex/primeflex.css",
                             "src/styles.css"
 
+
                         ],
                         "scripts": [
                             "node_modules/moment/min/moment.min.js",
@@ -53,7 +54,8 @@
                             "node_modules/push.js/bin/push.min.js",
                             "node_modules/abp-web-resources/Abp/Framework/scripts/abp.js",
                             "src/assets/abp-web-resources/abp.freeze-ui.js",
-                            "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.moment.js"
+                            "node_modules/abp-web-resources/Abp/Framework/scripts/libs/abp.moment.js",
+                            "node_modules/chart.js/dist/Chart.js"
                         ]
                     },
                     "configurations": {

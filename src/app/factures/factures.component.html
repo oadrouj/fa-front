@@ -39,7 +39,7 @@
             </div>
 
             <app-table #dt1 [cols]="cols" [styleClass]="'table'" (selectionChange)="selectionChange($event)" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [rowDeletedEvent]="rowDeletedSubject.asObservable()" [filterEvent]="filterSubject.asObservable()"
-                [getListApi$]="getListDevisApi$" [SelectItemEvent]="notifySelectedDevisChanged.asObservable()" [globalFilterFields]="['reference','client','dateEmission','echeancePaiement', 'montantTtc','statut']">
+                [getListApi$]="getListDevisApi$" [SelectItemEvent]="notifySelectedDevisChanged.asObservable()" [statusItems]="factureStatusItems" [globalFilterFields]="['reference','client','dateEmission','echeancePaiement', 'montantTtc','statut']">
             </app-table>
 
             <div class="devisTotal flex justify-content-between align-items-center w-100">

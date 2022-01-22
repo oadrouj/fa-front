@@ -6,7 +6,7 @@
                 <ng-template pTemplate="display">
                     <p-button [label]="monthTargetAmount + ' MAD'" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg"></p-button>
                 </ng-template>
-                <ng-template pTemplate="content" [display]="displayContent">
+                <ng-template pTemplate="content">
                     <!-- <input type="text" [(ngModel)]="newMonthTargetAmount" pInputText> -->
                     <p-inputNumber [(ngModel)]="newMonthTargetAmount" mode="decimal" [minFractionDigits]="2" placeholder="">
                     </p-inputNumber>

@@ -39,8 +39,8 @@
 
                     <ng-container *ngSwitchCase="'estimate-invoice-status-component'">
                         <td [colSpan]="colVar.colspan">
-                            <app-estimate-invoice-status [status]="rowData['statut']">
-                            </app-estimate-invoice-status>
+                            <app-document-status [label]="colVar.format(colMethod(rowData, 'statut'))" [items]="getStatusItems(rowData['statut'])">
+                            </app-document-status>
 
                         </td>
                     </ng-container>

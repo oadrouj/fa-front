@@ -1,12 +1,14 @@
 <div class="px-3 text-lg">
     <div class="header flex justify-content-between align-items-baseline">
-        <h4>[Période, mois courant par défaut]</h4>
+        <h4>{{'[Période, ' + parseDate() + ' ]'}}
+        </h4>
         <div class="flex">
             <div class="position-relative mr-4">
                 <button pButton pRipple type="button" [label]="'Début'" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg" (click)="startDateInline=!startDateInline">
                     <img src="assets/img/dashbord-date.png" alt="" class="mr-2">
                 </button>
-                <p-calendar [(ngModel)]="startDate" [inline]="startDateInline" (onSelect)="selectStartDate()"></p-calendar>
+                <p-calendar [(ngModel)]="startDate" [inline]="startDateInline" (onSelect)="selectStartDate()">
+                </p-calendar>
             </div>
             <div class="position-relative">
                 <button pButton pRipple type="button" [label]="'Fin'" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg" (click)="endDateInline=!endDateInline">
@@ -24,16 +26,17 @@
                 <svg viewBox="0 0 36 36" class="invoice-circular-chart text-an">
 
                     <path id="path" class="circle" stroke='#F8B849'
-                    [attr.stroke-dasharray]="[pendingInvoicesAmountPercentage + cashedInvoicesAmountPercentage + lateInvoicesAmountPercentage, totalLength]"
-                     d="M18 2.0845
+                        [attr.stroke-dasharray]="[pendingInvoicesAmountPercentage + cashedInvoicesAmountPercentage + lateInvoicesAmountPercentage, totalLength]"
+                        d="M18 2.0845
                     a 15.9155 15.9155 0 0 1 0 31.831
                     a 15.9155 15.9155 0 0 1 0 -31.831" />
 
                     <path class="circle" stroke="#4CC790"
-                        [attr.stroke-dasharray]="[cashedInvoicesAmountPercentage + lateInvoicesAmountPercentage, totalLength]" d="M18 2.0845
+                        [attr.stroke-dasharray]="[cashedInvoicesAmountPercentage + lateInvoicesAmountPercentage, totalLength]"
+                        d="M18 2.0845
                         a 15.9155 15.9155 0 0 1 0 31.831
                         a 15.9155 15.9155 0 0 1 0 -31.831" />
-                  
+
                     <path class="circle" stroke='#E8523F'
                         [attr.stroke-dasharray]="[lateInvoicesAmountPercentage, totalLength]" d="M18 2.0845
                         a 15.9155 15.9155 0 0 1 0 31.831
@@ -71,7 +74,8 @@
                     </div>
                     <div class="flex justify-content-between mt-2">
                         <span class="">Transformé</span>
-                        <span class="color-dashboard font-medium">{{transformedInvoicesAmount | number:'1.2-2' }} {{'MAD'}}</span>
+                        <span class="color-dashboard font-medium">{{transformedInvoicesAmount | number:'1.2-2' }}
+                            {{'MAD'}}</span>
                     </div>
                 </div>
                 <div class="col-1"></div>
@@ -80,12 +84,14 @@
                         <path class="circle" stroke='#F1F3F8' [attr.stroke-dasharray]="[100, 100]" d="M18 2.0845
                             a 15.9155 15.9155 0 0 1 0 31.831
                             a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path class="circle" stroke="#4CC790" [attr.stroke-dasharray]="[transformationPercentage, 100]" d="M18 2.0845
+                        <path class="circle" stroke="#4CC790" [attr.stroke-dasharray]="[transformationPercentage, 100]"
+                            d="M18 2.0845
                             a 15.9155 15.9155 0 0 1 0 31.831
                             a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <text x="25%" y="18" class="estimate-circle-text ">Taux de </text>
                         <text x="25%" y="22" class="estimate-circle-text ">transformation</text>
-                        <text x="25%" y="31" class="estimate-circle-percentage-text ">{{(transformationPercentage || 0) | number:'1.2-2' }}%</text>
+                        <text x="25%" y="31"
+                            class="estimate-circle-percentage-text ">{{(transformationPercentage || 0) | number:'1.2-2' }}%</text>
                     </svg>
                 </div>
             </div>
@@ -96,7 +102,8 @@
                         <div class="w-6rem inline-flex">
                             <span class="">{{item.catalogName}}</span>
                         </div>
-                        <p-progressBar [value]="getBestsellerPercentage(item.amount)" [showValue]="false"></p-progressBar>
+                        <p-progressBar [value]="getBestsellerPercentage(item.amount)" [showValue]="false">
+                        </p-progressBar>
                         <div class="product-price text-xl text-right inline-flex ml-3">
                             <span>{{item.amount | number:'1.2-2' }} {{'MAD'}}</span>
                         </div>

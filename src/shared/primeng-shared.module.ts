@@ -40,11 +40,11 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ItemPreviewComponent} from './components/item-preview/item-preview.component'
 import {FileUploadModule} from 'primeng/fileupload';
 import { NgxdModule } from '@ngxd/core';
-import { EstimateInvoiceStatusComponent } from './components/estimate-invoice-status/estimate-invoice-status.component'
+import { DocumentStatusComponent } from './components/document-status/document-status.component'
 import { EstimateInvoiceStatusStateService } from './services/estimate-invoice-status-state.service'
 import { DataViewModule } from 'primeng/dataview';
 import {InplaceModule} from 'primeng/inplace';
-import { ProgressBarModule } from 'primeng/progressbar';
+import {ListboxModule} from 'primeng/listbox';
 
 @NgModule({
   imports: [
@@ -83,14 +83,14 @@ import { ProgressBarModule } from 'primeng/progressbar';
     VirtualScrollerModule,
     DataViewModule,
     InplaceModule,
-    ProgressBarModule
+    ListboxModule
   ],
 
   declarations: [
     TableComponent,  
     FacturesDialogComponent,
     ItemPreviewComponent,
-    EstimateInvoiceStatusComponent,
+    DocumentStatusComponent,
   ],
   providers: [MessageService, ConfirmationService, ToastService, ConfirmDialogService],
   exports: [
@@ -127,13 +127,13 @@ import { ProgressBarModule } from 'primeng/progressbar';
     TableComponent,  
     FacturesDialogComponent,
     ItemPreviewComponent,
-    EstimateInvoiceStatusComponent,
+    DocumentStatusComponent,
     FileUploadModule,
     NgxdModule,
     VirtualScrollerModule,
     DataViewModule,
     InplaceModule, 
-    ProgressBarModule
+    ListboxModule
   ],
 })
 export class PrimengSharedModule { }

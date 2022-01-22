@@ -1,0 +1,30 @@
+:host>>>.p-calendar .p-inputtext {
+    display: none;
+}
+
+:host>>>.p-calendar {
+    position: absolute;
+    right: 0;
+    top: 110%;
+}
+
+:host>>>.p-button {
+    background-color: #EFF3FB !important;
+    color: #4D4D4D;
+    border: none;
+}
+
+:host>>>.p-listbox {
+    max-height: 13.25rem;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    top: 110%;
+    z-index: 10;
+    width: 100%;
+}
+
+img {
+    width: 1rem;
+    height: 1rem;
+}

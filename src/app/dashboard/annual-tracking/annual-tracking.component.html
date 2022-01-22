@@ -1,0 +1,51 @@
+<div class="px-3 text-lg">
+    <h4>Votre CA annual</h4>
+
+    <div class="chart-buttons-box flex justify-content-between mb-3">
+
+        <div class="legend-buttons ml-6">
+            <ng-container *ngIf="busnissDocumentDropdownButtonLabel == 'Factures' || !busnissDocumentDropdownButtonLabel; else elseTemplate">
+                <button pButton pRipple type="button" label="" class="p-button-text p-button-secondary text-sm" (click)="toggleLatePaymentInvoices()">
+                    <div class="legend-circle legend-circle-late-invoices  border-circle mr-2"
+                        [ngClass]="{'bg-red': chart.data ? (!chart.data.datasets[0].hidden) : true}"></div>
+                    Factures en retard de paiement
+                </button>
+                <button pButton pRipple type="button" label="" class="p-button-text p-button-secondary text-sm" (click)="toggleWaitingPaymentInvoices()">
+                    <div class="legend-circle legend-circle-waiting-invoices  border-circle mr-2 "
+                        [ngClass]="{'bg-yellow': chart.data ? (!chart.data.datasets[1].hidden) : true}"></div>
+                    Factures en attente de paiement
+                </button>
+                <button pButton pRipple type=" button " label=" " class="p-button-text p-button-secondary text-sm" (click)="toggleCashedPaymentInvoices()">
+                    <div class="legend-circle legend-circle-cashed-invoices  border-circle mr-2"
+                        [ngClass]="{'bg-green': chart.data ? (!chart.data.datasets[2].hidden) : true}"></div>
+                    Factures Encaissées
+                </button>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <button pButton pRipple type="button" label="" class="p-button-text p-button-secondary text-sm" (click)="toggleLatePaymentInvoices()">
+                    <div class="legend-circle legend-circle-cashed-invoices  border-circle mr-2"
+                        [ngClass]="{'bg-green': chart.data ? (!chart.data.datasets[0].hidden) : true}"></div>
+                    Devis Validés
+                </button>
+                <button pButton pRipple type="button" label="" class="p-button-text p-button-secondary text-sm" (click)="toggleWaitingPaymentInvoices()">
+                    <div class="legend-circle legend-circle-waiting-invoices  border-circle mr-2 "
+                        [ngClass]="{'bg-yellow': chart.data ? (!chart.data.datasets[1].hidden) : true}"></div>
+                    Devis Transformé
+                </button>
+            </ng-template>
+
+
+
+        </div>
+
+        <div>
+            <app-dropdown-button class="mr-4" [label]="busnissDocumentDropdownButtonLabel" [dropdownType]="'listBox'" [listOptions]="['Factures', 'Devis']" [imagesSrc]="busnissDocummentImagesSrc" (clickEventEmit)="updateBusnissDocumentValue($event)">
+            </app-dropdown-button>
+
+            <app-dropdown-button [label]="yearDropdownButtonLabel" [dropdownType]="'listBox'" [listOptions]="years" (clickEventEmit)="updateYearValue($event)"></app-dropdown-button>
+
+        </div>
+    </div>
+    <p-chart #chart [type]="type" [data]="basicData" [options]="basicOptions" [height]="'50vh'" class="mt-2"></p-chart>
+
+</div>
