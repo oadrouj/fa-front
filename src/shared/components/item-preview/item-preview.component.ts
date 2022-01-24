@@ -13,6 +13,7 @@ import * as moment from 'moment'
 import { AppSessionService } from '../../session/app-session.service'
 import jsPDF from 'jspdf'
 import { URL } from 'url'
+import { InfosEntrepriseServiceProxy } from '@shared/service-proxies/service-proxies'
 
 export interface ItemPreviewComponentArgs {
   item: any
@@ -28,9 +29,11 @@ export interface ItemPreviewComponentArgs {
   styleUrls: ['./item-preview.component.scss'],
 })
 export class ItemPreviewComponent implements OnInit {
+  entrepriseName: any
   constructor(
     private _sessionService: AppSessionService,
     private _ref: ChangeDetectorRef,
+    private _infosEntrepriseService: InfosEntrepriseServiceProxy,
   ) {}
 
   @Input() item: any
@@ -53,7 +56,11 @@ export class ItemPreviewComponent implements OnInit {
     { header: 'TVA', field: 'tva', type: 'pourcentage' },
     { header: 'TOTAL TTC', field: 'totalTtc', type: 'currency', colspan: 0 },
   ]
-  ngOnInit() {}
+  ngOnInit() {
+    this._infosEntrepriseService.getGeneralInfos().subscribe(res => {
+      this.entrepriseName = res.raisonSociale
+    })
+  }
 
   getUserName = () => this._sessionService.user.userName
 
