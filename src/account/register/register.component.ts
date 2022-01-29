@@ -44,6 +44,7 @@ export class RegisterComponent extends AppComponentBase {
         }
 
         // Autheticate
+        
         this.saving = true;
         this.authService.authenticateModel.userNameOrEmailAddress = this.model.userName;
         this.authService.authenticateModel.password = this.model.password;

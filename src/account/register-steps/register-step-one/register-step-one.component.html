@@ -1,54 +1,47 @@
 <div id="step-one-root-div">
-    <table id="tbl-timeline" class=" mx-auto mt-6 mb-6">
-        <tr>
-            <td><img src="../../../assets/img/EtapeUnBackground.png" /><label>1</label></td>
-            <td><img src="../../../assets/img/EtapeDeuxBackground.png" /></td>
-            <td><img src="../../../assets/img/EtapeTroiBackground.png" /></td>
-            <td><img src="../../../assets/img/EtapeUnBackground.png" /></td>
-            <td><img src="../../../assets/img/EtapeQuatreBackground.png" /></td>
-        </tr>
-    </table>
+    <app-register-timeline step="1"></app-register-timeline>
     <div id="form" class="mx-auto">
 
-        <p class="groupText text-left mt-6">Saisissez votre E-mail</p>
+        <p class="groupText text-left mt-4">Saisissez votre E-mail</p>
         <p class="label text-left">Cet e-mail n’est pas nécessairement celui à afficher sur vos documents, il peut s’agir de votre e-mail personnel ou de celui de votre entreprise</p>
         <div class="input-block">
-            <input type="email" name="emailAddress" pInputText
-                [(ngModel)]="model.emailAddress"
-                (change)="validateEmail()"/>
+            <input type="email" name="emailAddress" pInputText [(ngModel)]="model.emailAddress" (change)="validateEmail()" />
             <img src="../../../assets/img/IconeAdresseMail.png" />
         </div>
         <span class="validationMessage" *ngIf="emailAddressExiste">Cette adresse mail existe déjà !</span>
         <span class="validationMessage" *ngIf="emailRequired">Veuillez saisir votre adresse mail !</span>
         <span class="validationMessage" *ngIf="emailNonValide">Veuillez saisir une adresse mail valide !</span>
 
-        <p class="groupText text-left mt-6">Choisissez votre mot de passe</p>
+        <p class="groupText text-left mt-4">Choisissez votre mot de passe</p>
         <p class="label text-left">Votre mot de passe doit contenir au moins un caractère en minuscule, un caractère en majuscule, un chiffre et un caractère spécial</p>
         <div class="input-block">
-            <input type="password" name="firstPassword" pInputText
-                [(ngModel)]="firstPassword"
-                (change)="validatePassword()" />
+            <input type="password" name="firstPassword" pInputText [(ngModel)]="firstPassword" (change)="validatePassword()" />
             <img src="../../../assets/img/IconeMDP.png" />
         </div>
-        <span class="validationMessage" *ngIf="passwordDidntRepectRegex">Votre mot de passe doit contenir au moins huit caractères, 
+        <span class="validationMessage" *ngIf="passwordDidntRepectRegex">Votre mot de passe doit contenir au moins huit
+            caractères,
             au moins une lettre majuscule, une lettre minuscule et un chiffre et un caractère spécial !</span>
 
-        <p class="groupText text-left mt-6">Confirmez votre mot de passe</p>
+        <p class="groupText text-left mt-4">Confirmez votre mot de passe</p>
         <p class="label text-left">Cette case vous permet de vous assurer que vous avez saisi le bon mot de passe</p>
         <div class="input-block">
-            <input type="password" name="password" pInputText
-                [(ngModel)]="model.password"
-                (change)="validatePassword()" />
+            <input type="password" name="password" pInputText [(ngModel)]="model.password" (change)="validatePassword()" />
             <img src="../../../assets/img/IconeMDP.png" />
         </div>
         <span class="validationMessage" *ngIf="passwordDontMatch">Les deux mots de passe ne correspondent pas !</span>
 
-        <div class="grid mt-4">
-            <div class="col-12 mr-5">
-                <div id="div-btn-valider">
-                    <p-button label="Valider" (click)="save()"></p-button>
-                </div>
+        <div class="mt-4">
+            <div id="div-btn-valider">
+                <p-button label="Valider" (click)="save()"></p-button>
+            </div>
+            <div class="p-2 text-center text-lg">
+                <span class="gray-color">Vous avez déja un compte ? 
+                    <a href="" class="pruple-color font-bold" >Connectez-vous</a>
+                </span>
             </div>
         </div>
+
     </div>
 </div>
+
+<!-- <app-register-step-three></app-register-step-three> -->

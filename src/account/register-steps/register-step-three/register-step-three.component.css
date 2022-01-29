@@ -1,100 +1,38 @@
-p {
-    width: 100%;
-    font: Frutiger;
+.wrapper {
+    width: 55%;
+}
+
+.pruple-color {
+    color: #4A266B;
+}
+
+.gray-color {
     color: #898E99;
-    margin-bottom: 0px;
 }
-.message {
-    font-size: 46px;
-    font-weight: bold;
+
+:host>>>.p-slider.p-slider-vertical {
+    width: 1.25rem;
+    height: 24.5rem;
+    border-radius: 1rem;
+    background: #79BBE1;
 }
-.consigne {
-    font-size: 28px;
+
+.sliderValueContainer {
+    height: 24.5rem;
+    margin-top: 0.7rem;
 }
-#form {
-    width: 60%;
+
+:host>>>.p-slider-range {
+    border-radius: 1rem;
 }
-.groupText {
-    font-size: 30px;
-    font-weight: bold;
-    margin-bottom: 3px;
-    margin-top: 18px;
+
+:host>>>.p-slider-vertical .p-slider-handle {
+    left: 15%;
+    width: 2rem;
+    height: 2rem;
+    background: #2196F3;
 }
-#div-cards {
-    align-items: center;
-    justify-content: center;
-}
-:host >>> p-card .p-card {
-    width: 200px;
-    height: 200px;
-    border-radius: 15px;
-}
-:host >>> .p-card-body {
-    height: 100%;
-    width: 100%;
-    padding: 0px;
-}
-:host >>> .p-card-content {
-    height: 100%;
-    width: 100%;
-    padding: 0px;
-}
-div.card-content {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 25px;
-    text-align: center;
-    font-weight: bold;
-    color: #898E99;
-    border-radius: 15px;
-}
-:host >>> p-card .p-card:hover div.card-content {
-    color: white;
-    background-color: #EBA20C;
-    cursor: pointer;
-}
-div.card-selected {
-    color: white !important;
-    background-color: #EBA20C !important;
-    cursor: pointer !important;
-}
-#div-btn-valider {
-    padding: 0px 1%;
-}
-:host >>> #div-btn-valider button {
-    background-color: #EBA20C;
-    border: none;
-    border-radius: 20px;
-    color: #FFFFFF;
-    width: 155px;
-    float: right;
-} 
-:host >>> #div-btn-valider:hover button {
-    background-color: #f5a608;
-}
-#tbl-timeline {
-    min-width: 580px;
-}
-#tbl-timeline > tr {
-    min-width: 580px;
-}
-#tbl-timeline > tr > td {
-    position: relative;
-    padding: 0px;
-    margin: 0px;
-    text-align: center;
-}
-#tbl-timeline > tr > td > img {
-    width: 100%;
-}
-#tbl-timeline > tr > td > label {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translateX(-50%);
-    transform: translateY(-50%);
-    color: white;
+
+.color-blue {
+    color: #2196F3;
 }

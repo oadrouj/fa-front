@@ -1,45 +1,45 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { CreateInfosEntrepriseInput, InfosEntrepriseServiceProxy } from '@shared/service-proxies/service-proxies';
-import { PrimeNGConfig } from 'primeng/api';
+import { AfterViewInit, Component, Input, OnInit } from '@angular/core'
+import { Router } from '@angular/router'
+import { AppAuthService } from '@shared/auth/app-auth.service'
+import {
+  CreateInfosEntrepriseInput,
+  SubscriptionsManagementServiceProxy,
+  TokenAuthServiceProxy,
+} from '@shared/service-proxies/service-proxies'
+import { PrimeNGConfig } from 'primeng/api'
 
 @Component({
   selector: 'app-register-step-three',
   templateUrl: './register-step-three.component.html',
-  styleUrls: ['./register-step-three.component.css']
+  styleUrls: ['./register-step-three.component.css'],
 })
 export class RegisterStepThreeComponent implements OnInit {
-
   @Input()
-  code: number;
+  code: number
+  selectedMonth = 1
+  handlePosition = '0%'
 
-  ppSelected: boolean = true;
-  aeSelected: boolean = false;
-  sarlSelected: boolean = false;
-  saSelected: boolean = false;
+  constructor(
+    private _authService: AppAuthService,
+    private _subscriptionsManagementServiceProxy: SubscriptionsManagementServiceProxy,
+  ) {}
 
-  status: string = "pp";
+  ngOnInit(): void {
 
-  model: CreateInfosEntrepriseInput = new CreateInfosEntrepriseInput();
-
-  raisonSocialeRequired: boolean = false;
-
-  constructor(private _router: Router,
-    private primengConfig: PrimeNGConfig) { }
- 
-  ngOnInit(): void { 
-    this.model.userId = this.code;
-    this.primengConfig.ripple = true;
-  }
-  select(selected): void {
-    this.status = selected;
-    this.ppSelected = selected == 'Professionnel particulier';
-    this.aeSelected = selected == 'Auto entrepreneur';
-    this.sarlSelected = selected == 'SARL';
-    this.saSelected = selected == 'SA';
   }
 
-  save() {
-        this._router.navigate(['/account/redirect'], { state: { route: '/account/reister', step: '4', status: this.status, userId: this.code} });
+  submit() {
+    this._authService.activateAccount(this.code, () => {
+      //Create a subscription
+       this._subscriptionsManagementServiceProxy.createFreeSubscription(this.code).subscribe(res => {
+       })
+    })
+  }
+
+  changeSlider(event) {
+    console.log(event)
+    this.handlePosition = (document.querySelector(
+      '.p-slider-handle',
+    ) as HTMLElement).style.bottom
   }
 }

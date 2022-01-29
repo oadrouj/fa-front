@@ -1287,7 +1287,7 @@ export class CustomAccountServiceProxy {
      * @param userId (optional) 
      * @return Success
      */
-    sendConfirmationEmail(emailAddress: string | null | undefined, prenom: string | null | undefined, userId: number | undefined): Observable<void> {
+    sendConfirmationEmail(emailAddress: string | null | undefined, prenom: string | null | undefined, userId: number | undefined): Observable<number> {
         let url_ = this.baseUrl + "/api/services/app/CustomAccount/SendConfirmationEmail?";
         if (emailAddress !== undefined && emailAddress !== null)
             url_ += "emailAddress=" + encodeURIComponent("" + emailAddress) + "&";
@@ -1303,6 +1303,7 @@ export class CustomAccountServiceProxy {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "text/plain"
             })
         };
 
@@ -1313,14 +1314,14 @@ export class CustomAccountServiceProxy {
                 try {
                     return this.processSendConfirmationEmail(<any>response_);
                 } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
+                    return <Observable<number>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<void>><any>_observableThrow(response_);
+                return <Observable<number>><any>_observableThrow(response_);
         }));
     }
 
-    protected processSendConfirmationEmail(response: HttpResponseBase): Observable<void> {
+    protected processSendConfirmationEmail(response: HttpResponseBase): Observable<number> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1329,14 +1330,73 @@ export class CustomAccountServiceProxy {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<void>(<any>null);
+        return _observableOf<number>(<any>null);
+    }
+
+    /**
+     * @param userId (optional) 
+     * @return Success
+     */
+    checkOrUpdateConfirmationEmailIsSent(userId: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/CustomAccount/checkOrUpdateConfirmationEmailIsSent?";
+        if (userId === null)
+            throw new Error("The parameter 'userId' cannot be null.");
+        else if (userId !== undefined)
+            url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCheckOrUpdateConfirmationEmailIsSent(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCheckOrUpdateConfirmationEmailIsSent(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCheckOrUpdateConfirmationEmailIsSent(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
     }
 
     /**
@@ -3685,7 +3745,7 @@ export class InfosEntrepriseServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    createInfosEntreprise(body: CreateInfosEntrepriseInput | undefined): Observable<void> {
+    createInfosEntreprise(body: CreateInfosEntrepriseInput | undefined): Observable<boolean> {
         let url_ = this.baseUrl + "/api/services/app/InfosEntreprise/CreateInfosEntreprise";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3697,6 +3757,7 @@ export class InfosEntrepriseServiceProxy {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
             })
         };
 
@@ -3707,14 +3768,14 @@ export class InfosEntrepriseServiceProxy {
                 try {
                     return this.processCreateInfosEntreprise(<any>response_);
                 } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
+                    return <Observable<boolean>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<void>><any>_observableThrow(response_);
+                return <Observable<boolean>><any>_observableThrow(response_);
         }));
     }
 
-    protected processCreateInfosEntreprise(response: HttpResponseBase): Observable<void> {
+    protected processCreateInfosEntreprise(response: HttpResponseBase): Observable<boolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -3723,14 +3784,17 @@ export class InfosEntrepriseServiceProxy {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<void>(<any>null);
+        return _observableOf<boolean>(<any>null);
     }
 
     /**
@@ -4033,113 +4097,6 @@ export class InfosEntrepriseServiceProxy {
     }
 
     protected processUpdateContactInfos(response: HttpResponseBase): Observable<boolean> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 !== undefined ? resultData200 : <any>null;
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<boolean>(<any>null);
-    }
-
-    /**
-     * @return Success
-     */
-    getAdministrativeInfos(): Observable<AdministrativeInfosDto> {
-        let url_ = this.baseUrl + "/api/services/app/InfosEntreprise/GetAdministrativeInfos";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAdministrativeInfos(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAdministrativeInfos(<any>response_);
-                } catch (e) {
-                    return <Observable<AdministrativeInfosDto>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<AdministrativeInfosDto>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetAdministrativeInfos(response: HttpResponseBase): Observable<AdministrativeInfosDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = AdministrativeInfosDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<AdministrativeInfosDto>(<any>null);
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
-    updateAdministrativeInfos(body: AdministrativeInfosDto | undefined): Observable<boolean> {
-        let url_ = this.baseUrl + "/api/services/app/InfosEntreprise/UpdateAdministrativeInfos";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json-patch+json",
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdateAdministrativeInfos(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUpdateAdministrativeInfos(<any>response_);
-                } catch (e) {
-                    return <Observable<boolean>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<boolean>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processUpdateAdministrativeInfos(response: HttpResponseBase): Observable<boolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -5264,7 +5221,6 @@ export class StatisticsServiceProxy {
         }));
     }
 
-    
     protected processCreateOrUpdateMonthTargetAmount(response: HttpResponseBase): Observable<boolean> {
         const status = response.status;
         const responseBlob =
@@ -5662,6 +5618,74 @@ export class StatisticsServiceProxy {
 }
 
 @Injectable()
+export class SubscriptionsManagementServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param userId (optional) 
+     * @return Success
+     */
+    createFreeSubscription(userId: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/SubscriptionsManagement/createFreeSubscription?";
+        if (userId === null)
+            throw new Error("The parameter 'userId' cannot be null.");
+        else if (userId !== undefined)
+            url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateFreeSubscription(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateFreeSubscription(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreateFreeSubscription(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
+    }
+}
+
+@Injectable()
 export class TenantServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -6006,6 +6030,121 @@ export class TokenAuthServiceProxy {
     }
 
     protected processAuthenticate(response: HttpResponseBase): Observable<AuthenticateResultModel> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AuthenticateResultModel.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<AuthenticateResultModel>(<any>null);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    getAccessToken(body: AuthenticateModel | undefined): Observable<GetAccessTokenModel> {
+        let url_ = this.baseUrl + "/api/TokenAuth/getAccessToken";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAccessToken(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAccessToken(<any>response_);
+                } catch (e) {
+                    return <Observable<GetAccessTokenModel>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<GetAccessTokenModel>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAccessToken(response: HttpResponseBase): Observable<GetAccessTokenModel> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAccessTokenModel.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<GetAccessTokenModel>(<any>null);
+    }
+
+    /**
+     * @param userId (optional) 
+     * @param token (optional) 
+     * @return Success
+     */
+    activateAccount(userId: number | undefined, token: string | null | undefined): Observable<AuthenticateResultModel> {
+        let url_ = this.baseUrl + "/api/TokenAuth/activateAccount?";
+        if (userId === null)
+            throw new Error("The parameter 'userId' cannot be null.");
+        else if (userId !== undefined)
+            url_ += "UserId=" + encodeURIComponent("" + userId) + "&";
+        if (token !== undefined && token !== null)
+            url_ += "Token=" + encodeURIComponent("" + token) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processActivateAccount(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processActivateAccount(<any>response_);
+                } catch (e) {
+                    return <Observable<AuthenticateResultModel>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<AuthenticateResultModel>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processActivateAccount(response: HttpResponseBase): Observable<AuthenticateResultModel> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -8098,7 +8237,6 @@ export enum ModePaiementEnum {
     Liquide = 2,
     Effet = 3,
 }
-
 export class DevisItemDto implements IDevisItemDto {
     designation: string | undefined;
     date: moment.Moment;
@@ -9056,7 +9194,6 @@ export interface IFactureDtoListResultDto {
     items: FactureDto[] | undefined;
 }
 
-
 export class FactureInfosPaiementDto implements IFactureInfosPaiementDto {
     datePaiement: moment.Moment;
     montantPaye: number;
@@ -9174,17 +9311,6 @@ export interface IFactureInfosPaiementDtoListResultWithTotalEntityItemsDto {
 export class CreateInfosEntrepriseInput implements ICreateInfosEntrepriseInput {
     raisonSociale: string | undefined;
     secteurActivite: string | undefined;
-    statutJuridique: string | undefined;
-    adresse: string | undefined;
-    codePostal: string | undefined;
-    ville: string | undefined;
-    pays: string | undefined;
-    telephone: string | undefined;
-    adresseMail: string | undefined;
-    ice: string | undefined;
-    if: string | undefined;
-    tp: string | undefined;
-    userId: number;
 
     constructor(data?: ICreateInfosEntrepriseInput) {
         if (data) {
@@ -9199,17 +9325,6 @@ export class CreateInfosEntrepriseInput implements ICreateInfosEntrepriseInput {
         if (_data) {
             this.raisonSociale = _data["raisonSociale"];
             this.secteurActivite = _data["secteurActivite"];
-            this.statutJuridique = _data["statutJuridique"];
-            this.adresse = _data["adresse"];
-            this.codePostal = _data["codePostal"];
-            this.ville = _data["ville"];
-            this.pays = _data["pays"];
-            this.telephone = _data["telephone"];
-            this.adresseMail = _data["adresseMail"];
-            this.ice = _data["ice"];
-            this.if = _data["if"];
-            this.tp = _data["tp"];
-            this.userId = _data["userId"];
         }
     }
 
@@ -9224,17 +9339,6 @@ export class CreateInfosEntrepriseInput implements ICreateInfosEntrepriseInput {
         data = typeof data === 'object' ? data : {};
         data["raisonSociale"] = this.raisonSociale;
         data["secteurActivite"] = this.secteurActivite;
-        data["statutJuridique"] = this.statutJuridique;
-        data["adresse"] = this.adresse;
-        data["codePostal"] = this.codePostal;
-        data["ville"] = this.ville;
-        data["pays"] = this.pays;
-        data["telephone"] = this.telephone;
-        data["adresseMail"] = this.adresseMail;
-        data["ice"] = this.ice;
-        data["if"] = this.if;
-        data["tp"] = this.tp;
-        data["userId"] = this.userId;
         return data; 
     }
 
@@ -9249,17 +9353,6 @@ export class CreateInfosEntrepriseInput implements ICreateInfosEntrepriseInput {
 export interface ICreateInfosEntrepriseInput {
     raisonSociale: string | undefined;
     secteurActivite: string | undefined;
-    statutJuridique: string | undefined;
-    adresse: string | undefined;
-    codePostal: string | undefined;
-    ville: string | undefined;
-    pays: string | undefined;
-    telephone: string | undefined;
-    adresseMail: string | undefined;
-    ice: string | undefined;
-    if: string | undefined;
-    tp: string | undefined;
-    userId: number;
 }
 
 export class InfosEntrepriseDto implements IInfosEntrepriseDto {
@@ -9271,9 +9364,6 @@ export class InfosEntrepriseDto implements IInfosEntrepriseDto {
     pays: string | undefined;
     telephone: string | undefined;
     adresseMail: string | undefined;
-    ice: string | undefined;
-    if: string | undefined;
-    tp: string | undefined;
     userId: number;
     user: UserDto;
     lastModificationTime: moment.Moment | undefined;
@@ -9301,9 +9391,6 @@ export class InfosEntrepriseDto implements IInfosEntrepriseDto {
             this.pays = _data["pays"];
             this.telephone = _data["telephone"];
             this.adresseMail = _data["adresseMail"];
-            this.ice = _data["ice"];
-            this.if = _data["if"];
-            this.tp = _data["tp"];
             this.userId = _data["userId"];
             this.user = _data["user"] ? UserDto.fromJS(_data["user"]) : <any>undefined;
             this.lastModificationTime = _data["lastModificationTime"] ? moment(_data["lastModificationTime"].toString()) : <any>undefined;
@@ -9331,9 +9418,6 @@ export class InfosEntrepriseDto implements IInfosEntrepriseDto {
         data["pays"] = this.pays;
         data["telephone"] = this.telephone;
         data["adresseMail"] = this.adresseMail;
-        data["ice"] = this.ice;
-        data["if"] = this.if;
-        data["tp"] = this.tp;
         data["userId"] = this.userId;
         data["user"] = this.user ? this.user.toJSON() : <any>undefined;
         data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
@@ -9361,9 +9445,6 @@ export interface IInfosEntrepriseDto {
     pays: string | undefined;
     telephone: string | undefined;
     adresseMail: string | undefined;
-    ice: string | undefined;
-    if: string | undefined;
-    tp: string | undefined;
     userId: number;
     user: UserDto;
     lastModificationTime: moment.Moment | undefined;
@@ -9543,65 +9624,6 @@ export interface IContactInfosDto {
     codePostal: string | undefined;
     telephone: string | undefined;
     adresseMail: string | undefined;
-    id: number;
-}
-
-export class AdministrativeInfosDto implements IAdministrativeInfosDto {
-    statutJuridique: string | undefined;
-    ice: string | undefined;
-    if: string | undefined;
-    tp: string | undefined;
-    id: number;
-
-    constructor(data?: IAdministrativeInfosDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.statutJuridique = _data["statutJuridique"];
-            this.ice = _data["ice"];
-            this.if = _data["if"];
-            this.tp = _data["tp"];
-            this.id = _data["id"];
-        }
-    }
-
-    static fromJS(data: any): AdministrativeInfosDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new AdministrativeInfosDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["statutJuridique"] = this.statutJuridique;
-        data["ice"] = this.ice;
-        data["if"] = this.if;
-        data["tp"] = this.tp;
-        data["id"] = this.id;
-        return data; 
-    }
-
-    clone(): AdministrativeInfosDto {
-        const json = this.toJSON();
-        let result = new AdministrativeInfosDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IAdministrativeInfosDto {
-    statutJuridique: string | undefined;
-    ice: string | undefined;
-    if: string | undefined;
-    tp: string | undefined;
     id: number;
 }
 
@@ -11427,6 +11449,53 @@ export interface IAuthenticateResultModel {
     encryptedAccessToken: string | undefined;
     expireInSeconds: number;
     userId: number;
+}
+
+export class GetAccessTokenModel implements IGetAccessTokenModel {
+    accessToken: string | undefined;
+    expireInSeconds: number;
+
+    constructor(data?: IGetAccessTokenModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.accessToken = _data["accessToken"];
+            this.expireInSeconds = _data["expireInSeconds"];
+        }
+    }
+
+    static fromJS(data: any): GetAccessTokenModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAccessTokenModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["accessToken"] = this.accessToken;
+        data["expireInSeconds"] = this.expireInSeconds;
+        return data; 
+    }
+
+    clone(): GetAccessTokenModel {
+        const json = this.toJSON();
+        let result = new GetAccessTokenModel();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IGetAccessTokenModel {
+    accessToken: string | undefined;
+    expireInSeconds: number;
 }
 
 export class ExternalLoginProviderInfoModel implements IExternalLoginProviderInfoModel {

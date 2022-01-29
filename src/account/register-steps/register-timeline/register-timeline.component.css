@@ -1,0 +1,27 @@
+#tbl-timeline {
+    min-width: 580px;
+}
+
+#tbl-timeline>tr {
+    min-width: 580px;
+}
+
+#tbl-timeline>tr>td {
+    position: relative;
+    padding: 0px;
+    margin: 0px;
+    text-align: center;
+}
+
+#tbl-timeline>tr>td>img {
+    width: 100%;
+}
+
+#tbl-timeline>tr>td>label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    transform: translateY(-50%);
+    color: white;
+}

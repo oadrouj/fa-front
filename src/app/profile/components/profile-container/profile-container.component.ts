@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators, } from '@angular/forms';
 import { FileUpload } from 'primeng/fileupload';
 import {GeneralInfoComponent} from '../general-info/general-info.component'
 import {ContactInfosComponent} from '../contact-infos/contact-infos.component'
-import { AdministrativeInfosComponent } from '../administrative-infos/administrative-infos.component';
 import { DefaultAnnotationsComponent } from '../default-annotations/default-annotations.component';
 
 @Component({
@@ -26,13 +25,12 @@ export class ProfileContainerComponent implements OnInit, AfterViewInit{
     
   ngOnInit() {
     switch(this.componentName){
-      case 'GeneralInfos': this.currentComponent = GeneralInfoComponent;
+
+      case 'GeneralInfos': this.currentComponent = GeneralInfoComponent; 
         break;
-      case 'ContactInfos': this.currentComponent = ContactInfosComponent;
+      case 'ContactInfos': this.currentComponent = ContactInfosComponent; 
         break;
-      case 'AdministrativeInfos': this.currentComponent = AdministrativeInfosComponent;
-        break;
-      case 'DefaultAnnotations': this.currentComponent = DefaultAnnotationsComponent;
+      case 'DefaultAnnotations': this.currentComponent = DefaultAnnotationsComponent; 
         break;
 
     }

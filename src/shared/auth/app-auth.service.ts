@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 import { TokenService, LogService, UtilsService } from 'abp-ng2-module';
 import { AppConsts } from '@shared/AppConsts';
 import { UrlHelper } from '@shared/helpers/UrlHelper';
@@ -26,7 +26,7 @@ export class AppAuthService {
         this.clear();
     }
 
-    logout(reload?: boolean): void {
+    public logout(reload?: boolean): void {
         abp.auth.clearToken();
         abp.utils.setCookieValue(
             AppConsts.authorization.encryptedAuthTokenName,
@@ -35,13 +35,12 @@ export class AppAuthService {
             abp.appPath
         );
         if (reload !== false) {
-            location.href = AppConsts.appBaseUrl;
+            location.href = AppConsts.appBaseUrl; 
         }
     }
 
-    authenticate(finallyCallback?: () => void): void {
+    public authenticate(finallyCallback?: () => void, noRedirectToApp = false): void {
         finallyCallback = finallyCallback || (() => { });
-
         this._tokenAuthService
             .authenticate(this.authenticateModel)
             .pipe(
@@ -50,25 +49,48 @@ export class AppAuthService {
                 })
             )
             .subscribe((result: AuthenticateResultModel) => {
-                this.processAuthenticateResult(result);
+              
+                this.processAuthenticateResult(result, noRedirectToApp);
             });
     }
 
+    public saveAccessTokenAfterSignup(authenticateModel: AuthenticateModel){
+        this._tokenAuthService.getAccessToken(authenticateModel).subscribe(res => {
+            console.log(res);
+            this._tokenService.setToken(res.accessToken, new Date(new Date().getTime() + 1000 * res.expireInSeconds))
+        })
+    }
+
+    public activateAccount(userId: number, finallyCallback?: () => void){
+        finallyCallback = finallyCallback || (() => { });
+        this.rememberMe = true;
+        this._tokenAuthService.activateAccount(userId, this._tokenService.getToken())
+        .pipe(
+            finalize(() => {
+                finallyCallback();
+            })
+        )
+        .subscribe((result: AuthenticateResultModel) => {
+            this.processAuthenticateResult(result, false, true);
+        });
+    }
+
     private processAuthenticateResult(
-        authenticateResult: AuthenticateResultModel
+        authenticateResult: AuthenticateResultModel,
+        noRedirectToApp = false,
+        isFirstConnection = false
     ) {
         this.authenticateResult = authenticateResult;
-
         if (authenticateResult.accessToken) {
-            // Successfully logged in
             this.login(
                 authenticateResult.accessToken,
                 authenticateResult.encryptedAccessToken,
                 authenticateResult.expireInSeconds,
-                this.rememberMe
+                this.rememberMe,
+                noRedirectToApp,
+                isFirstConnection
             );
         } else {
-            // Unexpected result!
 
             this._logService.warn('Unexpected authenticateResult!');
             this._router.navigate(['account/home']);
@@ -79,14 +101,16 @@ export class AppAuthService {
         accessToken: string,
         encryptedAccessToken: string,
         expireInSeconds: number,
-        rememberMe?: boolean
+        rememberMe?: boolean,
+        noRedirectToApp = false,
+        isFirstConnection = false
     ): void {
         const tokenExpireDate = rememberMe
             ? new Date(new Date().getTime() + 1000 * expireInSeconds)
             : undefined;
 
         this._tokenService.setToken(accessToken, tokenExpireDate);
-
+        
         this._utilsService.setCookieValue(
             AppConsts.authorization.encryptedAuthTokenName,
             encryptedAccessToken,
@@ -94,12 +118,14 @@ export class AppAuthService {
             abp.appPath
         );
 
-        let initialUrl = UrlHelper.initialUrl;
-        // if (initialUrl.indexOf('/login') > 0) {
-            initialUrl = AppConsts.appBaseUrl;
-        // }
+        if(!noRedirectToApp){
+            if(isFirstConnection)
+                location.href = AppConsts.appBaseUrl + '/app/Profil';
+            else 
+                location.href = AppConsts.appBaseUrl + '/app/Dashboard';
 
-        location.href = initialUrl;
+        }
+      
     }
 
     private clear(): void {
