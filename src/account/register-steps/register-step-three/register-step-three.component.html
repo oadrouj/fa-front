@@ -1,49 +1,36 @@
 <div>
-    <table id="tbl-timeline" class=" mx-auto mt-6 mb-6">
-        <tr>
-            <td><img src="../../../assets/img/EtapeUnBackground.png" /></td>
-            <td><img src="../../../assets/img/EtapeDeuxBackground.png" /></td>
-            <td><img src="../../../assets/img/EtapeTroiBackground.png" /><label>3</label></td>
-            <td><img src="../../../assets/img/EtapeUnBackground.png" /></td>
-            <td><img src="../../../assets/img/EtapeQuatreBackground.png" /></td>
-        </tr>
-    </table>
-    <p class="message text-center">Félicitations !</p>
-    <p class="message text-center">Votre adresse e-mail a été validée.</p>
-    <p class="consigne mt-4 text-center">Dites-nous en plus à propos de entité pour nous permettre de générer
-    </p>
-    <p class="consigne text-center">vos factures et devis personnalisés.</p>
-    <div id="form" class="mx-auto">
+    <app-register-timeline step="3"></app-register-timeline>
 
-        <div id="div-cards" class="text-center m-6 card-container d-flex">
-            <p-card class="m-6" (click)="select('Professionnel particulier')">
-                <div [ngClass]="ppSelected ? 'card-selected' : ''" class="card-content" pRipple>
-                    Professionnel particulier
-                </div>
-            </p-card>
-            <p-card class="m-6" (click)="select('Auto entrepreneur')">
-                <div [ngClass]="aeSelected ? 'card-selected' : ''" class="card-content" pRipple>
-                    Auto entrepreneur
-                </div>
-            </p-card>
-            <p-card class="m-6" (click)="select('SARL')">
-                <div [ngClass]="sarlSelected ? 'card-selected' : ''" class="card-content" pRipple>
-                    SARL
-                </div>
-            </p-card>
-            <p-card class="m-6" (click)="select('SA')">
-                <div [ngClass]="saSelected ? 'card-selected' : ''" class="card-content" pRipple>
-                    SA
-                </div>
-            </p-card>
+    <div class="wrapper mx-auto">
+        <div class="text-center mx-auto text-4xl gray-color">
+            <span class="block">Une dernière étape avant d’accéder à votre compte :</span>
+            <span class="block">choisissez votre formule</span>
         </div>
+        <div class="flex justify-content-center pt-5">
+            <app-subscription-card [headerTitle]="'ESSAI'" [description]="'Testez l\'ensemble des fonctionnalités de FACTURI gratuitement et sans engagement'" [priceModel]="'GRATUIT'" [price]="0" [primaryColor]="'#58BBA4'" [secondaryColor]="'#337062'" [features]="['10 Clients', '10 Products ou Services', '5 Devis', '5 Factures']"
+                (clickEmit)="submit()">
+            </app-subscription-card>
 
-        <div class="grid">
-            <div class="col-12 mt-3 mr-5">
-                <div id="div-btn-valider">
-                    <p-button label="Valider" (click)="save()"></p-button>
-                </div>
+            <div class="mx-4"></div>
+
+            <app-subscription-card [headerTitle]="'SOUSCRIPTION'" [description]="'Accédez à l\'ensemble des fonctionnalités de FACTURI de manière illimitée pour un tarif défiant toute concurence'" [priceModel]="'90 MAD par mois'" [price]="selectedMonth * 90" [primaryColor]="'#9470B5'"
+                [secondaryColor]="'#4A266B'" [features]="['Clients illimités', 'Products et Services illimitées', 'Devis illimités', 'Factures illimitées']" (clickEmit)="submit()">
+            </app-subscription-card>
+
+            <div class="mx-3"></div>
+            <p-slider [(ngModel)]="selectedMonth" [min]="1" [max]="12" [orientation]="'vertical'" (onChange)="changeSlider($event)"></p-slider>
+            <div class="sliderValueContainer position-relative ml-3 text-center">
+                <span class="sliderValue color-blue position-absolute font-bold w-5rem" [ngStyle]="{'bottom': handlePosition}">
+                    Tarif pour {{selectedMonth}}
+                    <span>Mois</span>
+                </span>
             </div>
         </div>
+        <div class="block font-bold text-right">
+            <span>Choisissez la durée de votre abonnement</span>
+            <!-- <img src="assets/img/payment-slider-arrow.jpg" alt=""> -->
+        </div>
+
+
     </div>
 </div>

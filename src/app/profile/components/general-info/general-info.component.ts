@@ -8,6 +8,7 @@ import {
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { DomSanitizer } from '@angular/platform-browser'
 import {
+  CreateInfosEntrepriseInput,
   FileApiServiceProxy,
   FileParameter,
   GeneralInfosDto,
@@ -58,8 +59,11 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
         }),
       )
       .subscribe((res) => {
-        this.dto = res
-        this.fillForm(res)
+        if(res) {
+          this.dto = res
+          this.fillForm(res)
+        }
+      
       })
   }
 
@@ -81,20 +85,19 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
   
   initiateForm() {
     return this._formBuider.group({
-      companyName: ['', Validators.required],
-      activityArea: ['', Validators.required],
+      companyName: [''],
+      activityArea: [''],
     })
   }
 
   fillForm(dto: GeneralInfosDto) {
     return this.formGroup.setValue({
-      companyName: dto.raisonSociale,
-      activityArea: dto.secteurActivite,
+      companyName: dto.raisonSociale || '',
+      activityArea: dto.secteurActivite || ''
     })
   }
 
   onSelectFile(event) {
-    console.log(event.files[0])
     this.displayedImage = event.files[0].objectURL
     this.uploadedImage = event.files[0]
     this.shouldShowDefaultImage = false
@@ -135,10 +138,7 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
           )
           .subscribe((res) => {
             if (res) {
-              //Toast success
-              console.log(res)
             } else {
-              //Toast failed
               this._toastService.error({
                 detail: 'Une erreur s\'est produite lors de la chargement du logo',
               })
@@ -171,7 +171,6 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
           
         }
       }
-      console.log(this.dto)
     }
     else {
       this._toastService.error({
@@ -181,24 +180,56 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
   }
 
   updateGeneralInfos() {
-    let generalInfosDto = new GeneralInfosDto({
-      ...this.dto,
-      raisonSociale: this.formGroup.value.companyName,
-      secteurActivite: this.formGroup.value.activityArea,
-    })
-    this._infosEntrepriseService
-      .updateGeneralInfos(generalInfosDto)
-      .subscribe((res) => {
-        if (res) {
-          this._toastService.success({
-            detail: 'Les informations générales sont modifiées',
-          })
-        } else {
-          this._toastService.error({
-            detail: 'Une erreur s\'est produite lors de la modification',
-          })
-        }
+    if(this.dto.id){
+
+      let generalInfosDto = new GeneralInfosDto({
+        ...this.dto,
+        raisonSociale: this.formGroup.value.companyName,
+        secteurActivite: this.formGroup.value.activityArea,
       })
+      this._infosEntrepriseService
+        .updateGeneralInfos(generalInfosDto)
+        .subscribe((res) => {
+          if (res) {
+            this._toastService.success({
+              detail: 'Les informations générales sont modifiées',
+            })
+          } else {
+            this._toastService.error({
+              detail: 'Une erreur s\'est produite lors de la modification',
+            })
+          }
+        })
+    }
+
+    else {
+
+      let createInfosEntrepriseInput = new CreateInfosEntrepriseInput({
+        raisonSociale: this.formGroup.value.companyName,
+        secteurActivite: this.formGroup.value.activityArea,
+      })
+      if(!createInfosEntrepriseInput.raisonSociale && !createInfosEntrepriseInput.secteurActivite)
+         this._toastService.error({
+              detail: 'Vous devez remplir au moins un chemps',
+            })
+      else { 
+        this._infosEntrepriseService.createInfosEntreprise(createInfosEntrepriseInput).subscribe((res) => {
+          // console.log(res);
+          // if (res) {
+            this._toastService.success({
+              detail: 'Les informations générales sont ajoutées',
+            })
+          // } 
+          // else {
+            // this._toastService.error({
+              // detail: 'Une erreur s\'est produite lors de l\' ajout',
+            // })
+          // }
+        })
+      }
+    
+    }
+   
     
   }
 

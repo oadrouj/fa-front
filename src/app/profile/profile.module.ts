@@ -9,7 +9,6 @@ import { InputGroupComponent } from './components/input-group/input-group.compon
 import { ProfileContainerComponent } from './components/profile-container/profile-container.component';
 import { GeneralInfoComponent } from './components/general-info/general-info.component';
 import { ContactInfosComponent } from './components/contact-infos/contact-infos.component';
-import { AdministrativeInfosComponent } from './components/administrative-infos/administrative-infos.component';
 import { DefaultAnnotationsComponent } from './components/default-annotations/default-annotations.component';
 import { ChangeProfileContainerTitleService } from '@shared/services/change-profile-container-title.service';
 
@@ -29,7 +28,6 @@ import { ChangeProfileContainerTitleService } from '@shared/services/change-prof
     TextareaGroupComponent,
     GeneralInfoComponent,
     ContactInfosComponent,
-    AdministrativeInfosComponent,
     DefaultAnnotationsComponent,
   ]
 })

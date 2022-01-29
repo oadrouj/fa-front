@@ -10,7 +10,6 @@ import { SharedModule } from '@shared/shared.module';
 import { AccountComponent } from './account.component';
 import { RegisterComponent } from './register/register.component';
 import { AccountLanguagesComponent } from './layout/account-languages.component';
-import { AccountHomeComponent } from './account-home/account-home.component';
 import { AccountFooterComponent } from './layout/account-footer.component';
 
 // tenants
@@ -25,22 +24,20 @@ import {TimelineModule} from 'primeng/timeline';
 import {DropdownModule} from 'primeng/dropdown';
 import {CardModule} from 'primeng/card';
 import {RippleModule} from 'primeng/ripple';
-
+import {SliderModule} from 'primeng/slider';
 
 import { AccountHeaderMinComponent } from './layout/account-header-min/account-header-min.component';
 import { RegisterStepsComponent } from './register-steps/register-steps.component';
 import { RegisterStepOneComponent } from './register-steps/register-step-one/register-step-one.component';
 import { RegisterStepTwoComponent } from './register-steps/register-step-two/register-step-two.component';
 import { RegisterStepThreeComponent } from './register-steps/register-step-three/register-step-three.component';
-import { RegisterStepFourComponent } from './register-steps/register-step-four/register-step-four.component';
-import { RegisterStepFiveComponent } from './register-steps/register-step-five/register-step-five.component';
-import { RegisterEndComponent } from './register-steps/register-end/register-end.component';
 import { RedirectComponent } from './redirect/redirect.component';
 import { ValidateMailComponent } from './validate-mail/validate-mail.component';
 import { IsUniqueEmailAddressDirective } from './directives/is-unique-email-address.directive';
 
 import {LoginComponent} from './login/login.component';
-
+import { RegisterTimelineComponent } from './register-steps/register-timeline/register-timeline.component'
+import { SubscriptionCardComponent } from './register-steps/register-step-three/subscription-card/subscription-card.component'
 @NgModule({
     imports: [
         CommonModule,
@@ -58,7 +55,8 @@ import {LoginComponent} from './login/login.component';
         TimelineModule,
         DropdownModule,
         CardModule,
-        RippleModule
+        RippleModule,
+        SliderModule
     ],
     declarations: [
         AccountComponent,
@@ -68,19 +66,18 @@ import {LoginComponent} from './login/login.component';
         // tenant
         TenantChangeComponent,
         TenantChangeDialogComponent,
-        AccountHomeComponent,
         AccountHeaderMinComponent,
         RegisterStepsComponent,
         RegisterStepOneComponent,
         RegisterStepTwoComponent,
         RegisterStepThreeComponent,
-        RegisterStepFourComponent,
-        RegisterStepFiveComponent,
         IsUniqueEmailAddressDirective,
         RedirectComponent,
-        RegisterEndComponent,
         ValidateMailComponent,
-        LoginComponent
+        LoginComponent, 
+        RegisterTimelineComponent,
+        SubscriptionCardComponent,
+        
     ],
     entryComponents: [
         // tenant

@@ -33,6 +33,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     ) {
     super(injector);
   }
+
   ngOnInit(): void {
     if(this._activatedRoute.snapshot.paramMap.has('resetPassword')) {
       this.seConnecterAreaShown = false;
@@ -56,7 +57,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
 
   login(): void {
     this.submitting = true;
-    this.authService.authenticate(() => (this.submitting = false));
+    this.authService.authenticate(() => {});
   }
 
   ShowForgotPass(): void {

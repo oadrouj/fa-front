@@ -10,13 +10,22 @@
             <div class="flex justify-content-between mb-3">
                 <div class="flex align-items-center">
                     <div class="logoContainer flex justify-content-center mr-4">
-                        <img [src]="log.logoSrc" alt="">
+                        <img [src]="mapImageSrc(log.logType)" alt="">
                     </div>
-                    <div class="">
-                        <span class="block">{{parseTitle(log.logType) + '-' + log.reference}}</span>
-                        <span class="color-dashboard mr-3">{{log.clientName || '-'}}</span>
-                        <span class="date">{{log.date.toDate() | date:'medium'}}</span>
-                    </div>
+
+                    <ng-container *ngIf="log.reference">
+                        <div class="">
+                            <span class="block">{{parseTitle(log.logType) + '-' + log.reference}}</span>
+                            <span class="color-dashboard mr-3">{{log.clientName || '-'}}</span>
+                            <span class="date">{{log.date.toDate() | date:'medium'}}</span>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="!log.reference && lodingIsComplete">
+                        <div class="">
+                            <span class="block">Historique Indisponible</span>
+                        </div>
+                    </ng-container>
+
                 </div>
                 <div>
                     <h6 class="block">{{log.amount ? ((log.amount | number:'1.2-2') + ' ' + log.currency | uppercase) : '-' }} </h6>

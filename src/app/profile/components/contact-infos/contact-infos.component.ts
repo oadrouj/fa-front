@@ -46,12 +46,12 @@ export class ContactInfosComponent implements OnInit {
 
   fillForm(dto: ContactInfosDto) {
     return this.formGroup.setValue({
-      addres: dto.adresse,
-      country: dto.pays,
-      telephone: dto.telephone,
-      city: dto.ville,
-      postalCode: dto.codePostal,
-      email: dto.adresseMail
+      addres: dto.adresse || null,
+      country: dto.pays || null,
+      telephone: dto.telephone || null,
+      city: dto.ville || null,
+      postalCode: dto.codePostal || null,
+      email: dto.adresseMail || null
     })
   } 
 

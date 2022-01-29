@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { GlobalEventsService } from '@shared/globalEventsService';
 import { ChangeProfileContainerTitleService } from '@shared/services/change-profile-container-title.service';
 import { DefaultAnnotationsComponent } from './components/default-annotations/default-annotations.component';
-import { ProfileContainerComponent } from './components/profile-container/profile-container.component';
 
 @Component({
   selector: 'app-profile',
