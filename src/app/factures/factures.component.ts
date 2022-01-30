@@ -5,12 +5,10 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core'
-import { BehaviorSubject, Subject, zip } from 'rxjs'
-import { DevisItem } from '../../shared/models/DevisItem'
+import { Subject, zip } from 'rxjs'
 import { DialogStatus } from '../../shared/enums/DialogState.enum'
 import {
   GlobalEventsService,
-  ModificationStatusEnum,
 } from '@shared/globalEventsService'
 import { FormatService } from '../../shared/services/format.service'
 import { FakeService } from '@shared/services/fake.service'
@@ -18,7 +16,6 @@ import {
   ClientForAutoCompleteDto,
   ClientForAutoCompleteDtoListResultDto,
   ClientServiceProxy,
-  DevisServiceProxy,
   FactureServiceProxy,
   FactureInfosPaiementDto,
   ModePaiementEnum,
@@ -36,12 +33,9 @@ import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 import { ConfirmEventType, LazyLoadEvent } from 'primeng/api'
 import { map } from 'rxjs/operators'
 import { TableComponent } from '@app/table/table.component'
-import { ConvertDevisToFactureService } from '@shared/services/ConvertDevisToFacture.service'
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog'
 import { FacturePayementComponent } from './facture-payement/facture-payement.component'
-import { AppConsts } from '@shared/AppConsts'
 import * as printJS from 'print-js'
-import { AppSessionService } from '@shared/session/app-session.service'
 import { DomSanitizer } from '@angular/platform-browser'
 import { ItemPreviewComponent } from '@shared/components/item-preview/item-preview.component'
 import html2canvas from 'html2canvas'
@@ -68,8 +62,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     private _confirmDialogService: ConfirmDialogService,
     public globalEventsService: GlobalEventsService,
     public dialogService: DialogService,
-    private _convertDevisToFactureService: ConvertDevisToFactureService,
-    private _sessionService: AppSessionService,
     private _fileApiServiceProxy: FileApiServiceProxy,
     private _estimateInvoiceStatusStateService: EstimateInvoiceStatusStateService,
     private _sanitizer: DomSanitizer,
@@ -129,6 +121,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
             await this.showFacturePayementDialog('historic')
 
         }
+        
+        document.body.style.overflow = 'auto'
+
       }
     })
   }

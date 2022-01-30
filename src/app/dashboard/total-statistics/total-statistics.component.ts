@@ -7,10 +7,10 @@ import { StatisticsServiceProxy } from '@shared/service-proxies/service-proxies'
   styleUrls: ['./total-statistics.component.scss']
 })
 export class TotalStatisticsComponent implements OnInit {
-  issuedEstimates: number;
-  products: number;
-  clients: number;
-  issuedInvoices: number;
+  issuedEstimates = 0;
+  products = 0;
+  clients = 0;
+  issuedInvoices = 0;
 
   constructor(
     private _statisticsServiceProxy: StatisticsServiceProxy

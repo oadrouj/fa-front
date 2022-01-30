@@ -145,6 +145,8 @@ export class DevisComponent implements OnInit, AfterViewInit {
             )
             break
         }
+
+        document.body.style.overflow = 'auto'
       }
     })
   }
@@ -621,13 +623,6 @@ export class DevisComponent implements OnInit, AfterViewInit {
       statutFilter = event.filters.statut && event.filters.statut.value
     }
 
-    let shouldReturnExpiredEstimates = false
-    
-    // if(statutFilter == DevisStatutEnum.Expire){
-    //   statutFilter = DevisStatutEnum.Valide
-    //   shouldReturnExpiredEstimates = true
-    // }
-
     return zip(
       this._devisServiceProxy.getAllDevisTotalRecords(
         0,
@@ -692,11 +687,6 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
           devis.montantTtc = montantTtc - (montantHt * devis.remise) / 100
         })
-
-        // if(shouldReturnExpiredEstimates || !statutFilter) 
-        //   data = data.filter(x => x.statut == DevisStatutEnum.Expire)
-        // else if(!shouldReturnExpiredEstimates)
-        //   data = data.filter(x => x.statut != DevisStatutEnum.Expire)
 
         return { items: data, length, montantTotalAllDevis }
       }),
