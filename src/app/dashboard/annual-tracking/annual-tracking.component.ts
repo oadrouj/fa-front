@@ -111,7 +111,7 @@ export class AnnualTrackingComponent implements OnInit, AfterViewInit {
     },
   }
 
-  applicationStartDate = 2021
+  applicationStartDate = 2022
   yearDropdownButtonLabel
   busnissDocumentDropdownButtonLabel
   years: Array<number>
@@ -135,7 +135,6 @@ export class AnnualTrackingComponent implements OnInit, AfterViewInit {
         this.yearDropdownButtonLabel || this.applicationStartDate,
       )
       .subscribe((res) => {
-        console.log(this.mapValuesToNull(res.cashedInvoicesSerie));
         this.chart.data.datasets[2].data = this.mapValuesToNull(res.cashedInvoicesSerie)
         this.chart.data.datasets[1].data = this.mapValuesToNull(res.waitingInvoicesSerie)
         this.chart.data.datasets[0].data = this.mapValuesToNull(res.lateInvoicesSerie)
@@ -165,7 +164,6 @@ export class AnnualTrackingComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    console.log(this.chart)
     this.fillInvoicesTrackingData()
   }
 

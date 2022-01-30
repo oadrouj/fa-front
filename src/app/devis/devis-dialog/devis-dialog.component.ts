@@ -633,7 +633,7 @@ export class DevisDialogComponent implements OnInit {
 
       dateEmission: this.getExactDate(formValue.dateEmission, new Date()),
       echeancePaiement: formValue.echeancePaiement,
-      messageIntroduction: formValue.messageIntroduction,
+      messageIntroduction: formValue.messageIntroduction || '',
       piedDePage: formValue.piedDePage,
       remise: this.devisOptionsFormGroup.get('remise').value ?? 0,
       statut: DevisStatutEnum.Undefined,
@@ -721,7 +721,7 @@ export class DevisDialogComponent implements OnInit {
     })
     this._toastService.info({
       summary: 'Opértion réussie',
-      detail: 'Vous avez ajouté ce devis en brouillon',
+      detail: 'Vous avez ajouté ce devis avec succés',
     })
   }
 
@@ -734,7 +734,7 @@ export class DevisDialogComponent implements OnInit {
         : this.selectedDevisItem.reference,
       dateEmission: formValue.dateEmission,
       echeancePaiement: +formValue.echeancePaiement,
-      messageIntroduction: formValue.messageIntroduction,
+      messageIntroduction: formValue.messageIntroduction || '',
       piedDePage: formValue.piedDePage,
       remise: this.devisOptionsFormGroup.get('remise').value,
       statut: devisStatus,
@@ -812,7 +812,7 @@ export class DevisDialogComponent implements OnInit {
 
     this._toastService.info({
       summary: 'Opértion réussie',
-      detail: 'Vous avez modifié ce devis en brouillon',
+      detail: 'Vous avez modifié ce devis avec succés',
     })
   }
 

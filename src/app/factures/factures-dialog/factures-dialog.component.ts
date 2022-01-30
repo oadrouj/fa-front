@@ -120,7 +120,6 @@ export class FacturesDialogComponent
           ...devisItem,
           client: devisItem.client,
         }
-        // dateEmission: this.selectedDevisItem.dateEmission.toDate()}
       },
     )
 
@@ -739,7 +738,7 @@ export class FacturesDialogComponent
       })
     this._toastService.info({
       summary: 'Opértion réussie',
-      detail: 'Vous avez ajouté cette facture en brouillon',
+      detail: 'Vous avez ajouté cette facture avec succés',
     })
   }
   
@@ -844,7 +843,7 @@ export class FacturesDialogComponent
 
     this._toastService.info({
       summary: 'Opértion réussie',
-      detail: 'Vous avez modifié cette facture en brouillon',
+      detail: 'Vous avez modifié cette facture avec succés',
     })
   }
 

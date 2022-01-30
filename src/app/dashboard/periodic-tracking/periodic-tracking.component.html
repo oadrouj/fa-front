@@ -25,6 +25,10 @@
             <div>
                 <svg viewBox="0 0 36 36" class="invoice-circular-chart text-an">
 
+                    <path class="circle" stroke='#EFF3FB' [attr.stroke-dasharray]="[100]" d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831" />
+
                     <path id="path" class="circle" stroke='#F8B849'
                         [attr.stroke-dasharray]="[pendingInvoicesAmountPercentage + cashedInvoicesAmountPercentage + lateInvoicesAmountPercentage, totalLength]"
                         d="M18 2.0845

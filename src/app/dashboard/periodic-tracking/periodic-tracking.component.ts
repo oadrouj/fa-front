@@ -46,36 +46,22 @@ export class PeriodicTrackingComponent implements OnInit {
     this._statisticsServiceProxy
     .getPeriodicTrackingInfos(startDate, endDate)
     .subscribe((res) => {
-      this.totalInvoicesAmount =
-        res.invoicePeriodicTrackingDto.totalInvoicesAmount
-      this.cashedInvoicesAmount =
-        res.invoicePeriodicTrackingDto.cashedInvoicesAmount
-      this.pendingInvoicesAmount =
-        res.invoicePeriodicTrackingDto.pendingInvoicesAmount
-      this.lateInvoicesAmount =
-        res.invoicePeriodicTrackingDto.lateInvoicesAmount
+      this.totalInvoicesAmount = res.invoicePeriodicTrackingDto.totalInvoicesAmount
+      this.cashedInvoicesAmount = res.invoicePeriodicTrackingDto.cashedInvoicesAmount
+      this.pendingInvoicesAmount = res.invoicePeriodicTrackingDto.pendingInvoicesAmount
+      this.lateInvoicesAmount = res.invoicePeriodicTrackingDto.lateInvoicesAmount
+      this.totalEstimatesAmount = res.estimatePeriodicTrackingDto.totalEstimatesAmount
+      this.transformedInvoicesAmount = res.estimatePeriodicTrackingDto.transformedInvoicesAmount
 
-      this.cashedInvoicesAmountPercentage =
-        (this.cashedInvoicesAmount / this.totalInvoicesAmount) *
-        this.totalLength
-      this.pendingInvoicesAmountPercentage =
-        (this.pendingInvoicesAmount / this.totalInvoicesAmount) *
-        this.totalLength
-      this.lateInvoicesAmountPercentage =
-        (this.lateInvoicesAmount / this.totalInvoicesAmount) *
-        this.totalLength
-
-      this.totalEstimatesAmount =
-        res.estimatePeriodicTrackingDto.totalEstimatesAmount
-      this.transformedInvoicesAmount =
-        res.estimatePeriodicTrackingDto.transformedInvoicesAmount
-      this.transformationPercentage =
-        (this.transformedInvoicesAmount * 100) / this.totalEstimatesAmount
+      this.cashedInvoicesAmountPercentage = ((this.cashedInvoicesAmount / this.totalInvoicesAmount) * this.totalLength ) || 0
+      this.pendingInvoicesAmountPercentage = ((this.pendingInvoicesAmount / this.totalInvoicesAmount) * this.totalLength ) || 0
+      this.lateInvoicesAmountPercentage = ((this.lateInvoicesAmount / this.totalInvoicesAmount) * this.totalLength) || 0
+      this.transformationPercentage = ((this.transformedInvoicesAmount * 100) / this.totalEstimatesAmount ) || 0
 
       this.bestsellerList = res.bestsellerPeriodicTrackingDto
-      this.bestsellerTotalAmounts = res.bestsellerPeriodicTrackingDto
+      this.bestsellerTotalAmounts = this.bestsellerList.length && (res.bestsellerPeriodicTrackingDto
         .map((item) => item.amount)
-        .reduce((accum, current) => accum + current)
+        .reduce((accum, current) => accum + current))
 
       this.topClientsList = res.topClientsPeriodicTrackingDto
     })

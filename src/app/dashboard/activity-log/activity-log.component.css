@@ -6,6 +6,10 @@
     border: none;
 }
 
+:host>>>.p-dataview-header h4 {
+    font-weight: normal;
+}
+
 :host>>>.p-dataview-header .p-button {
     background: #ECEFF2;
 }
