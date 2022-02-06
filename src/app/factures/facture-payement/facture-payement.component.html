@@ -22,7 +22,7 @@
                 </div>
                 <div class="flex justify-content-between mt-3 align-items-center">
                     <span>Date de paiement</span>
-                    <p-calendar formControlName="datePaiement" [appendTo]="container" dateFormat="dd/mm/yy"></p-calendar>
+                    <p-calendar formControlName="datePaiement" [appendTo]="container" dateFormat="dd/mm/yy" (onSelect)="selectDate($event)"></p-calendar>
                 </div>
                 <div class="flex justify-content-between mt-3 align-items-center">
                     <span>Mode de paiement</span>

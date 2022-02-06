@@ -16,7 +16,7 @@
                 <div>
                     <label for="" class="mb-3 block">Client</label>
                     <p-autoComplete formControlName="client" class="autocomplete" [virtualScroll]="true" placeholder="Sélectionner un client" [suggestions]="clientSuggestions" [itemSize]="34" (completeMethod)="clientAutoCompleteSearch($event)" (change)="onSelectClientAutoComplete()"
-                        (onSelect)="onSelectClient($event)" field="nom" [dropdown]="true">
+                        (onSelect)="onSelectClient($event)" field="displayName" [dropdown]="true">
                     </p-autoComplete>
 
                 </div>
@@ -209,7 +209,7 @@
                             <p-toggleButton onLabel="Désactiver" formControlName="tva" (onChange)="toggleTVAOption($event.checked)" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check"></p-toggleButton>
                         </p-accordionTab>
                         <p-accordionTab header="Devise">
-                            <p-dropdown formControlName="devise" [options]="devisOptions.devise.list" (onChange)="Currency = $event.value" [appendTo]="acrd" placeholder="Sélectionner un devise">
+                            <p-dropdown formControlName="devise" [options]="currencies" (onChange)="Currency = $event.value" [appendTo]="acrd" placeholder="Sélectionner un devise">
                             </p-dropdown>
                         </p-accordionTab>
                     </p-accordion>
@@ -220,133 +220,8 @@
 
 </p-dialog>
 
-<p-dialog #dlg id="dialogClient" header="'NOUVEAU CLIENT'" [(visible)]="clientDialogDisplay" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
+<app-client-dialog [dialogStatus]="clientDialogStatus" [display]="clientDialogIsVisible" (emitHideDialogEvent)="closeClientDialog($event)"></app-client-dialog>
 
-    <p-selectButton [options]="categories2" [(ngModel)]="formClient.categorieClient" optionLabel="name" optionValue="code" (click)="onFormCategorySelected()">
-    </p-selectButton>
-
-    <div class="grid blockForm mx-3 mt-4 mb-2">
-        <div class="col-12">
-            <span class="title">PROFIL</span>
-        </div>
-        <div class="col-5 label" *ngIf="isFormProfetionnel">
-            <span>Secteur d’activité</span>
-        </div>
-        <div class="col-7" *ngIf="isFormProfetionnel">
-            <input type="text" pInputText placeholder="Text..." [(ngModel)]="formClient.secteurActivite" />
-        </div>
-        <div class="col-5 label" *ngIf="isFormProfetionnel">
-            <span>ICE</span>
-        </div>
-        <div class="col-7" *ngIf="isFormProfetionnel">
-            <input type="text" pInputText placeholder="123..." pKeyFilter="pint" [(ngModel)]="formClient.ice" />
-        </div>
-        <div class="col-5 label" *ngIf="!isFormProfetionnel">
-            <span>Nom <span class="red-color">*</span></span>
-        </div>
-        <div class="col-7" *ngIf="!isFormProfetionnel">
-            <input type="text" pInputText placeholder="Text" class="{{nomClass}}" [(ngModel)]="formClient.nom" />
-        </div>
-    </div>
-
-    <div class="grid blockForm mx-3 mt-4 mb-2">
-        <div class="col-12">
-            <span class="title">Coordonnées</span>
-        </div>
-        <div class="col-5 label" *ngIf="isFormProfetionnel">
-            <span>Raison sociale <span class="red-color">*</span></span>
-        </div>
-        <div class="col-7" *ngIf="isFormProfetionnel">
-            <input type="text" pInputText placeholder="Text" class="{{rSClass}}" [(ngModel)]="formClient.raisonSociale" />
-        </div>
-        <div class="col-5 label">
-            <span>Adresse</span>
-        </div>
-        <div class="col-7">
-            <input type="text" pInputText placeholder="Text" [(ngModel)]="formClient.adresse" />
-        </div>
-        <div class="col-5 label">
-            <span>Pays</span>
-        </div>
-        <div class="col-7">
-            <p-dropdown [options]="countries" [(ngModel)]="formClient.pays" optionLabel="paysName" optionValue="paysName" [virtualScroll]="true" [itemSize]="31" [filter]="false"></p-dropdown>
-
-            <!-- <p-dropdown [options]="countries" [(ngModel)]="formClient.pays" optionLabel="name" optionValue="isoCode" name="Pays"></p-dropdown> -->
-        </div>
-        <div class="col-5 label">
-            <span>Ville</span>
-        </div>
-        <div class="col-7">
-            <input type="text" pInputText placeholder="Text" [(ngModel)]="formClient.ville" />
-        </div>
-        <div class="col-5 label">
-            <span>Code postal</span>
-        </div>
-        <div class="col-7">
-            <input type="text" pInputText placeholder="123..." pKeyFilter="pint" [(ngModel)]="formClient.codePostal" />
-        </div>
-        <div class="col-5 label">
-            <span>E-mail</span>
-        </div>
-        <div class="col-7">
-            <input type="text" pInputText placeholder="Text@Text.Text" pKeyFilter="email" [(ngModel)]="formClient.email" />
-        </div>
-        <div class="col-5 label">
-            <span>Téléphone fixe</span>
-        </div>
-        <div class="col-7">
-            <input type="text" pInputText placeholder="212 699 99 99 99" pKeyFilter="pint" [(ngModel)]="formClient.telFix" />
-        </div>
-        <div class="col-5 label">
-            <span>Téléphone portable</span>
-        </div>
-        <div class="col-7">
-            <input type="text" pInputText placeholder="212 699 99 99 99" pKeyFilter="pint" [(ngModel)]="formClient.telPortable" />
-        </div>
-        <div class="col-5 label" *ngIf="isFormProfetionnel">
-            <span>Site Web</span>
-        </div>
-        <div class="col-7" *ngIf="isFormProfetionnel">
-            <input type="text" pInputText placeholder="Text" [(ngModel)]="formClient.siteWeb" />
-        </div>
-    </div>
-
-
-    <div class="grid blockForm mx-3 mt-4 mb-2">
-        <div class="col-12">
-            <span class="title">MODALITÉS DE FACTURATION</span>
-        </div>
-        <div class="col-5 label">
-            <span>Devise de facturation</span>
-        </div>
-        <div class="col-7">
-            <p-dropdown [options]="devises" [(ngModel)]="formClient.deviseFacturation">
-            </p-dropdown>
-        </div>
-        <div class="col-5 label">
-            <span>Remise permanente</span>
-        </div>
-        <div class="col-7">
-            <p-inputNumber placeholder="00,00%" mode="decimal" suffix="%" :min="0" :max="100" [minFractionDigits]="2" [maxFractionDigits]="2" [(ngModel)]="formClient.remisePermanente"></p-inputNumber>
-        </div>
-        <div class="col-5 label">
-            <span>Délai de paiement</span>
-        </div>
-        <div class="col-7">
-            <p-dropdown [options]="echeancePayementOptions" [(ngModel)]="formClient.delaiPaiement" suffix=" Jours" [appendTo]="dlg" [showClear]="false">
-
-            </p-dropdown>
-            <!-- <p-inputNumber placeholder="123..." mode="decimal" suffix=" Jours" :min="0" [(ngModel)]="formClient.delaiPaiement"></p-inputNumber> -->
-        </div>
-    </div>
-    <ng-template pTemplate="footer">
-        <span><span class="red-color">*</span> Champ(s) obligatoire(s)</span>
-        <p-button id="buttonValider" (click)="valider()" label="Valider"></p-button>
-    </ng-template>
-</p-dialog>
-
-
-<!-- catalogue component -->
 <p-dialog #dialog id="dialogCatalogue" header="NOUVEL ITEM" [(visible)]="catalogueDialogDisplay" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
 
     <form [formGroup]="catalogueFormGroup">

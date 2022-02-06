@@ -93,7 +93,7 @@
     transform: scale(0.9)
 }
 
-.html2canvas * {
+.html2canvas th {
     color: black !important;
 }
 

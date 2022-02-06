@@ -46,6 +46,8 @@ import { DataViewModule } from 'primeng/dataview';
 import {InplaceModule} from 'primeng/inplace';
 import {ListboxModule} from 'primeng/listbox';
 
+import { ClientDialogComponent } from '../app/clients/client-dialog/client-dialog.component'
+
 @NgModule({
   imports: [
     CommonModule,
@@ -88,9 +90,11 @@ import {ListboxModule} from 'primeng/listbox';
 
   declarations: [
     TableComponent,  
+    DevisDialogComponent,
     FacturesDialogComponent,
     ItemPreviewComponent,
     DocumentStatusComponent,
+    ClientDialogComponent
   ],
   providers: [MessageService, ConfirmationService, ToastService, ConfirmDialogService],
   exports: [
@@ -124,16 +128,19 @@ import {ListboxModule} from 'primeng/listbox';
     ToggleButtonModule,
     SkeletonModule,
     DynamicDialogModule,
-    TableComponent,  
-    FacturesDialogComponent,
-    ItemPreviewComponent,
-    DocumentStatusComponent,
     FileUploadModule,
     NgxdModule,
     VirtualScrollerModule,
     DataViewModule,
     InplaceModule, 
-    ListboxModule
+    ListboxModule,
+
+    TableComponent,  
+    FacturesDialogComponent,
+    ItemPreviewComponent,
+    DocumentStatusComponent,
+    DevisDialogComponent,
+    ClientDialogComponent,
   ],
 })
 export class PrimengSharedModule { }

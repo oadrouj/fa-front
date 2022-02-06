@@ -1,0 +1,13 @@
+<p-dataView #dv [value]="paymentHistoryItems" [paginator]="true" [rows]="4" [lazy]="true" (onLazyLoad)="loadPaymentHistoryItemsLazy($event)" [totalRecords]="totalRecords">
+    <ng-template let-payment pTemplate="listItem">
+        <div class="payment-history border-round flex justify-content-between mb-2">
+            <div class="">
+                <h5 class="block mb-0">{{payment.datePaiement.toDate() | date:'shortDate'}}</h5>
+                <span class="block">Payé par {{formatPaymentMethod(payment.modePaiement)}}</span>
+            </div>
+            <div class="align-self-center">
+                <h5 class="block">{{payment.montantPaye | number:'1.2-2' }} {{currency | uppercase}}</h5>
+            </div>
+        </div>
+    </ng-template>
+</p-dataView>

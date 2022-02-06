@@ -1,11 +1,11 @@
-<div id="contentToConvert" #pdfTable>
+<div id="contentToConvert" #pdfTable [ngClass]="{'html2canvas': this.printingMode}">
     <div class="content pt-4">
         <div class="grid px-1">
             <div class="col-5 pt-1">
-                <img *ngIf="logoSrc" [src]="logoSrc" alt="">
+                <img [src]="logoSrc" alt="">
             </div>
             <div class="col-7 text-right">
-                <h2>{{title}} {{item && item.reference}}
+                <h2>{{title + ' ' + (item && item.reference)}}
                 </h2>
                 <span class="date block line-height-1">Date d'émission: {{item && item.dateEmission | date:'shortDate'}}
               </span>
@@ -31,7 +31,9 @@
         </div>
     </div>
 
-    <div id="pageHeader" class="mt-1 ml-4"></div>
+    <div id="pageHeader" class="mt-1 ml-4">
+        <span class='font-semibold'>Objet: </span> {{this.item && this.item.messageIntroduction || ''}}
+    </div>
 
     <p-table [columns]="contentItemsCols" [value]="item && (item.devisItems || item.factureItems)">
         <ng-template pTemplate="header" let-yourColumnArrayVaraible>
@@ -122,5 +124,7 @@
         </ng-template>
     </p-table>
 
-    <div id="pageFooter" class="mt-6 m-auto text-center w-5"></div>
+    <div id="pageFooter" class="mt-6 m-auto text-center w-5">
+        <span>{{ this.item && this.item.piedDePage || '' }}</span>
+    </div>
 </div>

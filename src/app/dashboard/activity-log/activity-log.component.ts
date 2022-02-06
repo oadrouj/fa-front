@@ -37,24 +37,22 @@ export class ActivityLogComponent implements OnInit {
     })
 
     this._statisticsServiceProxy.getActivityLog().subscribe(res => {
-      // this.activityLogItems = res.items as any
-      this.lodingIsComplete = true;
-     this.activityLogItems = this.activityLogItems.map(item => {
-        let index = (res.items as any).findIndex(i => i.logType == item.logType)
-        if(index != -1)
-          item = (res.items as any)[index]
-
+     this.lodingIsComplete = true;
+     this.activityLogItems = (res.items.map(item => {
         if(item.logType == 'client'){
-          this.activityLogItems[index].amount = undefined;
-          this.activityLogItems[index].clientName = undefined;
+          item.amount = undefined;
+          item.clientName = undefined;
         }
          
         if(item.logType == 'catalog')
-         this.activityLogItems[index].amount = undefined;
-
+         item.amount = undefined;
+        
+        console.log(item)
         return item
       
-    })
+    }) as any)
+
+    console.log(this.activityLogItems)
   })
   }
 

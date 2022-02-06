@@ -44,51 +44,54 @@ import {
   FactureDto,
   FactureStatutEnum,
   CreateCatalogueInput,
+  FileApiServiceProxy,
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
 import { DateHelper } from '@shared/helpers/DateHelper'
-import {
-  GlobalEventsService,
-  ModificationStatusEnum,
-} from '@shared/globalEventsService'
+import { GlobalEventsService } from '@shared/globalEventsService'
 import { map } from 'rxjs/operators'
-import { ConvertDevisToFactureService } from '@shared/services/ConvertDevisToFacture.service'
 import { Router } from '@angular/router'
 import { ValidationHelper } from '@shared/helpers/ValidationHelper'
 import { CalculationsService } from '@shared/services/calculations.service'
 import { ConfirmDialog } from 'primeng/confirmdialog'
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
+import { PreviewService } from '@shared/services/preview.service'
+import { DomSanitizer } from '@angular/platform-browser'
 @Component({
   selector: 'app-factures-dialog',
   templateUrl: './factures-dialog.component.html',
   styleUrls: ['./factures-dialog.component.css'],
   providers: [ToastService],
 })
-export class FacturesDialogComponent
-  implements OnInit, AfterViewInit {
-    
+export class FacturesDialogComponent implements OnInit, AfterViewInit {
   remiseValue: number
   filteredCatalogues: CatalogueForAutoCompleteDto[]
 
-  //#region ClientDialog
-  formClient: any
-  clientDialogDisplay: boolean
-  isFormProfetionnel: boolean
-
-  rSClass: string
-  nomClass: string
-  categories2 = [
-    { name: 'PROFESSIONNEL', code: 'PRFS' },
-    { name: 'PARTICULIER', code: 'PRTC' },
-  ]
-  devises: string[]
-  countries: CountryDto[]
   devisIsSaved: any
   saveBrouillonHide = false
-  previousPreviewState: { item: any; title: any; summaryTotalHT: any; summaryTVA: any; remiseAmount: any; contentItemsCols: any }
   devisItemRowIndex: number
-  //#endregion
+
+  private _dataItem
+  clientDialogIsVisible: boolean
+  clientDialogStatus: DialogStatus
+  currencies: string[]
+  logoSrc: string
+  @Input() set dataItem(value) {
+    this._dataItem = value
+    this.selectedDevisItem = value
+  }
+
+  private _dialogStatus
+  @Input() set dialogStatus(value) {
+    this._dialogStatus = value
+    this.updateState(value)
+  }
+  get dialogStatus() {
+    return this._dialogStatus
+  }
+
+  @Output() emitCheckFormIsValidEvent = new EventEmitter()
 
   constructor(
     private formBuilder: FormBuilder,
@@ -103,179 +106,153 @@ export class FacturesDialogComponent
     private _calculationsService: CalculationsService,
     private _countryService: CountryServiceAppServiceProxy,
     private _confirmDialogService: ConfirmDialogService,
+    private _previewService: PreviewService,
+    private _fileApiServiceProxy: FileApiServiceProxy,
+    private  _sanitizer: DomSanitizer,
   ) {}
+
+  updateState(status) {
+    this.manuelReference = false
+    this.saveBrouillonHide = false
+    this.initiateSummaryValues()
+    this.visible && (document.body.style.overflow = 'hidden')
+
+    switch (status) {
+      case DialogStatus.New:
+        this.devisIsSaved = false
+        this.initiateFormGroupForNewDevis()
+        this.getNewReferenceWithIntroMessageAndFooter()
+
+        this.dialogTitle = 'Nouvelle'
+        this.selectedDevisItem && this.formGroup.get('client').setValue(this.selectedDevisItem.client)
+        this.devisItem = null
+
+        break
+
+      case DialogStatus.Edit:
+        this.initiateFormGroupWithTableControls()
+        this.dialogTitle = 'Modifier'
+        this.devisItem = this.selectedDevisItem
+        this.reference = this.devisItem.reference
+
+        ;(this.devisItem.statut == FactureStatutEnum.PaiementAttente ||
+          this.devisItem.statut == FactureStatutEnum.PaiementRetard) &&
+          (this.saveBrouillonHide = true)
+
+        this.setFormGroup()
+        this.formGroup.get('client').setValue(this.devisItem.client)
+
+        this.devisOptionsFormGroup.get('remise').setValue(this.devisItem.remise)
+
+        this.remiseValue = this.devisItem.remise
+
+        if (this.devisItem.remise)
+          this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(true)
+
+        let tvaIsDesactivated = this.selectedDevisItem.factureItems.every(
+          (item) => item.tva == 0,
+        )
+        this.devisOptionsFormGroup.get('tva').setValue(!tvaIsDesactivated)
+        tvaIsDesactivated && this.toggleTVAOption(false)
+
+        this.devisOptionsFormGroup
+          .get('devise')
+          .setValue(this.devisItem.currency)
+        this.Currency = this.devisItem.currency
+        this.calculateSummaryTotalHTAndTTC()
+        break
+
+      case DialogStatus.Duplicate:
+        this.getNewReference()
+        this.initiateFormGroupWithTableControls()
+        this.dialogTitle = 'Dupliquer'
+        this.devisItem = this.selectedDevisItem
+        this.setFormGroup()
+        this.devisOptionsFormGroup.get('remise').setValue(this.devisItem.remise)
+
+        this.remiseValue = this.devisItem.remise
+        this.remiseValue = this.selectedDevisItem.remise
+
+        if (this.devisItem.remise)
+          this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(true)
+
+        tvaIsDesactivated = this.selectedDevisItem.factureItems.every(
+          (item) => item.tva == 0,
+        )
+
+        this.devisOptionsFormGroup.get('tva').setValue(!tvaIsDesactivated)
+        tvaIsDesactivated && this.toggleTVAOption(false)
+
+        this.devisOptionsFormGroup
+          .get('devise')
+          .setValue(this.devisItem.currency)
+        this.Currency = this.devisItem.currency
+        this.calculateSummaryTotalHTAndTTC()
+        break
+
+      case DialogStatus.Convert:
+        this.getNewReferenceWithIntroMessageAndFooter()
+        this.initiateFormGroupWithTableControls()
+        this.dialogTitle = 'Nouvelle'
+        this.devisItem = this.selectedDevisItem
+        console.log(this.selectedDevisItem);
+        this.setFormGroup()
+        this.devisOptionsFormGroup.get('remise').setValue(this.devisItem.remise)
+        this.remiseValue = this.devisItem.remise
+
+        tvaIsDesactivated = this.devisItem.factureItems.every(
+          (item) => item.tva == 0,
+        )
+        this.devisOptionsFormGroup.get('tva').setValue(!tvaIsDesactivated)
+        tvaIsDesactivated && this.toggleTVAOption(false)
+
+        this.calculateSummaryTotalHTAndTTC()
+        this.formGroup.get('client').setValue(this.devisItem.client)
+        break
+      
+      case DialogStatus.CheckFormValidity:
+        this.initiateFormGroupWithTableControls()
+        this.devisItem = this.selectedDevisItem
+        this.setFormGroup()
+        this.emitCheckFormIsValidEvent.emit(this.formGroup.valid)
+        
+        if (!this.formGroup.valid) {
+          this.openDialogEvent.emit()
+          this.displayFormValidationErrors()
+        }
+      
+        break;
+      }
+  }
+
   ngOnInit() {
-    this.devisIsSaved = false;
+    this.devisIsSaved = false
     this.initiateFormGroup()
     this.devisOptionsFormGroup = this.initiateDevisOptionsGroup()
-    
-    //ClientDialog: 
-    this.initialiseClientForm()
-    //
     this.initiateCatalogueFormGroup()
+    this.getAllCurrencies()
 
-    this.eventsSubscription = this.SelectDevisItemEvent.subscribe(
-      (devisItem: any) => {
-        this.selectedDevisItem = {
-          ...devisItem,
-          client: devisItem.client,
-        }
-      },
-    )
-
-    this.dialogStatusEvent.subscribe(
-      ({ statut, dialogComponent, isConvertedDevis }) => {
-        document.body.style.overflow = 'hidden'
-        this.manuelReference = false
-        this.saveBrouillonHide =  false
-
-        if (dialogComponent == 'facture') {
-          this.initiateSummaryValues()
-          this.visible && (document.body.style.overflow = 'hidden')
-          switch (statut) {
-            case DialogStatus.New:
-            this.devisIsSaved = false
-              if (isConvertedDevis) {
-                this.getNewReferenceWithIntroMessageAndFooter()
-                this.initiateFormGroupWithTableControls()
-                this.dialogTitle = 'Nouvelle'
-                this.selectedDevisItem = {
-                  ...this.selectedDevisItem,
-                  factureItems: this.selectedDevisItem.devisItems,
-                  isConverted: true,
-                }
-                this.devisItem = this.selectedDevisItem
-
-                this.setFormGroup()
-                this.devisOptionsFormGroup
-                  .get('remise')
-                  .setValue(this.devisItem.remise)
-                this.remiseValue = this.devisItem.remise
-
-                let tvaIsDesactivated = this.devisItem.factureItems.every(
-                  (item) => item.tva == 0,
-                )
-                this.devisOptionsFormGroup
-                  .get('tva')
-                  .setValue(!tvaIsDesactivated)
-                tvaIsDesactivated && this.toggleTVAOption(false)
-
-                this.calculateSummaryTotalHTAndTTC()
-                this.formGroup.get('client').setValue(this.devisItem.client)
-              }
-               else {
-                this.initiateFormGroupForNewDevis()
-                this.getNewReferenceWithIntroMessageAndFooter()  
-
-                this.dialogTitle = 'Nouvelle'
-                this.selectedClientId &&
-                  this._clientServiceProxy
-                    .getByIdClient(this.selectedClientId)
-                    .subscribe((res) => {
-                      let nom = res.nom || res.raisonSociale
-                      this.formGroup.get('client').setValue({ ...res, nom })
-                    })
-                this.devisItem = null
-              }
-              break
-
-            case DialogStatus.Edit:
-              this.initiateFormGroupWithTableControls()
-              this.dialogTitle = 'Modifier'
-              this.devisItem = this.selectedDevisItem
-              this.reference = this.devisItem.reference;
-
-              (this.devisItem.statut == FactureStatutEnum.PaiementAttente || this.devisItem.statut == FactureStatutEnum.PaiementRetard) 
-                && (this.saveBrouillonHide =  true)
-              
-              this.setFormGroup()
-              this.formGroup.get('client').setValue(this.devisItem.client)
-
-              this.devisOptionsFormGroup
-                .get('remise')
-                .setValue(this.devisItem.remise)
-
-              this.remiseValue = this.devisItem.remise
-
-              if (this.devisItem.remise)
-                this.devisOptionsFormGroup
-                  .get('remiseBtnIsChecked')
-                  .setValue(true)
-
-              let tvaIsDesactivated = this.selectedDevisItem.factureItems.every(
-                (item) => item.tva == 0,
-              )
-              this.devisOptionsFormGroup.get('tva').setValue(!tvaIsDesactivated)
-              tvaIsDesactivated && this.toggleTVAOption(false)
-
-              this.devisOptionsFormGroup.get('devise').setValue(this.devisItem.currency)
-              this.Currency = this.devisItem.currency
-              this.calculateSummaryTotalHTAndTTC()
-              break
-
-            case DialogStatus.Duplicate:
-              this.getNewReference()
-              this.initiateFormGroupWithTableControls()
-              this.dialogTitle = 'Dupliquer'
-              this.devisItem = this.selectedDevisItem
-              this.setFormGroup()
-              this.devisOptionsFormGroup
-                .get('remise')
-                .setValue(this.devisItem.remise)
-
-              this.remiseValue = this.devisItem.remise
-              this.remiseValue = this.selectedDevisItem.remise
-
-              if (this.devisItem.remise)
-                this.devisOptionsFormGroup
-                  .get('remiseBtnIsChecked')
-                  .setValue(true)
-
-              tvaIsDesactivated = this.selectedDevisItem.factureItems.every(
-                (item) => item.tva == 0,
-              )
-              this.devisOptionsFormGroup.get('tva').setValue(!tvaIsDesactivated)
-              tvaIsDesactivated && this.toggleTVAOption(false)
-
-              this.devisOptionsFormGroup.get('devise').setValue(this.devisItem.currency)
-              this.Currency = this.devisItem.currency
-              this.calculateSummaryTotalHTAndTTC()
-              break
-
-            default:
-              break
-          }
-        }
-      },
-    )
+    this._fileApiServiceProxy.download().subscribe((res) => {
+      let objectURL = this._sanitizer.bypassSecurityTrustUrl(
+        URL.createObjectURL(res.data),
+      )
+      this.logoSrc = objectURL as string
+    })
   }
 
-  ngAfterViewInit() {
-    
-  }
- 
+  ngAfterViewInit() {}
+
   //#region properties
-
   title = 'Facture'
   primaryColor = 'orange'
   secondaryColor = 'secondary-green'
   @Input() visible = false
-  visibleSelf
-  @Input() SelectDevisItemEvent = new Observable<any>()
-  @Input() dialogStatusEvent!: Observable<{
-    statut: DialogStatus
-    dialogComponent
-    isConvertedDevis
-  }>
-  @Input() factureFormatReferenceNumber: (number) => string
-  @Input() template: any
   @Output() openDialogEvent = new EventEmitter()
   @Output() closeDialogEvent = new EventEmitter()
   @Output() crudOperationEvent = new EventEmitter()
   formGroup!: FormGroup
   tableControl!: FormArray
   devisOptionsFormGroup!: FormGroup
-  eventsSubscription!: Subscription
   @ViewChild('frm') frm!: HTMLFormElement
   selectedDevisItem!: any
   selectedClientId: number
@@ -337,7 +314,7 @@ export class FacturesDialogComponent
       type: 'inputNumber',
       colspan: 2,
       disabled: true,
-      class: 'lastElement'
+      class: 'lastElement',
     },
     { header: '', field: 'delete', type: 'button', label: '', icon: 'trash' },
   ]
@@ -350,7 +327,6 @@ export class FacturesDialogComponent
   get getFactureContentItems() {
     return this.getFromArrayControl.value as FactureContentItem[]
   }
-
   //#endregion
 
   //#region FormGroups
@@ -370,7 +346,7 @@ export class FacturesDialogComponent
       client: ['', Validators.required],
       dateEmission: [new Date(), Validators.required],
       echeancePaiement: ['30', Validators.required],
-       messageIntroduction: [''],
+      messageIntroduction: [''],
       piedDePage: [''],
       factureItems: this.formBuilder.array([]),
     })
@@ -381,7 +357,7 @@ export class FacturesDialogComponent
       client: ['', Validators.required],
       dateEmission: [new Date(), Validators.required],
       echeancePaiement: ['30', Validators.required],
-       messageIntroduction: [''],
+      messageIntroduction: [''],
       piedDePage: [''],
       factureItems: this.formBuilder.array([this.initiateTableForm()]),
     })
@@ -390,22 +366,21 @@ export class FacturesDialogComponent
   setFormGroup() {
     let factureItems = this.selectedDevisItem.factureItems.map((item: any) => {
       this.getFromArrayControl.push(this.initiateTableForm())
-
       return {
-        catalogue: {designation: item.designation},
+        catalogue: { designation: item.designation },
         date: item.date.toDate(),
         quantity: item.quantity,
         unit: item.unit,
         unitPriceHT: item.unitPriceHT,
         tva: !item.tva ? 20 : item.tva,
         totalTtc: item.totalTtc,
-        catalogueId: item.catalogueId
+        catalogueId: item.catalogueId,
       }
     })
 
     this.formGroup.setValue({
       client: this.devisItem.client,
-      dateEmission: this.devisItem.dateEmission,
+      dateEmission: this.devisItem.dateEmission.toDate(),
       echeancePaiement: this.devisItem.echeancePaiement,
       messageIntroduction: this.devisItem.messageIntroduction,
       piedDePage: this.devisItem.piedDePage,
@@ -416,19 +391,22 @@ export class FacturesDialogComponent
   initiateTableForm() {
     return this.formBuilder.group({
       catalogueId: [null],
-      catalogue: [{designation: '', id: 0}, Validators.required],
+      catalogue: [{ designation: '', id: 0 }, Validators.required],
       date: [this.formGroup.get('dateEmission').value, Validators.required],
       quantity: [1, Validators.required],
       unit: ['Heures', Validators.required],
       unitPriceHT: [0, Validators.required],
-      tva: [{ value: 20, disabled: !this.devisOptionsFormGroup.get('tva').value }, Validators.required],
+      tva: [
+        { value: 20, disabled: !this.devisOptionsFormGroup.get('tva').value },
+        Validators.required,
+      ],
       totalTtc: [0],
     })
   }
 
-  onSelectIssueDateCalendar(){
-    this.getFromArrayControl.controls.forEach(x => {
-      x.patchValue({date : this.formGroup.get('dateEmission').value})
+  onSelectIssueDateCalendar() {
+    this.getFromArrayControl.controls.forEach((x) => {
+      x.patchValue({ date: this.formGroup.get('dateEmission').value })
     })
   }
 
@@ -437,56 +415,55 @@ export class FacturesDialogComponent
     return this.formBuilder.group({
       remise: [remise],
       remiseBtnIsChecked: [false],
-      devise: [this.devisOptions.devise.list[0]],
+      devise: ['MAD'],
       tva: [true],
     })
   }
 
+  getAllCurrencies() {
+    fetch('/assets/json/currencies.json')
+      .then((res) => res.json())
+      .then((res) => (this.currencies = Object.keys(res)))
+  }
+  
   private clearTableControl() {
     ;(this.formGroup.get('factureItems') as FormArray).controls = []
   }
 
   //#endregion
 
-    @ViewChild("cd") closeDevisConfirmDialog: ConfirmDialog
-    closeDialog() {
-      if(this.previousPreviewState)  {
-        this.template.item = this.previousPreviewState.item
-        this.template.title = this.previousPreviewState.title
-        this.template.summaryTotalHT = this.previousPreviewState.summaryTotalHT
-        this.template.summaryTVA - this.previousPreviewState.summaryTVA
-        this.template.remiseAmount = this.previousPreviewState.remiseAmount
-        this.template.contentItemsCols = this.previousPreviewState.contentItemsCols
-      }
-      if((this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') && !this.devisIsSaved){
-        this._confirmDialogService.confirm({
-          message: 'Etes-vous sûr de vouloir quitter ? Toutes les données saisies seront perdues',
-          acceptCallback: () => {
-            this.closeDialogEvent.emit()
-            this.clearTableControl()
-            this.disableValidationClass()
-            document.body.style.overflow = 'auto'
-            this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(false)  
-            this.closeDevisConfirmDialog.close(event)
-          },
-          rejectCallback:() => { this.closeDevisConfirmDialog.close(event)}
-        })
-        let element = document.body.querySelector('.cd') as HTMLElement
-        element.style.display = 'none'
-      }
-      
-      else {
-        this.closeDialogEvent.emit()
-        this.clearTableControl()
-        this.disableValidationClass()
-        document.body.style.overflow = 'auto'
-        this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(false)  
-        this.closeDevisConfirmDialog.close(event)
-      }
-      
-
+  closeDialog() {
+    if (
+      (this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') &&
+      !this.devisIsSaved
+    ) {
+      this._confirmDialogService.confirm({
+        message:
+          'Etes-vous sûr de vouloir quitter ? Toutes les données saisies seront perdues',
+        acceptCallback: () => {
+          this.closeDialogEvent.emit()
+          this.clearTableControl()
+          this.disableValidationClass()
+          this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(false)
+        },
+        rejectCallback: () => {
+        },
+      })
+    } else {
+      this.closeDialogEvent.emit()
+      this.clearTableControl()
+      this.disableValidationClass()
+      document.body.style.overflow = 'auto'
+      this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(false)
     }
-   
+  }
+
+  factureFormatReferenceNumber(referenceNumber) {
+    return this._formatService.formatReferenceNumber(
+      referenceNumber,
+      ReferencePrefix.Facture,
+    )
+  }
 
   getNewReference() {
     this._factureServiceProxy.getLastReference().subscribe((res: number) => {
@@ -496,14 +473,20 @@ export class FacturesDialogComponent
   }
 
   getNewReferenceWithIntroMessageAndFooter() {
-    this._factureServiceProxy.getLastReferenceWithIntroMessageAndFooter().subscribe((res) => {
-      this.referenceCount = res.lastReference + 1
-      this.reference = this.factureFormatReferenceNumber(this.referenceCount)
+    this._factureServiceProxy
+      .getLastReferenceWithIntroMessageAndFooter()
+      .subscribe((res) => {
+        this.referenceCount = res.lastReference + 1
+        this.reference = this.factureFormatReferenceNumber(this.referenceCount)
+        console.log(this.referenceCount)
 
-      this.formGroup.get('messageIntroduction').setValue(res.invoiceIntroMessage)
-      this.formGroup.get('piedDePage').setValue(res.invoiceFooter)
-    })
+        this.formGroup
+          .get('messageIntroduction')
+          .setValue(res.invoiceIntroMessage)
+        this.formGroup.get('piedDePage').setValue(res.invoiceFooter)
+      })
   }
+
   changeReference() {
     this.manuelReference = true
     this.formGroup.addControl(
@@ -513,7 +496,6 @@ export class FacturesDialogComponent
         // Validators.pattern('[a-zA-Z][0-9]{5}'),
       ]),
     )
-
   }
 
   addRow() {
@@ -525,8 +507,6 @@ export class FacturesDialogComponent
     control.removeAt(index)
     this.calculateSummaryTotalHTAndTTC()
   }
-
-  autoCompleteSearch(event: any) {}
 
   //#region Calculations
 
@@ -596,7 +576,6 @@ export class FacturesDialogComponent
   calculateRemise(remise, totalHT) {
     return (totalHT * remise) / 100
   }
-
   //#endregion
 
   //#region Options
@@ -617,7 +596,7 @@ export class FacturesDialogComponent
         control.get('tva').enable()
       })
     }
-
+    
     this.calculateSummaryTotalHTAndTTC()
     this.RecalculateRows()
   }
@@ -633,15 +612,17 @@ export class FacturesDialogComponent
   }
 
   //#endregion
-  async getNewItemValue(){
+  async getNewItemValue() {
     let formValue = this.formGroup.value
-    let result = await this._clientServiceProxy.getByIdClient(formValue.client.id).toPromise()
+    let result = await this._clientServiceProxy
+      .getByIdClient(formValue.client.id)
+      .toPromise()
 
-     return this.template.item = new FactureDto({
+    return new FactureDto({
       reference: this.manuelReference
         ? this.formGroup.get('reference').value
-        : this.factureFormatReferenceNumber( this.referenceCount),
-     
+        : this.factureFormatReferenceNumber(this.referenceCount),
+
       dateEmission: this.getExactDate(formValue.dateEmission, new Date()),
       echeancePaiement: formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
@@ -666,12 +647,11 @@ export class FacturesDialogComponent
       montantTtc: this.summaryTotalTTC,
       lastModificationTime: null,
       lastModifierUserId: null,
-      creationTime: null, 
-      creatorUserId: null, 
-      id: null
-     })
-    
-}
+      creationTime: null,
+      creatorUserId: null,
+      id: null,
+    })
+  }
 
   //#region Crud operations
   createApiCall(devisStatus: FactureStatutEnum) {
@@ -679,31 +659,30 @@ export class FacturesDialogComponent
 
     let createDevisInput = new CreateFactureInput({
       reference: this.manuelReference
-      ? this.formGroup.get('reference').value
-      : this.factureFormatReferenceNumber( this.referenceCount),
-     
+        ? this.formGroup.get('reference').value
+        : this.factureFormatReferenceNumber(this.referenceCount),
+
       dateEmission: this.getExactDate(formValue.dateEmission, new Date()),
       echeancePaiement: formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
       remise: this.devisOptionsFormGroup.get('remise').value ?? 0,
       statut: devisStatus,
-      factureItems: formValue.factureItems.map(
-        (devisItem) => {
-          return new FactureItemDto({
-            catalogueId: devisItem.catalogueId,
-            designation: devisItem.catalogue.designation,
-            date: this.getExactDate(devisItem.date, new Date()),
-            quantity: devisItem.quantity ?? 0,
-            unit: devisItem.unit,
-            unitPriceHT: devisItem.unitPriceHT ?? 0,
-            tva: devisItem.tva || 0,
-            totalTtc: devisItem.totalTtc,
-          })
-        },
-      ),
+      factureItems: formValue.factureItems.map((devisItem) => {
+        return new FactureItemDto({
+          catalogueId: devisItem.catalogueId,
+          designation: devisItem.catalogue.designation,
+          date: this.getExactDate(devisItem.date, new Date()),
+          quantity: devisItem.quantity ?? 0,
+          unit: devisItem.unit,
+          unitPriceHT: devisItem.unitPriceHT ?? 0,
+          tva: devisItem.tva || 0,
+          totalTtc: devisItem.totalTtc,
+        })
+      }),
       clientId: formValue.client.id,
-      currency: this.Currency
+      currency: this.Currency,
+      montantTtc: this.summaryTotalTTC,
     })
 
     this._factureServiceProxy
@@ -729,7 +708,7 @@ export class FacturesDialogComponent
                     ...item,
                     date: this.getExactDate(item.date, new Date(), 'subtract'),
                   })),
-                  currency: this.Currency
+                  currency: this.Currency,
                 },
               })
             })
@@ -741,50 +720,49 @@ export class FacturesDialogComponent
       detail: 'Vous avez ajouté cette facture avec succés',
     })
   }
-  
-  getUpdatedValue(formValue, factureStatus?: FactureStatutEnum){
+
+  getUpdatedValue(formValue, factureStatus?: FactureStatutEnum) {
     return new UpdateFactureInput({
+      ...this.devisItem,
       id: this.devisItem.id,
       reference: this.manuelReference
         ? this.formGroup.get('reference').value
         : this.selectedDevisItem.reference,
-     
-      dateEmission: formValue.dateEmission,
+
+      dateEmission: moment(formValue.dateEmission),
       echeancePaiement: +formValue.echeancePaiement,
       messageIntroduction: formValue.messageIntroduction,
       piedDePage: formValue.piedDePage,
       remise: this.devisOptionsFormGroup.get('remise').value,
       statut: factureStatus,
-      factureItems: formValue.factureItems.map(
-        (devisItem) => {
-          return new FactureItemDto({
-            catalogueId: devisItem.catalogueId,
-            designation: devisItem.catalogue.designation,
-            date: devisItem.date,
-            quantity: devisItem.quantity ?? 0,
-            unit: devisItem.unit,
-            unitPriceHT: devisItem.unitPriceHT ?? 0,
-            tva: devisItem.tva || 0,
-            totalTtc: devisItem.totalTtc,
-          })
-        },
-      ),
+      factureItems: formValue.factureItems.map((devisItem) => {
+        return new FactureItemDto({
+          catalogueId: devisItem.catalogueId,
+          designation: devisItem.catalogue.designation,
+          date: moment(devisItem.date),
+          quantity: devisItem.quantity ?? 0,
+          unit: devisItem.unit,
+          unitPriceHT: devisItem.unitPriceHT ?? 0,
+          tva: devisItem.tva || 0,
+          totalTtc: devisItem.totalTtc,
+        })
+      }),
       clientId: formValue.client.id,
       currency: this.Currency,
-      montantTtc: this.summaryTotalTTC
+      montantTtc: this.summaryTotalTTC,
     })
   }
 
   updateApiCall(factureStatus: FactureStatutEnum) {
-    
     let formValue = this.formGroup.value
-    let updateDevisInput = this.getUpdatedValue(formValue, factureStatus)
-    
+    let updateInvoiceInput = this.getUpdatedValue(formValue, factureStatus)
+    updateInvoiceInput.dateEmission = updateInvoiceInput.dateEmission.add(1, 'days')
+    updateInvoiceInput.factureItems = updateInvoiceInput.factureItems.map(i =>  { i.date.add(1, 'days'); return i })
+
     this._factureServiceProxy
-      .updateFacture(updateDevisInput)
+      .updateFacture(updateInvoiceInput)
       .subscribe((res) => {
         if (res) {
-         
           this._clientServiceProxy
             .getByIdClient(formValue.client.id)
             .subscribe((res) => {
@@ -792,51 +770,20 @@ export class FacturesDialogComponent
                 this.crudOperationEvent.emit({
                   crudOperation: 'update',
                   result: {
-                    ...this.selectedDevisItem,
-                    ...updateDevisInput,
+                    ...this.getUpdatedValue(formValue, factureStatus),
                     client: res,
-                    dateEmission: this.getExactDate(
-                      updateDevisInput.dateEmission,
-                      this.selectedDevisItem.dateEmission,
-                      'subtract',
-                    ),
-                    factureItems: updateDevisInput.factureItems.map((item) => ({
-                      ...item,
-                      date: this.getExactDate(
-                        item.date,
-                        new Date(),
-                        'subtract',
-                      ),
-                    })),
-                    currency: this.Currency
                   },
                 })
+
               } else {
                 this.crudOperationEvent.emit({
                   crudOperation: 'update',
                   result: {
-                    ...this.selectedDevisItem,
-                    ...updateDevisInput,
-                    reference: updateDevisInput.reference,
-                    client: res,
-                    dateEmission: this.getExactDate(
-                      updateDevisInput.dateEmission,
-                      this.selectedDevisItem.dateEmission,
-                      'subtract',
-                    ),
-                    factureItems: updateDevisInput.factureItems.map((item) => ({
-                      ...item,
-                      date: this.getExactDate(
-                        item.date,
-                        new Date(),
-                        'subtract',
-                      ),
-                    })),
+                    ...this.getUpdatedValue(formValue, factureStatus),
                   },
                 })
               }
               this.closeDialog()
-              
             })
         }
       })
@@ -852,17 +799,20 @@ export class FacturesDialogComponent
       this._clientServiceProxy
         .getClientForAutoComplete(event.query)
         .subscribe((res: ClientForAutoCompleteDtoListResultDto) => {
-          if(res.items.length)
-          this.clientSuggestions = res.items
+          if (res.items.length) this.clientSuggestions = res.items
           else {
-            this.clientSuggestions = [new ClientForAutoCompleteDto({id: 0, nom: 'Ajouter un nouveau client ?'})]
-
+            this.clientSuggestions = [
+              new ClientForAutoCompleteDto({
+                id: 0,
+                displayName: 'Ajouter un nouveau client ?',
+              }),
+            ]
           }
         })
     }, 500)
   }
 
-  filterCatalogues(event){
+  filterCatalogues(event) {
     setTimeout(() => {
       this._catalogueServiceProxy
         .getCatalogueForAutoComplete(event.query)
@@ -890,33 +840,33 @@ export class FacturesDialogComponent
     this.selectedClientId = this.formGroup.get('client').value['id']
   }
 
-  onSelectClient(event){
-    if(this.clientSuggestions[0].id == 0){
+  onSelectClient(event) {
+    if (this.clientSuggestions[0].id == 0) {
       this.formGroup.get('client').setValue(null)
-      this.showDialogNouveau();
-      return;
+      this.showClientDialog()
+      return
     }
-    this._clientServiceProxy.getClientDefaults(event.id).subscribe(res => {
-      this.setClientDefaults(res);
+    
+    this._clientServiceProxy.getClientDefaults(event.id).subscribe((res) => {
+      this.setClientDefaults(res)
     })
   }
 
+  setClientDefaults(clientDefaultsDto: ClientDefaultsDto) {
+    this.formGroup.patchValue({
+      echeancePaiement: clientDefaultsDto.paymentPeriod,
+    })
 
-  setClientDefaults(clientDefaultsDto: ClientDefaultsDto){
-      this.formGroup.patchValue({
-        echeancePaiement: clientDefaultsDto.paymentPeriod,
-      })
+    this.devisOptionsFormGroup.patchValue({
+      devise: clientDefaultsDto.currency,
+      remiseBtnIsChecked: !!clientDefaultsDto.permanentDiscount,
+      remise: clientDefaultsDto.permanentDiscount,
+    })
 
-      this.devisOptionsFormGroup.patchValue({
-        devise: clientDefaultsDto.currency,
-        remiseBtnIsChecked: !!clientDefaultsDto.permanentDiscount,
-        remise: clientDefaultsDto.permanentDiscount
-      })
-
-      this.remiseAmountChanged(clientDefaultsDto.permanentDiscount)
-      this.Currency = clientDefaultsDto.currency;
+    this.remiseAmountChanged(clientDefaultsDto.permanentDiscount)
+    this.Currency = clientDefaultsDto.currency
   }
-  
+
   onSelectCatalogAutoComplete(event: CatalogueForAutoCompleteDto, index) {
     let factureItems = this.formGroup.get('factureItems') as FormArray
     if (this.filteredCatalogues[0].id == 0) {
@@ -927,31 +877,32 @@ export class FacturesDialogComponent
     }
     factureItems.at(index).setValue({
       catalogueId: event.id,
-      catalogue: {designation: event.designation},
+      catalogue: { designation: event.designation },
       date: this.formGroup.get('dateEmission').value,
       quantity: event.minimalQuantity,
       unit: event.unity || 'Heures',
       unitPriceHT: event.htPrice,
       tva: event.tva || 20,
-      totalTtc: this._calculationsService
-        .calculateTTCWithQuantity(event.htPrice, event.tva, event.minimalQuantity),
+      totalTtc: this._calculationsService.calculateTTCWithQuantity(
+        event.htPrice,
+        event.tva,
+        event.minimalQuantity,
+      ),
     })
 
     this.calculateSummaryTotalHTAndTTC()
     this.RecalculateRows()
   }
 
-  onClearCatalogAutoComplete(index){
+  onClearCatalogAutoComplete(index) {
     let factureItems = this.formGroup.get('factureItems') as FormArray
     factureItems.at(index).patchValue({
       catalogueId: 0,
     })
-    console.log(factureItems.at(index).value);
   }
 
   saveBrouillon() {
     // this.frm.nativeElement.classList.add('submitted')
-
     if (this.formGroup.get('client').valid) {
       let reference
       if (this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') {
@@ -967,11 +918,13 @@ export class FacturesDialogComponent
       this._factureServiceProxy
         .checkIfReferenceIsExist(reference)
         .subscribe((res) => {
-          if ((!res && !this.selectedDevisItem) ||
-            !res || this.dialogTitle == 'Modifier' &&
-          (reference == this.selectedDevisItem.reference)
+          if (
+            (!res && !this.selectedDevisItem) ||
+            !res ||
+            (this.dialogTitle == 'Modifier' &&
+              reference == this.selectedDevisItem.reference)
           ) {
-            if (this.devisItem && this.devisItem.isConverted) {
+            if (this.devisItem && this.dialogStatus == DialogStatus.Convert) {
               this.createApiCall(FactureStatutEnum.Cree)
               this.devisIsSaved = true
               this._router.navigate(['/app/Factures'])
@@ -1003,17 +956,14 @@ export class FacturesDialogComponent
         detail: 'Veuillez remplir le chemps client: ',
       })
     }
-    
-    
   }
 
-  validateDevis(isDevisStatusUpdate = false) {
-    let returnValue = of({ success: false, result: null })
-    this.enableValidationClass()
+  
+  displayFormValidationErrors(){
     let controlsNames = []
     const conrtolsObj = {
       client: 'Client',
-      factureItems: 'Désignation', 
+      devisItems: 'Désignation'
     }
 
     for (let control in this.formGroup.controls) {
@@ -1021,98 +971,82 @@ export class FacturesDialogComponent
         controlsNames = controlsNames.concat(conrtolsObj[control])
     }
 
-    if(this.formGroup.valid) {
-
-      if (isDevisStatusUpdate) {
-        returnValue = this.validateStatusApi()
-       
-      } else {
-
-      let reference
-      if (this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') {
-        reference = this.manuelReference
-          ? this.formGroup.get('reference').value
-          : this.factureFormatReferenceNumber(this.referenceCount)
-      
-      } else {
-        reference = this.manuelReference
-          ? this.formGroup.get('reference').value
-          : this.selectedDevisItem.reference
-       
-      }
-      
-      this._factureServiceProxy
-        .checkIfReferenceIsExist(reference)
-        .subscribe((res) => {
-          if (!res || this.dialogTitle == 'Modifier' &&
-            (reference == this.selectedDevisItem.reference)
-        ) {
-              
-                if (this.devisItem && this.devisItem.isConverted) {
-                  this.createApiCall(FactureStatutEnum.Valide)
-                  this.devisIsSaved = true
-                  this._router.navigate(['/app/Factures'])
-                  this.updateConvertedDevisStatus()
-                  document.body.style.overflow = 'auto'
-                  return
-                }
-  
-                if (
-                  this.dialogTitle == 'Nouvelle' ||
-                  this.dialogTitle == 'Dupliquer'
-                ) {
-                  this.createApiCall(FactureStatutEnum.Valide)
-                  this.devisIsSaved = true
-                  return
-                }
-  
-                if (this.dialogTitle == 'Modifier') {
-                  this.updateApiCall(FactureStatutEnum.Valide)
-                }
-            
-          } else {
-            this._toastService.error({
-              detail: 'Cette référence est déjà existe',
-            })
-          }
-        })
-    }
+    this._toastService.error({
+      detail:
+        'Veuillez remplir les chemps obligatoires: ' +
+        controlsNames.join(', '),
+    })
   }
-    else {
-      !this.visible && this.openDialogEvent.emit()
-      this._toastService.error({
-        detail:
-          'Veuillez remplir les chemps obligatoires: ' +
-          controlsNames.join(', '),
-      })
+
+  validateDevis() {
+    let returnValue = of({ success: false, result: null })
+    this.enableValidationClass()
+    let controlsNames = []
+    const conrtolsObj = {
+      client: 'Client',
+      factureItems: 'Désignation',
+    }
+
+    for (let control in this.formGroup.controls) {
+      if (!this.formGroup.controls[control].valid)
+        controlsNames = controlsNames.concat(conrtolsObj[control])
+    }
+
+    if (this.formGroup.valid) {
+        let reference
+        if (this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') {
+          reference = this.manuelReference
+            ? this.formGroup.get('reference').value
+            : this.factureFormatReferenceNumber(this.referenceCount)
+        } else {
+          reference = this.manuelReference
+            ? this.formGroup.get('reference').value
+            : this.selectedDevisItem.reference
+        }
+
+        this._factureServiceProxy
+          .checkIfReferenceIsExist(reference)
+          .subscribe((res) => {
+            if (
+              !res ||
+              (this.dialogTitle == 'Modifier' &&
+                reference == this.selectedDevisItem.reference)
+            ) {
+              if (this.devisItem && this.dialogStatus == DialogStatus.Convert) {
+                this.createApiCall(FactureStatutEnum.Valide)
+                this.devisIsSaved = true
+                this._router.navigate(['/app/Factures'])
+                this.updateConvertedDevisStatus()
+                document.body.style.overflow = 'auto'
+                return
+              }
+
+              if (
+                this.dialogTitle == 'Nouvelle' ||
+                this.dialogTitle == 'Dupliquer'
+              ) {
+                this.createApiCall(FactureStatutEnum.Valide)
+                this.devisIsSaved = true
+                return
+              }
+
+              if (this.dialogTitle == 'Modifier') {
+                this.updateApiCall(FactureStatutEnum.Valide)
+              }
+            } else {
+              this._toastService.error({
+                detail: 'Cette référence est déjà existe',
+              })
+            }
+          })
+      
+    } else {
+      this.displayFormValidationErrors()
     }
 
     return returnValue
   }
-
   //#endregion
-
-  validateStatusApi(): Observable<any> {
-    return this.updateByStatusApi(
-      this.devisItem.id,
-      FactureStatutEnum.Valide,
-      'La facture est validé',
-    ).pipe(
-      map((success) => ({
-        success,
-        result: { ...this.selectedDevisItem, statut: FactureStatutEnum.Valide },
-      })),
-    )
-  }
-
-  updateByStatusApi(
-    devisId: number,
-    devisStatut: FactureStatutEnum,
-    detail,
-    callback?,
-  ) {
-    return this._factureServiceProxy.changeFactureStatut(devisId, devisStatut)
-  }
 
   updateConvertedDevisStatus() {
     this._devisServiceProxy
@@ -1128,39 +1062,31 @@ export class FacturesDialogComponent
   }
 
   async preview() {
-    this.previousPreviewState = {
-      item: {...this.template.item},
-      title: this.template.title,
-      summaryTotalHT: this.template.summaryTotalHT,
-      summaryTVA: this.template.summaryTVA,
-      remiseAmount: this.template.remiseAmount,
-      contentItemsCols: this.template.contentItemsCols
-    }
-    let res;
-    if(this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') {
+    let res
+    if (this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer')
       res = await this.getNewItemValue()
-    }
-    
     else {
       res = this.getUpdatedValue(this.formGroup.value)
-      if(this.selectedClientId == this.devisItem.clientId){
-        res.client = this.devisItem.client
-      }
-      else{
-        res.client = await this._clientServiceProxy
-          .getByIdClient(this.formGroup.value.client.id).toPromise()
-      }
 
+      if (this.selectedClientId == this.devisItem.clientId)
+        res.client = this.devisItem.client
+      else {
+        res.client = await this._clientServiceProxy
+          .getByIdClient(this.formGroup.value.client.id)
+          .toPromise()
+      }
     }
-    
-    this.template.previewAsPDF({
-      item : res,
+
+    this._previewService.previewItem({
+      item: res,
       remiseAmount: this.remiseAmount,
       summaryTVA: this.summaryTVA,
       summaryTotalHT: this.summaryTotalHT,
-      })
-
+      title: 'Facture',
+      logoSrc: this.logoSrc
+    })
   }
+
   getExactDate(date1, date2, offset = 'add') {
     return date2
       ? DateHelper.initiateTimeFromDate(date1).getTime() ==
@@ -1182,188 +1108,97 @@ export class FacturesDialogComponent
   disableValidationClass = () =>
     ValidationHelper.disableCssValidationClass(this.frm)
 
-//#region Client dialog
+  catalogueDialogDisplay = false
+  catalogueOptions = ['produit', 'prestation']
+  catalogueFormGroup: FormGroup
+  tvaOptions = [10, 15, 20]
+  unityOptions = ['Heures', 'Kg']
 
-initialiseClientForm(): void {
-  this.formClient = new ClientDto()
-  this.formClient.pays = 'MAROC'
-  this.formClient.deviseFacturation = 'MAD'
-  this.formClient.categorieClient = 'PRFS'
-  this.formClient.delaiPaiement = 30
-  this.onFormCategorySelected()
-}
-
-showDialogNouveau() {
-  this.initialiseClientForm()
-  this.getAllCountries()
-  this.getAllCurrencies()
-  this.clientDialogDisplay = true
-}
-getAllCurrencies(){
-  fetch('/assets/json/currencies.json').then(res => res.json())
-    .then(res => this.devises = Object.keys(res))
-}
-
-getAllCountries(){
-  this._countryService.getAllCountries().subscribe(res => {
-    this.countries = res.items;
-  })
-}
-
-closeClientDialog(){
-  this.clientDialogDisplay = false
-}
-
-onFormCategorySelected(): void {
-  this.isFormProfetionnel = this.formClient.categorieClient == 'PRFS'
-}
-
-isNullOrEmpty(str: string): boolean {
-  return str == undefined || str.toString().trim() == ''
-}
-
-isFormValid: boolean
-validateForm(): void {
-  this.isFormValid = false
-
-  var isRaisonSocialeValide =
-    !this.isFormProfetionnel ||
-    !this.isNullOrEmpty(this.formClient.raisonSociale)
-  var isNomValide =
-    this.isFormProfetionnel || !this.isNullOrEmpty(this.formClient.nom)
-
-  this.rSClass = isRaisonSocialeValide ? '' : 'rSClass'
-  this.nomClass = isNomValide ? '' : 'nomClass'
-
-  if (!isRaisonSocialeValide) {
-    this._toastService.error({
-      summary: 'Champs requis !',
-      detail: 'Veuillez remplir le champs : Raison sociale',
+  initiateCatalogueFormGroup() {
+    this.catalogueFormGroup = this.formBuilder.group({
+      designation: ['', Validators.required],
+      description: [''],
+      unity: ['Heures'],
+      htPrice: [0],
+      tva: [0],
+      minimalQuantity: [1],
+      dialogSelectedType: ['produit'],
     })
-  } else if (!isNomValide) {
-    this._toastService.error({
-      summary: 'Champs requis !',
-      detail: 'Veuillez remplir le champs : Nom',
-      
-    })
-  } else {
-    this.formClient.raisonSociale = this.isFormProfetionnel
-      ? this.formClient.raisonSociale
-      : ''
-    this.formClient.ice = this.isFormProfetionnel ? this.formClient.ice : ''
-    this.formClient.secteurActivite = this.isFormProfetionnel
-      ? this.formClient.secteurActivite
-      : ''
-    this.formClient.nom = !this.isFormProfetionnel ? this.formClient.nom : ''
-    this.isFormValid = true
   }
-}
 
-valider() {
-  this.validateForm()
-  if (this.isFormValid) {
-      this._clientServiceProxy
-        .createClient(this.formClient)
-        .subscribe((result) => {
-          if (result != undefined) {
-            let clientForAutoCompleteDto = new ClientForAutoCompleteDto({id: result.id, nom: result.nom || result.raisonSociale})
-            this.clientSuggestions = [...this.clientSuggestions, clientForAutoCompleteDto]
-            this.formGroup.get('client').setValue(clientForAutoCompleteDto)
-            this.closeClientDialog()
-            var referenceClient = this._formatService.formatReferenceNumber(
-              result.reference,
-              ReferencePrefix.Client
-            )
+  closeCatalogueDialog() {
+    this.catalogueDialogDisplay = false
+    this.catalogueFormGroup.reset()
+  }
+
+  submitCatalogue() {
+    if (this.catalogueFormGroup.valid) {
+      let createCatalogInput = new CreateCatalogueInput({
+        designation: this.catalogueFormGroup.value.designation,
+        description: this.catalogueFormGroup.value.description,
+        catalogueType: this.catalogueFormGroup.value.dialogSelectedType,
+        unity: this.catalogueFormGroup.value.unity,
+        htPrice: this.catalogueFormGroup.value.htPrice || 0,
+        tva: this.catalogueFormGroup.value.tva || 0,
+        minimalQuantity: this.catalogueFormGroup.value.minimalQuantity || 1,
+      })
+      this._catalogueServiceProxy
+        .createCatalogue(createCatalogInput)
+        .subscribe((res) => {
+          if (res) {
+            let factureItems = this.formGroup.get('factureItems') as FormArray
+            factureItems.at(this.devisItemRowIndex).setValue({
+              catalogueId: res.id,
+              catalogue: { designation: res.designation },
+              date: this.formGroup.get('dateEmission').value,
+              quantity: res.minimalQuantity,
+              unit: res.unity || 'Heures',
+              unitPriceHT: res.htPrice,
+              tva: res.tva || 20,
+              totalTtc: this._calculationsService.calculateTTCWithQuantity(
+                res.htPrice,
+                res.tva,
+                res.minimalQuantity,
+              ),
+            })
 
             this._toastService.success({
-              summary: 'Opération réussie !',
-              detail:
-                'Le client est ajouté avec la référence : ' + referenceClient
+              summary: 'Opértion réussie',
+              detail: 'Vous avez ajouté un nouvel item',
             })
-           
+
+            this.closeCatalogueDialog()
           } else {
-            this._toastService.error({
-              summary: 'Opération échouée !',
-              detail:
-                'Une erreur serveur est parvenue ! Veuillez reessayer plutard.'
-            })
+            this._toastService.internalError()
           }
         })
-  }
-}
-
-//#endregion
-catalogueDialogDisplay = false
-catalogueOptions = ['produit', 'prestation']
-catalogueFormGroup: FormGroup
-tvaOptions = [10, 15, 20]
-unityOptions = ['Heures', 'Kg']
-
-initiateCatalogueFormGroup() {
-  this.catalogueFormGroup = this.formBuilder.group({
-    designation: ['', Validators.required],
-    description: [''],
-    unity: ['Heures'],
-    htPrice: [0],
-    tva: [0],
-    minimalQuantity: [1],
-    dialogSelectedType: ['produit'],
-  })
-}
-
-closeCatalogueDialog() {
-  this.catalogueDialogDisplay = false
-  this.catalogueFormGroup.reset()
-}
-
-submitCatalogue() {
-  if (this.catalogueFormGroup.valid) {
-    let createCatalogInput = new CreateCatalogueInput({
-      designation: this.catalogueFormGroup.value.designation,
-      description: this.catalogueFormGroup.value.description,
-      catalogueType: this.catalogueFormGroup.value.dialogSelectedType,
-      unity: this.catalogueFormGroup.value.unity,
-      htPrice: this.catalogueFormGroup.value.htPrice || 0,
-      tva: this.catalogueFormGroup.value.tva || 0,
-      minimalQuantity: this.catalogueFormGroup.value.minimalQuantity || 1,
-    })
-    this._catalogueServiceProxy
-      .createCatalogue(createCatalogInput)
-      .subscribe((res) => {
-        if (res) {
-          let factureItems = this.formGroup.get('factureItems') as FormArray
-          factureItems.at(this.devisItemRowIndex).setValue({
-            catalogueId: res.id,
-            catalogue: { designation: res.designation },
-            date: this.formGroup.get('dateEmission').value,
-            quantity: res.minimalQuantity,
-            unit: res.unity || 'Heures',
-            unitPriceHT: res.htPrice,
-            tva: res.tva || 20,
-            totalTtc: this._calculationsService.calculateTTCWithQuantity(
-              res.htPrice,
-              res.tva,
-              res.minimalQuantity,
-            ),
-          })
-         
-          this._toastService.success({
-            summary: 'Opértion réussie',
-            detail: 'Vous avez ajouté un nouvel item',
-          })
-
-          this.closeCatalogueDialog()
-        } else {
-          this._toastService.internalError()
-        }
+    } else {
+      this._toastService.error({
+        summary: 'Erreur',
+        detail: 'Veuillez remplir le chemps Désignation',
       })
-  } else {
-    this._toastService.error({
-      summary: 'Erreur',
-      detail: 'Veuillez remplir le chemps Désignation',
-    })
+    }
+  }
+
+  showClientDialog(){
+    this.clientDialogIsVisible = true
+    this.clientDialogStatus = DialogStatus.New
+  }
+
+  closeClientDialog(data){
+    this.clientDialogIsVisible = false
+    this.clientDialogStatus = undefined
+
+    if(data){
+      let clientForAutoCompleteDto = new ClientForAutoCompleteDto({
+        id: data.id,
+        displayName: data.displayName
+      })
+      this.clientSuggestions = [
+        ...this.clientSuggestions,
+        clientForAutoCompleteDto,
+      ]
+      this.formGroup.get('client').setValue(clientForAutoCompleteDto)
+    } 
   }
 }
- 
-}
-

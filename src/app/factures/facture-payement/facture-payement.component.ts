@@ -48,6 +48,8 @@ export class FacturePayementComponent implements OnInit {
 
   closeDialogAndGetValue(){
     if(this.formGroup.valid){
+      this.dateIsSelected && this.formGroup.get('datePaiement').setValue(moment(this.formGroup.get('datePaiement').value)
+        .add(1, 'days').toDate())
       this.ref.close(this.formGroup.value)
     }
   }
@@ -56,4 +58,8 @@ export class FacturePayementComponent implements OnInit {
      this.ref.close()
   }
 
+  dateIsSelected = false
+  selectDate(){
+    this.dateIsSelected = true
+  }
 }

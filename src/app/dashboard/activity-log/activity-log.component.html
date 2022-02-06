@@ -28,7 +28,7 @@
 
                 </div>
                 <div>
-                    <h6 class="block">{{log.amount ? ((log.amount | number:'1.2-2') + ' ' + log.currency | uppercase) : '-' }} </h6>
+                    <h6 class="block">{{log.amount != undefined ? ((log.amount | number:'1.2-2') + ' ' + log.currency | uppercase) : '-' }} </h6>
                 </div>
             </div>
         </ng-template>

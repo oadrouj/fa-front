@@ -43,6 +43,7 @@
     height: 11rem;
     text-anchor: middle;
     transform: rotate(22.5deg);
+    margin-top: -0.75rem;
 }
 
 .circle {
