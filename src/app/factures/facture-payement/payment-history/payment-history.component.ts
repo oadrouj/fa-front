@@ -21,7 +21,7 @@ export class PaymentHistoryComponent implements OnInit {
   paymentHistoryItems: any
   totalRecords
 
-  ngOnInit() {
+  ngOnInit() { 
 
   }
 

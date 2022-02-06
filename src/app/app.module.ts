@@ -53,10 +53,7 @@ import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {AccordionModule} from 'primeng/accordion';
 import {SplitButtonModule} from 'primeng/splitbutton';
 import {AutoCompleteModule} from 'primeng/autocomplete';
-import { ClientsComponent } from './clients/clients.component';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { DevisComponent } from './devis/devis.component';
-import { FacturesComponent } from './factures/factures.component';
 import { FacturesDialogComponent } from './factures/factures-dialog/factures-dialog.component';
 import { DevisDialogComponent } from './devis/devis-dialog/devis-dialog.component';
 import { CalendarModule } from 'primeng/calendar';
@@ -67,7 +64,6 @@ import { TableComponent } from './table/table.component';
 import { ToastService } from '@shared/services/toast.service';
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
 import {DynamicDialogModule} from 'primeng/dynamicdialog';
-import { FacturePayementComponent } from './factures/facture-payement/facture-payement.component';
 import { CatalogueComponent } from './catalogue/catalogue.component';
 import { ScullyLibModule } from '@scullyio/ng-lib';
 
@@ -101,7 +97,6 @@ import { ScullyLibModule } from '@scullyio/ng-lib';
     SidebarLogoComponent,
     SidebarUserPanelComponent,
     SidebarMenuComponent,
-    
    ],
   imports: [
     CommonModule,

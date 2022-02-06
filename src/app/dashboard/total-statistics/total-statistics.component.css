@@ -13,3 +13,7 @@
 .total-statistics img {
     width: fit-content;
 }
+
+.total-statistics-box {
+    border-bottom: .25rem solid;
+}

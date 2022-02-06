@@ -16,6 +16,7 @@ import {
 } from '@shared/service-proxies/service-proxies'
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 import { ToastService } from '@shared/services/toast.service'
+import { AppSessionService } from '@shared/session/app-session.service'
 import { FileUpload } from 'primeng/fileupload'
 import { zip } from 'rxjs'
 import { map } from 'rxjs/operators'
@@ -30,6 +31,9 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
   shouldShowDefaultImage = true
   dto: GeneralInfosDto
   logoIsRemoved: any
+  displayedImage: any
+  formGroup: FormGroup
+  @ViewChild('fu') fileUpload: FileUpload
 
   constructor(
     private _formBuider: FormBuilder,
@@ -38,13 +42,11 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
     private _sanitizer: DomSanitizer,
     private _toastService: ToastService,
     private _confirmDialogService: ConfirmDialogService,
-    
+    private _sessionService: AppSessionService,
+
   ) {}
 
-  displayedImage: any
-  formGroup: FormGroup
 
-  @ViewChild('fu') fileUpload: FileUpload
   ngOnInit() {
     this.formGroup = this.initiateForm()
 
@@ -138,6 +140,7 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
           )
           .subscribe((res) => {
             if (res) {
+
             } else {
               this._toastService.error({
                 detail: 'Une erreur s\'est produite lors de la chargement du logo',
@@ -181,7 +184,6 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
 
   updateGeneralInfos() {
     if(this.dto.id){
-
       let generalInfosDto = new GeneralInfosDto({
         ...this.dto,
         raisonSociale: this.formGroup.value.companyName,
@@ -191,6 +193,7 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
         .updateGeneralInfos(generalInfosDto)
         .subscribe((res) => {
           if (res) {
+            this._sessionService.entrepriseName = generalInfosDto.raisonSociale
             this._toastService.success({
               detail: 'Les informations générales sont modifiées',
             })

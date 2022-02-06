@@ -2303,9 +2303,10 @@ export class DevisServiceProxy {
      * @param statut (optional) 
      * @param devisItems (optional) 
      * @param clientId (optional) 
+     * @param montantTtc (optional) 
      * @return Success
      */
-    getByteDataDevisReport(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, currency: string | null | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined): Observable<string> {
+    getByteDataDevisReport(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, currency: string | null | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined, montantTtc: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Devis/GetByteDataDevisReport?";
         if (reference !== undefined && reference !== null)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
@@ -2342,6 +2343,10 @@ export class DevisServiceProxy {
             throw new Error("The parameter 'clientId' cannot be null.");
         else if (clientId !== undefined)
             url_ += "ClientId=" + encodeURIComponent("" + clientId) + "&";
+        if (montantTtc === null)
+            throw new Error("The parameter 'montantTtc' cannot be null.");
+        else if (montantTtc !== undefined)
+            url_ += "MontantTtc=" + encodeURIComponent("" + montantTtc) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -3187,9 +3192,10 @@ export class FactureServiceProxy {
      * @param statut (optional) 
      * @param factureItems (optional) 
      * @param clientId (optional) 
+     * @param montantTtc (optional) 
      * @return Success
      */
-    getByteDataFactureReport(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, currency: string | null | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined): Observable<string> {
+    getByteDataFactureReport(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, currency: string | null | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined, montantTtc: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/Facture/GetByteDataFactureReport?";
         if (reference !== undefined && reference !== null)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
@@ -3226,6 +3232,10 @@ export class FactureServiceProxy {
             throw new Error("The parameter 'clientId' cannot be null.");
         else if (clientId !== undefined)
             url_ += "ClientId=" + encodeURIComponent("" + clientId) + "&";
+        if (montantTtc === null)
+            throw new Error("The parameter 'montantTtc' cannot be null.");
+        else if (montantTtc !== undefined)
+            url_ += "MontantTtc=" + encodeURIComponent("" + montantTtc) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -4250,6 +4260,7 @@ export class ReportGeneratorServiceProxy {
      * @param client_Reference (optional) 
      * @param client_CategorieClient (optional) 
      * @param client_Nom (optional) 
+     * @param client_DisplayName (optional) 
      * @param client_SecteurActivite (optional) 
      * @param client_ICE (optional) 
      * @param client_RaisonSociale (optional) 
@@ -4281,7 +4292,7 @@ export class ReportGeneratorServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    getByteDataFacture(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_PendingInvoicesAmount: number | undefined, client_OverdueInvoicesAmount: number | undefined, client_ClientType: string | null | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, currency: string | null | undefined, montantTtc: number | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
+    getByteDataFacture(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: FactureStatutEnum | undefined, factureItems: FactureItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_DisplayName: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_PendingInvoicesAmount: number | undefined, client_OverdueInvoicesAmount: number | undefined, client_ClientType: string | null | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, currency: string | null | undefined, montantTtc: number | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/ReportGenerator/GetByteDataFacture?";
         if (reference !== undefined && reference !== null)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
@@ -4324,6 +4335,8 @@ export class ReportGeneratorServiceProxy {
             url_ += "Client.CategorieClient=" + encodeURIComponent("" + client_CategorieClient) + "&";
         if (client_Nom !== undefined && client_Nom !== null)
             url_ += "Client.Nom=" + encodeURIComponent("" + client_Nom) + "&";
+        if (client_DisplayName !== undefined && client_DisplayName !== null)
+            url_ += "Client.DisplayName=" + encodeURIComponent("" + client_DisplayName) + "&";
         if (client_SecteurActivite !== undefined && client_SecteurActivite !== null)
             url_ += "Client.SecteurActivite=" + encodeURIComponent("" + client_SecteurActivite) + "&";
         if (client_ICE !== undefined && client_ICE !== null)
@@ -4459,6 +4472,7 @@ export class ReportGeneratorServiceProxy {
      * @param client_Reference (optional) 
      * @param client_CategorieClient (optional) 
      * @param client_Nom (optional) 
+     * @param client_DisplayName (optional) 
      * @param client_SecteurActivite (optional) 
      * @param client_ICE (optional) 
      * @param client_RaisonSociale (optional) 
@@ -4490,7 +4504,7 @@ export class ReportGeneratorServiceProxy {
      * @param id (optional) 
      * @return Success
      */
-    getByteDataDevis(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_PendingInvoicesAmount: number | undefined, client_OverdueInvoicesAmount: number | undefined, client_ClientType: string | null | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, currency: string | null | undefined, montantTtc: number | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
+    getByteDataDevis(reference: string | null | undefined, dateEmission: moment.Moment | undefined, echeancePaiement: number | undefined, messageIntroduction: string | null | undefined, piedDePage: string | null | undefined, remise: number | undefined, statut: DevisStatutEnum | undefined, devisItems: DevisItemDto[] | null | undefined, clientId: number | undefined, client_Reference: number | undefined, client_CategorieClient: string | null | undefined, client_Nom: string | null | undefined, client_DisplayName: string | null | undefined, client_SecteurActivite: string | null | undefined, client_ICE: string | null | undefined, client_RaisonSociale: string | null | undefined, client_Adresse: string | null | undefined, client_Ville: string | null | undefined, client_Pays: string | null | undefined, client_CodePostal: string | null | undefined, client_Email: string | null | undefined, client_TelFix: string | null | undefined, client_TelPortable: string | null | undefined, client_SiteWeb: string | null | undefined, client_DeviseFacturation: string | null | undefined, client_RemisePermanente: number | undefined, client_DelaiPaiement: number | undefined, client_PendingInvoicesAmount: number | undefined, client_OverdueInvoicesAmount: number | undefined, client_ClientType: string | null | undefined, client_LastModificationTime: moment.Moment | null | undefined, client_LastModifierUserId: number | null | undefined, client_CreationTime: moment.Moment | undefined, client_CreatorUserId: number | null | undefined, client_Id: number | undefined, currency: string | null | undefined, montantTtc: number | undefined, lastModificationTime: moment.Moment | null | undefined, lastModifierUserId: number | null | undefined, creationTime: moment.Moment | undefined, creatorUserId: number | null | undefined, id: number | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/ReportGenerator/GetByteDataDevis?";
         if (reference !== undefined && reference !== null)
             url_ += "Reference=" + encodeURIComponent("" + reference) + "&";
@@ -4533,6 +4547,8 @@ export class ReportGeneratorServiceProxy {
             url_ += "Client.CategorieClient=" + encodeURIComponent("" + client_CategorieClient) + "&";
         if (client_Nom !== undefined && client_Nom !== null)
             url_ += "Client.Nom=" + encodeURIComponent("" + client_Nom) + "&";
+        if (client_DisplayName !== undefined && client_DisplayName !== null)
+            url_ += "Client.DisplayName=" + encodeURIComponent("" + client_DisplayName) + "&";
         if (client_SecteurActivite !== undefined && client_SecteurActivite !== null)
             url_ += "Client.SecteurActivite=" + encodeURIComponent("" + client_SecteurActivite) + "&";
         if (client_ICE !== undefined && client_ICE !== null)
@@ -7527,6 +7543,7 @@ export class ClientDto implements IClientDto {
     reference: number;
     categorieClient: string | undefined;
     nom: string | undefined;
+    displayName: string | undefined;
     secteurActivite: string | undefined;
     ice: string | undefined;
     raisonSociale: string | undefined;
@@ -7564,6 +7581,7 @@ export class ClientDto implements IClientDto {
             this.reference = _data["reference"];
             this.categorieClient = _data["categorieClient"];
             this.nom = _data["nom"];
+            this.displayName = _data["displayName"];
             this.secteurActivite = _data["secteurActivite"];
             this.ice = _data["ice"];
             this.raisonSociale = _data["raisonSociale"];
@@ -7601,6 +7619,7 @@ export class ClientDto implements IClientDto {
         data["reference"] = this.reference;
         data["categorieClient"] = this.categorieClient;
         data["nom"] = this.nom;
+        data["displayName"] = this.displayName;
         data["secteurActivite"] = this.secteurActivite;
         data["ice"] = this.ice;
         data["raisonSociale"] = this.raisonSociale;
@@ -7638,6 +7657,7 @@ export interface IClientDto {
     reference: number;
     categorieClient: string | undefined;
     nom: string | undefined;
+    displayName: string | undefined;
     secteurActivite: string | undefined;
     ice: string | undefined;
     raisonSociale: string | undefined;
@@ -7769,7 +7789,7 @@ export interface IClientDtoListResultWithTotalEntityItemsDto {
 }
 
 export class ClientForAutoCompleteDto implements IClientForAutoCompleteDto {
-    nom: string | undefined;
+    displayName: string | undefined;
     id: number;
 
     constructor(data?: IClientForAutoCompleteDto) {
@@ -7783,7 +7803,7 @@ export class ClientForAutoCompleteDto implements IClientForAutoCompleteDto {
 
     init(_data?: any) {
         if (_data) {
-            this.nom = _data["nom"];
+            this.displayName = _data["displayName"];
             this.id = _data["id"];
         }
     }
@@ -7797,7 +7817,7 @@ export class ClientForAutoCompleteDto implements IClientForAutoCompleteDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["nom"] = this.nom;
+        data["displayName"] = this.displayName;
         data["id"] = this.id;
         return data; 
     }
@@ -7811,7 +7831,7 @@ export class ClientForAutoCompleteDto implements IClientForAutoCompleteDto {
 }
 
 export interface IClientForAutoCompleteDto {
-    nom: string | undefined;
+    displayName: string | undefined;
     id: number;
 }
 
@@ -8237,6 +8257,7 @@ export enum ModePaiementEnum {
     Liquide = 2,
     Effet = 3,
 }
+
 export class DevisItemDto implements IDevisItemDto {
     designation: string | undefined;
     date: moment.Moment;
@@ -8319,6 +8340,7 @@ export class CreateDevisInput implements ICreateDevisInput {
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
+    montantTtc: number;
 
     constructor(data?: ICreateDevisInput) {
         if (data) {
@@ -8345,6 +8367,7 @@ export class CreateDevisInput implements ICreateDevisInput {
                     this.devisItems.push(DevisItemDto.fromJS(item));
             }
             this.clientId = _data["clientId"];
+            this.montantTtc = _data["montantTtc"];
         }
     }
 
@@ -8371,6 +8394,7 @@ export class CreateDevisInput implements ICreateDevisInput {
                 data["devisItems"].push(item.toJSON());
         }
         data["clientId"] = this.clientId;
+        data["montantTtc"] = this.montantTtc;
         return data; 
     }
 
@@ -8393,6 +8417,7 @@ export interface ICreateDevisInput {
     statut: DevisStatutEnum;
     devisItems: DevisItemDto[] | undefined;
     clientId: number;
+    montantTtc: number;
 }
 
 export class UpdateDevisInput implements IUpdateDevisInput {
@@ -8723,7 +8748,6 @@ export interface IDevisDtoListResultDto {
     items: DevisDto[] | undefined;
 }
 
-
 export class FactureItemDto implements IFactureItemDto {
     designation: string | undefined;
     date: moment.Moment;
@@ -8806,6 +8830,7 @@ export class CreateFactureInput implements ICreateFactureInput {
     statut: FactureStatutEnum;
     factureItems: FactureItemDto[] | undefined;
     clientId: number;
+    montantTtc: number;
 
     constructor(data?: ICreateFactureInput) {
         if (data) {
@@ -8832,6 +8857,7 @@ export class CreateFactureInput implements ICreateFactureInput {
                     this.factureItems.push(FactureItemDto.fromJS(item));
             }
             this.clientId = _data["clientId"];
+            this.montantTtc = _data["montantTtc"];
         }
     }
 
@@ -8858,6 +8884,7 @@ export class CreateFactureInput implements ICreateFactureInput {
                 data["factureItems"].push(item.toJSON());
         }
         data["clientId"] = this.clientId;
+        data["montantTtc"] = this.montantTtc;
         return data; 
     }
 
@@ -8880,6 +8907,7 @@ export interface ICreateFactureInput {
     statut: FactureStatutEnum;
     factureItems: FactureItemDto[] | undefined;
     clientId: number;
+    montantTtc: number;
 }
 
 export class UpdateFactureInput implements IUpdateFactureInput {
@@ -10453,6 +10481,7 @@ export class GetCurrentLoginInformationsOutput implements IGetCurrentLoginInform
     application: ApplicationInfoDto;
     user: UserLoginInfoDto;
     tenant: TenantLoginInfoDto;
+    entrepriseName: string | undefined;
 
     constructor(data?: IGetCurrentLoginInformationsOutput) {
         if (data) {
@@ -10468,6 +10497,7 @@ export class GetCurrentLoginInformationsOutput implements IGetCurrentLoginInform
             this.application = _data["application"] ? ApplicationInfoDto.fromJS(_data["application"]) : <any>undefined;
             this.user = _data["user"] ? UserLoginInfoDto.fromJS(_data["user"]) : <any>undefined;
             this.tenant = _data["tenant"] ? TenantLoginInfoDto.fromJS(_data["tenant"]) : <any>undefined;
+            this.entrepriseName = _data["entrepriseName"];
         }
     }
 
@@ -10483,6 +10513,7 @@ export class GetCurrentLoginInformationsOutput implements IGetCurrentLoginInform
         data["application"] = this.application ? this.application.toJSON() : <any>undefined;
         data["user"] = this.user ? this.user.toJSON() : <any>undefined;
         data["tenant"] = this.tenant ? this.tenant.toJSON() : <any>undefined;
+        data["entrepriseName"] = this.entrepriseName;
         return data; 
     }
 
@@ -10498,6 +10529,7 @@ export interface IGetCurrentLoginInformationsOutput {
     application: ApplicationInfoDto;
     user: UserLoginInfoDto;
     tenant: TenantLoginInfoDto;
+    entrepriseName: string | undefined;
 }
 
 export class ActivityLogDto implements IActivityLogDto {

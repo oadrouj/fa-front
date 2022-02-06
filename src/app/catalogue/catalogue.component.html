@@ -41,8 +41,7 @@
                 </div>
             </div>
 
-            <app-table #dt1 [cols]="cols" [currency]="Currency" [styleClass]="'table'" (selectionChange)="selectionChange($event)" [styleId]="'devisList'" [SelectItemEvent]="notifySelectedDevisChanged.asObservable()" [highlightColorInput]="tableSelectionColor" [filterEvent]="filterSubject.asObservable()"
-                [getListApi$]="getListApi" [globalFilterFields]="['reference','client']">
+            <app-table #dt1 [cols]="cols" [currency]="Currency" [styleClass]="'table'" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [filterEvent]="filterSubject.asObservable()" [getListApi$]="getListApi" [globalFilterFields]="['reference','client']">
             </app-table>
 
             <!-- <div class="devisTotal flex justify-content-between align-items-center w-100">
@@ -60,7 +59,7 @@
                 <div class="content p-4">
                     <div class="flex flex-column px-1">
                         <h2>{{replaceIfIsNullOrEmpty('designation')}}</h2>
-                        <h2 class="lineHeight-18">{{replaceIfIsNullOrEmpty('description')}}</h2>
+                        <h2 class="lineHeight-18 text-2xl"> {{replaceIfIsNullOrEmpty('description')}}</h2>
                         <span class="color-purple text-xl">{{catalogueFormatReferenceNumber(selectedItem)}} -
                             {{replaceIfIsNullOrEmpty('catalogueType') | titlecase}} </span>
                         <div class="grid pt-3 w-25rem">

@@ -8,8 +8,6 @@ import {
   ViewChild,
 } from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
-import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
-import { DevisItem } from '@shared/models/DevisItem'
 import {
   CatalogueServiceProxy,
   ClientServiceProxy,
@@ -19,7 +17,8 @@ import {
 import { FormatService } from '@shared/services/format.service'
 import { FilterMatchMode, FilterService, LazyLoadEvent } from 'primeng/api'
 import { Table } from 'primeng/table'
-import { Subscription, Observable, zip, of } from 'rxjs'
+import { Observable } from 'rxjs'
+import { LazyTableService } from '@shared/services/lazy-table.service'
 
 @Component({
   selector: 'app-table',
@@ -47,21 +46,18 @@ export class TableComponent implements OnInit {
   @Input() styleId!: string
   @Input() loadLazy!: (event: any) => void
   @Input() globalFilterFields!: string[]
-  @Output() selectionChange = new EventEmitter<any>()
   @Input() rowDeletedEvent!: Observable<any>
   @Input() filterEvent!: Observable<any>
-  @Input() SelectItemEvent!: Observable<any>
   @Input() getListApi$: (event) => Observable<any>
   @Input() statusItems = []
   @ViewChild('tbl') table: Table
 
-  tableData: any
-  eventsSubscription!: Subscription
-  selectedItem!: any
+  tableData = []
   defaultRowToBeSelected: any
-  selectedDevis: any
-  montantTotalAllDevis = 0
+  montantTotal = 0
   totalRecords: any
+  rows = 7
+  first = 0
 
   @HostBinding('style')
   get style() {
@@ -77,40 +73,40 @@ export class TableComponent implements OnInit {
     private _factureServiceProxy: FactureServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
     private _catalogueServiceProxy: CatalogueServiceProxy,
+    private _lazyTableService: LazyTableService,
   ) {}
 
   ngOnInit(): void {
-    this.eventsSubscription = this.SelectItemEvent.subscribe(
-      (devisItem: any) => {
-        this.defaultRowToBeSelected = {
-          ...devisItem,
-          rowId: 0,
-        }
-      },
-    )
 
-    if (this.rowDeletedEvent) {
-      this.eventsSubscription = this.rowDeletedEvent.subscribe((res: any) => {
-        if (res && res.id) {
-          this.selectionChange.emit({ type: 'delete', result: res })
-          this.loadTableLazy();
-        }
-      })
-    }
+    this._lazyTableService.dataOperation$.subscribe(res => {
+      switch (res.action) {
+        case 'add':
+          this.addItem(res.payload)
+          break;
+      
+        case 'update':
+          this.updateItem(res.payload)
+        break;
 
-    this.eventsSubscription = this.filterEvent.subscribe((res: any) => {
+        case 'remove':
+          this.removeItem(res.payload)
+        break;
+      }
+    })
+
+    this.filterEvent.subscribe((res: any) => {
       if (res.type == 'filterByInput') {
-        if (this.isValidDate(res.value))
-          this.table.filterGlobal(new Date(res.value), 'equals')
-        else this.table.filterGlobal(res.value, 'contains')
+        this.table.filterGlobal(res.value, 'contains')
       } else {
         for (let item in res.value) {
-          if (res.value[item] instanceof Date) {
-            this.table.filter(res.value[item], item, 'equals')
-          } else this.table.filter(res.value[item], item, 'contains')
+          this.table.filter(res.value[item], item, 'contains')
         }
       }
     })
+  }
+
+  isValidDate(dateString: string) {
+    return (new Date(dateString) as any) != 'Invalid Date'
   }
 
   colMethod(rowData, field) {
@@ -122,42 +118,25 @@ export class TableComponent implements OnInit {
     }
   }
 
-  isValidDate(dateString: string) {
-    return (new Date(dateString) as any) != 'Invalid Date'
-  }
-
   onRowSelect(event: any) {
-    this.selectionChange.emit({ type: 'selectionChanged', result: event.data })
+    this._lazyTableService.emitRowSelected = event.data
   }
 
   onRowUnselect() {
-    this.selectionChange.emit({ type: 'selectionChanged', result: null })
+    this._lazyTableService.emitRowSelected = null
   }
 
-  previousFirstState: number
   loadTableLazy(event?: LazyLoadEvent) {
-    event && (this.previousFirstState = event.first)
-    !event &&
-      (event = {
-        first: this.previousFirstState,
-        rows: 7,
-        sortField: '',
-        sortOrder: 1,
-      })
-
-    console.log(event)
     this.getListApi$(event).subscribe((res) => {
-      console.log(res)
       // this.tableData = Array.from({length: res.length})
       // this.tableData.splice(event.first, event.rows, ...res.items);
-      this.tableData = [...res.items]
-      this.selectedDevis = this.tableData[0]
-      this.totalRecords = res.length
-      this.montantTotalAllDevis = res.montantTotalAllDevis
-      this.selectionChange.emit({
-        type: 'firstSelectionChanged',
-        result: res.items[0],
-      })
+      // if(res.items.length){
+        this.tableData = [...res.items]
+        this.totalRecords = res.length
+        this.montantTotal= res.montantTotalAllDevis
+        this.setSelectedRow(res.items[0].id)
+      // }
+   
     })
   }
 
@@ -167,5 +146,47 @@ export class TableComponent implements OnInit {
 
   getStatusItems(status){
     return this.statusItems.filter(item => item.actualStatus == status)
+  }
+
+  addItem(item: any){
+    this.loadTableLazy({
+      first: this.first,
+      rows: this.rows,
+      sortField: '',
+      sortOrder: 1,
+    })
+  }
+
+  updateItem(item){
+    let index = this.tableData.findIndex((element) => element.id == item.id)
+    this.tableData[index] = item
+    this.tableData = [...this.tableData]
+    this.setSelectedRow(item.id)
+
+  }
+
+  removeItem(id: number){
+    let firstAftetDelete = this.tableData.length == 1 ? this.first - this.rows : this.first
+    this.loadTableLazy({
+      first: firstAftetDelete,
+      rows: this.rows,
+      sortField: '',
+      sortOrder: 1,
+    })
+  }
+
+  setSelectedRow(id: number){
+    if(id){
+      let item = this.tableData.find(i => i.id == id)
+      this.defaultRowToBeSelected = { ...item, rowId: 0 }
+      this._lazyTableService.emitRowSelected = item
+    }
+    else
+      this._lazyTableService.emitRowSelected = null
+
+  }
+
+  getSumOfField(field){
+    return this.tableData.map(item => item[field]).reduce((accum, current) => accum + current)
   }
 }

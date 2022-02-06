@@ -1,27 +1,27 @@
 <div class="px-3 text-lg">
-    <h4>Statistiques Totale</h4>
+    <!-- <h4>Statistiques Totale</h4> -->
     <div class="total-statistics flex pt-2">
-        <div class="flex flex-column align-items-center flex-1 color-green">
-            <span>{{(issuedInvoices | number:'1.2-2') + ' MAD' }}</span>
-            <span>Factures EMISES</span>
+        <div class="flex flex-column align-items-center flex-1 color-green bg-white  py-4 mx-3 total-statistics-box">
+            <span class="text-4xl font-bold text-center">{{(issuedInvoices | number:'1.2-2') + ' MAD' }}</span>
+            <span class="text-2xl">FACTURES EMISES</span>
             <img src="assets/img/total-statistics-invoice.png" alt="" class="mt-2">
         </div>
 
-        <div class="flex flex-column align-items-center flex-1 color-blue">
-            <span>{{(issuedEstimates  | number:'1.2-2') + ' MAD' }}</span>
-            <span>DEVIS EMISES</span>
+        <div class="flex flex-column align-items-center flex-1 color-blue bg-white  py-4 mx-3 total-statistics-box">
+            <span class="text-4xl font-bold text-center">{{(issuedEstimates  | number:'1.2-2') + ' MAD' }}</span>
+            <span class="text-2xl">DEVIS EMISES</span>
             <img src="assets/img/total-statistics-estimate.png" alt="" class="mt-2">
         </div>
 
-        <div class="flex flex-column align-items-center flex-1 color-purple">
-            <span>{{clients}}</span>
-            <span>CLIENTS</span>
+        <div class="flex flex-column align-items-center flex-1 color-purple bg-white  py-4 mx-3 total-statistics-box">
+            <span class="text-4xl font-bold text-center">{{clients}}</span>
+            <span class="text-2xl">CLIENTS</span>
             <img src="assets/img/total-statistics-client.png" alt="" class="mt-2">
         </div>
 
-        <div class="flex flex-column align-items-center flex-1 color-red">
-            <span>{{products}}</span>
-            <span>PRODUITS</span>
+        <div class="flex flex-column align-items-center flex-1 color-red bg-white  py-4 mx-3 total-statistics-box">
+            <span class="text-4xl font-bold text-center">{{products}}</span>
+            <span class="text-2xl">PRODUITS</span>
             <img src="assets/img/total-statistics-product.png" alt="" class="mt-2">
         </div>
     </div>

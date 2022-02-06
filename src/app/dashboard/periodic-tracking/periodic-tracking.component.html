@@ -67,9 +67,9 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-6 ml-4">
-            <div class="grid">
+        <div style="border-left: solid 1px #D8D8D8;" class="mt-4 ml-2"></div>
+        <div class="col-6 px-0">
+            <div class="grid ml-3">
                 <div class="col-5">
                     <h4>Devis</h4>
                     <div class="flex justify-content-between mt-5">
@@ -99,9 +99,10 @@
                     </svg>
                 </div>
             </div>
-            <div>
+            <div style="border-bottom: solid 1px #D8D8D8;" class=""></div>
+            <div class="ml-3 mt-3">
                 <h4>Top Ventes</h4>
-                <div>
+                <div class="pl-2">
                     <div *ngFor="let item of bestsellerList;" class="">
                         <div class="w-6rem inline-flex">
                             <span class="">{{item.catalogName}}</span>
@@ -114,10 +115,11 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
-        <div class="">
+        <div style="border-left: solid 1px #D8D8D8;" class="mt-4 mr-3"></div>
+
+        <div class="p-2">
             <h4>Top Clients</h4>
             <div>
                 <div *ngFor="let item of topClientsList; let i=index" class="mt-2" [ngClass]="'text-' + topClientFontSizesList[i]">

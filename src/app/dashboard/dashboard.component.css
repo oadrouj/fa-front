@@ -1,14 +1,14 @@
 .dashboard-wrapper {
-    background: #fff;
+    /* background: #fff; */
     min-height: calc(100vh - 60px);
 }
 
 .grid {
-    gap: 0;
+    margin-top: 0rem;
+    margin-bottom: 0rem;
 }
 
 .box {
-    background: #fff;
     border-radius: 0.75rem;
 }
 

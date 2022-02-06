@@ -48,8 +48,9 @@ export class MonthGoalTrackingComponent implements OnInit {
       readOnly: true,
       animation: false,
       editableTooltip: false,
+      step: 0.01,
       tooltipFormat: function(args){
-        return args.value + '% <span style="color: #898E99 !important; font-size: 0.95rem;">Accompli</spam>'
+        return args.value.toFixed(2) + '% <span style="color: #898E99 !important; font-size: 0.95rem;">Accompli</spam>'
     }
    
     });
@@ -61,7 +62,7 @@ export class MonthGoalTrackingComponent implements OnInit {
     (document.querySelector('.rs-handle') as HTMLElement).style.background = '#5CBCA6';
     let tooltip = (document.querySelector('.rs-tooltip') as HTMLElement)
 
-    tooltip.style.fontSize = '2rem';
+    tooltip.style.fontSize = '1.75rem';
     tooltip.style.transform = 'translate(-50%, -50%)';
     tooltip.style.lineHeight = '1.5rem';
     tooltip.style.top = '55% !important';
@@ -76,7 +77,6 @@ export class MonthGoalTrackingComponent implements OnInit {
   }
 
   createOrUpdateMonthTargetAmount(){
-    console.log('toto !!')
     if(this.newMonthTargetAmount != undefined) {
      this._statisticsServiceProxy.createOrUpdateMonthTargetAmount(this.newMonthTargetAmount)
       .subscribe(res => {
@@ -86,7 +86,6 @@ export class MonthGoalTrackingComponent implements OnInit {
           this.inplace.deactivate()
 
           this.updateSlider(this.accomplishedAmount * 100 / this.monthTargetAmount)
-
         }
         else { 
 
@@ -96,7 +95,5 @@ export class MonthGoalTrackingComponent implements OnInit {
     else {
       this._toastService.error({detail: 'Vous devez remplir le chemps objectif de mois !'})
     }
-
   }
-
 }
