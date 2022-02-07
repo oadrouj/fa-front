@@ -166,7 +166,7 @@ export class TableComponent implements OnInit {
   }
 
   removeItem(id: number){
-    let firstAftetDelete = this.tableData.length == 1 ? this.first - this.rows : this.first
+    let firstAftetDelete = (this.tableData.length == 1 && this.first - this.rows >= 0) ? this.first - this.rows : this.first
     this.loadTableLazy({
       first: firstAftetDelete,
       rows: this.rows,

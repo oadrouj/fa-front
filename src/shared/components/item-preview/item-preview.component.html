@@ -18,12 +18,12 @@
         <div class="grid px-2 pt-3">
             <div class="col-8 flex flex-column">
                 <span class="color-gray">Pour:</span>
-                <span>{{getClientName}}</span>
-                <span>{{item && item.client.adresse}}</span>
-                <span>{{item && item.client.ville}}
-                    {{item && item.client.codePostal}}</span>
-                <span>{{item && item.client.pays}}</span>
-                <span class="mt-3">{{item && item.client.telPortable}}</span>
+                <span>{{item && item.client && item.client.displayName}}</span>
+                <span>{{item && item.client && item.client.adresse}}</span>
+                <span>{{item && item.client && item.client.ville}}
+                    {{item && item.client && item.client.codePostal}}</span>
+                <span>{{item && item.client && item.client.pays}}</span>
+                <span class="mt-3">{{item && item.client && item.client.telPortable}}</span>
             </div>
             <div class="col-4 flex flex-column">
                 <span class="block color-gray">De</span>
