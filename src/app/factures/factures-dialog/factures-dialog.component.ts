@@ -903,7 +903,7 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit {
 
   saveBrouillon() {
     // this.frm.nativeElement.classList.add('submitted')
-    if (this.formGroup.get('client').valid) {
+    if (this.formGroup.valid) {
       let reference
       if (this.dialogTitle == 'Nouvelle' || this.dialogTitle == 'Dupliquer') {
         reference = this.manuelReference
@@ -952,9 +952,7 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit {
           }
         })
     } else {
-      this._toastService.error({
-        detail: 'Veuillez remplir le chemps client: ',
-      })
+      this.displayFormValidationErrors()
     }
   }
 
@@ -1048,6 +1046,7 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit {
   }
   //#endregion
 
+  
   updateConvertedDevisStatus() {
     this._devisServiceProxy
       .changeDevisStatut(this.selectedDevisItem.id, DevisStatutEnum.Converti)

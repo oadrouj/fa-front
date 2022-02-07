@@ -186,6 +186,7 @@ export class ClientDialogComponent implements OnInit {
   valider() {
     this.validateForm()
     if (this.isFormValid) {
+      this.formClient.remisePermanente = this.formClient.remisePermanente ? this.formClient.remisePermanente : 0
       if (this.dialogStatus == DialogStatus.New) {
         this._clientServiceProxy
           .createClient(this.formClient)

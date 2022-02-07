@@ -878,7 +878,7 @@ export class DevisDialogComponent implements OnInit {
   }
 
   saveBrouillon() {
-    if (this.formGroup.get('client').valid) {
+    if (this.formGroup.valid) {
       if (this.manuelReference) {
         let reference
         if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
@@ -922,9 +922,8 @@ export class DevisDialogComponent implements OnInit {
         }
       }
     } else {
-      this._toastService.error({
-        detail: 'Cette référence est déjà existe',
-      })
+
+      this.displayFormValidationErrors()
     }
   }
 
@@ -948,10 +947,11 @@ export class DevisDialogComponent implements OnInit {
   }
 
   validateDevis() {
+    console.log(this.formGroup.value, this.formGroup.valid);
     let returnValue = of({ success: false, result: null })
     this.enableValidationClass()
   
-    if (this.formGroup.value) {
+    if (this.formGroup.valid) {
       let reference
       if (this.dialogTitle == 'Nouveau' || this.dialogTitle == 'Dupliquer') {
         reference = this.manuelReference
@@ -987,7 +987,8 @@ export class DevisDialogComponent implements OnInit {
           })
     } 
     else {
-      this.displayFormValidationErrors()
+      // this.displayFormValidationErrors()
+     this.displayFormValidationErrors()
     }
 
     return returnValue
