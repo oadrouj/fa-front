@@ -30,15 +30,22 @@ export class ItemPreviewComponent implements OnInit {
   @Input() remiseAmount: number
   @ViewChild('pdfTable', { static: false }) pdfTable: ElementRef
   printingMode: boolean
+  infosEntreprise: any
 
   constructor(
     private _sessionService: AppSessionService,
     private _ref: ChangeDetectorRef,
+    private _infosEntrepriseService: InfosEntrepriseServiceProxy,
   ) {}
 
   get getClientName() {
     return this.item && this.item.client.displayName
   }
+
+  get getEntrepriseName() {
+    return this._sessionService.entrepriseName
+  }
+
   contentItemsCols = [
     { header: 'DESIGNATION', field: 'designation', type: 'text', colspan: 2 },
     { header: 'DATE', field: 'date', type: 'date', colspan: 0 },
@@ -50,6 +57,12 @@ export class ItemPreviewComponent implements OnInit {
   ]
   ngOnInit() {
     console.log(this.logoSrc)
+    this.getEntrepriseInfosApi()
+  }
+
+  getEntrepriseInfosApi(){
+    this._infosEntrepriseService.getContactInfos()
+      .subscribe(res => { this.infosEntreprise = res})
   }
 
   getDateEcheance = (dateEmission: Date, echeance: number) =>
@@ -62,6 +75,8 @@ export class ItemPreviewComponent implements OnInit {
     this.summaryTVA = itemPreviewComponentArgs.summaryTVA
     this.summaryTotalHT = itemPreviewComponentArgs.summaryTotalHT
     this.logoSrc = itemPreviewComponentArgs.logoSrc
+    this.infosEntreprise = itemPreviewComponentArgs.infosEntreprise
+    
     this._ref.detectChanges()
   }
 

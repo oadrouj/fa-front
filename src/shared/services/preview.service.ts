@@ -11,7 +11,7 @@ import {
   ViewContainerRef,
   ViewRef,
 } from '@angular/core'
-import { InfosEntrepriseServiceProxy } from '@shared/service-proxies/service-proxies'
+import { ContactInfosDto, InfosEntrepriseDto, InfosEntrepriseServiceProxy } from '@shared/service-proxies/service-proxies'
 import { AppSessionService } from '@shared/session/app-session.service'
 import * as moment from 'moment'
 import { ItemPreviewComponent } from '../components/item-preview/item-preview.component'
@@ -31,6 +31,7 @@ export interface ItemPreviewComponentArgs {
   summaryTVA: number
   remiseAmount: number
   logoSrc: string
+  infosEntreprise: ContactInfosDto
 
 }
 
@@ -38,17 +39,25 @@ export interface ItemPreviewComponentArgs {
   providedIn: 'root',
 })
 export class PreviewService {
-  private  entrepriseName: string
+  infosEntreprise: ContactInfosDto
+  
   constructor(
     private _sessionService: AppSessionService,
     private componentFactoryResolver: ComponentFactoryResolver,
     private appRef: ApplicationRef,
     private injector: Injector,
     private _infosEntrepriseService: InfosEntrepriseServiceProxy,
-  ) {}
+  ) {
+    this.getEntrepriseInfosApi()
+  }
 
   private extractPreviewComponent(){
 
+  }
+
+  getEntrepriseInfosApi(){
+    this._infosEntrepriseService.getContactInfos()
+      .subscribe(res => { this.infosEntreprise = res})
   }
 
   previewItem(itemPreviewComponentInput: ItemPreviewComponentArgs) {
@@ -62,7 +71,7 @@ export class PreviewService {
     document.body.appendChild(domElem)
     document.body.style.width = '44%'
 
-    componentRef.instance.previewAsPDF(itemPreviewComponentInput)
+    componentRef.instance.previewAsPDF({...itemPreviewComponentInput, infosEntreprise: this.infosEntreprise})
     document.body.removeChild(domElem)
     document.body.style.width = '100%'
     componentRef.destroy()
@@ -79,7 +88,7 @@ export class PreviewService {
     document.body.appendChild(domElem)
     document.body.style.width = '44%'
 
-    componentRef.instance.downloadAsPDF(itemPreviewComponentInput)
+    componentRef.instance.downloadAsPDF({...itemPreviewComponentInput, infosEntreprise: this.infosEntreprise})
     document.body.removeChild(domElem)
     document.body.style.width = '100%'
     componentRef.destroy()
@@ -96,7 +105,7 @@ export class PreviewService {
     document.body.appendChild(domElem)
     document.body.style.width = '44%'
 
-    componentRef.instance.print(itemPreviewComponentInput)
+    componentRef.instance.print({...itemPreviewComponentInput, infosEntreprise: this.infosEntreprise})
     document.body.removeChild(domElem)
     document.body.style.width = '100%'
     componentRef.destroy()
