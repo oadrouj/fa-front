@@ -22,6 +22,7 @@ export interface ItemPreviewComponentInput {
   summaryTotalHT: number
   summaryTVA: number
   remiseAmount: number
+  logoSrc: string
 }
 
 export interface ItemPreviewComponentArgs {
@@ -60,7 +61,7 @@ export class PreviewService {
       .subscribe(res => { this.infosEntreprise = res})
   }
 
-  previewItem(itemPreviewComponentInput: ItemPreviewComponentArgs) {
+  previewItem(itemPreviewComponentInput: ItemPreviewComponentInput) {
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
       ItemPreviewComponent,
     )
@@ -77,7 +78,7 @@ export class PreviewService {
     componentRef.destroy()
   }
 
-  download(itemPreviewComponentInput: ItemPreviewComponentArgs) {
+  download(itemPreviewComponentInput: ItemPreviewComponentInput) {
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
       ItemPreviewComponent,
     )
@@ -94,7 +95,7 @@ export class PreviewService {
     componentRef.destroy()
   }
 
-  print(itemPreviewComponentInput: ItemPreviewComponentArgs){
+  print(itemPreviewComponentInput: ItemPreviewComponentInput){
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
       ItemPreviewComponent,
     )
