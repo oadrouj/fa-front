@@ -1,9 +1,9 @@
 <div class="px-4">
-    <p-dataView #dv [value]="activityLogItems" [rows]="5">
+    <p-dataView #dv [value]="activityLogItems" [rows]="3">
         <ng-template pTemplate="header">
             <div class="flex justify-content-between align-items-center">
                 <h4 class="">Activité récente</h4>
-                <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded border-none shadow-none"></button>
+                <button pButton pRipple (click)="showActivityLogDialog()" type="button" icon="pi pi-plus" class="p-button-rounded border-none shadow-none"></button>
             </div>
         </ng-template>
         <ng-template let-log pTemplate="listItem">
@@ -34,3 +34,40 @@
         </ng-template>
     </p-dataView>
 </div>
+
+<p-dialog header="Title" [(visible)]="displayModal" [style]="{width: '70vw',border:'0px solid #fff',borderRadius:'10px',zIndex:5}">
+    <p-dataView #dv [value]="activityLogAllItems">
+        <ng-template pTemplate="header">
+            <div class="flex justify-content-between align-items-center">
+                <h4 class="">Activité récente</h4>
+               
+            </div>
+        </ng-template>
+        <ng-template let-log pTemplate="listItem">
+            <div class="flex justify-content-between mb-3">
+                <div class="flex align-items-center">
+                    <div class="logoContainer flex justify-content-center mr-4">
+                        <img [src]="mapImageSrc(log.logType)" alt="">
+                    </div>
+
+                    <ng-container *ngIf="log.reference">
+                        <div class="">
+                            <span class="block">{{parseTitle(log.logType) + '-' + log.reference}}</span>
+                            <span class="color-dashboard mr-3">{{log.clientName || '-'}}</span>
+                            <span class="date">{{log.date.toDate() | date:'medium'}}</span>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="!log.reference && lodingIsComplete">
+                        <div class="">
+                            <span class="block">Historique Indisponible</span>
+                        </div>
+                    </ng-container>
+
+                </div>
+                <div>
+                    <h6 class="block">{{log.amount != undefined ? ((log.amount | number:'1.2-2') + ' ' + log.currency | uppercase) : '-' }} </h6>
+                </div>
+            </div>
+        </ng-template>
+    </p-dataView>
+</p-dialog>

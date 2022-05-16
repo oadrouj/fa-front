@@ -42,7 +42,7 @@ export class PeriodicTrackingComponent implements OnInit {
     this.consumeApi(undefined, undefined)
   }
 
-  consumeApi(startDate, endDate){
+  async consumeApi(startDate, endDate){
     this._statisticsServiceProxy
     .getPeriodicTrackingInfos(startDate, endDate)
     .subscribe((res) => {
@@ -59,15 +59,21 @@ export class PeriodicTrackingComponent implements OnInit {
       this.transformationPercentage = ((this.transformedInvoicesAmount * 100) / this.totalEstimatesAmount ) || 0
 
       this.bestsellerList = res.bestsellerPeriodicTrackingDto
+      console.log('res: '+JSON.stringify(res));
+      
       this.bestsellerTotalAmounts = this.bestsellerList.length && (res.bestsellerPeriodicTrackingDto
         .map((item) => item.amount)
         .reduce((accum, current) => accum + current))
 
       this.topClientsList = res.topClientsPeriodicTrackingDto
+
+      console.log("this.bestsellerList: "+ JSON.stringify(this.bestsellerList));
+      
     })
   }
 
   getBestsellerPercentage(amount) {
+    console.log("getBestsellerPercentage: "+(amount * 100) / this.bestsellerTotalAmounts);
     return (amount * 100) / this.bestsellerTotalAmounts
   }
 

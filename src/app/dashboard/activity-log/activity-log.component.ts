@@ -21,13 +21,15 @@ class ActivityLog {
   styleUrls: ['./activity-log.component.css']
 })
 export class ActivityLogComponent implements OnInit {
+  displayModal: boolean = false;
   lodingIsComplete: any;
 
   constructor(
     private _statisticsServiceProxy: StatisticsServiceProxy
   ) { }
 
-  activityLogItems = new Array<ActivityLog>(5)
+  activityLogItems = new Array<ActivityLog>(3)
+  activityLogAllItems= new Array<ActivityLog>()
   activityLogArray = Array.from({length: 5})
   activityLogTitles = ['estimate', 'invoice', 'payment', 'client', 'catalog']
 
@@ -51,7 +53,7 @@ export class ActivityLogComponent implements OnInit {
         return item
       
     }) as any)
-
+    this.activityLogItems=this.activityLogItems.slice(0,3)
     console.log(this.activityLogItems)
   })
   }
@@ -99,4 +101,26 @@ export class ActivityLogComponent implements OnInit {
     return this.activityLogItems && this.activityLogItems.findIndex(index);
   }
 
+  showActivityLogDialog() {
+    this.displayModal = true;
+
+    this._statisticsServiceProxy.getActivityLog().subscribe(res => {
+      this.lodingIsComplete = true;
+      this.activityLogAllItems = (res.items.map(item => {
+         if(item.logType == 'client'){
+           item.amount = undefined;
+           item.clientName = undefined;
+         }
+          
+         if(item.logType == 'catalog')
+          item.amount = undefined;
+         
+         console.log(item)
+         return item
+       
+     }) as any)
+ 
+     console.log(this.activityLogAllItems)
+})
+}
 }

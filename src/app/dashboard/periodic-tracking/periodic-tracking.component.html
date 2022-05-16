@@ -103,11 +103,11 @@
             <div class="ml-3 mt-3">
                 <h4>Top Ventes</h4>
                 <div class="pl-2">
-                    <div *ngFor="let item of bestsellerList;" class="">
+                    <div *ngFor="let item of bestsellerList" class="">
                         <div class="w-6rem inline-flex">
                             <span class="">{{item.catalogName}}</span>
                         </div>
-                        <p-progressBar [value]="getBestsellerPercentage(item.amount)" [showValue]="false">
+                        <p-progressBar [value]="getBestsellerPercentage(item.amount)" [showValue]="true">
                         </p-progressBar>
                         <div class="product-price text-xl text-right inline-flex ml-3">
                             <span>{{item.amount | number:'1.2-2' }} {{'MAD'}}</span>

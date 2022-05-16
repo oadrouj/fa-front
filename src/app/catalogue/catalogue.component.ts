@@ -124,7 +124,7 @@ export class CatalogueComponent implements OnInit {
     this.formGroup = this.formBuilder.group({
       designation: ['', Validators.required],
       description: [''],
-      unity: ['Heures'],
+      unity: [''],
       htPrice: [0],
       tva: [0],
       minimalQuantity: [1],

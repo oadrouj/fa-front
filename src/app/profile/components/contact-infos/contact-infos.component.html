@@ -12,8 +12,8 @@
         </div>
 
         <div class="col-6">
-            <app-dropdown-group [control]="this.formGroup.get('city')" [labelText]="'Ville'" [placeholder]="'Paris'" [options]="['Rabat', 'Tunisie', 'Paris']">
-            </app-dropdown-group>
+            <app-input-group [control]="this.formGroup.get('city')" [labelText]="'Ville'" [placeholder]="'La ville'">
+            </app-input-group>
             <div class="pt-3"></div>
             <app-input-group [control]="this.formGroup.get('postalCode')" [labelText]="'Code postal'" [placeholder]="'29000'">
             </app-input-group>

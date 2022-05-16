@@ -491,7 +491,7 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit {
     this.manuelReference = true
     this.formGroup.addControl(
       'reference',
-      new FormControl('', [
+      new FormControl(this.reference, [
         Validators.required,
         // Validators.pattern('[a-zA-Z][0-9]{5}'),
       ]),

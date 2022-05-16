@@ -469,7 +469,7 @@ export class DevisDialogComponent implements OnInit {
     this.manuelReference = true
     this.formGroup.addControl(
       'reference',
-      new FormControl('', [
+      new FormControl(this.reference, [
         Validators.required,
         // Validators.pattern('[\]+|[\d]'),
       ]),
