@@ -180,17 +180,18 @@ export class DevisComponent implements OnInit, AfterViewInit {
       type: 'text',
     },
     {
-      header: 'DATE D’EMISSION',
+      header: 'EMISSION',
       field: 'dateEmission',
       type: 'date',
       format: (date) => (date._i ? new Date(date._i) : new Date(date._d)),
     },
+    /* Hidding Echeance
     {
       header: 'ECHEANCE',
       field: 'echeancePaiement',
       type: 'text',
       suffix: 'jours',
-    },
+    },*/
     {
       header: 'MONTANT TTC',
       field: 'montantTtc',

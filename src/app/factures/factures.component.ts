@@ -170,18 +170,19 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       type: 'text',
     },
     {
-      header: 'DATE D’EMISSION',
+      header: 'EMISSION',
       field: 'dateEmission',
       type: 'date',
       format: (date) => (date._i ? new Date(date._i) : new Date(date._d)),
       colspan: 2,
     },
+    /* Hidding Echeance
     {
       header: 'ECHEANCE',
       field: 'echeancePaiement',
       type: 'text',
       suffix: 'jours',
-    },
+    },*/
     {
       header: 'MONTANT TTC',
       field: 'montantTtc',

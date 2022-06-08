@@ -47,7 +47,7 @@
                             </div>
                             <div class="grid align-items-center">
                                 <div class="col-5">
-                                    <p>Date d'émission</p>
+                                    <p>Emission</p>
                                 </div>
                                 <div class="col-7">
                                     <p-calendar formControlName="dateEmission" dateFormat="dd-mm-yy" icon="pi pi-calendar" [showIcon]="true" (onSelect)="onSelectIssueDateCalendar()">
@@ -197,8 +197,8 @@
                     <p-accordion #acrd class="shadow-2">
                         <div class="py-3 px-4 bg-white " [ngClass]="'color-' + primaryColor">Options</div>
                         <p-accordionTab header="Remise" [selected]="false">
-                            <p-toggleButton #tglBtn formControlName="remiseBtnIsChecked" onLabel="Désactiver" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check" (onChange)="toggleRemiseOption($event)"></p-toggleButton>
-                            <p-inputNumber *ngIf="tglBtn.checked" formControlName="remise" (onInput)="remiseAmountChanged($event.value)" suffix="%" class="mt-2">
+    
+                            <p-inputNumber formControlName="remise" (onInput)="remiseAmountChanged($event.value)" suffix="%" class="mt-2">
                             </p-inputNumber>
                         </p-accordionTab>
                         <p-accordionTab header="TVA">
