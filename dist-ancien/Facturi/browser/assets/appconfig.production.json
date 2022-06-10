@@ -1,5 +1,5 @@
 {
-    "remoteServiceBaseUrl": "http://localhost:21021",
+    "remoteServiceBaseUrl": "http://app.facturi.ma:8000",
     "appBaseUrl": "http://localhost",
     "localeMappings": [{
             "from": "pt-BR",

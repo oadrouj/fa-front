@@ -8,7 +8,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against 142.11.215.22",
-            "url": "http://localhost:4200",
+            "url": "http://app.facturi.ma",
             "sourceMaps": true,
             "webRoot": "${workspaceFolder}"
         }
