@@ -20,6 +20,7 @@ import { FormatService } from '@shared/services/format.service'
 import { ConfirmationService, LazyLoadEvent, MessageService } from 'primeng/api'
 import { BehaviorSubject, Observable, of, Subscription } from 'rxjs'
 import { ToastService } from '@shared/services/toast.service'
+import { ConvertCurrencyService } from '@shared/services/convert-currency.service'
 import {
   ClientForAutoCompleteDto,
   ClientForAutoCompleteDtoListResultDto,
@@ -106,6 +107,7 @@ export class DevisDialogComponent implements OnInit {
     private _previewService: PreviewService,
     private _fileApiServiceProxy: FileApiServiceProxy,
     private  _sanitizer: DomSanitizer,
+    private _currencyConverterService: ConvertCurrencyService
   ) {}
 
   updateState(status) {
@@ -240,6 +242,7 @@ export class DevisDialogComponent implements OnInit {
   referenceCount: number = 0
   dialogTitle!: string
   Currency: string = 'MAD'
+  OldCurrency: string ='MAD'
   clientSuggestions!: ClientForAutoCompleteDto[]
   echeancePayementOptions = [30, 60, 90]
   echeancePayementSelected = this.echeancePayementOptions[0] || ''
@@ -1138,5 +1141,22 @@ export class DevisDialogComponent implements OnInit {
       ]
       this.formGroup.get('client').setValue(clientForAutoCompleteDto)
     }
+  }
+
+
+  currencyChangeConvertAmounts(event){
+    this.OldCurrency = this.Currency
+    this.Currency = event.value
+    this._currencyConverterService.convertDevise(this.OldCurrency, this.Currency,this.summaryTotalHT)
+    .subscribe({
+      next: data => {
+        console.log(data);
+        console.log("Yessss");
+         
+        },
+        error: error => {
+         console.log(error)
+        }
+    });
   }
 }

@@ -63,7 +63,7 @@
                         </ng-container>
                         <ng-container *ngSwitchCase="'currency'">
                             <td [colSpan]="colVar.colspan" mode="decimal">
-                                {{yourRowVaraible[colVar.field] | number:'1.2-2' }} {{' ' + (item && item.currency)}}
+                                {{yourRowVaraible[colVar.field] | number:'1.2-2' }} <!-- {{' ' + (item && item.currency)}} -->
                             </td>
                         </ng-container>
                         <ng-container *ngSwitchCase="'pourcentage'">

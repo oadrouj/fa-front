@@ -205,7 +205,7 @@
                             <p-toggleButton onLabel="Désactiver" formControlName="tva" (onChange)="toggleTVAOption($event.checked)" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check"></p-toggleButton>
                         </p-accordionTab>
                         <p-accordionTab header="Devise">
-                            <p-dropdown formControlName="devise" [options]="currencies" (onChange)="Currency = $event.value" [appendTo]="acrd" placeholder="Sélectionner un devise">
+                            <p-dropdown formControlName="devise" [options]="currencies" (onChange)="currencyChangeConvertAmounts($event)" [appendTo]="acrd" placeholder="Sélectionner un devise">
                             </p-dropdown>
                         </p-accordionTab>
                     </p-accordion>

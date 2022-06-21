@@ -3591,8 +3591,10 @@ export class FileApiServiceProxy {
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = new FormData();
-        if (file !== null && file !== undefined)
+        if (file !== null && file !== undefined){
+            console.log("Test isset(File) ")
             content_.append("file", file.data, file.fileName ? file.fileName : "file");
+        }
 
         let options_ : any = {
             body: content_,

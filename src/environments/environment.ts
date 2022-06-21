@@ -6,5 +6,9 @@
 export const environment = {
     production: false,
     hmr: false,
-    appConfig: 'appconfig.json'
+    appConfig: 'appconfig.json',
+    currencyAPI:{
+        'X-RapidAPI-Key': "910196889cmshbd50f6a50c2d860p1c89a7jsn31b9c4fc5d79",
+        'X-RapidAPI-Host':"http://currency-converter5.p.rapidapi.com"
+    }
 };

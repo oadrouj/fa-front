@@ -11,6 +11,7 @@ import { GeneralInfoComponent } from './components/general-info/general-info.com
 import { ContactInfosComponent } from './components/contact-infos/contact-infos.component';
 import { DefaultAnnotationsComponent } from './components/default-annotations/default-annotations.component';
 import { ChangeProfileContainerTitleService } from '@shared/services/change-profile-container-title.service';
+import { ImageCropperModule } from 'ngx-image-cropper';
 
 @NgModule({
   imports: [
@@ -18,6 +19,7 @@ import { ChangeProfileContainerTitleService } from '@shared/services/change-prof
       { path: '', component: ProfileComponent}
   ]),
     PrimengSharedModule,
+    ImageCropperModule
   ],
   providers: [ChangeProfileContainerTitleService],
   declarations: [

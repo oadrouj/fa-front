@@ -17,6 +17,7 @@ import {
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 import { ToastService } from '@shared/services/toast.service'
 import { AppSessionService } from '@shared/session/app-session.service'
+import { base64ToFile, Dimensions, ImageCroppedEvent, ImageTransform } from 'ngx-image-cropper'
 import { FileUpload } from 'primeng/fileupload'
 import { zip } from 'rxjs'
 import { map } from 'rxjs/operators'
@@ -33,7 +34,20 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
   logoIsRemoved: any
   displayedImage: any
   formGroup: FormGroup
+
+
   @ViewChild('fu') fileUpload: FileUpload
+
+  imageChangedEvent: any = '';
+  croppedImage: any = '';
+  canvasRotation = 0;
+  rotation = 0;
+  scale = 1;
+  showCropper = false;
+  containWithinAspectRatio = false;
+  transform: ImageTransform = {};
+  imageCroppedInstance : ImageCroppedEvent;
+  cropperCleanImageURL:any;
 
   constructor(
     private _formBuider: FormBuilder,
@@ -103,6 +117,12 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
     this.displayedImage = event.files[0].objectURL
     this.uploadedImage = event.files[0]
     this.shouldShowDefaultImage = false
+
+    this.cropperCleanImageURL = this._sanitizer.bypassSecurityTrustUrl(event.files[0].objectURL);
+    console.log(this.cropperCleanImageURL);
+    console.log(this.cropperCleanImageURL.changingThisBreaksApplicationSecurity);
+    this.imageChangedEvent = event.originalEvent;
+
   }
 
   clear() {
@@ -121,12 +141,13 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
   }
 
   save() {
+    console.log(this.uploadedImage);
     if (this.formGroup.valid) {
       if (!!this.uploadedImage) {
         //Upload Image
         let file: FileParameter = {
           fileName: this.uploadedImage.name,
-          data: this.uploadedImage,
+          data: base64ToFile(this.displayedImage),
         }
 
         this._fileApiServiceProxy
@@ -236,5 +257,30 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
     
   }
 
-  onUpload(event) {}
+  imageCropped(event: ImageCroppedEvent) {
+    this.croppedImage = event.base64;
+    console.log(event, base64ToFile(event.base64));
+   
+    this.displayedImage = event.base64;
+  }
+
+  imageLoaded() {
+    this.showCropper = true;
+    console.log('Image loaded');
+  }
+
+  cropperReady(sourceImageDimensions: Dimensions) {
+    console.log('Cropper ready', sourceImageDimensions);
+  }
+
+  loadImageFailed() {
+    console.log('Load failed');
+  }
+  onUpload(event) {
+   /*  console.log("test upload cropeer");
+    console.log(event);
+    this.imageChangedEvent = event; */
+  }
+
+
 }

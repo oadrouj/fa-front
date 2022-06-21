@@ -267,7 +267,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       case DevisStatutEnum.Valide:
         return 'Validé'
       case DevisStatutEnum.Converti:
-        return 'Convérti'
+        return 'Converti'
       case DevisStatutEnum.Rejete:
         return 'Rejeté'
       case DevisStatutEnum.Expire:
@@ -530,6 +530,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
   dialogComponentShown = false
 
   showFactureDialog() {
+
+    this._toastService.info({
+      summary: 'Conversion réussie',
+      detail: 'Devis converti avec succés',
+    })
     this.invoiceItemProp = {
       ...this.selectedDevisItem,
       factureItems: this.selectedDevisItem.devisItems,
