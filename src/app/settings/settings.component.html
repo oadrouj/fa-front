@@ -1,0 +1,137 @@
+<div class="full-screen">
+
+    <p-card styleClass="settings-card" class="settings-card">
+        <ng-template pTemplate="header">
+           <h4 class="color-green mb-1">Paramètres</h4>
+           <p>Consultez ou modifiez les paramètres de votre compte</p>
+        </ng-template>
+        <form [formGroup]="formGroup">
+            <div class="grid blockForm mt-1">
+                <div class="col-md-6 col-sm-12">
+                    <p class="m-0">TVA par défaut</p>
+                    <span style="width: 100%">
+                        <p-dropdown class="w-100" [style]="{'minWidth':'100%'}" formControlName="tva" [options]="tvas" placeholder="Sélectionner un devise">
+                        </p-dropdown>
+                    </span>
+                </div>
+    
+                <div class="col-md-6 col-sm-12">
+                    <p class="m-0">Devise par défaut</p>
+                    <span style="width: 100%">
+                        <p-dropdown class="w-100" [style]="{'minWidth':'100%'}" formControlName="devise" [options]="devises" placeholder="Sélectionner un devise">
+                        </p-dropdown>
+                    </span>
+    
+                </div>
+            </div>
+            <div class="user-infos mt-3">
+                <div class="row">
+                    <p class="col-4">Votre nom d'utilisateur</p>
+                    <p class="col-4">{{user?.emailAddress}}</p>
+                    <p class="col-4 color-green"><a class="open-dialog-links" (click)="openChangeMail()">Changer</a></p>
+                </div>
+                <div class="row">
+                    <p class="col-4">Votre mot de passe</p>
+                    <p class="col-4">**********</p>
+                    <p class="col-4 color-green"><a class="open-dialog-links" (click)="openChangePass()">Changer</a></p>
+                </div>
+                <div class="row">
+                    <p class="col-4">Type d'abonnement</p>
+                    <p class="col-4">Gratuit</p>
+                    <p class="col-4 color-green"><a class="open-dialog-links" href="javascript:void(0)">S'abonner</a></p>
+                </div>
+                <div class="row">
+                    <p class="col-4"></p>
+                    <p class="col-4">8/10 Devis ou Factures Créés</p>
+                    <p class="col-4 color-green">2 Restants</p>
+                </div>
+            </div>
+            
+           
+        </form>
+    
+        <ng-template pTemplate="footer">
+            <div class="w-100 d-flex justify-content-end">
+                <p-button id="buttonValider" class="bg-green" [icon]="iconClassesTvaCurrency" (click)="submitTvaCurrency()" label="Enregistrer"></p-button>
+            </div>
+        </ng-template>
+    </p-card>
+</div>
+<p-dialog #dialog id="dialogUpdatePass" header="{{dialogTitle}}" [(visible)]="dialogDisplay" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
+  
+     <form [formGroup]="formGroupPass">
+            <div class="w-100 mt-1">
+                <div class="col-12">
+                    <p class="m-0 ">Mot de passe actuel</p>
+                    <div class="p-inputgroup mb-3">
+                        <input class= "w-100"  [type]="hideCurrentPass ? 'password':'text'" pInputText placeholder="" formControlName="currentPassword" />
+                        <div class="p-inputgroup-addon">
+                          <i  class="cursor-pointer fa" [ngClass]="{
+                            'fa-eye-slash': hideCurrentPass, 
+                            'fa-eye': !hideCurrentPass}" (click)="hideCurrentPass = !hideCurrentPass"></i>
+                        </div>
+                    </div>
+                    <span class="invalid-control" *ngIf="fPass.currentPassword.errors && fPass.currentPassword.touched">
+                        <span *ngIf="fPass.currentPassword.errors.required">Veuillez saisir un nouveau mot de passe</span>
+                    </span>
+                </div>
+                <div class="col-12">
+                    <p class="m-0">Nouveau mot de passe</p>
+                    <input class= "w-100" type="text" pInputText placeholder="" formControlName="newPassword" />
+                    <span class="invalid-control" *ngIf="fPass.newPassword.errors && fPass.newPassword.touched">
+                        <span *ngIf="fPass.newPassword.errors.required">Veuillez saisir un nouveau mot de passe</span>
+                        <span *ngIf="fPass.newPassword.errors.mustMatch">Les mots de passes ne correspondent pas</span>
+                        <span *ngIf="fPass.newPassword.errors.pattern">Votre mot de passe doit contenir au moins huit
+                            caractères,
+                            au moins une lettre majuscule, une lettre minuscule et un chiffre et un caractère spécial !</span>
+                    </span>
+                </div>
+                <div class="col-12">
+                    <p class="m-0">Confirmer votre mot de passe</p>
+                    <input class= "w-100" type="text" (onChange)="formGroupPass.updateValueAndValidity()" pInputText placeholder="" formControlName="confirmPassword" />
+                    <span class="invalid-control" *ngIf="fPass.confirmPassword.errors && fPass.confirmPassword.touched">
+                        <span *ngIf="fPass.confirmPassword.errors.required">Veuillez confirmer votre mot de passe</span>
+                        <span *ngIf="fPass.confirmPassword.errors.mustMatch">Les mots de passes ne correspondent pas</span>
+                       <!--  <span *ngIf="fPass.confirmPassword.errors.pattern">Votre mot de passe doit contenir au moins huit
+                            caractères,
+                            au moins une lettre majuscule, une lettre minuscule et un chiffre et un caractère spécial !</span> -->
+                    </span>
+                </div>
+            </div>
+        </form>
+    <ng-template pTemplate="footer">
+       <div class="d-flex w-100 justify-content-center">
+        <button pButton class="buttonValider" label="Valider" [icon]="iconClasses" (click)="submitChangePass()" [disabled] ="!formGroupPass.valid"></button>
+        <button pButton class="buttonAnnuler" label="Annuler" (click)="closeChangePass()"></button>
+       </div>
+    </ng-template>
+</p-dialog>
+
+<p-dialog id="dialogUpdateMail" header="{{dialogTitleMail}}" [(visible)]="dialogDisplayMail" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
+  
+    <form [formGroup]="formGroupMail">
+           <div class="w-100 mt-1">
+               
+               <div class="col-12">
+                   <p class="m-0">Adresse Email</p>
+                   <input class= "w-100" type="text" pInputText placeholder="Nouvelle adresse Email" formControlName="emailAddress" />
+                   <span class="invalid-control" *ngIf="fMail.emailAddress.errors && fMail.emailAddress.touched">
+                       <span *ngIf="fMail.emailAddress.errors.required">Veuillez saisir une nouvelle adresse email</span>
+                       <span *ngIf="fMail.emailAddress.errors.emailExists && user.emailAddress != fMail.emailAddress.value">
+                        Cette adresse email existe déjà dans notre base.
+                        </span>
+                        <span *ngIf="fMail.emailAddress.errors.pattern">Veuillez saisir une adresse email valide : example@example.com</span>
+                   </span>
+               </div>
+             
+           </div>
+       </form>
+   <ng-template pTemplate="footer">
+      <div class="d-flex w-100 justify-content-center">
+       <button pButton class="buttonValider" label="Valider" [icon]="iconClassesMail" (click)="submitChangeMail()" [disabled] ="!formGroupMail.valid"></button>
+       <button pButton class="buttonAnnuler" label="Annuler" (click)="closeChangeMail()"></button>
+      </div>
+   </ng-template>
+</p-dialog>
+
+<p-toast [style]="{marginTop: 'marginTop'}" styleClass="styleClass"></p-toast>

@@ -28,7 +28,7 @@ export class ProfileComponent implements OnInit {
       this.dynamicTitle = res
     })
 
-    this.favIcon.href = 'assets/img/DevisLogo.png'
+    this.favIcon.href = 'assets/img/MonProfilIcon.png'
   }
   
 }

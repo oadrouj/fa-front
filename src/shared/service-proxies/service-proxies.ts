@@ -13,6 +13,7 @@ import { Injectable, Inject, Optional, InjectionToken } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
 
 import * as moment from 'moment';
+import { environment } from 'environments/environment';
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
@@ -1225,6 +1226,7 @@ export class CustomAccountServiceProxy {
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+        console.log(`OUSSAMA LOG FROM CUSTOM ACCOUNT PROXY ${this.baseUrl}`);
     }
 
     /**
@@ -1280,6 +1282,185 @@ export class CustomAccountServiceProxy {
         }
         return _observableOf<boolean>(<any>null);
     }
+
+     /**
+     * @param id (optional) 
+     * @param currentPassword (optional) 
+     * @param newPassword (optional) 
+     * @param confirmPassword (optional) 
+     * @return Success
+     */
+    updatePassword(id: number | null | undefined, currentPassword: string | null | undefined, newPassword: string | null | undefined, confirmPassword: number | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/CustomAccount/ChangePassword?";
+        if (id !== undefined && id !== null)
+        url_ += "id=" + encodeURIComponent("" + id) + "&";
+        if (currentPassword !== undefined && currentPassword !== null)
+            url_ += "currentPassword=" + encodeURIComponent("" + currentPassword) + "&";
+        if (newPassword !== undefined && newPassword !== null)
+            url_ += "newPassword=" + encodeURIComponent("" + newPassword) + "&";
+        if (confirmPassword !== undefined && confirmPassword !== null)
+            url_ += "confirmPassword=" + encodeURIComponent("" + confirmPassword) + "&";
+    
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdatePassword(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdatePassword(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdatePassword(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
+    }
+
+     /**
+     * @param userId (optional) 
+     * @param emailAddress (optional) 
+     * @return Success
+     */
+      updateMail(userId: number | null | undefined, emailAddress: string | null | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/CustomAccount/ChangeEmail?";
+        if (userId !== undefined && userId !== null)
+        url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+        if (emailAddress !== undefined && emailAddress !== null)
+            url_ += "emailAddress=" + encodeURIComponent("" + emailAddress) + "&";
+    
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateMail(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateMail(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdateMail(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
+    }
+
+     /**
+     * @param id (optional) 
+     * @return Success
+     */
+      getUserById(id: number | null | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/CustomAccount/GetUserById?";
+        if (id !== undefined && id !== null)
+        url_ += "id=" + encodeURIComponent("" + id) + "&";
+       
+    
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetUserById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetUserById(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetUserById(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
+    }
+
 
     /**
      * @param emailAddress (optional) 
@@ -4002,6 +4183,65 @@ export class InfosEntrepriseServiceProxy {
     }
 
     protected processUpdateGeneralInfos(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
+    }
+
+    /**
+     * @param id (required) 
+     * @param tva (optional) 
+     * @param currency (optional) 
+     * @return Success
+     */
+     updateTvaAndCurrency(body: TvaCurrencyDto | undefined): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/services/app/InfosEntreprise/UpdateTvaAndCurrency";
+        url_ = url_.replace(/[?&]$/, "");
+
+        console.log(body);
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body:content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateTvaAndCurrency(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateTvaAndCurrency(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdateTvaAndCurrency(response: HttpResponseBase): Observable<boolean> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -9485,9 +9725,13 @@ export interface IInfosEntrepriseDto {
 }
 
 export class GeneralInfosDto implements IGeneralInfosDto {
+
     raisonSociale: string | undefined;
     secteurActivite: string | undefined;
+    tva: string | undefined;
+    currency: string | undefined;
     hasLogo: boolean | undefined;
+
     id: number;
 
     constructor(data?: IGeneralInfosDto) {
@@ -9504,6 +9748,8 @@ export class GeneralInfosDto implements IGeneralInfosDto {
             this.raisonSociale = _data["raisonSociale"];
             this.secteurActivite = _data["secteurActivite"];
             this.hasLogo = _data["hasLogo"];
+            this.tva = _data["tva"];
+            this.currency = _data["currency"];
             this.id = _data["id"];
         }
     }
@@ -9520,6 +9766,8 @@ export class GeneralInfosDto implements IGeneralInfosDto {
         data["raisonSociale"] = this.raisonSociale;
         data["secteurActivite"] = this.secteurActivite;
         data["hasLogo"] = this.hasLogo;
+        data["currency"] = this.currency;
+        data["tva"] = this.tva;
         data["id"] = this.id;
         return data; 
     }
@@ -9536,6 +9784,45 @@ export interface IGeneralInfosDto {
     raisonSociale: string | undefined;
     secteurActivite: string | undefined;
     hasLogo: boolean | undefined;
+    tva: string | undefined;
+    currency: string | undefined;
+    id: number;
+}
+
+export class TvaCurrencyDto implements ITvaCurrencyDto {
+
+    currency: string | undefined;
+    tva: string | undefined;
+    id: number;
+
+    constructor(data?: ITvaCurrencyDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tva = _data["tva"];
+            this.currency = _data["currency"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): TvaCurrencyDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TvaCurrencyDto();
+        result.init(data);
+        return result;
+    }
+}
+
+export interface ITvaCurrencyDto {
+    tva: string | undefined;
+    currency: string | undefined;
     id: number;
 }
 

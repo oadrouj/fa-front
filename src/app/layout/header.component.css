@@ -1,6 +1,7 @@
 :host>>>.main-header {
     margin-left: 0rem!important;
     z-index: 2000;
+    height:60px;
 }
 
 .pi-bell {

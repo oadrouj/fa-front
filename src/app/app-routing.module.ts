@@ -50,6 +50,13 @@ import { AppRouteGuard } from '@shared/auth/auth-route-guard';
                         data: { preload: true},
                         canActivate: [AppRouteGuard]
                     }
+                    ,
+                    {
+                        path: 'Parametres',
+                        loadChildren: () => import('./settings/settings.module').then(m => m.SettingsModule),
+                        data: { preload: true},
+                        canActivate: [AppRouteGuard]
+                    }
 
                     // { path: 'home', component: HomeComponent,  canActivate: [AppRouteGuard] },
                     // { path: 'users', component: UsersComponent, data: { permission: 'Pages.Users' }, canActivate: [AppRouteGuard] },

@@ -45,8 +45,8 @@ import { EstimateInvoiceStatusStateService } from './services/estimate-invoice-s
 import { DataViewModule } from 'primeng/dataview';
 import {InplaceModule} from 'primeng/inplace';
 import {ListboxModule} from 'primeng/listbox';
-
-import { ClientDialogComponent } from '../app/clients/client-dialog/client-dialog.component'
+import {CardModule} from 'primeng/card';
+import {ClientDialogComponent } from '../app/clients/client-dialog/client-dialog.component'
 
 @NgModule({
   imports: [
@@ -85,7 +85,8 @@ import { ClientDialogComponent } from '../app/clients/client-dialog/client-dialo
     VirtualScrollerModule,
     DataViewModule,
     InplaceModule,
-    ListboxModule
+    ListboxModule,
+    CardModule,
   ],
 
   declarations: [
@@ -134,7 +135,7 @@ import { ClientDialogComponent } from '../app/clients/client-dialog/client-dialo
     DataViewModule,
     InplaceModule, 
     ListboxModule,
-
+    CardModule,
     TableComponent,  
     FacturesDialogComponent,
     ItemPreviewComponent,

@@ -1,0 +1,149 @@
+::ng-deep .p-card{
+    background-color: white !important;
+    padding: 1.25rem;
+    border-radius: 20px !important;
+    -webkit-box-shadow: 0px 0px 2px 3px rgba(201,201,201,0.58); 
+    box-shadow: 0px 0px 2px 3px rgba(201,201,201,0.58);
+    .p-card-body{
+        padding: 0 !important;
+
+        .grid{
+            padding-bottom:20px;
+            border-bottom: solid 3px #f2f2f2;
+        }
+        p-inputNumber {
+            width:100% !important;
+
+            span {
+                width:100%;
+            }
+        }
+        p-dropdown {
+            width:100% !important;
+            min-width:100% !important;
+        }
+
+        .user-infos{
+            p{
+                margin-bottom:3px !important;
+            }
+        }
+        p-button{
+            border-radius:4px;
+        }
+        .p-button{
+            background-color: var(--green-color);
+            border: 1px solid var(--green-color);
+            padding: 0.4rem 1.25rem;
+            border-radius: 4px;
+        }
+        .p-button:hover{
+            background-color: #0f8749;
+            border: 1px solid #0f8749;
+        }
+    }
+
+    .open-dialog-links{
+        color: var(--green-color);
+        cursor:pointer;
+    }
+    .open-dialog-links:hover, .open-dialog-links:active, .open-dialog-links:focus {
+        text-decoration: underline;
+        text-decoration-color: var(--green-color);
+    }
+}
+
+.full-screen{
+    width: 90%;
+    height: calc(95vh - 60px);
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.settings-card {
+    width:60%;
+
+    p{
+        font-size:12px;
+        font-weight: 600;
+    }
+}
+
+::ng-deep #dialogUpdatePass, ::ng-deep #dialogUpdateMail{
+    p{
+        font-weight:600;
+        color: #a39da8;
+    }
+    .p-dialog{
+        width:40% !important;
+
+        .p-dialog-header{
+            background-color: var(--green-color) !important;
+            color:#fff;
+        }
+
+        input.p-inputtext{
+            padding: 0.3rem 0.5rem !important;
+            border-radius:6px;
+        }
+        .p-inputtext:enabled:hover {
+            border-color: var(--green-color);
+            border-left:none;
+            border-right:none;
+            border-top:none;
+        }
+        .p-inputtext:enabled:focus {
+            outline: 0 none;
+            outline-offset: 0;
+            box-shadow: 0 4px 2px -2px #b5fcd7;
+            border-color: var(--green-color);
+            border-left:none;
+            border-right:none;
+            border-top:none;
+        }
+
+        .p-inputgroup-addon {
+            border-left: 0 none;
+            background: transparent;
+            margin-left: -5px;
+        }
+        .p-inputgroup .p-inputtext {
+            border-right: 0;
+        }
+        p-button{
+            border-radius:15px;
+        }
+        .p-button{
+            padding: 0.4rem 1.25rem;
+            border-radius: 15px;
+            font-weight:600;
+            cursor:pointer;
+        }
+        .buttonAnnuler{
+            background-color: #a39da8;
+            border: 1px solid #a39da8;
+
+        }
+
+        .buttonAnnuler:hover{
+            background-color: #86818a;
+            border: 1px solid #86818a;
+
+        }
+        .buttonValider{
+            background-color: var(--green-color);
+            border: 1px solid var(--green-color);
+        }
+        .buttonValider:hover{
+            background-color: #0f8749;
+            border: 1px solid #0f8749;
+        }
+    }
+    
+}
+::ng-deep p-toast{
+    z-index: 11001;
+    .p-toast{
+        z-index: 11001 !important;
+    }
+}
