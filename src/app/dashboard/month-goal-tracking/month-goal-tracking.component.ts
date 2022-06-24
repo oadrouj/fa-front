@@ -14,7 +14,7 @@ export class MonthGoalTrackingComponent implements OnInit {
   monthTargetAmount = 0;
   accomplishedAmount = 0;
   newMonthTargetAmount: any;
-
+  progressRate: number = 0;
   @ViewChild("inplace") inplace 
   accomplishedAmountPercentage: any;
 
@@ -28,10 +28,42 @@ export class MonthGoalTrackingComponent implements OnInit {
       this.monthTargetAmount = res.monthTargetAmount 
       this.accomplishedAmount = res.accomplishedAmount
 
+      console.log(this.accomplishedAmount)
+      console.log(this.monthTargetAmount)
+      console.log(this.accomplishedAmount * 100 / this.monthTargetAmount)
+
+      this.progressRate = this.accomplishedAmount * 100 / this.monthTargetAmount;
+      console.log('OUSSAMA LOG: ',this.progressRate);
+
+       $("#slider1").roundSlider({
+        value: this.progressRate,
+        disabled: false,
+        radius: 70,
+        width: 4,
+        handleSize: "+5",
+        handleShape: "full",
+        handleColor: '#5CBCA6',
+        sliderType: "min-range",
+        startAngle: 90,
+        svgMode: true,
+        borderColor: 'none',
+        pathColor: '#EFF3FB',
+        rangeColor: '#5CBCA6',
+        readOnly: true,
+        animation: false,
+        editableTooltip: true,
+        step: 0.01,
+        tooltipFormat: function(args){
+          return `</br><span style="color: #898E99 !important; font-size: 0.95rem;">Accompli</span>`
+      }
+     
+      });
       this.updateSlider(this.accomplishedAmount * 100 / this.monthTargetAmount)
+      this.applySliderStyles() 
     })
 
-    $("#slider1").roundSlider({
+    
+    /* $("#slider1").roundSlider({
       value: 0,
       disabled: false,
       radius: 70,
@@ -47,15 +79,14 @@ export class MonthGoalTrackingComponent implements OnInit {
       rangeColor: '#5CBCA6',
       readOnly: true,
       animation: false,
-      editableTooltip: false,
+      editableTooltip: true,
       step: 0.01,
       tooltipFormat: function(args){
-        return args.value.toFixed(2) + '% <span style="color: #898E99 !important; font-size: 0.95rem;">Accompli</spam>'
+        return args.value.toFixed(2)+ '% <span style="color: #898E99 !important; font-size: 0.95rem;">'+ this.progressRate+ ' Oussama</spam>'
     }
    
     });
-
-   this.applySliderStyles()
+    this.applySliderStyles() */
   }
 
   applySliderStyles(){
@@ -73,6 +104,7 @@ export class MonthGoalTrackingComponent implements OnInit {
   updateSlider(accomplishedAmountPercentage){
     var obj1 =  $("#slider1").data("roundSlider");
     obj1.setValue(accomplishedAmountPercentage);
+    
     this.applySliderStyles();
   }
 

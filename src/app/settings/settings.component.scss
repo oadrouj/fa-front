@@ -84,28 +84,28 @@
 
         input.p-inputtext{
             padding: 0.3rem 0.5rem !important;
-            border-radius:6px;
+            border-top-left-radius:6px;
+            border-bottom-left-radius:6px;
+            border-top-right-radius:0px;
+            border-bottom-right-radius:0px;
         }
         .p-inputtext:enabled:hover {
             border-color: var(--green-color);
-            border-left:none;
-            border-right:none;
-            border-top:none;
         }
         .p-inputtext:enabled:focus {
             outline: 0 none;
             outline-offset: 0;
-            box-shadow: 0 4px 2px -2px #b5fcd7;
             border-color: var(--green-color);
-            border-left:none;
-            border-right:none;
-            border-top:none;
         }
 
         .p-inputgroup-addon {
-            border-left: 0 none;
+            border-left: 0 none;/* 
             background: transparent;
-            margin-left: -5px;
+            margin-left: -5px; */
+            border-top-left-radius:0px;
+            border-bottom-left-radius:0px;
+            border-top-right-radius:6px;
+            border-bottom-right-radius:6px;
         }
         .p-inputgroup .p-inputtext {
             border-right: 0;

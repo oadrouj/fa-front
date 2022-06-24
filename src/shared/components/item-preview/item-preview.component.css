@@ -100,3 +100,34 @@
 .html2canvas .content .date {
     font-size: 1.15rem;
 }
+
+#contentToConvert{
+    position:relative;
+    height:100%; 
+}
+.a4-page{
+    width: 21cm;
+    min-height: 29.7cm;
+    /* padding: 0.3cm;
+    margin: 0.3cm auto; */
+}
+.margin-top-footer{
+    margin-top:1.5rem;
+}
+
+
+#pageFooter{
+    font-size:14px;
+    width:100%;
+    display: flex;
+    justify-content: center;
+}
+#pageFooter span{
+  display:inline-block;
+  width:75%;
+}
+.absolute-footer{
+    position: absolute;
+    bottom: 30px;
+    margin: 0px auto;
+}

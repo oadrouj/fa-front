@@ -19,14 +19,24 @@
                     <span class="block">ACCOMPLI</span>
                     <span>{{accomplishedAmount | number:'1.2-2' }} {{'MAD'}}</span>
                 </div>
-                <div class="col-6 color-yellow">
+                <div class="col-6 color-yellow" *ngIf="monthTargetAmount - accomplishedAmount > 0">
                     <span class="block">RESTANT</span>
                     <span>{{ monthTargetAmount - accomplishedAmount | number:'1.2-2' }} {{'MAD'}}</span>
                 </div>
+                <div class="col-6 color-yellow" *ngIf="monthTargetAmount - accomplishedAmount < 0">
+                    <span class="block">RESTANT</span>
+                    <span> 0 {{'MAD'}}</span>
+                </div>
             </div>
         </div>
-        <div class="col-4">
-            <div id="slider1"></div>
+        <div class="col-4 relativeParent">
+            <div class="customValueTooltip d-flex justify-content-center align-items-center">
+                <span class="inline-block">{{progressRate | number:'1.2-2'}} %</span>
+            </div>
+          
+            <div id="slider1" >
+              
+            </div>
         </div>
     </div>
 

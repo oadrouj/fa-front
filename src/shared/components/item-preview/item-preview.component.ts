@@ -29,9 +29,9 @@ export class ItemPreviewComponent implements OnInit {
   @Input() summaryTVA: number
   @Input() remiseAmount: number
   @ViewChild('pdfTable', { static: false }) pdfTable: ElementRef
+  @ViewChild('showObjet') showObjet: ElementRef;
   printingMode: boolean
   infosEntreprise: any
-
   constructor(
     private _sessionService: AppSessionService,
     private _ref: ChangeDetectorRef,
@@ -100,6 +100,7 @@ export class ItemPreviewComponent implements OnInit {
 
       const items = this.item.devisItems || this.item.factureItems
       let table = document.querySelector('#contentToConvert p-table')
+   
       let rest = items.length % 5
       let count = (items.length - rest) / 5 + +!!rest,
         splittedItems: any
@@ -125,6 +126,8 @@ export class ItemPreviewComponent implements OnInit {
 
   downloadAsPDF(itemPreviewComponentArgs: ItemPreviewComponentArgs) {
     this.printingMode = true
+  /*   this.showObjet.nativeElement.style.display = 'none'; */
+  
     this.updateProps(itemPreviewComponentArgs)
     let element = this.pdfTable.nativeElement
     html2canvas(element, {
@@ -140,19 +143,26 @@ export class ItemPreviewComponent implements OnInit {
 
       const items = this.item.devisItems || this.item.factureItems
       let table = document.querySelector('#contentToConvert p-table')
+      console.log(this.showObjet.nativeElement);
       let rest = items.length % 5
       let count = (items.length - rest) / 5 + +!!rest,
         splittedItems: any
 
       doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
-
+     /*  this.showObjet = true; */
       doc.save('exportedPdf.pdf')
+    /*   this.showObjet.nativeElement.style.display = "initial"; */
+      
+
     })
   }
 
   print(itemPreviewComponentInput: ItemPreviewComponentArgs) {
     this.printingMode = true
+    /* this.showObjet.nativeElement.style.display = 'none'; */
+
     this.updateProps(itemPreviewComponentInput)
+
     let element = this.pdfTable.nativeElement
     html2canvas(element, {
       scale: 2,
@@ -176,6 +186,9 @@ export class ItemPreviewComponent implements OnInit {
         type: 'image',
         base64: true,
       })
+
+    //  this.showObjet.nativeElement.style.display = 'initial';
+
     })
   }
 }
