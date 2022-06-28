@@ -5,13 +5,14 @@
                 cancelIcon="fa fa-trash" (onClear)="clear()" styleClass="pl-3" fileUploadListener="onFileChange($event)">
                 <ng-template let-file pTemplate="file" class="dragdrop-area">
                     <span class="block mb-3">Votre logo</span>
-                    <img [src]="displayedImage" height="150px" width="150px">   
-                    <div>
+                    <img [src]="displayedImage" style="height:auto;width:auto;max-width:150px;max-height:150px;">   
+                 <!-- FULL CROPPER IMPLEMENTATION
+                        <div>
                             <image-cropper *ngIf="displayedImage"
                             [imageFile]="uploadedImage"
-                            [maintainAspectRatio]="true"
+                            [maintainAspectRatio]="false"
                             [containWithinAspectRatio]="containWithinAspectRatio"
-                            [aspectRatio]="1 / 1"
+                            [aspectRatio]="1 / 2.5"
                             [resizeToWidth]="300"
                             [cropperMinWidth]="128"
                             [onlyScaleDown]="true"
@@ -25,8 +26,10 @@
                             (imageLoaded)="imageLoaded()"
                             (cropperReady)="cropperReady($event)"
                             (loadImageFailed)="loadImageFailed()"
-                        ></image-cropper>
-                        </div>
+                        ></image-cropper> 
+                    </div>
+                
+                -->
                 </ng-template>
                
                 <ng-template pTemplate="content">
@@ -46,7 +49,7 @@
         </div>
     </div>
     <div class="text-right">
-        <p-button label="Enregistrer" (click)="save()" styleClass="bg-dark-orange border-0 mt-3">
+        <p-button label="Enregistrer" [icon]="iconSpin" (click)="save()" styleClass="bg-dark-orange border-0 mt-3" [disabled]="!formGroup.valid">
         </p-button>
     </div>
 

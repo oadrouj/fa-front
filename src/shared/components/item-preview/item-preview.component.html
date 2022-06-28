@@ -3,6 +3,8 @@
     'html2canvas a4-page': this.printingMode, 
     'margin-top-page': !this.printingMode 
 }">
+
+<ng-container *ngIf="item">
     <div class="content pt-4"> 
         <div class="grid px-1">
             <div class="col-5 pt-1">
@@ -185,4 +187,11 @@
     }">
         <span class="text-center">{{ this.item && this.item.piedDePage || '' }}</span>
     </div>
+
+</ng-container>
+   <ng-container *ngIf="!item">
+    <div class="text-center d-flex justify-content-center align-items-center" style="margin-top:100px;">
+        <h4>Merci de sélectionner la ligne à visualiser.</h4>
+    </div>
+</ng-container>
 </div>

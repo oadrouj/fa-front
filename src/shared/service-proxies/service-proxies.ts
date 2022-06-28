@@ -3921,6 +3921,112 @@ export class FileApiServiceProxy {
         }
         return _observableOf<boolean>(<any>null);
     }
+
+    /**
+     * @param id (required) 
+     * @return Success
+     */
+     downloadFacture(factureId: number): Observable<FileResponse> {
+        let url_ = this.baseUrl + "/file-api/download-facture?";
+        if (factureId === null)
+        throw new Error("The parameter 'factureId' cannot be null.");
+        else if (factureId !== undefined) url_ += "id=" + encodeURIComponent("" + factureId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDownloadFacture(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDownloadFacture(<any>response_);
+                } catch (e) {
+                    return <Observable<FileResponse>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<FileResponse>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processDownloadFacture(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<FileResponse>(<any>null);
+    }
+
+       /**
+     * @param id (required) 
+     * @return Success
+     */
+        downloadDevis(devisId: number): Observable<FileResponse> {
+            let url_ = this.baseUrl + "/file-api/download-devis?";
+            if (devisId === null)
+            throw new Error("The parameter 'devisId' cannot be null.");
+            else if (devisId !== undefined) url_ += "id=" + encodeURIComponent("" + devisId) + "&";
+            url_ = url_.replace(/[?&]$/, "");
+    
+            let options_ : any = {
+                observe: "response",
+                responseType: "blob",
+                headers: new HttpHeaders({
+                    "Accept": "text/plain"
+                })
+            };
+    
+            return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+                return this.processDownloadDevis(response_);
+            })).pipe(_observableCatch((response_: any) => {
+                if (response_ instanceof HttpResponseBase) {
+                    try {
+                        return this.processDownloadDevis(<any>response_);
+                    } catch (e) {
+                        return <Observable<FileResponse>><any>_observableThrow(e);
+                    }
+                } else
+                    return <Observable<FileResponse>><any>_observableThrow(response_);
+            }));
+        }
+    
+        protected processDownloadDevis(response: HttpResponseBase): Observable<FileResponse> {
+            const status = response.status;
+            const responseBlob =
+                response instanceof HttpResponse ? response.body :
+                (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+    
+            let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+            if (status === 200 || status === 206) {
+                const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+                const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+                return _observableOf({ fileName: fileName, data: <any>responseBlob, status: status, headers: _headers });
+            } else if (status !== 200 && status !== 204) {
+                return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+                }));
+            }
+            return _observableOf<FileResponse>(<any>null);
+        }
 }
 
 @Injectable()

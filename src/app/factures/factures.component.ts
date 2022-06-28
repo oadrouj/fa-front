@@ -27,7 +27,7 @@ import { Moment } from 'moment'
 import { FacturesDialogComponent } from './factures-dialog/factures-dialog.component'
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 import { ConfirmEventType, LazyLoadEvent } from 'primeng/api'
-import { map } from 'rxjs/operators'
+import { map, first, finalize } from 'rxjs/operators'
 import { TableComponent } from '@app/table/table.component'
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog'
 import { FacturePayementComponent } from './facture-payement/facture-payement.component'
@@ -271,6 +271,8 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   montantTotalAllDevis
   ref: DynamicDialogRef
 
+  iconSpin = "";
+  iconSpinPrint = "";
   //#endregion
 
   emitDateFilterEvent(event) {
@@ -685,6 +687,59 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       title: 'Facture',
       logoSrc: this.logoSrc
     })
+  }
+
+  downloadFactureAsPdf() {
+    this.iconSpin="pi pi-spin pi-spinner";
+
+    if(this.selectedDevisItem){
+      this._fileApiServiceProxy.downloadFacture(this.selectedDevisItem.id)
+      .pipe(first(),finalize(() => {this.iconSpin=""; }))
+      
+      .subscribe((res) => {
+        if (res) {
+          let blob = new File([res.data], res.fileName)
+          let objectURL = this._sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(res.data))
+          ;(blob as any).objectURL = objectURL
+
+           let fileName="Facture_"+this.selectedDevisItem.reference+"-"+Date.now(); 
+          
+         // let dataType = res.type;
+          let binaryData = [];
+          binaryData.push(blob);
+          let downloadLink = document.createElement('a');
+          downloadLink.href = window.URL.createObjectURL(res.data);
+          if (res.fileName) fileName = res.fileName;
+          downloadLink.setAttribute('download', fileName);
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+         /*  this.fileUpload.clear()
+          this.fileUpload.files.push(blob) 
+          this.displayedImage = objectURL
+          this.shouldShowDefaultImage = false */
+        }
+      })
+    }
+  }
+
+  printFacture() {
+    this.iconSpinPrint="pi pi-spin pi-spinner";
+
+    if(this.selectedDevisItem){
+      this._fileApiServiceProxy.downloadFacture(this.selectedDevisItem.id)
+      .pipe(first(),finalize(() => {this.iconSpinPrint=""; }))
+      .subscribe((res) => {
+        if (res) {
+          let blob = new File([res.data], res.fileName)
+          let objectURL = this._sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(res.data))
+          ;(blob as any).objectURL = objectURL
+
+           let fileName="Facture_"+this.selectedDevisItem.reference+"-"+Date.now(); 
+          
+            printJS({printable:URL.createObjectURL(res.data), type:'pdf', showModal:true})
+        }
+      })
+    }
   }
 
   viewUpdateSelectedItemStatut(statut: any) {

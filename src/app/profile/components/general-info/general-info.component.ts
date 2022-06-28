@@ -20,7 +20,7 @@ import { AppSessionService } from '@shared/session/app-session.service'
 import { base64ToFile, Dimensions, ImageCroppedEvent, ImageTransform } from 'ngx-image-cropper'
 import { FileUpload } from 'primeng/fileupload'
 import { zip } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { finalize, map, first } from 'rxjs/operators'
 @Component({
   selector: 'app-general-info',
   templateUrl: './general-info.component.html',
@@ -34,11 +34,12 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
   logoIsRemoved: any
   displayedImage: any
   formGroup: FormGroup
+  iconSpin = "";
 
 
   @ViewChild('fu') fileUpload: FileUpload
 
-  imageChangedEvent: any = '';
+  /* imageChangedEvent: any = '';
   croppedImage: any = '';
   canvasRotation = 0;
   rotation = 0;
@@ -47,7 +48,7 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
   containWithinAspectRatio = false;
   transform: ImageTransform = {};
   imageCroppedInstance : ImageCroppedEvent;
-  cropperCleanImageURL:any;
+  cropperCleanImageURL:any; */
 
   constructor(
     private _formBuider: FormBuilder,
@@ -118,10 +119,10 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
     this.uploadedImage = event.files[0]
     this.shouldShowDefaultImage = false
 
-    this.cropperCleanImageURL = this._sanitizer.bypassSecurityTrustUrl(event.files[0].objectURL);
+    /* this.cropperCleanImageURL = this._sanitizer.bypassSecurityTrustUrl(event.files[0].objectURL);
     console.log(this.cropperCleanImageURL);
     console.log(this.cropperCleanImageURL.changingThisBreaksApplicationSecurity);
-    this.imageChangedEvent = event.originalEvent;
+    this.imageChangedEvent = event.originalEvent; */
 
   }
 
@@ -141,15 +142,16 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
   }
 
   save() {
-    console.log(this.uploadedImage);
+
     if (this.formGroup.valid) {
       if (!!this.uploadedImage) {
         //Upload Image
         let file: FileParameter = {
           fileName: this.uploadedImage.name,
-          data: base64ToFile(this.displayedImage),
+          data: this.uploadedImage,
+        /*   data: base64ToFile(this.displayedImage), */
         }
-
+        this.iconSpin="pi pi-spin pi-spinner";
         this._fileApiServiceProxy
           .upload(file)
           .pipe(
@@ -157,7 +159,7 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
               this.dto.hasLogo = true
               this.updateGeneralInfos()
               return x
-            }),
+            }),finalize(() => {this.iconSpin=""; })
           )
           .subscribe((res) => {
             if (res) {
@@ -171,13 +173,14 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
       }
       else {
         if(this.logoIsRemoved) {
+          this.iconSpin="pi pi-spin pi-spinner";
           this._fileApiServiceProxy.delete()
           .pipe(
             map((x) => {
               this.dto.hasLogo = false
               this.updateGeneralInfos()
               return x
-            }),
+            }),finalize(() => {this.iconSpin=""; })
           )
             .subscribe(res => {
             if (res) {
@@ -205,13 +208,17 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
 
   updateGeneralInfos() {
     if(this.dto.id){
+      
       let generalInfosDto = new GeneralInfosDto({
         ...this.dto,
         raisonSociale: this.formGroup.value.companyName,
         secteurActivite: this.formGroup.value.activityArea,
       })
+      this.iconSpin="pi pi-spin pi-spinner";
+
       this._infosEntrepriseService
         .updateGeneralInfos(generalInfosDto)
+        .pipe(first(),finalize(() => {this.iconSpin=""; }))
         .subscribe((res) => {
           if (res) {
             this._sessionService.entrepriseName = generalInfosDto.raisonSociale
@@ -237,7 +244,11 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
               detail: 'Vous devez remplir au moins un chemps',
             })
       else { 
-        this._infosEntrepriseService.createInfosEntreprise(createInfosEntrepriseInput).subscribe((res) => {
+        this.iconSpin="pi pi-spin pi-spinner";
+        
+        this._infosEntrepriseService.createInfosEntreprise(createInfosEntrepriseInput)
+        .pipe(first(),finalize(() => {this.iconSpin=""; }))
+        .subscribe((res) => {
           // console.log(res);
           // if (res) {
             this._toastService.success({
@@ -257,7 +268,9 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
     
   }
 
-  imageCropped(event: ImageCroppedEvent) {
+ /* CROPPER FULL IMPLENTATION
+
+ imageCropped(event: ImageCroppedEvent) {
     this.croppedImage = event.base64;
     console.log(event, base64ToFile(event.base64));
    
@@ -275,7 +288,7 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
 
   loadImageFailed() {
     console.log('Load failed');
-  }
+  } */
   onUpload(event) {
    /*  console.log("test upload cropeer");
     console.log(event);

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { StatisticsServiceProxy } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 
@@ -6,6 +6,9 @@ import * as moment from 'moment'
   selector: 'app-periodic-tracking',
   templateUrl: './periodic-tracking.component.html',
   styleUrls: ['./periodic-tracking.component.css'],
+  host: {
+    '(document:click)': 'onClick($event)',
+  },
 })
 export class PeriodicTrackingComponent implements OnInit {
   totalInvoicesAmount = 0
@@ -21,6 +24,9 @@ export class PeriodicTrackingComponent implements OnInit {
   totalLength = 0
   transformationPercentage = 0
   bestsellerTotalAmounts = 0
+
+  @ViewChild("start_date") start_date :ElementRef
+  @ViewChild("end_date") end_date :ElementRef
 
   constructor(private _statisticsServiceProxy: StatisticsServiceProxy) {}
 
@@ -88,10 +94,20 @@ export class PeriodicTrackingComponent implements OnInit {
   }
   
   parseDate(){
+    var date = new Date();
+    var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    var lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
     let string = (this.startDate || this.endDate) ?
        ((this.startDate ? this.startDate.toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR')) + 
-      ' - ' + (this.endDate ? this.endDate.toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR'))) : ' mois courant par défaut'
+      ' - ' + (this.endDate ? this.endDate.toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR'))) : 
+      firstDay.toLocaleDateString('fr-FR') + " - "+ lastDay.toLocaleDateString('fr-FR');
 
       return string
   }
+
+  onClick(event) {
+      if (!this.start_date.nativeElement.contains(event.target)) console.log("Clcked outside calendar")    
+  }
+  
 }

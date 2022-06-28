@@ -1,6 +1,6 @@
 {
-    "remoteServiceBaseUrl": "http://facturi.ma:8000",
-    "appBaseUrl": "http://app.facturi.ma",
+    "remoteServiceBaseUrl": "https://facturi.ma:8000",
+    "appBaseUrl": "https://app.facturi.ma",
     "localeMappings": [{
             "from": "pt-BR",
             "to": "pt"

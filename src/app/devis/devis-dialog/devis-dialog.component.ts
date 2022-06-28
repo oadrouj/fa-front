@@ -39,6 +39,9 @@ import {
   CountryDto,
   CreateCatalogueInput,
   FileApiServiceProxy,
+  TvaCurrencyDto,
+  GeneralInfosDto,
+  InfosEntrepriseServiceProxy,
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
@@ -47,7 +50,7 @@ import {
   GlobalEventsService,
   ModificationStatusEnum,
 } from '@shared/globalEventsService'
-import { map } from 'rxjs/operators'
+import { map, first } from 'rxjs/operators'
 import { ValidationHelper } from '@shared/helpers/ValidationHelper'
 import { CalculationsService } from '@shared/services/calculations.service'
 import { Router } from '@angular/router'
@@ -70,6 +73,11 @@ export class DevisDialogComponent implements OnInit {
   filteredCatalogues: CatalogueForAutoCompleteDto[]
   devisIsSaved: boolean
   saveBrouillonHide: boolean
+
+  tvaCurrencyDto: TvaCurrencyDto;
+  generalInfosDto: GeneralInfosDto;
+  selectedTva :string = "20%";
+  selectedDevise :string = "MAD";
 
   private _dataItem
   currencies: string[]
@@ -107,7 +115,8 @@ export class DevisDialogComponent implements OnInit {
     private _previewService: PreviewService,
     private _fileApiServiceProxy: FileApiServiceProxy,
     private  _sanitizer: DomSanitizer,
-    private _currencyConverterService: ConvertCurrencyService
+    private _currencyConverterService: ConvertCurrencyService,
+    private _infosEntrepriseService: InfosEntrepriseServiceProxy,
   ) {}
 
   updateState(status) {
@@ -1158,5 +1167,42 @@ export class DevisDialogComponent implements OnInit {
          console.log(error)
         }
     });
+  }
+
+  getCurrentTvaAndCurrency(){
+    let observer = {
+      next: result=> {
+        if (result){
+          this.generalInfosDto = result;
+          this.tvaCurrencyDto = new TvaCurrencyDto({
+            "id": this.generalInfosDto.id,  
+            "tva": this.generalInfosDto.tva,
+            "currency": this.generalInfosDto.currency
+            })
+          if(result.tva != null) this.selectedTva = result.tva; 
+          if(result.currency != null) this.selectedDevise = result.currency; 
+          this.setValueForm();
+        }else{
+          console.log("No infos found");
+        }
+      },
+      error: error =>{
+        console.log(error)
+      }
+    }
+
+    this._infosEntrepriseService
+    .getGeneralInfos()
+    .pipe(first())
+    .subscribe(observer)
+  }
+  
+
+
+  setValueForm(){
+    this.devisOptionsFormGroup.controls.devise.setValue(this.selectedDevise);
+    this.devisOptionsFormGroup.controls.tva.setValue(this.selectedTva);
+   /*  this.f.tva.setValue(this.selectedTva);
+    this.f.devise.setValue(this.selectedDevise); */
   }
 }

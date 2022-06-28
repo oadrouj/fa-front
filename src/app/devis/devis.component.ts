@@ -19,7 +19,9 @@ import {
   DevisStatutEnum,
   FactureDto,
   FileApiServiceProxy,
+  GeneralInfosDto,
   InfosEntrepriseServiceProxy,
+  TvaCurrencyDto,
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 import { DateHelper } from '@shared/helpers/DateHelper'
@@ -29,7 +31,7 @@ import { DevisDialogComponent } from './devis-dialog/devis-dialog.component'
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog'
 import { ConfirmEventType, LazyLoadEvent } from 'primeng/api'
-import { map } from 'rxjs/operators'
+import { map, first, finalize } from 'rxjs/operators'
 import { TableComponent } from '@app/table/table.component'
 import * as printJS from 'print-js'
 import { FacturesDialogComponent } from '@app/factures/factures-dialog/factures-dialog.component'
@@ -64,6 +66,13 @@ export class DevisComponent implements OnInit, AfterViewInit {
   invoiceItemProp: FactureDto[]
   formIsValid: any
   firstLoad = true
+  tvaCurrencyDto: TvaCurrencyDto;
+  generalInfosDto: GeneralInfosDto;
+  selectedTva :string = "20%";
+  selectedDevise :string = "MAD";
+  iconSpin="";
+  iconSpinPrint="";
+
 
   constructor(
     private _devisServiceProxy: DevisServiceProxy,
@@ -582,4 +591,91 @@ export class DevisComponent implements OnInit, AfterViewInit {
     })
   }
 
+  downloadDevisAsPdf() {
+    this.iconSpin="pi pi-spin pi-spinner";
+
+    if(this.selectedDevisItem){
+      this._fileApiServiceProxy.downloadDevis(this.selectedDevisItem.id)
+      .pipe(first(),finalize(() => {this.iconSpin=""; }))
+      
+      .subscribe((res) => {
+        if (res) {
+          let blob = new File([res.data], res.fileName)
+          let objectURL = this._sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(res.data))
+          ;(blob as any).objectURL = objectURL
+
+           let fileName="Devis_"+this.selectedDevisItem.reference+"-"+Date.now(); 
+          
+         // let dataType = res.type;
+          let binaryData = [];
+          binaryData.push(blob);
+          let downloadLink = document.createElement('a');
+          downloadLink.href = window.URL.createObjectURL(res.data);
+          if (res.fileName) fileName = res.fileName;
+          downloadLink.setAttribute('download', fileName);
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+         /*  this.fileUpload.clear()
+          this.fileUpload.files.push(blob) 
+          this.displayedImage = objectURL
+          this.shouldShowDefaultImage = false */
+        }
+      })
+    }
+  }
+
+  printDevis() {
+    this.iconSpinPrint="pi pi-spin pi-spinner";
+
+    if(this.selectedDevisItem){
+      this._fileApiServiceProxy.downloadDevis(this.selectedDevisItem.id)
+      .pipe(first(),finalize(() => {this.iconSpinPrint=""; }))
+      
+      .subscribe((res) => {
+        if (res) {
+          let blob = new File([res.data], res.fileName)
+          let objectURL = this._sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(res.data))
+          ;(blob as any).objectURL = objectURL
+
+           let fileName="Devis_"+this.selectedDevisItem.reference+"-"+Date.now(); 
+          
+            printJS({printable:URL.createObjectURL(res.data), type:'pdf', showModal:true})
+        }
+      })
+    }
+  }
+  getCurrentTvaAndCurrency(){
+    let observer = {
+      next: result=> {
+        if (result){
+          this.generalInfosDto = result;
+          this.tvaCurrencyDto = new TvaCurrencyDto({
+            "id": this.generalInfosDto.id,  
+            "tva": this.generalInfosDto.tva,
+            "currency": this.generalInfosDto.currency
+            })
+          if(result.tva != null) this.selectedTva = result.tva; 
+          if(result.currency != null) this.selectedDevise = result.currency; 
+          this.setValueForm();
+        }else{
+          console.log("No infos found");
+        }
+      },
+      error: error =>{
+        console.log(error)
+      }
+    }
+
+    this._infosEntrepriseService
+    .getGeneralInfos()
+    .pipe(first())
+    .subscribe(observer)
+  }
+  
+
+
+  setValueForm(){
+   /*  this.f.tva.setValue(this.selectedTva);
+    this.f.devise.setValue(this.selectedDevise); */
+  }
 }

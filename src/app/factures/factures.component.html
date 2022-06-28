@@ -52,8 +52,8 @@
             <div class="devis-details">
                 <div class="header flex justify-content-end">
                     <div class="flex">
-                        <button pButton label="Télécharger" (click)="downloadAsPDF()" class="p-button-text"></button>
-                        <button pButton label="Imprimer" class="p-button-text" (click)="print()"></button>
+                        <button pButton label="Télécharger" (click)="downloadFactureAsPdf()" class="p-button-text" [icon]="iconSpin"></button>
+                        <button pButton label="Imprimer" class="p-button-text" (click)="printFacture()" [icon]="iconSpinPrint"></button>
                         <button pButton label="Dupliquer" class="p-button-text" (click)="duplicateDevis()"></button>
                         <button pButton label="Modifier" class="p-button-text" (click)="editDevis()"></button>
                         <button pButton label="Supprimer" class="p-button-text" (click)="deleteDevis()"></button>

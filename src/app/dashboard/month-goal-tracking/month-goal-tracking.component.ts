@@ -113,7 +113,10 @@ export class MonthGoalTrackingComponent implements OnInit {
      this._statisticsServiceProxy.createOrUpdateMonthTargetAmount(this.newMonthTargetAmount)
       .subscribe(res => {
         if(res){
+          console.log("Salama ya rbi");
           this.monthTargetAmount = this.newMonthTargetAmount
+          this.progressRate = this.accomplishedAmount * 100 / this.monthTargetAmount;
+
           this._toastService.success({summary: 'Opértion réussie', detail: 'Le montant d\'objectif du mois est changé avec succès'})
           this.inplace.deactivate()
 

@@ -53,7 +53,7 @@ export class ActivityLogComponent implements OnInit {
         return item
       
     }) as any)
-    this.activityLogItems=this.activityLogItems.slice(0,3)
+    this.activityLogItems=this.activityLogItems.slice(0,5)
     console.log(this.activityLogItems)
   })
   }

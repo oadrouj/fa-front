@@ -28,7 +28,7 @@
 
     </div>
     <div class="text-right">
-        <p-button label="Enregistrer" (click)="save()" styleClass="bg-dark-orange border-0 mt-3">
+        <p-button label="Enregistrer" [icon]="iconSpin" (click)="save()" styleClass="bg-dark-orange border-0 mt-3" [disabled]="!formGroup.valid">
         </p-button>
     </div>
 

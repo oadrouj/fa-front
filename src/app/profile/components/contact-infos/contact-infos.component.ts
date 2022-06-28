@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ContactInfosDto, CountryServiceAppServiceProxy, InfosEntrepriseServiceProxy } from '@shared/service-proxies/service-proxies';
 import { ToastService } from '@shared/services/toast.service';
+import { finalize, first } from 'rxjs/operators'
 
 @Component({
   selector: 'app-contact-infos',
@@ -14,6 +15,7 @@ export class ContactInfosComponent implements OnInit {
   dto: ContactInfosDto;
   currentId: number;
   countries: string[];
+  iconSpin = "";
 
   constructor(
     private _formBuider: FormBuilder,
@@ -72,8 +74,10 @@ export class ContactInfosComponent implements OnInit {
         codePostal: this.formGroup.value.postalCode,
         adresseMail: this.formGroup.value.email
       });
-
-      this._infosEntrepriseService.updateContactInfos(contactInfosDto).subscribe(res => {
+      this.iconSpin="pi pi-spin pi-spinner";
+      this._infosEntrepriseService.updateContactInfos(contactInfosDto)
+      .pipe(first(),finalize(() => {this.iconSpin=""; }))
+      .subscribe(res => {
         if (res) {
           this._toastService.success({
             detail: 'Les informations générales sont modifiées',

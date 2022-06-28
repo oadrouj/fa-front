@@ -12,7 +12,7 @@
         </div>
 
         <div class="col-6">
-            <app-input-group [control]="this.formGroup.get('city')" [labelText]="'Ville'" [placeholder]="'La ville'">
+            <app-input-group [control]="this.formGroup.get('city')" [labelText]="'Ville'" [placeholder]="'Ex: Casablanca'">
             </app-input-group>
             <div class="pt-3"></div>
             <app-input-group [control]="this.formGroup.get('postalCode')" [labelText]="'Code postal'" [placeholder]="'29000'">
@@ -23,7 +23,7 @@
         </div>
     </div>
     <div class="text-right">
-        <p-button label="Enregistrer" (click)="save()" styleClass="bg-dark-orange border-0 mt-3">
+        <p-button label="Enregistrer" [icon]="iconSpin" (click)="save()" styleClass="bg-dark-orange border-0 mt-3" [disabled]="!formGroup.valid">
         </p-button>
     </div>
  

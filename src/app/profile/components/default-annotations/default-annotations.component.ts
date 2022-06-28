@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { DefaultAnnotationsDto, InfosEntrepriseServiceProxy } from '@shared/service-proxies/service-proxies';
 import { ChangeProfileContainerTitleService } from '@shared/services/change-profile-container-title.service';
 import { ToastService } from '@shared/services/toast.service';
-import { type } from 'os';
+import { finalize, first } from 'rxjs/operators'
 
 @Component({
   selector: 'app-default-annotations',
@@ -13,7 +13,7 @@ import { type } from 'os';
 })
 export class DefaultAnnotationsComponent implements OnInit {
   dto: DefaultAnnotationsDto;
-
+  iconSpin = "";
  
   constructor(
     private _formBuider: FormBuilder,
@@ -64,7 +64,12 @@ export class DefaultAnnotationsComponent implements OnInit {
           invoiceFooter: this.formGroup.value.invoiceFooter
         })
 
-      this._infosEntrepriseService.updateDefaultAnnotations(defaultAnnotationsDto).subscribe(res => {
+        this.iconSpin="pi pi-spin pi-spinner";
+
+      this._infosEntrepriseService.updateDefaultAnnotations(defaultAnnotationsDto)
+      .pipe(first(),finalize(() => {this.iconSpin=""; }))
+      
+      .subscribe(res => {
         if (res) {
           this._toastService.success({
             detail: 'Les informations générales sont modifiées',
