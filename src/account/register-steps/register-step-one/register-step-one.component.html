@@ -5,7 +5,7 @@
         <p class="groupText text-left mt-4">Saisissez votre E-mail</p>
         <p class="label text-left">Cet e-mail n’est pas nécessairement celui à afficher sur vos documents, il peut s’agir de votre e-mail personnel ou de celui de votre entreprise</p>
         <div class="input-block">
-            <input type="email" name="emailAddress" pInputText [(ngModel)]="model.emailAddress" (change)="validateEmail()" />
+            <input type="email" name="emailAddress" pInputText [(ngModel)]="model.emailAddress" (change)="validateEmail()" autocomplete="new-email" />
             <img src="../../../assets/img/IconeAdresseMail.png" />
         </div>
         <span class="validationMessage" *ngIf="emailAddressExiste">Cette adresse mail existe déjà !</span>
@@ -15,7 +15,7 @@
         <p class="groupText text-left mt-4">Choisissez votre mot de passe</p>
         <p class="label text-left">Votre mot de passe doit contenir au moins un caractère en minuscule, un caractère en majuscule, un chiffre et un caractère spécial</p>
         <div class="input-block">
-            <input type="password" name="firstPassword" pInputText [(ngModel)]="firstPassword" (change)="validatePassword()" />
+            <input type="password" name="firstPassword" pInputText [(ngModel)]="firstPassword" (change)="validatePassword()" autocomplete="new-password" />
             <img src="../../../assets/img/IconeMDP.png" />
         </div>
         <span class="validationMessage" *ngIf="passwordDidntRepectRegex">Votre mot de passe doit contenir au moins huit

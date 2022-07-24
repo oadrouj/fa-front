@@ -502,4 +502,12 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
     this.invoiceDialogIsVisible = false
   }
 
+  onScroll(event): void {
+
+    if(event.srcElement.scrollTop > 3 ){
+      document.getElementById("headerApercu").classList.add('header-shadow');
+    }else{
+      document.getElementById("headerApercu").classList.remove('header-shadow');
+    }
+   }
 }

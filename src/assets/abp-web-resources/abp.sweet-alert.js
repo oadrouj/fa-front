@@ -1,11 +1,13 @@
+//import * as $ from 'jquery';
+//import {Swal} from '../../node_modules/sweetalert2/dist/sweetalert2.js';
 var abp = abp || {};
 
 (function () {
   if (!Swal) {
+   
     return;
-  }
+  } 
   /* MESSAGE **************************************************/
-
 
   var showMessage = function showMessage(type, message, title, isHtml, options) {
     if (!title) {
@@ -13,9 +15,58 @@ var abp = abp || {};
       message = undefined;
     }
 
-    options = options || {};
+    console.log(options);
+
+    let optionsForced = {
+      toast: true,
+      position: "top-end",
+      confirmButtonText :"Salam",
+      showConfirmButton: false,
+      showCloseButton: true,
+      timer: 15000,
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      },
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      },
+      customClass: {
+        container: 'swalContainer',
+        popup: '...',
+        header: '...',
+        title: 'color-dashboard',
+        closeButton: '...',
+        icon: '...',
+        image: '...',
+        content: '...',
+        htmlContainer: '...',
+        input: '...',
+        inputLabel: '...',
+        validationMessage: '...',
+        actions: '...',
+        confirmButton: '...',
+        denyButton: '...',
+        cancelButton: '...',
+        loader: '...',
+        footer: '....',
+        timerProgressBar: 'timerProgressBar'
+      }
+    };
+    console.log(optionsForced);
+
+    options = options || optionsForced;
+    
     options.title = title;
     options.icon = type;
+    if(type == "error") options.customClass.title = "text-danger";
+    if(type == "success") options.customClass.title = "text-success";
+    if(type == "warning") options.customClass.title = "text-warning";
+    if(type == "info") options.customClass.title = "text-info";
     options.confirmButtonText = options.confirmButtonText || abp.localization.abpWeb("Ok");
 
     if (isHtml) {
@@ -40,6 +91,7 @@ var abp = abp || {};
   };
 
   abp.message.error = function (message, title, isHtml, options) {
+  /*   alert("Oussama"); */
     return showMessage("error", message, title, isHtml, options);
   };
 
@@ -55,8 +107,8 @@ var abp = abp || {};
     options = options || {};
     options.title = title ? title : abp.localization.abpWeb("AreYouSure");
     options.icon = "warning";
-    options.confirmButtonText = options.confirmButtonText || abp.localization.abpWeb("Yes");
-    options.cancelButtonText = options.cancelButtonText || abp.localization.abpWeb("Cancel");
+    //options.confirmButtonText = options.confirmButtonText || abp.localization.abpWeb("Yes");
+    //options.cancelButtonText = options.cancelButtonText || abp.localization.abpWeb("Cancel");
     options.showCancelButton = true;
 
     if (isHtml) {
@@ -69,14 +121,30 @@ var abp = abp || {};
       callback && callback(result.value);
     });
   };
+
+
   /* NOTIFICATION *********************************************/
 
 
   var Toast = Swal.mixin({
     toast: true,
     position: "bottom-end",
+    confirmButtonText :"Salam",
     showConfirmButton: false,
-    timer: 3000
+    showCloseButton: true,
+    timer: 3000,
+    showClass: {
+      popup: 'animate__animated animate__fadeInDown'
+    },
+    hideClass: {
+      popup: 'animate__animated animate__fadeOutUp'
+    },
+    backdrop: `
+    rgba(0,0,123,0.4)
+    url("/assets/img/error.gif")
+    left top
+    no-repeat
+  `
   });
 
   var showNotification = function showNotification(type, message, title, options) {
@@ -94,7 +162,9 @@ var abp = abp || {};
     showNotification("success", message, title, Object.assign({
       background: "#34bfa3",
       customClass: {
-        icon: "fas fa-check-circle"
+        icon: "fas fa-check-circle successIcon swalIcon",
+        title: "successTitle swalTitle",
+        content: "successMessage swalMessage"
       }
     }, options));
   };
@@ -103,7 +173,9 @@ var abp = abp || {};
     showNotification("info", message, title, Object.assign({
       background: "#36a3f7",
       customClass: {
-        icon: "fas fa-info-circle"
+        icon: "fas fa-info-circle infoIcon swalIcon",
+        title: "infoTitle swalTitle",
+        content: "infoMessage swalMessage"
       }
     }, options));
   };
@@ -112,7 +184,9 @@ var abp = abp || {};
     showNotification("warning", message, title, Object.assign({
       background: "#ffb822",
       customClass: {
-        icon: "fas fa-exclamation-triangle"
+        icon: "fas fa-exclamation-triangle warnIcon swalIcon",
+        title: "warnTitle swalTitle",
+        content: "warnMessage swalMessage"
       }
     }, options));
   };
@@ -121,7 +195,9 @@ var abp = abp || {};
     showNotification("error", message, title, Object.assign({
       background: "#f4516c",
       customClass: {
-        icon: "fas fa-exclamation-circle"
+        icon: "fas fa-exclamation-circle errorIcon swalIcon",
+        title: "errorTitle swalTitle",
+        content: "errorMessage swalMessage"
       }
     }, options));
   };

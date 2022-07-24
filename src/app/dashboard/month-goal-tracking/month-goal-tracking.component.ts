@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { StatisticsServiceProxy } from '@shared/service-proxies/service-proxies';
 import { ToastService } from '@shared/services/toast.service';
 import $ from 'jquery';
@@ -17,6 +17,7 @@ export class MonthGoalTrackingComponent implements OnInit {
   progressRate: number = 0;
   @ViewChild("inplace") inplace 
   accomplishedAmountPercentage: any;
+  @Input() currency : string;
 
   constructor(
     private _statisticsServiceProxy: StatisticsServiceProxy,

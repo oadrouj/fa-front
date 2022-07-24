@@ -3,3 +3,27 @@
     padding-left: .3rem;
     padding-right: .3rem;
 }
+
+.span-green{
+    background-color: var(--green-color);
+    color: white;
+}
+
+.span-orange{
+    background-color: var(--light-orangee-color);
+}
+
+.span-red{
+    background-color: var(--light-red);
+}
+.span-grey{
+    background-color: #c6c6c6;
+}
+.span-blue{
+    background-color: var(--light-yellow-color);
+}
+.tag-status{
+    padding: 4px 10px;
+    font-weight:600;
+    border-radius: 8px;
+}

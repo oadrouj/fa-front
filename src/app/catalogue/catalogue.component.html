@@ -52,11 +52,11 @@
 
         <div class="rightSection col-12 p-0">
             <div class="devis-details">
-                <div class="header flex justify-content-end">
+                <div id="devis-header" class="header flex justify-content-end">
                     <button pButton label="Modifier" class="p-button-text" (click)="editCatalogue()"></button>
                     <button pButton label="Supprimer" class="p-button-text" (click)="deleteCatalogue()"></button>
                 </div>
-                <div class="content p-4">
+                <div id="devis-body" class="content p-4">
                     <div class="flex flex-column px-1">
                         <h2>{{replaceIfIsNullOrEmpty('designation')}}</h2>
                         <h2 class="lineHeight-18 text-2xl"> {{replaceIfIsNullOrEmpty('description')}}</h2>
@@ -109,14 +109,14 @@
                 <span>Désignation <span class="red-color">*</span></span>
             </div>
             <div class="col-7">
-                <input type="text" pInputText placeholder="Text" formControlName="designation" />
+                <input type="text" pInputText placeholder="" formControlName="designation" />
             </div>
 
             <div class="col-5 label">
                 <span>Description</span>
             </div>
             <div class="col-7">
-                <input type="text" pInputText placeholder="Text" formControlName="description" />
+                <input type="text" pInputText placeholder="" formControlName="description" />
             </div>
 
             <div class="col-5 label">
@@ -127,7 +127,7 @@
             </div>
 
             <div class="col-5 label">
-                <span>Prix (MAD)</span>
+                <span>Prix (<span class="bold color-purple">{{Currency}}</span>)</span>
             </div>
             <div class="col-7">
                 <input type="text" pInputText formControlName="htPrice" />

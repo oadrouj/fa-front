@@ -48,7 +48,7 @@
 }
 
 :host ::ng-deep .p-datatable-footer {
-    width: 60%;
+    width: 100% !important;
     padding-top: 1.5rem;
     padding-right: 16px;
     margin-left: auto;
@@ -82,8 +82,8 @@
 }
 
 .content img {
-    width: 125px;
-    height: 80px;
+    max-width: 125px;
+    max-height: 80px;
 }
 
 
@@ -103,7 +103,9 @@
 
 #contentToConvert{
     position:relative;
-    height:100%; 
+    height:75vh;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .a4-page{
     width: 21cm;
@@ -130,4 +132,15 @@
     position: absolute;
     bottom: 30px;
     margin: 0px auto;
+}
+
+.coordonnees{
+    font-size:12px;
+    line-height: 50%;
+}
+
+.coords-title{
+    font-size:14px;
+    line-height: 50%;
+
 }

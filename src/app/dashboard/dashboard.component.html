@@ -2,35 +2,35 @@
     <div class="grid">
         <div #col1 class="col-6 ">
             <div class="bg-white py-5 box h-100">
-                <app-activity-log></app-activity-log>
+                <app-activity-log [currency]="Currency"></app-activity-log>
             </div>
         </div>
 
         <div #col2 class="col-6">
             <div class="bg-white pt-3 box">
-                <app-monthly-evolution></app-monthly-evolution>
+                <app-monthly-evolution [currency]="Currency"></app-monthly-evolution>
             </div>
             <div class="my-3"></div>
             <div class="bg-white pt-3 box">
-                <app-month-goal-tracking></app-month-goal-tracking>
+                <app-month-goal-tracking [currency]="Currency"></app-month-goal-tracking>
             </div>
         </div>
 
         <div class="col-12 mt-2">
             <div class="bg-white py-3 box">
-                <app-periodic-tracking></app-periodic-tracking>
+                <app-periodic-tracking [currency]="Currency"></app-periodic-tracking>
             </div>
         </div>
 
         <div class="col-12 mt-2 ">
             <div class="bg-white py-3 box">
-                <app-annual-tracking></app-annual-tracking>
+                <app-annual-tracking [currency]="Currency"></app-annual-tracking>
             </div>
         </div>
 
         <div class="col-12 mt-2 mb-3">
             <div class="py-3">
-                <app-total-statistics></app-total-statistics>
+                <app-total-statistics [currency]="Currency"></app-total-statistics>
             </div>
         </div>
     </div>

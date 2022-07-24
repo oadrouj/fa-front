@@ -24,7 +24,12 @@
 }
 
 :host>>>.p-datatable .p-datatable-wrapper {
-    /* height: 52vh; */
+     height: 45vh !important;
+     width: 100% !important;
+
+     overflow-y: auto !important; 
+     overflow-x: auto !important; 
+
 }
 
 :host>>>.p-paginator-bottom {
@@ -59,4 +64,23 @@
 
 :host>>>.pi-sort-amount-down:before {
     content: '\e902';
+}
+
+td {
+    vertical-align: middle !important;
+}
+/* tr:last-child{
+width: 2px !important;
+}  */
+.width-50px{
+    width:50px !important;
+}
+.width-100px{
+    width:100px !important;
+}
+.width-150px{
+    width:150px !important;
+}
+.width-200px{
+    width:250px !important;
 }

@@ -48,10 +48,14 @@ export class AppAuthService {
                     finallyCallback();
                 })
             )
-            .subscribe((result: AuthenticateResultModel) => {
+            .subscribe({
+                next : (result: AuthenticateResultModel) => {
               
                 this.processAuthenticateResult(result, noRedirectToApp);
-            });
+                }, error:error => {
+                 console.log(error); 
+                }
+        });
     }
 
     public saveAccessTokenAfterSignup(authenticateModel: AuthenticateModel){

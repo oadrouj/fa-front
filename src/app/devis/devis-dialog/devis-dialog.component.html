@@ -6,7 +6,7 @@
         <h2>{{dialogTitle}} {{title | lowercase}}</h2>
         <div class="flex">
             <button pButton label="Enregistrer le brouillon" [hidden]="saveBrouillonHide" [ngClass]="'bg-' + secondaryColor" (click)="saveBrouillon()" class="bg-orange color-white border-none mx-2"></button>
-            <button pButton label="Valider" class="mx-2 bg-turquoise" (click)="validateDevis()"></button>
+            <button pButton label="Valider" class="mx-2 bg-turquoise" (click)="validateDevis()" [icon]="iconClasses"></button>
             <button pButton label="Aperçu" class="bg-purple mx-2" (click)="preview()"></button>
         </div>
     </ng-template>
@@ -116,14 +116,14 @@
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'dropdown'">
                                                 <td [colSpan]="col.colspan" class="w-20">
-                                                    <p-dropdown [options]="col.options" [formControlName]="col.field" [disabled]="col.disabled" [appendTo]="myTable" (onChange)="col.changeEvent(i)">
-                                                        <ng-template pTemplate="selectedItem">
-                                                            <div class="" *ngIf="group.get(col.field).value">
-                                                                {{group.get(col.field).value}}
+                                                    <p-dropdown [options]="col.options" [formControlName]="col.field" [disabled]="col.disabled" [appendTo]="myTable" (onChange)="changeTVA(i)">
+                                                        <ng-template let-item pTemplate="selectedItem">
+                                                            <div class="" *ngIf="group.get(col.field).value || item.value == 0">
+                                                                {{item.label}}
                                                             </div>
                                                         </ng-template>
                                                         <ng-template let-option pTemplate="item">
-                                                            <div>{{option}}</div>
+                                                            <div>{{option.label}}</div>
                                                         </ng-template>
                                                     </p-dropdown>
                                                 </td>
@@ -154,19 +154,27 @@
                             </ng-template>
                             <ng-template pTemplate="summary" let-yourColumnArrayVaraible>
                                 <div class="flex justify-content-between align-items-start ">
-                                    <button pButton (click)="addRow()" label="Ajouter une ligne" icon="pi pi-arrow-down" iconPos="right" class="bg-orange color-white border-none"></button>
+                                    <button pButton (click)="addRow(myTable)" label="Ajouter une ligne" icon="pi pi-arrow-down" iconPos="right" class="bg-orange color-white border-none"></button>
                                     <div class="new-devis-summary text-right">
                                         <div class="grid my-1">
-                                            <div class="col-7 color-gray"><span>TOTAL HT</span></div>
+                                            <div class="col-7 color-gray"><span>Montant Total HT</span></div>
                                             <div class="col-5" [ngClass]="'color-' + primaryColor">
                                                 <span>{{summaryTotalHT | number:'1.2-2' }}
                                                     {{' ' + Currency}}</span></div>
                                         </div>
-                                        <div class="grid my-1">
-                                            <div class="col-7 color-gray"><span>REMISE</span></div>
+                                        <div class="grid my-1" *ngIf="remiseValue > 0">
+                                            <div class="col-7 color-gray"><span>Remise ({{remiseValue}}%)</span></div>
                                             <div class="col-5 " [ngClass]="'color-' + primaryColor">
                                                 <span>
                                                     {{remiseAmount || 0 | number:'1.2-2' }}{{' ' + Currency}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="grid my-1" *ngIf="remiseValue > 0">
+                                            <div class="col-7 color-gray"><span>Total HT aprés remise</span></div>
+                                            <div class="col-5 " [ngClass]="'color-' + primaryColor">
+                                                <span>
+                                                    {{ (summaryTotalHT - remiseAmount ) | number:'1.2-2' }} {{' ' + Currency}}
                                                 </span>
                                             </div>
                                         </div>
@@ -180,7 +188,7 @@
                                         </div>
                                         <hr>
                                         <div class="grid">
-                                            <div class="col-7 color-gray"><span>TOTAL ESTIME TTC</span></div>
+                                            <div class="col-7 color-gray"><span>Montant Total TTC</span></div>
                                             <div class="col-5" [ngClass]="'color-' + primaryColor">
                                                 <span>
                                                     {{summaryTotalTTC || 0 | number:'1.2-2' }} {{' ' + Currency}}
@@ -205,7 +213,7 @@
                             <p-toggleButton onLabel="Désactiver" formControlName="tva" (onChange)="toggleTVAOption($event.checked)" offLabel="Activer" onIcon="pi pi-times" offIcon="pi pi-check"></p-toggleButton>
                         </p-accordionTab>
                         <p-accordionTab header="Devise">
-                            <p-dropdown formControlName="devise" [options]="currencies" (onChange)="currencyChangeConvertAmounts($event)" [appendTo]="acrd" placeholder="Sélectionner un devise">
+                            <p-dropdown formControlName="devise" [options]="currencies" (onChange)="currencyChangeConvertAmounts($event)" [appendTo]="acrd" placeholder="Sélectionner une devise">
                             </p-dropdown>
                         </p-accordionTab>
                     </p-accordion>
@@ -218,7 +226,7 @@
 
 <app-client-dialog [dialogStatus]="clientDialogStatus" [display]="clientDialogIsVisible" (emitHideDialogEvent)="closeClientDialog($event)"></app-client-dialog>
 
-<p-dialog #dialog id="dialogCatalogue" header="NOUVEL ITEM" [(visible)]="catalogueDialogDisplay" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
+<!-- <p-dialog #dialog id="dialogCatalogue" header="NOUVEL ITEM" [(visible)]="catalogueDialogDisplay" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
 
     <form [formGroup]="catalogueFormGroup">
         <p-selectButton [options]="catalogueOptions" formControlName="dialogSelectedType" class="uppercase">
@@ -248,6 +256,65 @@
 
             <div class="col-5 label">
                 <span>Prix HT</span>
+            </div>
+            <div class="col-7">
+                <input type="text" pInputText formControlName="htPrice" />
+            </div>
+
+            <div class="col-5 label">
+                <span>TVA</span>
+            </div>
+            <div class="col-7">
+                <p-inputNumber formControlName="tva" id="tva" [suffix]="' %'">
+                </p-inputNumber>
+            </div>
+
+            <div class="col-5 label">
+                <span>Quantité minimale</span>
+            </div>
+            <div class="col-7">
+                <p-inputNumber formControlName="minimalQuantity" [suffix]="' ' + catalogueFormGroup.get('unity').value">
+                </p-inputNumber>
+
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <span><span class="red-color">*</span> Champ(s) obligatoire(s)</span>
+        <p-button id="buttonValider" (click)="submitCatalogue()" label="Valider"></p-button>
+    </ng-template>
+</p-dialog> -->
+
+<p-dialog #dialog id="dialogCatalogue" header="NOUVEL ITEM" [(visible)]="catalogueDialogDisplay" [modal]="true" [baseZIndex]="10000" [draggable]="false" [resizable]="false">
+
+    <form [formGroup]="catalogueFormGroup">
+        <p-selectButton [options]="catalogueOptions" formControlName="dialogSelectedType" class="uppercase">
+        </p-selectButton>
+        <div class="grid blockForm mx-3 mt-3 mb-2">
+            <div class="col-5 label">
+                <span>Désignation <span class="red-color">*</span></span>
+            </div>
+            <div class="col-7">
+                <input type="text" pInputText placeholder="" formControlName="designation" />
+            </div>
+
+            <div class="col-5 label">
+                <span>Description</span>
+            </div>
+            <div class="col-7">
+                <input type="text" pInputText placeholder="" formControlName="description" />
+            </div>
+
+            <div class="col-5 label">
+                <span>Unité</span>
+            </div>
+            <div class="col-7">
+                <input type="text" pInputText formControlName="unity"/>
+            </div>
+
+            <div class="col-5 label">
+                <span>Prix (<span class="bold color-purple">{{Currency}}</span>)</span>
             </div>
             <div class="col-7">
                 <input type="text" pInputText formControlName="htPrice" />

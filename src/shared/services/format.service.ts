@@ -40,11 +40,11 @@ export class FormatService {
       case FactureStatutEnum.Cree:
         return 'Brouillon'
       case FactureStatutEnum.Valide:
-        return 'Validé'
+        return 'Validée'
       case FactureStatutEnum.Regle:
-        return 'Réglé'
+        return 'Réglée'
       case FactureStatutEnum.ReglePartiellemt:
-        return 'Réglé Partiellement'
+        return 'Réglée Partiellement'
       case FactureStatutEnum.PaiementAttente:
         return 'En attente'
       case FactureStatutEnum.PaiementRetard:
@@ -57,7 +57,7 @@ export class FormatService {
   formatPaymentMethod(paymentMethod: ModePaiementEnum) {
     switch (paymentMethod) {
       case ModePaiementEnum.Cheque:
-        return 'Chèaue'
+        return 'Chèque'
       case ModePaiementEnum.Effet:
         return 'Effet'
       case ModePaiementEnum.Liquide:

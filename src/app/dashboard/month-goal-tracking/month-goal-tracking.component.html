@@ -4,7 +4,7 @@
         <div class="col-8">
             <p-inplace #inplace [closable]="false" closeIcon="pi pi-check" class="block">
                 <ng-template pTemplate="display">
-                    <p-button [label]="monthTargetAmount + ' MAD'" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg"></p-button>
+                    <p-button [label]="monthTargetAmount + ' ' + currency" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg"></p-button>
                 </ng-template>
                 <ng-template pTemplate="content">
                     <!-- <input type="text" [(ngModel)]="newMonthTargetAmount" pInputText> -->
@@ -17,15 +17,15 @@
             <div class="grid pt-3 text-2xl ">
                 <div class="col-6 color-dashboard">
                     <span class="block">ACCOMPLI</span>
-                    <span>{{accomplishedAmount | number:'1.2-2' }} {{'MAD'}}</span>
+                    <span>{{accomplishedAmount | number:'1.2-2' }} {{currency}}</span>
                 </div>
                 <div class="col-6 color-yellow" *ngIf="monthTargetAmount - accomplishedAmount > 0">
                     <span class="block">RESTANT</span>
-                    <span>{{ monthTargetAmount - accomplishedAmount | number:'1.2-2' }} {{'MAD'}}</span>
+                    <span>{{ monthTargetAmount - accomplishedAmount | number:'1.2-2' }} {{currency}}</span>
                 </div>
                 <div class="col-6 color-yellow" *ngIf="monthTargetAmount - accomplishedAmount < 0">
                     <span class="block">RESTANT</span>
-                    <span> 0 {{'MAD'}}</span>
+                    <span> 0 {{currency}}</span>
                 </div>
             </div>
         </div>

@@ -191,4 +191,13 @@ export class ItemPreviewComponent implements OnInit {
 
     })
   }
+
+  onScroll(event): void {
+
+    if(event.srcElement.scrollTop > 3 ){
+      document.getElementById("devisDetailsHeader").classList.add('header-shadow');
+    }else{
+      document.getElementById("devisDetailsHeader").classList.remove('header-shadow');
+    }
+   }
 }

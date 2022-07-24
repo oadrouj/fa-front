@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
   HostBinding,
@@ -15,10 +16,11 @@ import {
   FactureServiceProxy,
 } from '@shared/service-proxies/service-proxies'
 import { FormatService } from '@shared/services/format.service'
-import { FilterMatchMode, FilterService, LazyLoadEvent } from 'primeng/api'
+import { FilterMatchMode, FilterService, LazyLoadEvent, SortEvent } from 'primeng/api'
 import { Table } from 'primeng/table'
 import { Observable } from 'rxjs'
 import { LazyTableService } from '@shared/services/lazy-table.service'
+import { EstimateInvoiceStatusStateService } from '@shared/services/estimate-invoice-status-state.service'
 
 @Component({
   selector: 'app-table',
@@ -59,13 +61,15 @@ export class TableComponent implements OnInit {
   rows = 7
   first = 0
 
+  selectedIndex = 0;
+
   @HostBinding('style')
   get style() {
     return this.sanitizer.bypassSecurityTrustStyle(
       `--highlight-color: ${this.highlightColorInput};`,
     )
   }
-
+  loading = false;
   constructor(
     private sanitizer: DomSanitizer,
     public _formatService: FormatService,
@@ -74,6 +78,7 @@ export class TableComponent implements OnInit {
     private _clientServiceProxy: ClientServiceProxy,
     private _catalogueServiceProxy: CatalogueServiceProxy,
     private _lazyTableService: LazyTableService,
+    private _estimateInvoiceStatusStateService : EstimateInvoiceStatusStateService
   ) {}
 
   ngOnInit(): void {
@@ -105,6 +110,8 @@ export class TableComponent implements OnInit {
     })
   }
 
+
+
   isValidDate(dateString: string) {
     return (new Date(dateString) as any) != 'Invalid Date'
   }
@@ -120,6 +127,9 @@ export class TableComponent implements OnInit {
 
   onRowSelect(event: any) {
     this._lazyTableService.emitRowSelected = event.data
+    this.selectedIndex=event.data.id;
+    console.log(this.selectedIndex);
+  
   }
 
   onRowUnselect() {
@@ -127,10 +137,14 @@ export class TableComponent implements OnInit {
   }
 
   loadTableLazy(event?: LazyLoadEvent) {
+    this.loading = true;
     this.getListApi$(event).subscribe((res) => {
       // this.tableData = Array.from({length: res.length})
       // this.tableData.splice(event.first, event.rows, ...res.items);
       // if(res.items.length){
+        console.log("Table data reloaded")
+        this.loading = false;
+
         this.tableData = [...res.items]
         this.totalRecords = res.length
         this.montantTotal= res.montantTotalAllDevis
@@ -189,4 +203,47 @@ export class TableComponent implements OnInit {
   getSumOfField(field){
     return this.tableData.map(item => item[field]).reduce((accum, current) => accum + current)
   }
+
+  customSort(event: SortEvent) {
+    console.log("Salam from sort")
+    event.data.sort((data1, data2) => {
+        let value1 = data1[event.field];
+        let value2 = data2[event.field];
+        let result = null;
+
+        if (value1 == null && value2 != null)
+            result = -1;
+        else if (value1 != null && value2 == null)
+            result = 1;
+        else if (value1 == null && value2 == null)
+            result = 0;
+        else if (typeof value1 === 'string' && typeof value2 === 'string')
+            result = value1.localeCompare(value2);
+        else
+            result = (value1 < value2) ? -1 : (value1 > value2) ? 1 : 0;
+
+        return (event.order * result);
+    });
+}
+
+mySort(event: any, field: string) {
+  if (event.order === 1) {
+    this.tableData.sort((a, b) => {
+      if (typeof a[field] === 'string') {
+        const sortDesc = a[field] < b[field] ? -1 : 0;
+        return a[field] > b[field] ? 1 : sortDesc;
+      }
+      return a[field] - b[field];
+    });
+  } else {
+    this.tableData.sort((a, b) => {
+      if (typeof a[field] === 'string') {
+        const sortDesc = a[field] < b[field] ? 1 : 0;
+        return a[field] > b[field] ? -1 : sortDesc;
+      }
+      return b[field] - a[field];
+    });
+  }
+  this.tableData = [...this.tableData];
+}
 }

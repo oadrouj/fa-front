@@ -1,6 +1,6 @@
 <div #container>
     <div class="custom-dialog-header">
-        <span class="custom-dialog-title">Paiement du facture</span>
+        <span class="custom-dialog-title">Paiement Facture {{this.config.data.factureRef}}</span>
         <div class="p-dialog-header-icons">
             <button type="button" (click)="closeDialog()" class="p-dialog-header-icon p-dialog-header-maximize p-link ">
                 <span class="p-dialog-header-close-icon pi pi-times ng-tns-c139-15"></span>
@@ -8,12 +8,17 @@
         </div>
     </div>
     <p-tabView>
-        <p-tabPanel header="Ajouter un payement" *ngIf="this.config.data.tabPanelShowMode == 'both' || this.config.data.tabPanelShowMode == 'addPayement'">
+        <p-tabPanel header="Ajouter un paiement" *ngIf="this.config.data.tabPanelShowMode == 'both' || this.config.data.tabPanelShowMode == 'addPayement'">
             <form [formGroup]="formGroup" class="mt-1">
-                <div *ngIf="this.config.data.status == 2" class="flex justify-content-center align-items-center ">
+                <div *ngIf="this.config.data.status == 2 || this.config.data.status == 4" class="flex justify-content-center align-items-center ">
                     <span class="mr-1 text-xl font-bold text-black">Reste à payer:</span>
                     <span class="ml-1 text-3xl font-bold color-orange">{{this.config.data.restAmount | number:'1.2-2' }}
                         {{currency | uppercase}}</span>
+                </div>
+                <div class="flex justify-content-between mt-4 align-items-center">
+                
+                    <p-inputNumber formControlName="id" hidden>
+                    </p-inputNumber>
                 </div>
                 <div class="flex justify-content-between mt-4 align-items-center">
                     <span>Montant</span>
@@ -34,7 +39,7 @@
 
             </form>
         </p-tabPanel>
-        <p-tabPanel header="Voir tous les payaments" *ngIf="this.config.data.tabPanelShowMode == 'both' || this.config.data.tabPanelShowMode == 'historic'">
+        <p-tabPanel header="Tous les paiements" *ngIf="this.config.data.tabPanelShowMode == 'both' || this.config.data.tabPanelShowMode == 'historic'">
             <app-payment-history [factureId]="this.config.data.factureId" [currency]="currency"></app-payment-history>
 
         </p-tabPanel>

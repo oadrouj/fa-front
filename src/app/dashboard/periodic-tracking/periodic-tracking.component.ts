@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
 import { StatisticsServiceProxy } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 
@@ -27,6 +27,8 @@ export class PeriodicTrackingComponent implements OnInit {
 
   @ViewChild("start_date") start_date :ElementRef
   @ViewChild("end_date") end_date :ElementRef
+
+  @Input() currency : string;
 
   constructor(private _statisticsServiceProxy: StatisticsServiceProxy) {}
 

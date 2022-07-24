@@ -38,6 +38,13 @@ import { IsUniqueEmailAddressDirective } from './directives/is-unique-email-addr
 import {LoginComponent} from './login/login.component';
 import { RegisterTimelineComponent } from './register-steps/register-timeline/register-timeline.component'
 import { SubscriptionCardComponent } from './register-steps/register-step-three/subscription-card/subscription-card.component'
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ToastService } from '@shared/services/toast.service';
+import { ConfirmDialogService } from '@shared/services/confirm-dialog.service';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { CalendarModule } from 'primeng/calendar';
+import { AutoCompleteModule } from 'primeng/autocomplete';
 @NgModule({
     imports: [
         CommonModule,
@@ -56,7 +63,18 @@ import { SubscriptionCardComponent } from './register-steps/register-step-three/
         DropdownModule,
         CardModule,
         RippleModule,
-        SliderModule
+        SliderModule,
+        ToastModule,
+        SharedModule,
+        ButtonModule,
+        DropdownModule,
+        InputTextModule,
+        ToastModule,
+        ConfirmDialogModule,
+        CalendarModule,
+        AutoCompleteModule,
+        ConfirmDialogModule
+
     ],
     declarations: [
         AccountComponent,
@@ -79,6 +97,7 @@ import { SubscriptionCardComponent } from './register-steps/register-step-three/
         SubscriptionCardComponent,
         
     ],
+    providers: [MessageService, ConfirmationService, ToastService, ConfirmDialogService],
     entryComponents: [
         // tenant
         TenantChangeDialogComponent

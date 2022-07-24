@@ -19,7 +19,8 @@ export class AppInitializer {
 
   init(): () => Promise<boolean> {
     return () => {
-      abp.ui.setBusy();
+      abp.ui.setBusy(null, "", 1);
+    
       return new Promise<boolean>((resolve, reject) => {
         AppConsts.appBaseHref = this.getBaseHref();
         const appBaseUrl = this.getDocumentOrigin() + AppConsts.appBaseHref;
@@ -30,7 +31,9 @@ export class AppInitializer {
             const appSessionService = this._injector.get(AppSessionService);
             appSessionService.init().then(
               (result) => {
+               // abp.ui.clearBusy();
                 abp.ui.clearBusy();
+
                 if (this.shouldLoadLocale()) {
                   const angularLocale = this.convertAbpLocaleToAngularLocale(
                     abp.localization.currentLanguage.name
@@ -125,9 +128,9 @@ export class AppInitializer {
 
     if (token) {
       requestHeaders['Authorization'] = `Bearer ${token}`;
-    }
-
-    this._httpClient
+      callback();
+    }else{
+      this._httpClient
       .get<any>(
         `${AppConsts.remoteServiceBaseUrl}/AbpUserConfiguration/GetAll`,
         {
@@ -148,9 +151,9 @@ export class AppInitializer {
         if (abp.clock.provider.supportsMultipleTimezone) {
           moment.tz.setDefault(abp.timing.timeZoneInfo.iana.timeZoneId);
         }
-
         callback();
       });
+    }
   }
 
   private getApplicationConfig(appRootUrl: string, callback: () => void) {

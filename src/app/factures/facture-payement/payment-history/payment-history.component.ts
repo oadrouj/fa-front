@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FactureServiceProxy } from '@shared/service-proxies/service-proxies';
+import { FactureDto, FactureServiceProxy, FactureStatutEnum } from '@shared/service-proxies/service-proxies';
 import { FormatService } from '@shared/services/format.service';
+import { ToastService } from '@shared/services/toast.service';
 import * as moment from 'moment';
 
 @Component({
@@ -13,6 +14,7 @@ export class PaymentHistoryComponent implements OnInit {
   constructor(
     private _factureServiceProxy: FactureServiceProxy,
     private _formatService: FormatService,
+    private _toastService: ToastService
   ) { }
 
 
@@ -21,6 +23,8 @@ export class PaymentHistoryComponent implements OnInit {
   paymentHistoryItems: any
   totalRecords
 
+  rows = 4;
+  first = 0
   ngOnInit() { 
 
   }
@@ -39,4 +43,39 @@ export class PaymentHistoryComponent implements OnInit {
     return this._formatService.formatPaymentMethod(paymentMethod)
   }
  
+  deletePayement(facturePayement){
+    console.log(facturePayement);
+
+    this._factureServiceProxy.deleteFactureInfosPaiement(facturePayement.id)
+    .subscribe(res => {
+      this._toastService.success({
+        summary: 'Opération réussie',
+        detail: 'Réglement supprimé avec succés',
+      })
+      this._factureServiceProxy.getByFactureIdFactureInfosPaiement(facturePayement.factureId, this.first, this.rows)
+      .subscribe( res2=>{
+        this.paymentHistoryItems = res2.items
+        if (this.paymentHistoryItems.length == 0){
+          this._factureServiceProxy
+          .changeFactureStatut(
+            facturePayement.factureId,
+            FactureStatutEnum.PaiementAttente,
+          )
+          .subscribe({
+            next: (res3) => {
+              this._toastService.success({
+                summary: 'Aucun réglement saisi',
+                detail: 'La facture est désormais en attente de paiement',
+              })
+          },
+          error: err =>{
+            console.log(err);
+          }
+        })
+
+      }
+      })
+
+    })
+  }
 }

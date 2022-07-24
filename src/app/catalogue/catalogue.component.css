@@ -5,7 +5,7 @@
 .main {
     padding-right: .8rem;
     background: #f1f6ff;
-    min-height: 100vh;
+    height: calc(100vh - 60px);
 }
 
 .header {
@@ -137,17 +137,38 @@ i.pi-search {
 /* Devis details */
 
 .devis-details {
-    background-color: #faf9f9;
+    background-color: #fff;
     /* min-height: 782px; */
-    min-height: max(calc(100vh - 60px), 710px);
+    height: 84vh;
     margin-bottom: 0.7rem;
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 50%);
 }
 
 .devis-details .header {
-    padding: 20px 20px;
+    padding: 12px .75rem;
     border-bottom: 1px solid #d8d8d8;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+
+    z-index: 100;
+    margin-top:-2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+
+:host ::ng-deep .header button span {
+    font-weight:700 !important;
+    padding-left:5px;
+}
+
+
+.header-shadow{
+    background-color: #f0ffff;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22) !important;
 }
 
 .devis-details .header .p-button-text {
@@ -297,4 +318,35 @@ i.pi-search {
 
 :host>>>.blockForm .p-dropdown .p-dropdown-label {
     padding-top: 4px;
+}
+
+#devis-body{
+    position:relative;
+    height:75vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+#devis-header {
+    /* min-height: 17.5vh;
+    max-height: 17.5vh; */
+  /*   border-bottom: 1px solid #d8d8d8;
+    position: relative;
+    padding: 20px; */
+
+    padding: 12px .75rem;
+    border-bottom: 1px solid #d8d8d8;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+
+    z-index: 100;
+    margin-top:-2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+.header-shadow{
+    background-color: var(--light-purple-color);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22) !important;
 }

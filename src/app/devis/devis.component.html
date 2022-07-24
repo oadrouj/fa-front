@@ -15,30 +15,31 @@
                     <button pButton (click)="newDevis()" class="btn-new-devis text-normal" [ngClass]="'bg-' + primaryColor" [label]="'Nouveau ' + title"></button>
 
                 </div>
-                <p class="subtitle pt-2">Visualisez, modifiez et gérez toutes vos {{title | lowercase}} !</p>
-
-                <span class="searchInput p-input-icon-left mt-2 shadow-1">
-                    <i class="pi pi-search"></i>
-                    <input pInputText [(ngModel)]="searchText"
-                        (input)="emitFilterEvent('filterByInput', $event.target.value)" class=""
-                        placeholder="Rechercher ici" />
-                </span>
-
-                <div class="flex align-items-center pt-4 filterContainer">
-                    <p-autoComplete [(ngModel)]="selectedClient" placeholder="Client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)" field="displayName" (onSelect)="emitFilterEvent('filterByButton', null)"></p-autoComplete>
-                    <p-calendar [(ngModel)]="selectedDate" selectionMode="range" placeholder="Date" (onSelect)="emitDateFilterEvent($event)"></p-calendar>
-                    <p-inputNumber [(ngModel)]="selectedEcheance" placeholder="Echéance" (onInput)="selectedEcheance = $event.value; emitFilterEvent('filterByButton', null)">
-                    </p-inputNumber>
-                    <p-inputNumber [(ngModel)]="selectedMontant" placeholder="Montant" mode="decimal" [minFractionDigits]="2" (onInput)="selectedMontant = $event.value; emitFilterEvent('filterByButton', null)">
-                    </p-inputNumber>
-                    <p-dropdown [options]="statutOptions" [(ngModel)]="selectedStatut" placeholder="Statut" optionLabel="label" optionValue="value" [showClear]="false" (onChange)="emitFilterEvent('filterByButton', null)"></p-dropdown>
-
-                    <button pButton pRipple type="button" icon="fa fa-undo" (click)="resetFilterFields()" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor "></button>
-
+                <div class="w-100 flex justify-content-between mt-3 pr-3">
+                    <p class="subtitle" style="display:inline-block;">Visualisez, modifiez et gérez toutes vos {{title | lowercase}} !</p>
+                    <button  class="" pButton pRipple type="button" icon="fa fa-undo" (click)="resetFilterFields()" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor "></button>
                 </div>
+                <div class="w-100 flex mr-3">
+                    <span class="searchInput p-input-icon-left mt-2 shadow-1">
+                        <i class="pi pi-search"></i>
+                        <input pInputText [(ngModel)]="searchText"
+                            (input)="emitFilterEvent('filterByInput', $event.target.value)" class=""
+                            placeholder="Rechercher ici" />
+                    </span>
+                    <div class="flex align-items-center pt-1 filterContainer">
+                        <p-autoComplete [(ngModel)]="selectedClient" placeholder="Client" [suggestions]="clientSuggestions" (completeMethod)="clientAutoCompleteSearch($event)" field="displayName" (onSelect)="emitFilterEvent('filterByButton', null)"></p-autoComplete>
+                        <p-calendar [(ngModel)]="selectedDate" selectionMode="range" placeholder="Date" (onSelect)="emitDateFilterEvent($event)"></p-calendar>
+                        <p-inputNumber [(ngModel)]="selectedMontant" placeholder="Montant" mode="decimal" [minFractionDigits]="2" (onInput)="selectedMontant = $event.value; emitFilterEvent('filterByButton', null)">
+                        </p-inputNumber>
+                        <p-dropdown [options]="statutOptions" [(ngModel)]="selectedStatut" placeholder="Statut" optionLabel="label" optionValue="value" [showClear]="false" (onChange)="emitFilterEvent('filterByButton', null)"></p-dropdown>
+                    </div>
+                </div>
+                
+
+                
             </div>
 
-            <app-table #dt1 [cols]="cols" [styleClass]="'table'" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [filterEvent]="filterSubject.asObservable()" [getListApi$]="getListDevisApi$" [statusItems]="devisStatusItems" [globalFilterFields]="['reference','client','dateEmission','echeancePaiement', 'montantTtc','statut']">
+            <app-table #dt1 [cols]="cols" [styleClass]="'table'" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [filterEvent]="filterSubject.asObservable()" [getListApi$]="getListDevisApi$" [statusItems]="devisStatusItems" [globalFilterFields]="['reference','client','dateEmission', 'montantTtc','statut','action']">
             </app-table>
 
             <div class="devisTotal flex justify-content-between align-items-center w-100">
@@ -48,9 +49,9 @@
             </div>
         </div>
 
-        <div class="rightSection md:col-12 p-0">
-            <div class="devis-details">
-                <div class="header flex justify-content-end">
+        <div class="rightSection col-12 p-0">
+            <div #devisDetails class="devis-details">
+                <div id="devisDetailsHeader" class="header flex justify-content-end" #devisDetailsHeader>
                     <div class="flex">
                         <button pButton label="Télécharger" [icon]="iconSpin" class="p-button-text" (click)="downloadDevisAsPdf()"></button>
                         <button pButton label="Imprimer"  [icon]="iconSpinPrint" class="p-button-text" (click)="printDevis()"></button>

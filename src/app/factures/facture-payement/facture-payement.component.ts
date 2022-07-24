@@ -19,7 +19,12 @@ export class FacturePayementComponent implements OnInit {
     private _formBuider: FormBuilder,
     private _formatService: FormatService,
   )
-   { }
+   { 
+
+    console.log("this.config.data.status")
+    console.log(this.config.data)
+
+   }
 
    formGroup: FormGroup 
    payementOptions = [
@@ -39,6 +44,7 @@ export class FacturePayementComponent implements OnInit {
 
   initiateForm(){
     return this.formGroup = this._formBuider.group({
+      id: [this.config.data.factureId, ],
       datePaiement: [moment().toDate(), Validators.required],
       montant: [0, Validators.required],
       modePaiement: [ModePaiementEnum.Cheque],

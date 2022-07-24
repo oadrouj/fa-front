@@ -19,6 +19,9 @@ import {
   FileApiServiceProxy,
   FactureItemDto,
   FactureDto,
+  GeneralInfosDto,
+  TvaCurrencyDto,
+  InfosEntrepriseServiceProxy,
 } from '@shared/service-proxies/service-proxies'
 import * as moment from 'moment'
 import { DateHelper } from '@shared/helpers/DateHelper'
@@ -53,7 +56,13 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   invoiceDialogStatus: DialogStatus
   invoiceItemProp: any
   firstLoad = true
-
+  tvaCurrencyDto: TvaCurrencyDto;
+  generalInfosDto: GeneralInfosDto;
+  selectedTva :string = "20%";
+  selectedDevise :string = "MAD";
+  iconSpin="";
+  iconSpinPrint="";
+  
   constructor(
     private _factureServiceProxy: FactureServiceProxy,
     private _clientServiceProxy: ClientServiceProxy,
@@ -66,6 +75,8 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     private _sanitizer: DomSanitizer,
     private _lazyTableService: LazyTableService,
     private _previewService: PreviewService,
+    private _infosEntrepriseService: InfosEntrepriseServiceProxy,
+
   ) {}
 
   ngOnInit() {
@@ -96,7 +107,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.updateApiCall(
         this.selectedDevisItem.id,
         this.parseStatutForStatutValide(this.selectedDevisItem),
-        'Le devis est validé',
+        'La facture est validée',
       )
     }
   }
@@ -104,6 +115,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this._estimateInvoiceStatusStateService.statusModifier$.subscribe(
       async (res) => {
+
+        this.resetFilterFields();
+
         if (res.target == 'Invoice') {
           switch (res.statusAction) {
             case 'Validate':
@@ -153,14 +167,14 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   echeanceOptions = [15, 20, 30]
   statutOptions = [
     { value: FactureStatutEnum.Cree, label: 'Créé' },
-    { value: FactureStatutEnum.Regle, label: 'Réglé' },
-    { value: FactureStatutEnum.ReglePartiellemt, label: 'Réglé Partiellement' },
+    { value: FactureStatutEnum.Regle, label: 'Réglée' },
+    { value: FactureStatutEnum.ReglePartiellemt, label: 'Réglée Partiellement' },
     { value: FactureStatutEnum.PaiementAttente, label: 'Paiement en attente' },
     { value: FactureStatutEnum.PaiementRetard, label: 'Paiement en retard' },
   ]
   cols = [
     {
-      header: 'REFERENCE',
+      header: 'RÉF.',
       field: 'reference',
       type: 'text',
     },
@@ -170,7 +184,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       type: 'text',
     },
     {
-      header: 'EMISSION',
+      header: 'ÉMISSION',
       field: 'dateEmission',
       type: 'date',
       format: (date) => (date._i ? new Date(date._i) : new Date(date._d)),
@@ -187,6 +201,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       header: 'MONTANT TTC',
       field: 'montantTtc',
       type: 'currency',
+      colspan: 2,
     },
     {
       header: 'STATUT',
@@ -195,6 +210,12 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       format: this.formatStatut,
       colspan: 2,
     },
+    {
+      header: ' ',
+      field: 'action',
+      type: 'estimate-invoice-action',
+      format: this.formatStatut,
+    }
   ]
 
   factureStatusItems = [
@@ -271,8 +292,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   montantTotalAllDevis
   ref: DynamicDialogRef
 
-  iconSpin = "";
-  iconSpinPrint = "";
+ 
   //#endregion
 
   emitDateFilterEvent(event) {
@@ -285,11 +305,11 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       case FactureStatutEnum.Cree:
         return 'Brouillon'
       case FactureStatutEnum.Valide:
-        return 'Validé'
+        return 'Validée'
       case FactureStatutEnum.Regle:
-        return 'Réglé'
+        return 'Réglée'
       case FactureStatutEnum.ReglePartiellemt:
-        return 'Réglé Partiellement'
+        return 'Réglée Partiellement'
       case FactureStatutEnum.PaiementAttente:
         return 'Paiement en attente'
       case FactureStatutEnum.PaiementRetard:
@@ -379,7 +399,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
               this.summaryTVA = 0
               this._toastService.info({
                 summary: 'Opération réussie',
-                detail: 'La facture est supprimée avec succès',
+                detail: 'Facture supprimée avec succès',
               })
             }
           })
@@ -408,7 +428,41 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   calculateSummaryTotalHTAndTVA() {
+
     if (this.selectedDevisItem && this.selectedDevisItem.factureItems) {
+      this.summaryTotalHT = this.selectedDevisItem.factureItems
+        .map((item) => item.unitPriceHT * item.quantity)
+        .reduce((accum, current) => accum + current)
+      
+        this.remiseAmount = this.calculateRemise(
+          this.selectedDevisItem.remise,
+          this.summaryTotalHT,
+        )
+        console.info("Remise Amount", this.remiseAmount)
+        console.info("Remise Amount", this.selectedDevisItem.remise)
+        if (this.selectedDevisItem.remise == 0){
+          console.info("Remise Amount", "Remise NULLE")
+          this.summaryTVA = this.selectedDevisItem.factureItems
+          .map((item) => (item.unitPriceHT * item.quantity * item.tva) / 100)
+          .reduce((accum, current) => accum + current)
+        }else{
+          console.info("Remise Amount", "Remise NON NULLE")
+
+          this.summaryTVA = this.selectedDevisItem.factureItems
+          .map((item) => ((item.unitPriceHT - item.unitPriceHT * this.selectedDevisItem.remise / 100 ) * item.quantity * item.tva) / 100)
+          //.map((item) => {
+            
+           // item = (item.unitPriceHT * 0.1 * item.quantity * item.tva) / 100
+            // console.log((item.unitPriceHT * this.selectedDevisItem.remise * item.quantity * item.tva) / (100 * 100)) 
+
+          // }) 
+          .reduce((accum, current) => accum + current)
+        }
+
+        console.info("SUMMARY TVA", this.summaryTVA)
+    } 
+
+    /* if (this.selectedDevisItem && this.selectedDevisItem.factureItems) {
       this.summaryTotalHT = this.selectedDevisItem.factureItems
         .map((item) => item.unitPriceHT * item.quantity)
         .reduce((accum, current) => accum + current)
@@ -419,7 +473,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedDevisItem.remise,
         this.summaryTotalHT,
       )
-    }
+    } */
   }
 
   calculateRemise(remise, totalHT) {
@@ -433,6 +487,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         ? this.parseStatutForStatutValide(event)
         : invoice.statut
 
+    console.log("status changed", invoice.statut)
     if (event.crudOperation == 'create') {
       this._lazyTableService.emitDataOperation = {
         action: 'add',
@@ -582,17 +637,18 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.ref = this.dialogService.open(FacturePayementComponent, {
       data: {
         factureId: this.selectedDevisItem.id,
+        factureRef: this.selectedDevisItem.reference,
         status: this.selectedDevisItem.statut,
         restAmount: restAmount,
         currency: this.selectedDevisItem.currency,
         tabPanelShowMode: tabPanelShowMode,
       },
-      header: 'Réler le payement',
+      header: 'Saisir paiement',
       width: '34vw',
       showHeader: false,
       contentStyle: {
-        height: '31.56rem',
-
+        height: '33.56rem',
+        minWidth: '400px',
         overflow: 'auto',
         padding: '0',
         borderRadius: '20px',
@@ -601,69 +657,95 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     })
 
     this.ref.onClose.subscribe(async (result) => {
-      if (result && result.montant != 0) {
-        let factureInfosPaiementDto = new FactureInfosPaiementDto({
-          datePaiement:  moment(result.datePaiement),
-          montantPaye: result.montant,
-          modePaiement: result.modePaiement,
-          factureId: this.selectedDevisItem.id,
-          id: facturePayementInfo.id,
-        })
+      console.log("result after close")
+      console.log(result)
 
-        let payedAmount = 0
-        if (
-          this.selectedDevisItem.statut == FactureStatutEnum.ReglePartiellemt
-        ) {
-          payedAmount = totalPayments + result.montant
-        } else {
-          payedAmount = result.montant
-        }
+      if(result){
+            this._factureServiceProxy
+            .getByIdFacture(result.id)
+            .subscribe((res : FactureDto) => {
 
-        if (payedAmount.toFixed(2) == this.selectedDevisItem.montantTtc) {
-          this._factureServiceProxy
-            .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
-            .subscribe((res) => {
-              if (res) {
-                this._toastService.info({ detail: 'La facture est réglée' })
+              console.log(res)
+          
+            if (result && result.montant != 0) {
+              let factureInfosPaiementDto = new FactureInfosPaiementDto({
+                datePaiement:  moment(result.datePaiement),
+                montantPaye: result.montant,
+                modePaiement: result.modePaiement,
+                factureId: result.id,
+                id: facturePayementInfo.id,
+              })
+
+              let payedAmount = 0
+              if (
+                res.statut == FactureStatutEnum.ReglePartiellemt
+              ) {
+                payedAmount = totalPayments + result.montant
+              } else {
+                payedAmount = result.montant
+              }
+
+              if (payedAmount == res.montantTtc) {
                 this._factureServiceProxy
-                  .changeFactureStatut(
-                    this.selectedDevisItem.id,
-                    FactureStatutEnum.Regle,
-                  )
-                  .subscribe((res) => {
-                    if (res) {
-                      this.viewUpdateSelectedItemStatut(FactureStatutEnum.Regle)
+                  .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
+                  .subscribe((res2) => {
+                    if (res2) {
+                      this._toastService.info({ detail: 'La facture est réglée' })
+                      this._factureServiceProxy
+                        .changeFactureStatut(
+                          res.id,
+                          FactureStatutEnum.Regle,
+                        )
+                        .subscribe((res3) => {
+                          if (res3) {
+                            this.viewUpdateSelectedItemStatut(res.id,FactureStatutEnum.Regle)
+                            this.resetFilterFields();
+                          }
+                        })
                     }
                   })
-              }
-            })
-        } else if (
-          payedAmount.toFixed(2) <= this.selectedDevisItem.montantTtc
-        ) {
-          this._factureServiceProxy
-            .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
-            .subscribe((res) => {
-              if (res) {
-                this._toastService.info({
-                  detail: 'La facture est partiellement réglée',
+              } else if (
+                payedAmount <= res.montantTtc
+              ) {
+                this._factureServiceProxy
+                  .createOrUpdateFactureInfosPaiement(factureInfosPaiementDto)
+                  .subscribe((res2) => {
+                    if (res2) {
+                      this._toastService.info({
+                        detail: 'La facture est partiellement réglée',
+                      })
+
+                      this._factureServiceProxy
+                        .changeFactureStatut(
+                          res.id,
+                          FactureStatutEnum.ReglePartiellemt,
+                        )
+                        .subscribe((res3) => {
+                          if (res3) {
+                            this.viewUpdateSelectedItemStatut(res.id,
+                              FactureStatutEnum.ReglePartiellemt
+                            )
+                            this.resetFilterFields();
+                          }
+                        })
+                    }
+                  })
+              }else if (
+                payedAmount > res.montantTtc
+              ) {
+                
+                this._toastService.error({
+                  detail: 'Le paiement saisi est supérieur au montant restant.',
                 })
 
-                this._factureServiceProxy
-                  .changeFactureStatut(
-                    this.selectedDevisItem.id,
-                    FactureStatutEnum.ReglePartiellemt,
-                  )
-                  .subscribe((res) => {
-                    if (res) {
-                      this.viewUpdateSelectedItemStatut(
-                        FactureStatutEnum.ReglePartiellemt,
-                      )
-                    }
-                  })
               }
-            })
-        }
+            }
+
+        });
       }
+      this.resetFilterFields();
+
+     
     })
   }
 
@@ -742,7 +824,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  viewUpdateSelectedItemStatut(statut: any) {
+  viewUpdateSelectedItemStatut(id:number, statut: any) {
     this.selectedDevisItem = {
       ...this.selectedDevisItem,
       dateEmission: moment(this.selectedDevisItem.dateEmission),
@@ -750,10 +832,18 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     let index = this.tableChild.tableData
       .filter((item) => item)
-      .findIndex((item) => item.id == this.selectedDevisItem.id)
+      .findIndex((item) => item.id == id)
+
+    this.selectedDevisItem = this.tableChild.tableData
+      .filter((item) => item)
+      .find((item) => item.id == id)
+      console.log(this.selectedDevisItem)
+
     this.tableChild.tableData[index] = { ...this.selectedDevisItem }
     this.tableChild.tableData = [...this.tableChild.tableData]
   }
+
+
 
   parseStatutForStatutValide(documentItem) {
     return moment().isAfter(
@@ -776,5 +866,33 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       return str
     }
+  }
+
+  getCurrentTvaAndCurrency(){
+    let observer = {
+      next: result=> {
+        if (result){
+          this.generalInfosDto = result;
+          this.tvaCurrencyDto = new TvaCurrencyDto({
+            "id": this.generalInfosDto.id,  
+            "tva": this.generalInfosDto.tva,
+            "currency": this.generalInfosDto.currency
+            })
+          if(result.tva != null) this.selectedTva = result.tva; 
+          if(result.currency != null) this.selectedDevise = result.currency; 
+        
+        }else{
+          console.log("No infos found");
+        }
+      },
+      error: error =>{
+        console.log(error)
+      }
+    }
+
+    this._infosEntrepriseService
+    .getGeneralInfos()
+    .pipe(first())
+    .subscribe(observer)
   }
 }

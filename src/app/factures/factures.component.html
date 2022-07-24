@@ -38,7 +38,7 @@
                 </div>
             </div>
 
-            <app-table #dt1 [cols]="cols" [styleClass]="'table'" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [filterEvent]="filterSubject.asObservable()" [getListApi$]="getListDevisApi$" [statusItems]="factureStatusItems" [globalFilterFields]="['reference','client','dateEmission','echeancePaiement', 'montantTtc','statut']">
+            <app-table #dt1 [cols]="cols" [styleClass]="'table'" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [filterEvent]="filterSubject.asObservable()" [getListApi$]="getListDevisApi$" [statusItems]="factureStatusItems" [globalFilterFields]="['reference','client','dateEmission', 'montantTtc','statut','action']">
             </app-table>
 
             <div class="devisTotal flex justify-content-between align-items-center w-100">
@@ -48,12 +48,12 @@
             </div>
         </div>
 
-        <div class="rightSection md:col-12 p-0">
-            <div class="devis-details">
-                <div class="header flex justify-content-end">
+        <div class="rightSection col-12 p-0">
+            <div #devisDetails class="devis-details">
+                <div id="devisDetailsHeader" class="header flex justify-content-end" #devisDetailsHeader>
                     <div class="flex">
-                        <button pButton label="Télécharger" (click)="downloadFactureAsPdf()" class="p-button-text" [icon]="iconSpin"></button>
-                        <button pButton label="Imprimer" class="p-button-text" (click)="printFacture()" [icon]="iconSpinPrint"></button>
+                        <button pButton label="Télécharger" [icon]="iconSpin" (click)="downloadFactureAsPdf()" class="p-button-text" [icon]="iconSpin"></button>
+                        <button pButton label="Imprimer" [icon]="iconSpinPrint" class="p-button-text" (click)="printFacture()" [icon]="iconSpinPrint"></button>
                         <button pButton label="Dupliquer" class="p-button-text" (click)="duplicateDevis()"></button>
                         <button pButton label="Modifier" class="p-button-text" (click)="editDevis()"></button>
                         <button pButton label="Supprimer" class="p-button-text" (click)="deleteDevis()"></button>

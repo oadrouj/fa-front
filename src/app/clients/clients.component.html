@@ -53,215 +53,217 @@
                     <p-button label="Supprimer" styleClass="p-button-link" (click)="supprimerClient()"></p-button>
                 </div>
             </div>
-            <div id="rappelClient">
-                <div class="pl-4">
-                    <span id="nomClientApercu">
-                        {{replaceIfIsNullOrEmpty(isClientProfetionnel ? client.raisonSociale : client.nom)}}
-                    </span><br>
-                    <span id="referenceClientApercu">
-                        {{getReferenceFromReferenceNumber(client.reference)}}
-                    </span><br>
-                    <span id="categorieClientApercu">{{replaceIfIsNullOrEmpty(client.clientType)}} -
-                        {{replaceIfIsNullOrEmpty(isClientProfetionnel ? "Professionnel" : "Particulier")}}
-                    </span>
+            <div class="blockBody" (scroll)="onScroll($event)">
+                <div id="rappelClient">
+                    <div class="pl-4">
+                        <span id="nomClientApercu">
+                            {{replaceIfIsNullOrEmpty(isClientProfetionnel ? client.raisonSociale : client.nom)}}
+                        </span><br>
+                        <span id="referenceClientApercu">
+                            {{getReferenceFromReferenceNumber(client.reference)}}
+                        </span><br>
+                        <span id="categorieClientApercu">{{replaceIfIsNullOrEmpty(client.clientType)}} -
+                            {{replaceIfIsNullOrEmpty(isClientProfetionnel ? "Professionnel" : "Particulier")}}
+                        </span>
+                    </div>
                 </div>
-            </div>
-            <div id="ongletsClient">
-                <p-tabView (onChange)="handleTabChange($event)">
-                    <p-tabPanel id="clientInfos" header="Infos">
-                        <table>
-                            <tr *ngIf="isClientProfetionnel">
-                                <td>Raison sociale</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.raisonSociale)}}</td>
-                            </tr>
-                            <tr *ngIf="isClientProfetionnel">
-                                <td>ICE</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.ice)}}</td>
-                            </tr>
-                            <tr *ngIf="!isClientProfetionnel">
-                                <td>Nom</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.nom)}}</td>
-                            </tr>
-                            <tr *ngIf="isClientProfetionnel">
-                                <td>Secteur d’activité</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.secteurActivite)}}</td>
-                            </tr>
-                            <tr>
-                                <td>Téléphone fixe</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.telFix)}}</td>
-                            </tr>
-                            <tr>
-                                <td>Téléphone portable</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.telPortable)}}</td>
-                            </tr>
-                            <tr>
-                                <td>E-mail</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.email)}}</td>
-                            </tr>
-                            <tr>
-                                <td>Site Web</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.siteWeb)}}</td>
-                            </tr>
-                            <tr>
-                                <td>Adresse</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.adresse)}}</td>
-                            </tr>
-                            <tr>
-                                <td>Ville</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.ville)}}</td>
-                            </tr>
-                            <tr>
-                                <td>Pays</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.pays)}}</td>
-                            </tr>
-                            <tr>
-                                <td>Code postal</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.codePostal)}}</td>
-                            </tr>
-                            <tr>
-                                <td>Devise de facturation</td>
-                                <td>{{replaceIfIsNullOrEmpty(client.deviseFacturation)}}</td>
-                            </tr>
-                            <tr>
-                                <td>Remise</td>
-                                <td>{{client.remisePermanente}} %</td>
-                            </tr>
-                            <tr>
-                                <td>Délai de paiement</td>
-                                <td>{{client.delaiPaiement}} Jours</td>
-                            </tr>
-                        </table>
-                    </p-tabPanel>
-                    <p-tabPanel header="Factures">
-
-                        <p-table [columns]="factureCols" [value]="factureList" dataKey="reference">
-                            <ng-template pTemplate="header" let-columns>
-                                <tr>
-                                    <th *ngFor="let col of columns">
-                                        {{col.header}}
-                                    </th>
+                <div id="ongletsClient">
+                    <p-tabView (onChange)="handleTabChange($event)">
+                        <p-tabPanel id="clientInfos" header="Infos">
+                            <table>
+                                <tr *ngIf="isClientProfetionnel">
+                                    <td>Raison sociale</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.raisonSociale)}}</td>
                                 </tr>
-                            </ng-template>
-                            <ng-template pTemplate="body" let-rowData let-columns="columns">
-                                <ng-container *ngIf="!hasFactures; else hasRecordsFactures">
-
-                                    <div id="noRecordsFactures" class="absolute w-100">
-                                        <div class="mx-auto">
-                                            <p>Aucune facture pour ce client</p><br>
-                                            <img src="../../assets/img/NoRecordsFactureIcon.png">
-                                        </div>
-                                    </div>
-                                </ng-container>
-                                <ng-template #hasRecordsFactures>
-                                    <tr style="height:40px" [pSelectableRow]="rowData">
-                                        <ng-container *ngFor="let colVar of columns">
-                                            <ng-container [ngSwitch]="colVar.type">
-
-                                                <ng-container *ngSwitchCase="'date'">
-                                                    <td [colSpan]="colVar.colspan">
-                                                        {{colVar.format(rowData[colVar.field]) | date:'shortDate'}}
-                                                    </td>
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchCase="'currency'">
-                                                    <td [colSpan]="colVar.colspan" mode="decimal">
-                                                        {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + Currency}}
-                                                    </td>
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchCase="'pourcentage'">
-                                                    <td [colSpan]="colVar.colspan">
-                                                        {{rowData[colVar.field] + '%'}}
-                                                    </td>
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchDefault>
-                                                    <td [colSpan]="colVar.colspan">
-                                                        {{colVar.format ? colVar.format(rowData[colVar.field], rowData.referencePrefix) : rowData[colVar.field]}} {{colVar.suffix && ' ' + colVar.suffix}}
-                                                    </td>
-                                                </ng-container>
-
-                                            </ng-container>
-
-                                        </ng-container>
+                                <tr *ngIf="isClientProfetionnel">
+                                    <td>ICE</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.ice)}}</td>
+                                </tr>
+                                <tr *ngIf="!isClientProfetionnel">
+                                    <td>Nom</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.nom)}}</td>
+                                </tr>
+                                <tr *ngIf="isClientProfetionnel">
+                                    <td>Secteur d’activité</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.secteurActivite)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Téléphone fixe</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.telFix)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Téléphone portable</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.telPortable)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>E-mail</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.email)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Site Web</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.siteWeb)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Adresse</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.adresse)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Ville</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.ville)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Pays</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.pays)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Code postal</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.codePostal)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Devise de facturation</td>
+                                    <td>{{replaceIfIsNullOrEmpty(client.deviseFacturation)}}</td>
+                                </tr>
+                                <tr>
+                                    <td>Remise</td>
+                                    <td>{{client.remisePermanente}} %</td>
+                                </tr>
+                                <tr>
+                                    <td>Délai de paiement</td>
+                                    <td>{{client.delaiPaiement}} Jours</td>
+                                </tr>
+                            </table>
+                        </p-tabPanel>
+                        <p-tabPanel header="Factures">
+    
+                            <p-table [columns]="factureCols" [value]="factureList" dataKey="reference">
+                                <ng-template pTemplate="header" let-columns>
+                                    <tr>
+                                        <th *ngFor="let col of columns">
+                                            {{col.header}}
+                                        </th>
                                     </tr>
                                 </ng-template>
-
-
-                            </ng-template>
-                            <ng-template pTemplate="loadingbody" let-columns="columns">
-                                <tr style="height:34px">
-                                    <td *ngFor="let col of columns">
-                                        <p-skeleton [ngStyle]="{'width': '100%'}"></p-skeleton>
-                                    </td>
-                                </tr>
-                            </ng-template>
-                            <ng-template pTemplate="summary" let-rowData let-columns="columns">
-                                <button *ngIf="hasFactures" pButton type="button" [routerLink]="['/app/Factures']" class="p-button-raised border-none bg-orange">Voir tous les factures</button>
-                            </ng-template>
-                        </p-table>
-                    </p-tabPanel>
-                    <p-tabPanel header="Devis">
-
-                        <p-table [columns]="devisCols" [value]="devisList" dataKey="reference">
-                            <ng-template pTemplate="header" let-columns>
-                                <tr>
-                                    <th *ngFor="let col of columns">
-                                        {{col.header}}
-                                    </th>
-                                </tr>
-                            </ng-template>
-                            <ng-template pTemplate="body" let-rowData let-columns="columns">
-                                <ng-container *ngIf="!hasDevis; else hasRecordsDevis">
-                                    <div id="noRecordsFactures" class="absolute w-100">
-                                        <div class="mx-auto">
-                                            <p>Aucun devis pour ce client</p><br>
-                                            <img src="../../assets/img/NoRecordsDevisIcon.png">
+                                <ng-template pTemplate="body" let-rowData let-columns="columns">
+                                    <ng-container *ngIf="!hasFactures; else hasRecordsFactures">
+    
+                                        <div id="noRecordsFactures" class="absolute w-100">
+                                            <div class="mx-auto">
+                                                <p>Aucune facture pour ce client</p><br>
+                                                <img src="../../assets/img/NoRecordsFactureIcon.png">
+                                            </div>
                                         </div>
-                                    </div>
-                                </ng-container>
-                                <ng-template #hasRecordsDevis>
-                                    <tr style="height:40px" [pSelectableRow]="rowData">
-                                        <ng-container *ngFor="let colVar of columns">
-                                            <ng-container [ngSwitch]="colVar.type">
-
-                                                <ng-container *ngSwitchCase="'date'">
-                                                    <td [colSpan]="colVar.colspan">
-                                                        {{colVar.format(rowData[colVar.field]) | date:'shortDate'}}
-                                                    </td>
+                                    </ng-container>
+                                    <ng-template #hasRecordsFactures>
+                                        <tr style="height:40px" [pSelectableRow]="rowData">
+                                            <ng-container *ngFor="let colVar of columns">
+                                                <ng-container [ngSwitch]="colVar.type">
+    
+                                                    <ng-container *ngSwitchCase="'date'">
+                                                        <td [colSpan]="colVar.colspan">
+                                                            {{colVar.format(rowData[colVar.field]) | date:'shortDate'}}
+                                                        </td>
+                                                    </ng-container>
+    
+                                                    <ng-container *ngSwitchCase="'currency'">
+                                                        <td [colSpan]="colVar.colspan" mode="decimal">
+                                                            {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + Currency}}
+                                                        </td>
+                                                    </ng-container>
+    
+                                                    <ng-container *ngSwitchCase="'pourcentage'">
+                                                        <td [colSpan]="colVar.colspan">
+                                                            {{rowData[colVar.field] + '%'}}
+                                                        </td>
+                                                    </ng-container>
+    
+                                                    <ng-container *ngSwitchDefault>
+                                                        <td [colSpan]="colVar.colspan">
+                                                            {{colVar.format ? colVar.format(rowData[colVar.field], rowData.referencePrefix) : rowData[colVar.field]}} {{colVar.suffix && ' ' + colVar.suffix}}
+                                                        </td>
+                                                    </ng-container>
+    
                                                 </ng-container>
-
-                                                <ng-container *ngSwitchCase="'currency'">
-                                                    <td [colSpan]="colVar.colspan" mode="decimal">
-                                                        {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + Currency}}
-                                                    </td>
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchCase="'pourcentage'">
-                                                    <td [colSpan]="colVar.colspan">
-                                                        {{rowData[colVar.field] + '%'}}
-                                                    </td>
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchDefault>
-                                                    <td [colSpan]="colVar.colspan">
-                                                        {{colVar.format ? colVar.format(rowData[colVar.field], rowData.referencePrefix) : rowData[colVar.field]}} {{colVar.suffix && ' ' + colVar.suffix}}
-                                                    </td>
-                                                </ng-container>
-
+    
                                             </ng-container>
-
-                                        </ng-container>
+                                        </tr>
+                                    </ng-template>
+    
+    
+                                </ng-template>
+                                <ng-template pTemplate="loadingbody" let-columns="columns">
+                                    <tr style="height:34px">
+                                        <td *ngFor="let col of columns">
+                                            <p-skeleton [ngStyle]="{'width': '100%'}"></p-skeleton>
+                                        </td>
                                     </tr>
                                 </ng-template>
-                            </ng-template>
-                            <ng-template pTemplate="summary">
-                                <button *ngIf="hasDevis" pButton type="button" [routerLink]="['/app/Devis']" class="p-button-raised bg-green border-none">Voir tous les devis</button>
-                            </ng-template>
-                        </p-table>
-
-                    </p-tabPanel>
-                </p-tabView>
+                                <ng-template pTemplate="summary" let-rowData let-columns="columns">
+                                    <button *ngIf="hasFactures" pButton type="button" [routerLink]="['/app/Factures']" class="p-button-raised border-none bg-orange">Voir tous les factures</button>
+                                </ng-template>
+                            </p-table>
+                        </p-tabPanel>
+                        <p-tabPanel header="Devis">
+    
+                            <p-table [columns]="devisCols" [value]="devisList" dataKey="reference">
+                                <ng-template pTemplate="header" let-columns>
+                                    <tr>
+                                        <th *ngFor="let col of columns">
+                                            {{col.header}}
+                                        </th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-rowData let-columns="columns">
+                                    <ng-container *ngIf="!hasDevis; else hasRecordsDevis">
+                                        <div id="noRecordsFactures" class="absolute w-100">
+                                            <div class="mx-auto">
+                                                <p>Aucun devis pour ce client</p><br>
+                                                <img src="../../assets/img/NoRecordsDevisIcon.png">
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                    <ng-template #hasRecordsDevis>
+                                        <tr style="height:40px" [pSelectableRow]="rowData">
+                                            <ng-container *ngFor="let colVar of columns">
+                                                <ng-container [ngSwitch]="colVar.type">
+    
+                                                    <ng-container *ngSwitchCase="'date'">
+                                                        <td [colSpan]="colVar.colspan">
+                                                            {{colVar.format(rowData[colVar.field]) | date:'shortDate'}}
+                                                        </td>
+                                                    </ng-container>
+    
+                                                    <ng-container *ngSwitchCase="'currency'">
+                                                        <td [colSpan]="colVar.colspan" mode="decimal">
+                                                            {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + Currency}}
+                                                        </td>
+                                                    </ng-container>
+    
+                                                    <ng-container *ngSwitchCase="'pourcentage'">
+                                                        <td [colSpan]="colVar.colspan">
+                                                            {{rowData[colVar.field] + '%'}}
+                                                        </td>
+                                                    </ng-container>
+    
+                                                    <ng-container *ngSwitchDefault>
+                                                        <td [colSpan]="colVar.colspan">
+                                                            {{colVar.format ? colVar.format(rowData[colVar.field], rowData.referencePrefix) : rowData[colVar.field]}} {{colVar.suffix && ' ' + colVar.suffix}}
+                                                        </td>
+                                                    </ng-container>
+    
+                                                </ng-container>
+    
+                                            </ng-container>
+                                        </tr>
+                                    </ng-template>
+                                </ng-template>
+                                <ng-template pTemplate="summary">
+                                    <button *ngIf="hasDevis" pButton type="button" [routerLink]="['/app/Devis']" class="p-button-raised bg-green border-none">Voir tous les devis</button>
+                                </ng-template>
+                            </p-table>
+    
+                        </p-tabPanel>
+                    </p-tabView>
+                </div>
             </div>
         </div>
     </div>

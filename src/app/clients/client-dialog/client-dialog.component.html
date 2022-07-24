@@ -11,19 +11,19 @@
             <span>Secteur d’activité</span>
         </div>
         <div class="col-7" *ngIf="isFormProfetionnel">
-            <input type="text" pInputText placeholder="Text..." [(ngModel)]="formClient && formClient.secteurActivite" />
+            <input type="text" class="w-100" pInputText placeholder="" [(ngModel)]="formClient && formClient.secteurActivite" />
         </div>
         <div class="col-5 label" *ngIf="isFormProfetionnel">
             <span>ICE</span>
         </div>
         <div class="col-7" *ngIf="isFormProfetionnel">
-            <input type="text" pInputText placeholder="123..." pKeyFilter="pint" [(ngModel)]="formClient && formClient.ice" />
+            <input type="text" class="w-100" pInputText placeholder="" pKeyFilter="pint" [(ngModel)]="formClient && formClient.ice" />
         </div>
         <div class="col-5 label" *ngIf="!isFormProfetionnel">
             <span>Nom <span class="red-color">*</span></span>
         </div>
         <div class="col-7" *ngIf="!isFormProfetionnel">
-            <input type="text" pInputText placeholder="Text" class="{{nomClass}}" [(ngModel)]="formClient && formClient.nom" />
+            <input type="text" pInputText placeholder="" class="w-100 {{nomClass}}" [(ngModel)]="formClient && formClient.nom" />
         </div>
     </div>
 
@@ -35,55 +35,55 @@
             <span>Raison sociale <span class="red-color">*</span></span>
         </div>
         <div class="col-7" *ngIf="isFormProfetionnel">
-            <input type="text" pInputText placeholder="Text" class="{{rSClass}}" [(ngModel)]="formClient && formClient.raisonSociale" maxlength="30"/>
+            <input type="text" pInputText placeholder="" class="w-100 {{rSClass}}" [(ngModel)]="formClient && formClient.raisonSociale" maxlength="30"/>
         </div>
         <div class="col-5 label">
             <span>Adresse</span>
         </div>
         <div class="col-7">
-            <input type="text" pInputText placeholder="Text" [(ngModel)]="formClient && formClient.adresse" maxlength="100"/>
+            <input type="text" class="w-100" pInputText placeholder="" [(ngModel)]="formClient && formClient.adresse" maxlength="100"/>
         </div>
         <div class="col-5 label">
             <span>Pays</span>
         </div>
         <div class="col-7">
-            <p-dropdown [options]="countries" [(ngModel)]="formClient && formClient.pays" optionLabel="paysName" optionValue="paysName" [virtualScroll]="true" [itemSize]="31" [filter]="false"></p-dropdown>
+            <p-dropdown class="w-100" [options]="countries" [(ngModel)]="formClient && formClient.pays" optionLabel="paysName" optionValue="paysName" [virtualScroll]="true" [itemSize]="31" [filter]="false"></p-dropdown>
         </div>
         <div class="col-5 label">
             <span>Ville</span>
         </div>
         <div class="col-7">
-            <input type="text" pInputText placeholder="" [(ngModel)]="formClient && formClient.ville" maxlength="40"/>
+            <input type="text" class="w-100" pInputText placeholder="" [(ngModel)]="formClient && formClient.ville" maxlength="40"/>
         </div>
         <div class="col-5 label">
             <span>Code postal</span>
         </div>
         <div class="col-7">
-            <input type="text" pInputText placeholder="" pKeyFilter="pint" [(ngModel)]="formClient && formClient.codePostal" maxlength="8"/>
+            <input type="text" class="w-100" pInputText placeholder="" pKeyFilter="pint" [(ngModel)]="formClient && formClient.codePostal" maxlength="8"/>
         </div>
         <div class="col-5 label">
             <span>E-mail</span>
         </div>
         <div class="col-7">
-            <input type="text" pInputText placeholder="" pKeyFilter="email" [(ngModel)]="formClient && formClient.email" maxlength="60"/>
+            <input type="text" class="w-100" pInputText placeholder="" pKeyFilter="email" [(ngModel)]="formClient && formClient.email" maxlength="60"/>
         </div>
         <div class="col-5 label">
             <span>Téléphone fixe</span>
         </div>
         <div class="col-7">
-            <input type="text" pInputText placeholder="" pKeyFilter="pint" [(ngModel)]="formClient && formClient.telFix" maxlength="25"/>
+            <input type="text" class="w-100" pInputText placeholder="" pKeyFilter="pint" [(ngModel)]="formClient && formClient.telFix" maxlength="25"/>
         </div>
         <div class="col-5 label">
             <span>Téléphone portable</span>
         </div>
         <div class="col-7">
-            <input type="text" pInputText placeholder="" pKeyFilter="pint" [(ngModel)]="formClient && formClient.telPortable" maxlength="25"/>
+            <input type="text" class="w-100" pInputText placeholder="" pKeyFilter="pint" [(ngModel)]="formClient && formClient.telPortable" maxlength="25"/>
         </div>
         <div class="col-5 label" *ngIf="isFormProfetionnel">
             <span>Site Web</span>
         </div>
         <div class="col-7" *ngIf="isFormProfetionnel">
-            <input type="text" pInputText placeholder="Text" [(ngModel)]="formClient && formClient.siteWeb" maxlength="40"/>
+            <input type="text" class="w-100" pInputText placeholder="" [(ngModel)]="formClient && formClient.siteWeb" maxlength="40"/>
         </div>
     </div>
 

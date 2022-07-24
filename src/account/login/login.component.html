@@ -1,4 +1,6 @@
-﻿<div class="m-3">
+﻿<p-toast [style]="{marginTop: 'marginTop'}" [baseZIndex]="2500" styleClass="styleClass"></p-toast>
+
+<div class="m-3">
     <app-account-header-min></app-account-header-min>
 
     <div id="loginContent" class="mx-auto">
@@ -13,14 +15,23 @@
                 </div>
                 <div class="input-block pt-2">
                     <label for="input-mdp" class="login-gray-color">Mot de passe</label>
-                    <input id="input-mdp" type="password" pInputText name="password" placeholder="Votre mot de passe ici ..." [(ngModel)]="authService.authenticateModel.password">
+                    <div class="p-inputgroup">
+                        <input
+                        id="input-mdp" pInputText name="password" placeholder="Votre mot de passe ici ..." [(ngModel)]="authService.authenticateModel.password"
+                        class= "w-100"  [type]="hidePass ? 'password':'text'" />
+                        <div class="p-inputgroup-addon">
+                          <i  class="cursor-pointer fa" [ngClass]="{
+                            'fa-eye-slash': hidePass, 
+                            'fa-eye': !hidePass}" (click)="hidePass = !hidePass"></i>
+                        </div>
+                    </div>
                 </div>
                 <div id="div-forgot-mdp" class="text-center mt-3">
                     <p-button id="btn-forgot-mdp" label="Vous avez oublié votre mot de passe ?" styleClass="p-button-link color-purple text-lg" (click)="ShowForgotPass()"></p-button>
                 </div>
 
                 <div class="div-buttons mt-3">
-                    <p-button id="btn-se-connecter" styleClass="bg-purple" label="Se connecter" (click)="login()"></p-button>
+                    <p-button id="btn-se-connecter" styleClass="bg-purple" [icon]="iconClasses" label="Se connecter" (click)="login()"></p-button>
                     <!-- <p id="ou">Ou</p>
                     <p-button id="btn-google">
                         <img src="../../assets/img/IconeGoogleWhite.png" class="mr-6" />
@@ -36,55 +47,102 @@
         </div>
 
         <div id="sendMailArea" *ngIf="sendMailAreaShown" class="text-center">
-            <button pButton pRipple type="button" icon="pi pi-arrow-left" class="p-button-rounded p-button-outlined return-button" (click)="returnToLogin()"></button>
-            <img src="../../assets/img/LogoFacturi.png" class="logo-facturi">
-            <div id="send-mail-content" class="mx-auto">
-                <p class="title">Mot de passe oublié ?</p>
-                <p class="text">Saisisez l'adresse mail que vous utilisez pour vous connecter, et nous vous enverons des instructions pour réinitialiser votre mot de passe.</p>
-                <p class="text">Pour des raison de sécurité, nous n'enregistrons jamais votre mot de passe en claire. Du coup nous n'allons pas vous l'envoyé par mail.</p>
-                <div class="input-block">
-                    <span>
-            <label for="input-mail">Adresse Mail</label>
-            <input id="input-mail" type="text" pInputText name="userNameOrEmailAddress"
-              placeholder="Votre adresse mail ici ..." [(ngModel)]="emailAdress">
-          </span>
+            <div class="bg-header py-3 text-center text-white d-flex justify-content-center" style="position:relative;padding-left: 35px; padding-right: 35px;">
+                <div class="" style="position:absolute; left:0; top: 0;">
+                    <button pButton pRipple type="button" icon="pi pi-arrow-left" style="color:white;" class="btn-ripple mt-2 p-button-rounded p-button-outlined return-button" (click)="returnToLogin()"></button>
                 </div>
-                <div class="div-buttons">
-                    <p-button id="btn-se-connecter" label="Envoyer" (click)="envoyerMail()"></p-button>
+                <div class="">
+                    <h3>Récupérez votre mot de passe</h3>   
+                </div>
+            </div>
+            <!-- <img src="../../assets/img/LogoFacturi.png" class="logo-facturi"> -->
+            <div class="mx-auto" style="width:85%;margin-top: 10px; padding-left: 2%;padding-right: 2%;">
+                <p class="text" style="font-size:0.95rem;font-weight:600;text-align:left;">Saisisez l'adresse mail associée à votre compte, et nous vous y enverons les instructions pour réinitialiser votre mot de passe.</p>
+            </div>
+
+            <div id="send-mail-content" class="w-100 px-4">
+              <!--   <p class="title">Mot de passe oublié ?</p> -->
+               <!--  <p class="text">Pour des raison de sécurité, nous n'enregistrons jamais votre mot de passe en claire. Du coup nous n'allons pas vous l'envoyé par mail.</p> -->
+                <div class="input-block" style="margin-bottom:15px;">
+                    <span>
+                        <label for="input-mail" style="font-weight: 600; color:#9A9AB0;">Email</label>
+                        <input id="input-mail" type="email" pInputText name="userNameOrEmailAddress"  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" 
+                        placeholder=""  [(ngModel)]="emailAdress" #userNameOrEmailAddress="ngModel" >
+                    </span>
+                    <div *ngIf="userNameOrEmailAddress.touched">
+                        <p *ngIf="userNameOrEmailAddress.errors?.required" class="text-danger">L'Email est requis</p>
+                        <p *ngIf="userNameOrEmailAddress.errors?.pattern" class="text-danger">Veuillez saisir une adresse email valide</p>
+                      </div>
+                </div>
+                <div class="div-buttons" style="margin-bottom:10px;">
+                    <p-button [disabled]="userNameOrEmailAddress.invalid" id="btn-se-connecter" label="Envoyer" (click)="envoyerMail()" styleClass="bg-purple" [icon]="iconClassesMail"></p-button>
                 </div>
             </div>
         </div>
 
         <div id="mailSentArea" *ngIf="mailSentAreaShown" class="text-center">
-            <button pButton pRipple type="button" icon="pi pi-arrow-left" class="p-button-rounded p-button-outlined return-button" (click)="returnToLogin()"></button>
-            <img src="../../assets/img/LogoFacturi.png" class="logo-facturi">
-            <div id="mail-sent-content" class="mx-auto">
-                <p class="title">Lien de réinitialisation envoyé !</p>
-                <p class="text">Nous vous invitons à consulter votre boite email</p>
-                <p class="text">pour réinitialiser votre mot de passe.</p>
+            <div class="bg-header py-3 text-center text-white d-flex justify-content-center" style="position:relative;padding-left: 35px; padding-right: 35px;">
+                <div class="" style="position:absolute; left:0; top: 0;">
+                    <button pButton pRipple type="button" icon="pi pi-arrow-left" style="color:white;" class="btn-ripple mt-2 p-button-rounded p-button-outlined return-button" (click)="returnToLogin()"></button>
+                </div>
+                <div class="">
+                    <h3>Lien de réinitialisation</h3>   
+                </div>
             </div>
+            <!-- <img src="../../assets/img/LogoFacturi.png" class="logo-facturi"> -->
+            <div id="mail-sent-content" class="mx-auto mb-3" style="width:85%;margin-top: 10px; padding-left: 2%;padding-right: 2%;">
+                <p class="text" style="font-size:1.25rem;font-weight:600;text-align:center;">Lien de réinitialisation envoyé avec succés !</p>
+                <p class="text" style="font-size:1rem;font-weight:600;text-align:center;">Nous vous invitons à consulter votre boite email et cliquez sur le lien de réinitialisation</p>
+            </div>
+        
         </div>
 
         <div id="resetPassArea" *ngIf="resetPassAreaShown" class="text-center">
-            <button pButton pRipple type="button" icon="pi pi-arrow-left" class="p-button-rounded p-button-outlined return-button" (click)="returnToLogin()"></button>
-            <img src="../../assets/img/LogoFacturi.png" class="logo-facturi">
-            <div id="reinit-pass-content" class="mx-auto">
-                <p class="title">Réinitialisez votre mot de passe</p>
-                <p class="text">Saisisez votre nouveau mot de passe et confirmez le pour pouvoir le réinitialiser.</p>
-                <div class="input-block">
-                    <label for="input-mdp-res text-left">Mot de passe</label>
-                    <input id="input-mdp-res" type="password" pInputText name="password" placeholder="Votre mot de passe ici ..." [(ngModel)]="password">
+            <div class="bg-header py-3 text-center text-white d-flex justify-content-center" style="position:relative;padding-left: 35px; padding-right: 35px;">
+                <div class="" style="position:absolute; left:0; top: 0;">
+                    <button pButton pRipple type="button" icon="pi pi-arrow-left" style="color:white;" class="btn-ripple mt-2 p-button-rounded p-button-outlined return-button" (click)="returnToLogin()"></button>
                 </div>
-                <span>
-          <div class="input-block">
-            <input id="input-mdp-resc" type="password" pInputText name="password"
-              placeholder="Votre mot de passe ici ...">
-          </div>
-        </span>
-                <div class="div-buttons">
-                    <p-button id="btn-se-connecter" label="Réinitialiser" (click)="reinitialiser()"></p-button>
+                <div class="">
+                    <h3>Créez votre nouveau mot de passe</h3>   
                 </div>
             </div>
+            
+            <div class="mx-auto" style="width:85%;margin-top: 10px; padding-left: 2%;padding-right: 2%;">
+                <p class="text" style="font-size:1.25rem;font-weight:600;text-align:left;">Saisisez votre nouveau mot de passe</p>
+                <p class="text" style="font-size:0.95rem;font-weight:600;text-align:left;">Votre mot de passe doit contenir en moins un caractère en miniscule, un caractère en majuscule, un chiffre et un caractère spécial.</p>
+            </div>
+            
+
+              <!--   <p class="title">Saisisez votre nouveau mot de passe</p>
+                <p class="text">Votre mot de passe doit contenir en moins un caractère en miniscule, un caractère en majuscule, un chiffre et un caractère spécial.</p> -->
+                <div class="input-block px-5">
+                  <!--   <label for="input-mdp-res text-left">Mot de passe</label> -->
+                    <input required id="input-mdp-res" type="password" pInputText name="password$" placeholder="" [(ngModel)]="password" #password$="ngModel" (change)="validatePassword()" autocomplete="new-password">
+                </div>
+                 <span class="validationMessage" *ngIf="passwordDidntRepectRegex">Votre mot de passe doit contenir au moins huit
+                    caractères,
+                    au moins une lettre majuscule, une lettre minuscule et un chiffre et un caractère spécial !</span>
+                <div *ngIf="password$.touched">
+                    <span *ngIf="password$.errors?.required" class="validationMessage">Veuillez saisir un mot de passe</span>
+                </div>
+                <div class="mx-auto" style="width:85%;margin-top: 10px; padding-left: 2%;padding-right: 2%;">
+                    <p class="text" style="font-size:1.25rem;font-weight:600;text-align:left;">Saisisez votre nouveau mot de passe</p>
+                    <p class="text" style="font-size:0.95rem;font-weight:600;text-align:left;">Votre mot de passe doit contenir en moins un caractère en miniscule, un caractère en majuscule, un chiffre et un caractère spécial.</p>
+                </div>
+
+                
+                <div class="input-block px-5" >
+                    <input required id="input-mdp-resc" type="password" pInputText name="passwordConfirm$"
+                    placeholder="" [(ngModel)]="passwordConfirm" #passwordConfirm$="ngModel" (change)="validatePasswordConfirm()" autocomplete="new-password">
+                </div>
+                <div *ngIf="passwordConfirm$.touched">
+                    <span *ngIf="passwordConfirm$.errors?.required" class="validationMessage">Veuillez confirmer votre mot de passe</span>
+                    <span class="validationMessage" *ngIf="passwordDontMatch">Les deux mots de passe ne correspondent pas !</span>
+                </div>
+                <div class="div-buttons px-5 mt-3 mb-3">
+                    <p-button [disabled]="password$.invalid || passwordConfirm$.invalid || passwordDontMatch || passwordDidntRepectRegex" id="btn-se-connecter" label="Réinitialiser" (click)="reinitialiser()" styleClass="bg-purple" [icon]="iconClassesReset"></p-button>
+                </div>
+           
         </div>
 
     </div>

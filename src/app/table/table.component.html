@@ -1,15 +1,25 @@
-<p-table #tbl [columns]="cols" [value]="tableData" [paginator]="true" [rows]="7" [totalRecords]="totalRecords" [(first)]="first" [lazy]="true" selectionMode="single" [(selection)]="defaultRowToBeSelected" dataKey="reference" (onRowSelect)="onRowSelect($event)"
+<p-table #tbl [columns]="cols"  [value]="tableData" [paginator]="true" [rows]="7" [totalRecords]="totalRecords" [(first)]="first" [lazy]="true" selectionMode="single" [(selection)]="defaultRowToBeSelected" dataKey="reference" (onRowSelect)="onRowSelect($event)"
     (onRowUnselect)="onRowUnselect()" [id]="styleId" (onLazyLoad)="loadTableLazy($event)" [globalFilterFields]="globalFilterFields" [virtualRowHeight]="40" [class]="styleClass">
     <ng-template pTemplate="header" let-columns>
         <tr>
-            <th *ngFor="let col of columns" [pSortableColumn]="col.field" [colSpan]="col.colspan">
+            <th *ngFor="let col of columns" [pSortableColumn]="col.field" [colSpan]="col.colspan"
+            [ngClass]="
+                {
+                    'width-50px' : col.header == 'RÉF.' || col.header == ' '|| col.header == '',
+                    'width-150px' : col.header == 'CLIENT' || col.header == 'MONTANT TTC' || col.header == 'STATUT',
+                    'width-100px' : col.header == 'ÉMISSION',
+                    'span-orange' : label == 'Converti' || label == 'Paiement en attente',
+                    'span-red' : label == 'Rejeté' || label == 'Paiement en retard',
+                    'span-grey' : label == 'Brouillon'
+                }
+            ">
                 {{col.header}}
                 <p-sortIcon [field]="col.field"></p-sortIcon>
             </th>
         </tr>
     </ng-template>
     <ng-template pTemplate="body" let-rowData let-columns="columns">
-        <tr style="height:40px" [pSelectableRow]="rowData">
+        <tr style="height:40px;width:100%;" [pSelectableRow]="rowData">
             <ng-container *ngFor="let colVar of columns">
                 <ng-container [ngSwitch]="colVar.type">
 
@@ -44,6 +54,14 @@
 
                         </td>
                     </ng-container>
+                    <ng-container *ngSwitchCase="'estimate-invoice-action'">
+                        <td [colSpan]="colVar.colspan" class="actions">
+                            <!--  [disabled]="selectedIndex == rowData['id']" -->
+                            <app-document-action  (clickedEvent)="setSelectedRow(rowData['id'])" [rowId]="rowData['id']" [label]="Action" [items]="getStatusItems(rowData['statut'])">
+                            </app-document-action>
+
+                        </td>
+                    </ng-container>
                 </ng-container>
 
             </ng-container>
@@ -53,7 +71,7 @@
 
     <ng-template pTemplate="loadingbody" let-columns="columns">
         <tr style="height:34px">
-            <td *ngFor="let col of columns">
+            <td *ngFor="let col of columns" >
                 <p-skeleton [ngStyle]="{'width': '100%'}"></p-skeleton>
             </td>
         </tr>

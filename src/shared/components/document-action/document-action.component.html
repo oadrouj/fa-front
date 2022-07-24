@@ -1,0 +1,5 @@
+<ng-container>
+   <p-menu [showTransitionOptions]="'0ms'" [hideTransitionOptions]="'0ms'" #menu [popup]="true" [model]="itemsAdapter" appendTo="body"></p-menu>
+    <button  [disabled] = "items.length == 0" class="p-ripple p-button-rounded color-green p-button-text p-button-icon-only" type="button" pButton icon="pi pi pi-ellipsis-v" (click)="toggleMenu($event)"></button>
+</ng-container>
+<!-- [disabled] = "items.length == 0 || !disabled" -->

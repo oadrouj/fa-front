@@ -1,11 +1,12 @@
 <ng-container *ngIf="control.invalid && (control.dirty || control.touched)">
   <ng-container *ngFor="let validationError of validationErrors">
-    <span
+    <p
       *ngIf="!!this.control.errors[validationError.name]"
       class="error invalid-feedback"
       [class.d-block]="!!this.control.errors[validationError.name]"
     >
-      {{ getValidationErrorMessage(validationError) }}
-    </span>
+      {{ getValidationErrorMessage(validationError) }} <br>
+  </p>
+  
   </ng-container>
 </ng-container>

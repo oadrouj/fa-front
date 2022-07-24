@@ -45,7 +45,14 @@
     padding-top: .65rem !important;
     padding-bottom: .65rem !important;
 }
-
+#input-mdp{
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+.p-inputgroup-addon{
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
 .div-buttons {
     width: 100%;
 }
@@ -151,4 +158,21 @@
 
 .login-gray-color {
     color: #898E99;
+}
+
+.p-inputtext {
+    border: solid 1px #898E99 !important;
+}
+
+.btn-ripple:hover{
+    color:var(--light-purple-color) !important;
+}
+
+.validationMessage {
+    padding-left:30px;
+    padding-right:30px;
+    text-align:left;
+    font-size: 15px;
+    color: tomato;
+    display: block;
 }

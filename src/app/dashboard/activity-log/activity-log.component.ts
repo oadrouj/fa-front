@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivityLogDto, StatisticsServiceProxy } from '@shared/service-proxies/service-proxies';
 import * as moment from 'moment';
 
@@ -23,6 +23,7 @@ class ActivityLog {
 export class ActivityLogComponent implements OnInit {
   displayModal: boolean = false;
   lodingIsComplete: any;
+  @Input() currency : string;
 
   constructor(
     private _statisticsServiceProxy: StatisticsServiceProxy

@@ -1,6 +1,11 @@
-<ng-container *ngIf="items.length; else elseTemplate">
-    <p-splitButton class=" border-radius-6" [label]="label" [model]="items"> </p-splitButton>
+<ng-container>
+    <span class ="tag-status" [ngClass]="
+    {
+        'span-green' : label == 'Validé' || label == 'Réglée',
+        'span-blue' : label == 'Réglée Partiellement',
+        'span-orange' : label == 'Converti' || label == 'Paiement en attente',
+        'span-red' : label == 'Rejeté' || label == 'Paiement en retard',
+        'span-grey' : label == 'Brouillon'
+    }
+    ">{{label}}</span>
 </ng-container>
-<ng-template #elseTemplate>
-    <span>{{label}}</span>
-</ng-template>

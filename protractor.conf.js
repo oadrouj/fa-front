@@ -13,7 +13,7 @@ exports.config = {
         'browserName': 'chrome'
     },
     directConnect: true,
-    baseUrl: 'http://app.facturi.ma/',
+    baseUrl: 'https://app.facturi.ma/',
     framework: 'jasmine',
     jasmineNodeOpts: {
         showColors: true,

@@ -9,7 +9,8 @@ body {
 .main {
     padding-right: .8rem;
     background: #f1f6ff;
-    min-height: 100vh;
+    height: calc(100vh - 60px);
+    overflow: hidden;
 }
 
 .header {
@@ -106,12 +107,15 @@ i.pi-search {
 }
 
 :host>>>#devisList .p-datatable .p-datatable-thead>tr>th {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     padding-left: 0rem;
     padding-right: 0rem;
     text-align: center;
     text-transform: uppercase;
-    background-color: transparent;
+   /*  background-color: transparent; */
+  /*   position: sticky;
+    top:0;
+    background-color: #f1f6ff !important; */
 }
 
 :host ::ng-deep #devisList .p-datatable .p-datatable-thead>tr>th,
@@ -121,14 +125,22 @@ i.pi-search {
 }
 
 :host ::ng-deep #devisList .p-datatable .p-datatable-tbody>tr>td {
-    font-size: 0.85rem;
-    color: #898e99;
+    font-size: 0.8rem;
+    color: #7a7f8a;
     text-align: center;
     /* padding-left: 0rem;
     padding-right: 0rem; */
     padding: .8rem .1rem;
 }
-
+/* :host ::ng-deep #devisList .p-datatable .p-datatable-tbody>tr>td {
+    position: sticky;
+    right:0;
+} */
+/* :host ::ng-deep #devisList .p-datatable .p-datatable-tbody>tr>td:last-child {
+    position: sticky;
+    right:0;
+    background-color: red !important;
+} */
 
 /* List details footer */
 
@@ -155,15 +167,34 @@ i.pi-search {
 .devis-details {
     background-color: #fff;
     /* min-height: 782px; */
-    min-height: max(calc(100vh - 60px), 710px);
+    height: 84vh;
     margin-bottom: 0.7rem;
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 50%);
 }
 
 .devis-details .header {
-    padding: 20px .75rem;
+    padding: 12px .75rem;
     border-bottom: 1px solid #d8d8d8;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    z-index: 100;
+    margin-top:10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+
+:host ::ng-deep .header button span {
+    font-weight:700 !important;
+    padding-left:5px;
+}
+
+.header-shadow{
+    background-color: #fffbf0;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22) !important;
 }
 
 .devis-details .content h1 {
@@ -187,15 +218,15 @@ i.pi-search {
     min-height: 37px;
 }
 
-:host>>>table .p-button {
+/* :host>>>table .p-button {
     padding-left: .35rem;
     padding-right: .35rem;
-}
+} */
 
-:host ::ng-deep .p-splitbutton button:hover,
+/* :host ::ng-deep .p-splitbutton button:hover,
 :host>>>table .p-button:hover {
     background-color: var(--orange-color);
-}
+} */
 
 :host>>>.p-splitbutton .p-splitbutton-menubutton {
     width: 1.357rem;
@@ -214,7 +245,7 @@ i.pi-search {
 :host>>>table .p-button {
     font-size: 0.8rem;
     border: none;
-    background-color: var(--orange-color);
+   /*  background-color: var(--orange-color); */
 }
 
 :host ::ng-deep .p-splitbutton-menubutton {
@@ -240,7 +271,7 @@ i.pi-search {
 
 :host ::ng-deep .devis-details .p-datatable tr>th,
 :host ::ng-deep .devis-details .p-datatable tr>td {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     padding: 1rem 0rem;
     text-align: center;
 }
@@ -298,3 +329,27 @@ i.pi-search {
 :host>>>.filterContainer .p-datepicker {
     top: -198px !important;
 }
+
+.html2canvas {
+    transform: scale(0.9)
+}
+
+.html2canvas * {
+    color: black !important;
+}
+
+.html2canvas .content .date {
+    font-size: 1.15rem;
+}
+
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: var(--orange-color) !important; 
+
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-orange-color) !important; 
+  }

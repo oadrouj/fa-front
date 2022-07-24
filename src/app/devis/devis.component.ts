@@ -44,6 +44,7 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { EstimateInvoiceStatusStateService } from '@shared/services/estimate-invoice-status-state.service'
 import { LazyTableService } from '@shared/services/lazy-table.service'
 import { PreviewService } from '@shared/services/preview.service'
+import { Table } from 'primeng/table'
 
 @Component({
   selector: 'app-devis',
@@ -57,6 +58,9 @@ export class DevisComponent implements OnInit, AfterViewInit {
   sample: DynamicDialogRef
 
   @ViewChild('prv', { static: true }) template: ItemPreviewComponent
+  @ViewChild('devisDetailsHeader') devisDetailsHeader: ElementRef
+  @ViewChild('devisDetails') devisDetails: ElementRef
+  @ViewChild('dt1') dt1: Table
 
   sampleComponent = FacturesDialogComponent
   logoSrc: string
@@ -127,6 +131,9 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this._estimateInvoiceStatusStateService.statusModifier$.subscribe((res) => {
+
+      console.log("Status changed ...")
+      this.resetFilterFields();
       if (res.target == 'Estimate') {
         switch (res.statusAction) {
           case 'Validate':
@@ -179,7 +186,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
   ]
   cols = [
     {
-      header: 'REFERENCE',
+      header: 'RÉF.',
       field: 'reference',
       type: 'text',
     },
@@ -189,7 +196,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       type: 'text',
     },
     {
-      header: 'EMISSION',
+      header: 'ÉMISSION',
       field: 'dateEmission',
       type: 'date',
       format: (date) => (date._i ? new Date(date._i) : new Date(date._d)),
@@ -212,6 +219,12 @@ export class DevisComponent implements OnInit, AfterViewInit {
       type: 'estimate-invoice-status-component',
       format: this.formatStatut,
     },
+    {
+      header: ' ',
+      field: 'action',
+      type: 'estimate-invoice-action',
+      format: this.formatStatut,
+    }
   ]
 
   devisStatusItems = [
@@ -220,11 +233,12 @@ export class DevisComponent implements OnInit, AfterViewInit {
       label: 'Convertir',
       icon: 'pi pi-check',
       command: () => {
+        console.log("test Convert")
         this._estimateInvoiceStatusStateService.statusModifier = {
           statusAction: 'Convert',
           target: 'Estimate',
         }
-      },
+      }
     },
     {
       actualStatus: DevisStatutEnum.Valide,
@@ -246,6 +260,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
           statusAction: 'Validate',
           target: 'Estimate',
         }
+        this.ngOnInit()
       },
     },
   ]
@@ -256,7 +271,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
   dateEmission = new Date()
   echeancePayementOptions = [30, 60, 90]
   echeancePayementSelected = this.echeancePayementOptions[0] || ''
-  selectedDevisItem!: any
+  selectedDevisItem!: any;
   summaryTotalHT = 0
   summaryTVA = 0
   summaryTotalTTC = 0
@@ -339,6 +354,8 @@ export class DevisComponent implements OnInit, AfterViewInit {
     this.displayDialog = true
     this.devisItemProp = null
     this.dialogStatus = DialogStatus.New
+
+    console.log(this.dialogStatus)
   }
 
   editDevis() {
@@ -369,7 +386,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
               this.montantTotalAllDevis -= this.selectedDevisItem.montantTtc
               this._toastService.info({
                 summary: 'Opération réussie',
-                detail: 'Le devis est supprimé avec succès',
+                detail: 'Devis supprimé avec succès',
               })
             }
           })
@@ -401,14 +418,34 @@ export class DevisComponent implements OnInit, AfterViewInit {
       this.summaryTotalHT = this.selectedDevisItem.devisItems
         .map((item) => item.unitPriceHT * item.quantity)
         .reduce((accum, current) => accum + current)
-      this.summaryTVA = this.selectedDevisItem.devisItems
-        .map((item) => (item.unitPriceHT * item.quantity * item.tva) / 100)
-        .reduce((accum, current) => accum + current)
+      
+        this.remiseAmount = this.calculateRemise(
+          this.selectedDevisItem.remise,
+          this.summaryTotalHT,
+        )
+        console.info("Remise Amount", this.remiseAmount)
+        console.info("Remise Amount", this.selectedDevisItem.remise)
+        if (this.selectedDevisItem.remise == 0){
+          console.info("Remise Amount", "Remise NULLE")
+          this.summaryTVA = this.selectedDevisItem.devisItems
+          .map((item) => (item.unitPriceHT * item.quantity * item.tva) / 100)
+          .reduce((accum, current) => accum + current)
+        }else{
+          console.info("Remise Amount", "Remise NON NULLE")
 
-      this.remiseAmount = this.calculateRemise(
-        this.selectedDevisItem.remise,
-        this.summaryTotalHT,
-      )
+          this.summaryTVA = this.selectedDevisItem.devisItems
+          .map((item) => ((item.unitPriceHT - item.unitPriceHT * this.selectedDevisItem.remise / 100 ) * item.quantity * item.tva) / 100)
+          /* .map((item) => {
+            
+           item = (item.unitPriceHT * 0.1 * item.quantity * item.tva) / 100
+            console.log((item.unitPriceHT * this.selectedDevisItem.remise * item.quantity * item.tva) / (100 * 100)) 
+
+          }) */
+          .reduce((accum, current) => accum + current)
+        }
+
+        console.info("SUMMARY TVA", this.summaryTVA)
+
     }
   }
 
@@ -678,4 +715,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
    /*  this.f.tva.setValue(this.selectedTva);
     this.f.devise.setValue(this.selectedDevise); */
   }
+
+ 
+
 }

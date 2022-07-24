@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core'
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 import { TableComponent } from '@app/table/table.component'
 import { ReferencePrefix } from '@shared/enums/reference-prefix.enum'
@@ -11,6 +11,7 @@ import {
   CatalogueDto,
   UpdateCatalogueInput,
   ICatalogueDto,
+  InfosEntrepriseServiceProxy,
 } from '@shared/service-proxies/service-proxies'
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
 import { FormatService } from '@shared/services/format.service'
@@ -18,7 +19,7 @@ import { ToastService } from '@shared/services/toast.service'
 import { CalculationsService } from '@shared/services/calculations.service'
 import * as moment from 'moment'
 import { of, Subject } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, takeUntil } from 'rxjs/operators'
 import { LazyTableService } from '@shared/services/lazy-table.service'
 
 @Component({
@@ -26,7 +27,10 @@ import { LazyTableService } from '@shared/services/lazy-table.service'
   templateUrl: './catalogue.component.html',
   styleUrls: ['./catalogue.component.scss'],
 })
-export class CatalogueComponent implements OnInit {
+export class CatalogueComponent implements OnInit, OnDestroy {
+
+  public $destroyed = new Subject<any>();
+
   selectedItem: any
   dialogTitle: string
   @ViewChild(TableComponent, { static: false })
@@ -88,10 +92,11 @@ export class CatalogueComponent implements OnInit {
     },
   ]
   Currency = 'MAD'
+  Tva = 0
   dialogDisplay = false
   catalogueOptions = ['produit', 'prestation']
   formGroup: FormGroup
-  tvaOptions = [10, 15, 20]
+  tvaOptions = [7,10, 14, 20]
   unityOptions = ['Heures', 'Kg']
   favIcon: HTMLLinkElement = document.querySelector('#favIcon')
 
@@ -104,7 +109,35 @@ export class CatalogueComponent implements OnInit {
     private formBuilder: FormBuilder,
     private _calculationsService: CalculationsService,
     private _lazyTableService: LazyTableService,
-  ) {}
+    private _infosEntrepriseService: InfosEntrepriseServiceProxy
+  ) {
+    let observer = {
+      next: result=> {
+        if (result){
+          console.log(result.tva);
+          
+          if(result.currency != null) this.Currency = result.currency; 
+          if(result.tva != null) this.Tva =  parseInt(result.tva.slice(0, -1)); 
+          
+        }else{
+          console.log("No infos found");
+        }
+      },
+      error: error =>{
+        console.log(error)
+      }
+    }
+
+    this._infosEntrepriseService
+    .getGeneralInfos()
+    .pipe(
+      takeUntil(this.$destroyed)
+    )
+    .subscribe(observer)
+
+  }
+  
+  
 
   ngOnInit() {
     this.globalEventsService.announcedThePageChangedColorSubject(
@@ -120,13 +153,19 @@ export class CatalogueComponent implements OnInit {
     })
   }
 
+  @HostListener('unloaded')
+  ngOnDestroy(): void {
+    this.$destroyed.next();
+    this.$destroyed.complete();
+  }
+
   initiateFormGroup() {
     this.formGroup = this.formBuilder.group({
       designation: ['', Validators.required],
       description: [''],
       unity: [''],
       htPrice: [0],
-      tva: [0],
+      tva: [this.Tva],
       minimalQuantity: [1],
       dialogSelectedType: ['produit'],
     })
@@ -209,7 +248,7 @@ export class CatalogueComponent implements OnInit {
 
       this.dialogDisplay = true
     } else {
-      this.catchNoSelectedItem(this.selectedItem, 'Catalougue')
+      this.catchNoSelectedItem(this.selectedItem, 'Catalogue')
     }
   }
 
@@ -227,7 +266,7 @@ export class CatalogueComponent implements OnInit {
                 }
                 this._toastService.success({
                   summary: 'Opération réussie',
-                  detail: 'Le catalogue est supprimé avec succès',
+                  detail: 'Article supprimé avec succès',
                 })
               } else {
                 //TODO: propagate this method to other components
@@ -362,7 +401,16 @@ export class CatalogueComponent implements OnInit {
         summary: `Aucun ${element} sélectionné`,
         detail: `Séléctionner un ${element}`,
       })
-      return false
+      return false 
     }
   }
+
+  onScroll(event): void {
+
+    if(event.srcElement.scrollTop > 3 ){
+      document.getElementById("devis-header").classList.add('header-shadow');
+    }else{
+      document.getElementById("devis-header").classList.remove('header-shadow');
+    }
+   }
 }

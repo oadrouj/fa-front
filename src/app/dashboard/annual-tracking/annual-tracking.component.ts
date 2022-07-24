@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core'
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core'
 import {
   AnnualEstimatesTrackingDto,
   AnnualInvoicesTrackingDto,
@@ -16,7 +16,7 @@ export class AnnualTrackingComponent implements OnInit, AfterViewInit {
 
   @ViewChild('chart') chart: any
   type: ChartType = 'line'
-
+  @Input() currency : string;
   options: IBarChartOptions = {
     axisX: {
       showGrid: false,

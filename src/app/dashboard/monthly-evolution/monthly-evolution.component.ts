@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { StatisticsServiceProxy } from '@shared/service-proxies/service-proxies';
 
 @Component({
@@ -11,6 +11,7 @@ export class MonthlyEvolutionComponent implements OnInit {
   totaEstimatedAmountEvolved = 0;
   totalClientsEvolved = 0;
   totalCatalogsEvolved = 0;
+  @Input() currency : string;
 
   constructor(private _statisticsServiceProxy: StatisticsServiceProxy) { }
 

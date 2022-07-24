@@ -41,12 +41,14 @@ import { ItemPreviewComponent} from './components/item-preview/item-preview.comp
 import {FileUploadModule} from 'primeng/fileupload';
 import { NgxdModule } from '@ngxd/core';
 import { DocumentStatusComponent } from './components/document-status/document-status.component'
+import { DocumentActionComponent } from './components/document-action/document-action.component'
 import { EstimateInvoiceStatusStateService } from './services/estimate-invoice-status-state.service'
 import { DataViewModule } from 'primeng/dataview';
 import {InplaceModule} from 'primeng/inplace';
 import {ListboxModule} from 'primeng/listbox';
 import {CardModule} from 'primeng/card';
 import {ClientDialogComponent } from '../app/clients/client-dialog/client-dialog.component'
+import { MenuModule } from 'primeng/menu';
 
 @NgModule({
   imports: [
@@ -87,6 +89,7 @@ import {ClientDialogComponent } from '../app/clients/client-dialog/client-dialog
     InplaceModule,
     ListboxModule,
     CardModule,
+    MenuModule
   ],
 
   declarations: [
@@ -95,6 +98,7 @@ import {ClientDialogComponent } from '../app/clients/client-dialog/client-dialog
     FacturesDialogComponent,
     ItemPreviewComponent,
     DocumentStatusComponent,
+    DocumentActionComponent,
     ClientDialogComponent
   ],
   providers: [MessageService, ConfirmationService, ToastService, ConfirmDialogService],
@@ -140,8 +144,10 @@ import {ClientDialogComponent } from '../app/clients/client-dialog/client-dialog
     FacturesDialogComponent,
     ItemPreviewComponent,
     DocumentStatusComponent,
+    DocumentActionComponent,
     DevisDialogComponent,
     ClientDialogComponent,
+    
   ],
 })
 export class PrimengSharedModule { }

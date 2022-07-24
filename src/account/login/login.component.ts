@@ -5,15 +5,20 @@ import { accountModuleAnimation } from '@shared/animations/routerTransition';
 import { AppAuthService } from '@shared/auth/app-auth.service';
 import { CustomAccountServiceProxy } from '@shared/service-proxies/service-proxies';
 import { ActivatedRoute, Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
+import { ToastService } from '@shared/services/toast.service';
 
 @Component({
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  animations: [accountModuleAnimation()]
+  providers: [ToastService],
+  animations: [accountModuleAnimation()],
+ 
 })
 export class LoginComponent extends AppComponentBase implements OnInit {
 
   submitting = false;
+  hidePass = true;
 
   seConnecterAreaShown: boolean = true;
   sendMailAreaShown: boolean = false;
@@ -22,7 +27,17 @@ export class LoginComponent extends AppComponentBase implements OnInit {
 
   emailAdress: string;
   password: string;
+  passwordConfirm: string;
 
+  iconClasses= "";
+  iconClassesMail= "";
+  iconClassesReset= "";
+
+
+  passwordRequired: boolean = false
+  passwordDontMatch: boolean = false
+  passwordDidntRepectRegex: boolean = false
+  
   constructor(
     injector: Injector,
     public authService: AppAuthService,
@@ -30,6 +45,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
     private _customAccountService: CustomAccountServiceProxy,
     private _activatedRoute: ActivatedRoute,
     private _router: Router,
+    private _toastService: ToastService
     ) {
     super(injector);
   }
@@ -57,7 +73,12 @@ export class LoginComponent extends AppComponentBase implements OnInit {
 
   login(): void {
     this.submitting = true;
-    this.authService.authenticate(() => {});
+    this.iconClasses="pi pi-spin pi-spinner";
+
+    this.authService.authenticate(() => {
+      this.iconClasses="";
+
+    });
   }
 
   ShowForgotPass(): void {
@@ -73,20 +94,62 @@ export class LoginComponent extends AppComponentBase implements OnInit {
   }
 
   envoyerMail(): void {
-    this._customAccountService.sendResetPasswordMail(this.emailAdress).subscribe(() => {
+    this.iconClassesMail="pi pi-spin pi-spinner";
+
+    console.log(this.emailAdress)
+    this._customAccountService.sendResetPasswordMail(this.emailAdress)
+    .pipe(finalize(() => {this.iconClassesMail=""; }))
+    .subscribe({
+      next: () => {
+      this.iconClassesMail="";
       this.sendMailAreaShown = false;
       this.mailSentAreaShown = true;
+    },
+    error: err => {
+      this.iconClassesMail="";
+    }
     });
   }
 
   reinitialiser(): void {
+    this.iconClassesReset="pi pi-spin pi-spinner";
+
     var userId = Number(this._activatedRoute.snapshot.paramMap.get('resetPassword'));
-      this._customAccountService.resetPassword(userId, this.password).subscribe(() => {
+      this._customAccountService.resetPassword(userId, this.password)
+      .pipe(finalize(()=>{this.iconClassesReset="";}))
+      .subscribe({
+        next: () => {
+          this.iconClassesReset="";
+
+          this._toastService.info({
+            summary: 'Opértion réussie',
+            detail: 'Mot de passe réinitialisé avec succés',
+          })
+
         this.returnToLogin();
-      });
+      }, error: err =>{
+        this.iconClassesReset="";
+      }
+    });
   }
 
   register(): void {
     this._router.navigate(['/account/redirect'], { state: { route: '/account/reister'} });
+  }
+
+  validatePassword(): boolean {
+    const regularExpressionEmail = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+    this.passwordDidntRepectRegex = !regularExpressionEmail.test(
+      String(this.password),
+    )
+    
+    if (this.passwordDidntRepectRegex) return false
+    return true
+  }
+
+  validatePasswordConfirm(): boolean {
+    this.passwordDontMatch = !(this.password == this.passwordConfirm)
+    if ( this.passwordDontMatch ) return false
+    return true
   }
 }
