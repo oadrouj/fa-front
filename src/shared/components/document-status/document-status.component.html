@@ -2,7 +2,7 @@
     <span class ="tag-status" [ngClass]="
     {
         'span-green' : label == 'Validé' || label == 'Réglée',
-        'span-blue' : label == 'Réglée Partiellement',
+        'span-blue' : label == 'Réglée Partiellement' || label == 'Expiré',
         'span-orange' : label == 'Converti' || label == 'Paiement en attente',
         'span-red' : label == 'Rejeté' || label == 'Paiement en retard',
         'span-grey' : label == 'Brouillon'

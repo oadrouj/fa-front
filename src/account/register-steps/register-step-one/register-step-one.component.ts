@@ -29,6 +29,8 @@ export class RegisterStepOneComponent extends AppComponentBase {
   firstPassword: string
   passwordRequired: boolean = false
   passwordDontMatch: boolean = false
+  iconClasses= "";
+
   constructor(
     injector: Injector,
     private _accountService: AccountServiceProxy,
@@ -74,6 +76,8 @@ export class RegisterStepOneComponent extends AppComponentBase {
     isFormValid = isFormValid && this.validatePassword()
 
     if (isFormValid) {
+      this.iconClasses="pi pi-spin pi-spinner";
+
       this.saving = true
       this.model.surname = 'surname'
       this.model.name = 'name'
@@ -82,7 +86,8 @@ export class RegisterStepOneComponent extends AppComponentBase {
         .register(this.model)
         .pipe(
           finalize(() => {
-            this.saving = false
+            this.saving = false; 
+            this.iconClasses="";
           }),
         )
         .subscribe((result: RegisterOutput) => {

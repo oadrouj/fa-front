@@ -15,7 +15,7 @@ var abp = abp || {};
       message = undefined;
     }
 
-    console.log(options);
+  
 
     let optionsForced = {
       toast: true,
@@ -57,7 +57,6 @@ var abp = abp || {};
         timerProgressBar: 'timerProgressBar'
       }
     };
-    console.log(optionsForced);
 
     options = options || optionsForced;
     

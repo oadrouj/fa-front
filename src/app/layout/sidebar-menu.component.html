@@ -23,11 +23,39 @@
     <a
       *ngIf="item.route && item.route.indexOf('http') != 0"
       class="nav-link"
-      style="width: 100% !important; padding: 1rem 1rem !important;"
+      style="width: 100% !important; padding: 1rem 1rem !important;display: flex;
+      justify-content: start;
+      align-items: center;"
       [routerLink]="item.route"
-      [class.active]="item.isActive"
+      
+      [ngClass]="
+      {
+        'active-dashboard' : item.isActive && item.route == '/app/Dashboard',
+        'active-devis' : item.isActive && item.route == '/app/Devis',
+        'active-catalogue' : item.isActive && item.route == '/app/Catalogue',
+        'active-facture' : item.isActive && item.route == '/app/Factures',
+        'active-client' : item.isActive && item.route == '/app/Clients',
+        'active-profil' : item.isActive && item.route == '/app/Profil',
+        'active-settings' : item.isActive && item.route == '/app/Parametres',
+        'menu-dashboard' : item.route == '/app/Dashboard',
+        'menu-devis' : item.route == '/app/Devis',
+        'menu-catalogue' : item.route == '/app/Catalogue',
+        'menu-facture' : item.route == '/app/Factures',
+        'menu-client' : item.route == '/app/Clients',
+        'menu-profil' : item.route == '/app/Profil',
+        'menu-settings' : item.route == '/app/Parametres'
+      }
+  "
+
     >
-      <img class="nav-icon"  src="{{ item.icon }}" />
+   <!--  [class.active]="item.isActive" -->
+   <img class="nav-icon"  src="{{ item.icon }}" *ngIf="item.route == '/app/Dashboard'" style="width:23px;margin-right:8px;"/>
+   <img class="nav-icon"  src="{{ item.icon }}" *ngIf="item.route == '/app/Devis'" style="width:23px;margin-right:8px;"/>
+   <img class="nav-icon"  src="{{ item.icon }}" *ngIf="item.route == '/app/Catalogue'" style="width:23px;margin-right:8px;"/>
+   <img class="nav-icon"  src="{{ item.icon }}" *ngIf="item.route == '/app/Factures'" style="width:21px;margin-right:8px;"/>
+   <img class="nav-icon"  src="{{ item.icon }}" *ngIf="item.route == '/app/Clients'" style="width:25px;margin-right:8px;"/>
+   <img class="nav-icon"  src="{{ item.icon }}" *ngIf="item.route == '/app/Profil'" style="width:23px;margin-right:8px;"/>
+   <img class="nav-icon"  src="{{ item.icon }}" *ngIf="item.route == '/app/Parametres'" style="width:23px;margin-right:8px;"/>
       <p>
         {{ item.label }}
       </p>

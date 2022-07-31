@@ -24,6 +24,7 @@ import {
   FactureDto,
   FactureServiceProxy,
   FactureStatutEnum,
+  InfosEntrepriseServiceProxy,
 } from '@shared/service-proxies/service-proxies'
 
 import { ConfirmDialogService } from '@shared/services/confirm-dialog.service'
@@ -39,7 +40,7 @@ import {
   ConfirmEventType,
 } from 'primeng/api'
 import { Subject } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, first } from 'rxjs/operators'
 
 interface Category {
   name: string
@@ -56,6 +57,8 @@ interface Type {
   styleUrls: ['./clients.component.css'],
 })
 export class ClientsComponent extends AppComponentBase implements OnInit {
+  Tva = 0
+  
   constructor(
     injector: Injector,
     private confirmationService: ConfirmationService,
@@ -67,8 +70,28 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
     private _toastService: ToastService,
     private _confirmDialogService: ConfirmDialogService,
     private _lazyTableService: LazyTableService,
+    private _infosEntrepriseService: InfosEntrepriseServiceProxy
   ) {
     super(injector)
+    let observer = {
+      next: result=> {
+        if (result){
+          
+          if(result.currency != null) this.Currency = result.currency; 
+          if(result.tva != null) this.Tva =  parseInt(result.tva.slice(0, -1)); 
+          
+        }else{
+        }
+      },
+      error: error =>{
+        console.log(error)
+      }
+    }
+
+    this._infosEntrepriseService
+    .getGeneralInfos()
+    .pipe(first())
+    .subscribe(observer)
   }
 
   //#region properties
@@ -83,7 +106,7 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
   clientApercu: ClientDto
   cols = [
     {
-      header: 'REFERENCE',
+      header: 'RÉF',
       field: 'reference',
       type: 'text',
       format: (number) =>
@@ -93,7 +116,7 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
         ),
     },
     {
-      header: "DATE D'AJOUT",
+      header: "AJOUT",
       field: 'creationTime',
       type: 'date',
       format: (date) => (date._i ? new Date(date._i) : new Date(date._d)),
@@ -125,6 +148,7 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
   totalAmountOverdueFactures = 0
   scrollHeight: string = '0px'
   favIcon: HTMLLinkElement = document.querySelector('#favIcon')
+  pageTitle: HTMLElement = document.querySelector('#pageTitle')
   estimateDialogIsVisible: boolean
   isClientProfetionnel: boolean
   invoiceDialogIsVisible: boolean
@@ -135,7 +159,7 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
   selectedTabName = ''
   devisCols = [
     {
-      header: 'REFERENCE',
+      header: 'RÉF',
       field: 'reference',
       type: 'text',
       format: (number, customPrefix) =>
@@ -177,7 +201,7 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
 
   factureCols = [
     {
-      header: 'REFERENCE',
+      header: 'RÉF',
       field: 'reference',
       type: 'text',
       format: (number, customPrefix) =>
@@ -226,7 +250,8 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
       this.showDialogNouveau()
     }
 
-    this.favIcon.href = '../../assets/img/ClientsTitreIcon.png'
+    /* this.favIcon.href = '../../assets/img/ClientsTitreIcon.png' */
+    this.pageTitle.innerText = 'Facturi | Clients'
     this.factureList = [new FactureDto()]
     this.devisList = [new DevisDto()]
 
@@ -268,7 +293,7 @@ export class ClientsComponent extends AppComponentBase implements OnInit {
         })
       }, 500)
     } else if (filterType == 'filterByButton') {
-    console.log(this.selectedCategory)
+  
 
       this.filterSubject.next({
         type: 'filterByButton',

@@ -56,7 +56,6 @@ export class ItemPreviewComponent implements OnInit {
     { header: 'TOTAL TTC', field: 'totalTtc', type: 'currency', colspan: 0 },
   ]
   ngOnInit() {
-    console.log(this.logoSrc)
     this.getEntrepriseInfosApi()
   }
 
@@ -116,7 +115,6 @@ export class ItemPreviewComponent implements OnInit {
 
       // for(let i=0; i < count; i++){
       //   splittedItems = items.slice(length, length + 4)
-      //   console.log(length)
       //   doc.addPage()
       //   doc.addImage(contentDataURL, 'PNG', 0, position, docWidth, docHeight)
 
@@ -143,7 +141,6 @@ export class ItemPreviewComponent implements OnInit {
 
       const items = this.item.devisItems || this.item.factureItems
       let table = document.querySelector('#contentToConvert p-table')
-      console.log(this.showObjet.nativeElement);
       let rest = items.length % 5
       let count = (items.length - rest) / 5 + +!!rest,
         splittedItems: any

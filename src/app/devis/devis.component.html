@@ -19,7 +19,7 @@
                     <p class="subtitle" style="display:inline-block;">Visualisez, modifiez et gérez toutes vos {{title | lowercase}} !</p>
                     <button  class="" pButton pRipple type="button" icon="fa fa-undo" (click)="resetFilterFields()" [ngClass]="'p-button-rounded ml-2 bg-' + primaryColor "></button>
                 </div>
-                <div class="w-100 flex mr-3">
+                <div class="w-100 flex mr-3 ml-2">
                     <span class="searchInput p-input-icon-left mt-2 shadow-1">
                         <i class="pi pi-search"></i>
                         <input pInputText [(ngModel)]="searchText"
@@ -39,25 +39,25 @@
                 
             </div>
 
-            <app-table #dt1 [cols]="cols" [styleClass]="'table'" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [filterEvent]="filterSubject.asObservable()" [getListApi$]="getListDevisApi$" [statusItems]="devisStatusItems" [globalFilterFields]="['reference','client','dateEmission', 'montantTtc','statut','action']">
+            <app-table #dt1 [cols]="cols" [styleClass]="'table'" [styleId]="'devisList'" [highlightColorInput]="tableSelectionColor" [filterEvent]="filterSubject.asObservable()" [getListApi$]="getListDevisApi$" [statusItems]="devisStatusItems" [globalFilterFields]="['reference','client','dateEmission', 'montantTtc','statut','action']" [currency]="selectedDevise">
             </app-table>
 
-            <div class="devisTotal flex justify-content-between align-items-center w-100">
+          <!--   <div class="devisTotal flex justify-content-between align-items-center w-100">
                 <span class="color-gray ">Total TTC</span>
                 <span class="color-gray">{{montantTotalAllDevis | number:'1.2-2' }}
-                    {{' ' + (selectedDevisItem && selectedDevisItem.currency)}}</span>
-            </div>
+                    {{' ' + selectedDevise}}</span>
+            </div> -->
         </div>
 
         <div class="rightSection col-12 p-0">
             <div #devisDetails class="devis-details">
                 <div id="devisDetailsHeader" class="header flex justify-content-end" #devisDetailsHeader>
                     <div class="flex">
-                        <button pButton label="Télécharger" [icon]="iconSpin" class="p-button-text" (click)="downloadDevisAsPdf()"></button>
-                        <button pButton label="Imprimer"  [icon]="iconSpinPrint" class="p-button-text" (click)="printDevis()"></button>
-                        <button pButton label="Dupliquer" class="p-button-text" (click)="duplicateDevis()"></button>
-                        <button pButton label="Modifier" class="p-button-text" (click)="editDevis()"></button>
-                        <button pButton label="Supprimer" class="p-button-text" (click)="deleteDevis()"></button>
+                        <button pButton label="Télécharger" [icon]="iconSpin" class="p-button-text" (click)="downloadDevisAsPdf()"  [disabled]="!selectedDevisItem"></button>
+                        <button pButton label="Imprimer"  [icon]="iconSpinPrint" class="p-button-text" (click)="printDevis()"  [disabled]="!selectedDevisItem"></button>
+                        <button pButton label="Dupliquer" class="p-button-text" (click)="duplicateDevis()"  [disabled]="!selectedDevisItem"></button>
+                        <button pButton label="Modifier" class="p-button-text" (click)="editDevis()" [disabled]="!selectedDevisItem || (selectedDevisItem && selectedDevisItem?.statut != 1 && selectedDevisItem?.statut != 0 && selectedDevisItem?.statut != 4 )"></button>
+                        <button pButton label="Supprimer" class="p-button-text" (click)="deleteDevis()"  [disabled]="!selectedDevisItem || (selectedDevisItem && selectedDevisItem?.statut != 1 && selectedDevisItem?.statut != 0 && selectedDevisItem?.statut != 4 )"></button>
                     </div>
                 </div>
                 <app-item-preview #prv [item]="selectedDevisItem" [title]="title" [logoSrc]="logoSrc" [summaryTotalHT]="summaryTotalHT" [summaryTVA]="summaryTVA" [remiseAmount]="remiseAmount">

@@ -10,6 +10,7 @@ import { DefaultAnnotationsComponent } from './components/default-annotations/de
 })
 export class ProfileComponent implements OnInit {
   dynamicTitle = 'Devis';
+  pageTitle: HTMLElement = document.querySelector('#pageTitle')
 
   constructor(
     private _globalEventsService: GlobalEventsService,
@@ -23,12 +24,13 @@ export class ProfileComponent implements OnInit {
     this._globalEventsService.announcedThePageChangedColorSubject(
       `var(--dark-orange-color`,
     )
+    this.pageTitle.innerText ="Facturi | Profil"
 
     this._changeProfileContainerTitleService.changeTitle$.subscribe(res => {
       this.dynamicTitle = res
     })
 
-    this.favIcon.href = 'assets/img/MonProfilIcon.png'
+    /* this.favIcon.href = 'assets/img/icone-profil.png' */
   }
   
 }

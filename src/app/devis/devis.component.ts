@@ -1,5 +1,7 @@
 import {
+  AfterViewChecked,
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   OnInit,
@@ -52,7 +54,7 @@ import { Table } from 'primeng/table'
   styleUrls: ['./devis.component.css'],
   providers: [DialogService, EstimateInvoiceStatusStateService],
 })
-export class DevisComponent implements OnInit, AfterViewInit {
+export class DevisComponent implements OnInit, AfterViewInit, AfterViewChecked {
   remiseAmount: number
   @ViewChild('factureDialog', {})
   sample: DynamicDialogRef
@@ -92,15 +94,19 @@ export class DevisComponent implements OnInit, AfterViewInit {
     private _lazyTableService: LazyTableService,
     private _previewService: PreviewService,
     private _infosEntrepriseService: InfosEntrepriseServiceProxy,
+    private cdr: ChangeDetectorRef
   ) {}
 
   favIcon: HTMLLinkElement = document.querySelector('#favIcon')
+  pageTitle: HTMLElement = document.querySelector('#pageTitle')
+
   ngOnInit() {
     this.globalEventsService.announcedThePageChangedColorSubject(
       `var(--${this.primaryColor}-color`,
     )
+    this.pageTitle.innerText ="Facturi | Devis"
 
-    this.favIcon.href = 'assets/img/DevisLogo.png'
+   /*  this.favIcon.href = 'assets/img/devis-icone.png' */
 
     this._fileApiServiceProxy.download().subscribe((res) => {
       let objectURL = this._sanitizer.bypassSecurityTrustUrl(
@@ -108,9 +114,11 @@ export class DevisComponent implements OnInit, AfterViewInit {
       )
       this.logoSrc = objectURL as string
     })
-
+    this.getCurrentTvaAndCurrency();
     this._lazyTableService.rowSelected$.subscribe((res) => {
-      this.firstLoad && (this.montantTotalAllDevis = this.tableChild.montantTotal)
+    /*   this.firstLoad && (  ) */
+    this.montantTotalAllDevis = this.tableChild.montantTotal
+  
       this.selectedDevisItem = res
       this.calculateSummaryTotalHTAndTVA()
       this.firstLoad = false
@@ -124,7 +132,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
       this.updateApiCall(
         this.selectedDevisItem.id,
         DevisStatutEnum.Valide,
-        'Le devis est validé',
+        'Devis validé',
       )
     }
   }
@@ -132,7 +140,6 @@ export class DevisComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this._estimateInvoiceStatusStateService.statusModifier$.subscribe((res) => {
 
-      console.log("Status changed ...")
       this.resetFilterFields();
       if (res.target == 'Estimate') {
         switch (res.statusAction) {
@@ -230,10 +237,9 @@ export class DevisComponent implements OnInit, AfterViewInit {
   devisStatusItems = [
     {
       actualStatus: DevisStatutEnum.Valide,
-      label: 'Convertir',
+      label: 'Convertir en facture',
       icon: 'pi pi-check',
       command: () => {
-        console.log("test Convert")
         this._estimateInvoiceStatusStateService.statusModifier = {
           statusAction: 'Convert',
           target: 'Estimate',
@@ -261,6 +267,51 @@ export class DevisComponent implements OnInit, AfterViewInit {
           target: 'Estimate',
         }
         this.ngOnInit()
+      },
+    },
+    {
+      actualStatus: DevisStatutEnum.Converti,
+      label: 'Réouvrir',
+      icon: 'pi pi-check',
+      command: () => {
+        this._estimateInvoiceStatusStateService.statusModifier = {
+          statusAction: 'Validate',
+          target: 'Estimate',
+        }
+      }
+    }, 
+    {
+      actualStatus: DevisStatutEnum.Rejete,
+      label: 'Réouvrir',
+      icon: 'pi pi-check',
+      command: () => {
+       
+        this._estimateInvoiceStatusStateService.statusModifier = {
+          statusAction: 'Validate',
+          target: 'Estimate',
+        }
+      }
+    },
+    {
+      actualStatus: DevisStatutEnum.Expire,
+      label: 'Convertir en facture',
+      icon: 'pi pi-check',
+      command: () => {
+        this._estimateInvoiceStatusStateService.statusModifier = {
+          statusAction: 'Convert',
+          target: 'Estimate',
+        }
+      }
+    },
+    {
+      actualStatus: DevisStatutEnum.Expire,
+      label: 'Rejeter',
+      icon: 'pi pi-times',
+      command: () => {
+        this._estimateInvoiceStatusStateService.statusModifier = {
+          statusAction: 'Reject',
+          target: 'Estimate',
+        }
       },
     },
   ]
@@ -355,7 +406,6 @@ export class DevisComponent implements OnInit, AfterViewInit {
     this.devisItemProp = null
     this.dialogStatus = DialogStatus.New
 
-    console.log(this.dialogStatus)
   }
 
   editDevis() {
@@ -435,12 +485,7 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
           this.summaryTVA = this.selectedDevisItem.devisItems
           .map((item) => ((item.unitPriceHT - item.unitPriceHT * this.selectedDevisItem.remise / 100 ) * item.quantity * item.tva) / 100)
-          /* .map((item) => {
-            
-           item = (item.unitPriceHT * 0.1 * item.quantity * item.tva) / 100
-            console.log((item.unitPriceHT * this.selectedDevisItem.remise * item.quantity * item.tva) / (100 * 100)) 
-
-          }) */
+     
           .reduce((accum, current) => accum + current)
         }
 
@@ -579,8 +624,9 @@ export class DevisComponent implements OnInit, AfterViewInit {
 
     this._toastService.info({
       summary: 'Conversion réussie',
-      detail: 'Devis converti avec succés',
+      detail: 'Devis converti avec succés, veuillez valider ou enregistrer le brouillon pour sauvegarder la facture',
     })
+  
     this.invoiceItemProp = {
       ...this.selectedDevisItem,
       factureItems: this.selectedDevisItem.devisItems,
@@ -695,7 +741,6 @@ export class DevisComponent implements OnInit, AfterViewInit {
           if(result.currency != null) this.selectedDevise = result.currency; 
           this.setValueForm();
         }else{
-          console.log("No infos found");
         }
       },
       error: error =>{
@@ -716,6 +761,9 @@ export class DevisComponent implements OnInit, AfterViewInit {
     this.f.devise.setValue(this.selectedDevise); */
   }
 
- 
+  ngAfterViewChecked(){
+    /*   this.resetFilterFields(); */
+      this.cdr.detectChanges();
+   }
 
 }

@@ -1,5 +1,7 @@
 import {
+  AfterViewChecked,
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   OnDestroy,
   OnInit,
@@ -49,7 +51,7 @@ import { PreviewService } from '@shared/services/preview.service'
   styleUrls: ['./factures.component.css'],
   providers: [DialogService, EstimateInvoiceStatusStateService],
 })
-export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
+export class FacturesComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
   remiseAmount: number
   favIcon: HTMLLinkElement = document.querySelector('#favIcon')
   logoSrc: string
@@ -60,8 +62,10 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
   generalInfosDto: GeneralInfosDto;
   selectedTva :string = "20%";
   selectedDevise :string = "MAD";
+
   iconSpin="";
   iconSpinPrint="";
+  pageTitle: HTMLElement = document.querySelector('#pageTitle')
   
   constructor(
     private _factureServiceProxy: FactureServiceProxy,
@@ -76,6 +80,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     private _lazyTableService: LazyTableService,
     private _previewService: PreviewService,
     private _infosEntrepriseService: InfosEntrepriseServiceProxy,
+    private cdr : ChangeDetectorRef
 
   ) {}
 
@@ -84,7 +89,8 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       `var(--${this.primaryColor}-color`,
     )
 
-    this.favIcon.href = 'assets/img/FacturesLogo.png'
+    /* this.favIcon.href = 'assets/img/icone-facture.png' */
+    this.pageTitle.innerText ="Facturi | Factures"
 
     this._fileApiServiceProxy.download().subscribe((res) => {
       let objectURL = this._sanitizer.bypassSecurityTrustUrl(
@@ -93,8 +99,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       this.logoSrc = objectURL as string
     })
 
+    this.getCurrentTvaAndCurrency();
     this._lazyTableService.rowSelected$.subscribe((res) => {
-      this.firstLoad && (this.montantTotalAllDevis = this.tableChild.montantTotal)
+      (this.montantTotalAllDevis = this.tableChild.montantTotal)
       this.selectedDevisItem = res
       this.calculateSummaryTotalHTAndTVA()
       this.firstLoad = false
@@ -450,12 +457,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
 
           this.summaryTVA = this.selectedDevisItem.factureItems
           .map((item) => ((item.unitPriceHT - item.unitPriceHT * this.selectedDevisItem.remise / 100 ) * item.quantity * item.tva) / 100)
-          //.map((item) => {
-            
-           // item = (item.unitPriceHT * 0.1 * item.quantity * item.tva) / 100
-            // console.log((item.unitPriceHT * this.selectedDevisItem.remise * item.quantity * item.tva) / (100 * 100)) 
-
-          // }) 
+      
           .reduce((accum, current) => accum + current)
         }
 
@@ -487,7 +489,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
         ? this.parseStatutForStatutValide(event)
         : invoice.statut
 
-    console.log("status changed", invoice.statut)
     if (event.crudOperation == 'create') {
       this._lazyTableService.emitDataOperation = {
         action: 'add',
@@ -638,6 +639,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         factureId: this.selectedDevisItem.id,
         factureRef: this.selectedDevisItem.reference,
+        factureTtc: this.selectedDevisItem.montantTtc,
         status: this.selectedDevisItem.statut,
         restAmount: restAmount,
         currency: this.selectedDevisItem.currency,
@@ -657,15 +659,14 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     })
 
     this.ref.onClose.subscribe(async (result) => {
-      console.log("result after close")
-      console.log(result)
+
 
       if(result){
             this._factureServiceProxy
             .getByIdFacture(result.id)
             .subscribe((res : FactureDto) => {
 
-              console.log(res)
+       
           
             if (result && result.montant != 0) {
               let factureInfosPaiementDto = new FactureInfosPaiementDto({
@@ -837,7 +838,6 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedDevisItem = this.tableChild.tableData
       .filter((item) => item)
       .find((item) => item.id == id)
-      console.log(this.selectedDevisItem)
 
     this.tableChild.tableData[index] = { ...this.selectedDevisItem }
     this.tableChild.tableData = [...this.tableChild.tableData]
@@ -882,7 +882,7 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
           if(result.currency != null) this.selectedDevise = result.currency; 
         
         }else{
-          console.log("No infos found");
+       
         }
       },
       error: error =>{
@@ -895,4 +895,9 @@ export class FacturesComponent implements OnInit, AfterViewInit, OnDestroy {
     .pipe(first())
     .subscribe(observer)
   }
+
+  ngAfterViewChecked(){
+  /*   this.resetFilterFields(); */
+    this.cdr.detectChanges();
+ }
 }

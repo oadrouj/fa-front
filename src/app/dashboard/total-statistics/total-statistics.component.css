@@ -14,6 +14,20 @@
     width: fit-content;
 }
 
-.total-statistics-box {
-    border-bottom: .25rem solid;
+.total-statistics-box:hover {
+    box-shadow: -1px 5px 16px 0px rgba(0,0,0,0.4);
+    cursor:pointer;
+}
+
+.total-statistics-box-f {
+    border-bottom: .25rem solid var(--orange-color);
+}
+.total-statistics-box-d {
+    border-bottom: .25rem solid var(--green-color);
+}
+.total-statistics-box-c {
+    border-bottom: .25rem solid var(--blue-color);
+}
+.total-statistics-box-p {
+    border-bottom: .25rem solid var(--purple-color);
 }

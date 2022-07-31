@@ -14,6 +14,7 @@ export class SubscriptionCardComponent implements OnInit {
   @Input() priceModel: string
   @Input() features: string[]
   @Input() price: number
+  @Input() selectedMonth: number
   @Input() primaryColor: string
   @Input() secondaryColor: string
   @Output() clickEmit = new EventEmitter()

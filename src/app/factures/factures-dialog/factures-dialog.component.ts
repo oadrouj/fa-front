@@ -136,8 +136,6 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit {
     let observer = {
       next: result=> {
         if (result){
-          console.log(result.tva);
-           
       
           if(this._dialogStatus == DialogStatus.New) {
             if(result.tva != null) this.selectedTva =  result.tva; 
@@ -150,10 +148,11 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit {
               }
             }
           }
-          if(result.currency != null) this.Currency = result.currency; 
+          if(this._dialogStatus != DialogStatus.Convert) {
+            if(result.currency != null) this.Currency = result.currency; 
+          }
           
         }else{
-          console.log("No infos found");
         }
       },
       error: error =>{
@@ -260,7 +259,10 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit {
         this.initiateFormGroupWithTableControls()
         this.dialogTitle = 'Nouvelle'
         this.devisItem = this.selectedDevisItem
-        console.log(this.selectedDevisItem);
+
+        this.devisItem.dateEmission = new Date()
+
+     
         this.setFormGroup()
         this.devisOptionsFormGroup.get('remise').setValue(this.devisItem.remise)
         this.remiseValue = this.devisItem.remise
@@ -271,6 +273,11 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit {
         this.devisOptionsFormGroup.get('tva').setValue(!tvaIsDesactivated)
         tvaIsDesactivated && this.toggleTVAOption(false)
 
+        this.devisOptionsFormGroup
+        .get('devise')
+        .setValue(this.devisItem.currency)
+        
+        this.Currency = this.devisItem.currency
         this.calculateSummaryTotalHTAndTTC()
         this.formGroup.get('client').setValue(this.devisItem.client)
         break
@@ -453,7 +460,7 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit {
 
     this.formGroup.setValue({
       client: this.devisItem.client,
-      dateEmission: this.devisItem.dateEmission.toDate(),
+      dateEmission: typeof (this.devisItem.dateEmission) == 'string' ? this.devisItem.dateEmission.toDate() : this.devisItem.dateEmission,
       echeancePaiement: this.devisItem.echeancePaiement,
       messageIntroduction: this.devisItem.messageIntroduction,
       piedDePage: this.devisItem.piedDePage,
@@ -559,7 +566,7 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit {
       .subscribe((res) => {
         this.referenceCount = res.lastReference + 1
         this.reference = this.factureFormatReferenceNumber(this.referenceCount)
-        console.log(this.referenceCount)
+  
 
         this.formGroup
           .get('messageIntroduction')
@@ -651,25 +658,20 @@ export class FacturesDialogComponent implements OnInit, AfterViewInit {
 
 if (this.devisOptionsFormGroup.get('tva').value){
   if (this.remiseValue == 0){
-    console.info("Remise Amount", "Remise NULLE")
+ 
     this.summaryTVA = this.getFactureContentItems
     .map((item) => (item.unitPriceHT * item.quantity * item.tva) / 100)
     .reduce((accum, current) => accum + current)
   }else{
-    console.info("Remise Amount", "Remise NON NULLE")
+  
 
     this.summaryTVA = this.getFactureContentItems
     .map((item) => ((item.unitPriceHT - item.unitPriceHT * this.remiseValue / 100 ) * item.quantity * item.tva) / 100)
     .reduce((accum, current) => accum + current)
     
     this.getFactureContentItems.forEach(v =>{
-      console.log("Bizarre")
 
-      console.log(v.tva)
     })
-   
-
-    console.log(this.summaryTVA)
   }
 
 }else{
@@ -1338,17 +1340,7 @@ if (this.devisOptionsFormGroup.get('tva').value){
   currencyChangeConvertAmounts(event){
 
     this.Currency = event.value
-    /* this._currencyConverterService.convertDevise(this.OldCurrency, this.Currency,this.summaryTotalHT)
-    .subscribe({
-      next: data => {
-        console.log(data);
-        console.log("Yessss");
-         
-        },
-        error: error => {
-         console.log(error)
-        }
-    }); */
+
   }
 
   getCurrentTvaAndCurrency(){
@@ -1365,7 +1357,6 @@ if (this.devisOptionsFormGroup.get('tva').value){
           if(result.currency != null) this.Currency = result.currency; 
           this.setValueForm();
         }else{
-          console.log("No infos found");
         }
       },
       error: error =>{
@@ -1387,7 +1378,6 @@ if (this.devisOptionsFormGroup.get('tva').value){
   }
 
   updateTva(row){
-    console.log(row)
-   /*  this.selectedDevisItem.devisItems[row].tva =  */
+
   }
 }

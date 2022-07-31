@@ -25,11 +25,10 @@ export class DocumentActionComponent implements OnInit {
    this.items.forEach(value => {
     this.itemsAdapter.push({
       'label': value.label,
-      'icon':value.icon,
+  /*     'icon':value.icon, */
       'command': value.command
     })
    })
-   console.log(this.itemsAdapter) 
   }
 
   toggleMenu(event){

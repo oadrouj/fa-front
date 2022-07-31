@@ -98,7 +98,7 @@ export class DevisDialogComponent implements OnInit, OnDestroy {
   @Input() set dataItem(value) {
     this._dataItem = value
    this.selectedDevisItem = value
-    console.log(value)
+    
   }
 
   private _dialogStatus
@@ -151,7 +151,6 @@ export class DevisDialogComponent implements OnInit, OnDestroy {
           if(result.currency != null) this.Currency = result.currency; 
           
         }else{
-          console.log("No infos found");
         }
       },
       error: error =>{
@@ -172,13 +171,13 @@ export class DevisDialogComponent implements OnInit, OnDestroy {
   updateState(status) {
     this.manuelReference = false
     this.saveBrouillonHide = false
-    console.log('statut changed', status);
+
 
     this.initiateSummaryValues()
     this.visible && (document.body.style.overflow = 'hidden')
     switch (status) {
       case DialogStatus.New:
-        console.log("ça rentre avant")
+     
         this.devisIsSaved = false
         this.getNewReferenceWithIntroMessageAndFooter()
         this.initiateFormGroupForNewDevis()
@@ -458,10 +457,7 @@ export class DevisDialogComponent implements OnInit, OnDestroy {
 
     fb.get('tva').setValue(parseInt(this.selectedTva.slice(0,-1)));
 
-    console.log("parseInt(this.selectedTva.slice(0,-1))")
-    console.log(parseInt(this.selectedTva.slice(0,-1)))
-    console.log("fb.get('tva').value")
-    console.log(fb.get('tva').value)
+
     return fb
 
   }
@@ -602,7 +598,7 @@ export class DevisDialogComponent implements OnInit, OnDestroy {
     let total_ttc = total_ht
 
     if (this.devisOptionsFormGroup.get('tva').value) {
-      console.log("deb :", row.tva)
+
       total_ttc = total_ht + (total_ht * row.tva) / 100
     }
 
@@ -647,28 +643,22 @@ export class DevisDialogComponent implements OnInit, OnDestroy {
         )
 
     if (this.devisOptionsFormGroup.get('tva').value){
-      console.log("this.remiseValue");
-      console.log(this.remiseValue);
+     
       if (this.remiseValue == 0){
-        console.info("Remise Amount", "Remise NULLE")
         this.summaryTVA = this.getDevisContentItems
         .map((item) => (item.unitPriceHT * item.quantity * item.tva) / 100)
         .reduce((accum, current) => accum + current)
       }else{
-        console.info("Remise Amount", "Remise NON NULLE")
+
 
         this.summaryTVA = this.getDevisContentItems
         .map((item) => ((item.unitPriceHT - item.unitPriceHT * this.remiseValue / 100 ) * item.quantity * item.tva) / 100)
         .reduce((accum, current) => accum + current)
         
         this.getDevisContentItems.forEach(v =>{
-          console.log("Bizarre")
-
-          console.log(v.tva)
+          
         })
-       
 
-        console.log(this.summaryTVA)
       }
 
     }else{
@@ -874,7 +864,7 @@ export class DevisDialogComponent implements OnInit, OnDestroy {
     let formValue = this.formGroup.value
     let updateDevisInput = this.getUpdatedValue(formValue, devisStatus)
 
-    console.log(updateDevisInput)
+   
 
     updateDevisInput.dateEmission = updateDevisInput.dateEmission.add(1, 'days')
     updateDevisInput.devisItems = updateDevisInput.devisItems.map(i =>  { i.date.add(1, 'days'); return i })
@@ -1093,7 +1083,6 @@ export class DevisDialogComponent implements OnInit, OnDestroy {
   }
 
   validateDevis() {
-    console.log(this.formGroup.value, this.formGroup.valid);
 
     let returnValue = of({ success: false, result: null })
     this.enableValidationClass()
@@ -1293,17 +1282,7 @@ export class DevisDialogComponent implements OnInit, OnDestroy {
     this.OldCurrency = this.Currency
 
     this.Currency = event.value
-    /* this._currencyConverterService.convertDevise(this.OldCurrency, this.Currency,this.summaryTotalHT)
-    .subscribe({
-      next: data => {
-        console.log(data);
-        console.log("Yessss");
-         
-        },
-        error: error => {
-         console.log(error)
-        }
-    }); */
+
   }
 
   getCurrentTvaAndCurrency(){
@@ -1320,7 +1299,6 @@ export class DevisDialogComponent implements OnInit, OnDestroy {
           if(result.currency != null) this.Currency = result.currency; 
           this.setValueForm();
         }else{
-          console.log("No infos found");
         }
       },
       error: error =>{
@@ -1342,7 +1320,6 @@ export class DevisDialogComponent implements OnInit, OnDestroy {
   }
 
   updateTva(row){
-    console.log(row)
-   /*  this.selectedDevisItem.devisItems[row].tva =  */
+
   }
 }

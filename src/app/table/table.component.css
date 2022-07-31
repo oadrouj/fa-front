@@ -24,17 +24,23 @@
 }
 
 :host>>>.p-datatable .p-datatable-wrapper {
-     height: 45vh !important;
+     height: 55vh !important;
      width: 100% !important;
 
      overflow-y: auto !important; 
      overflow-x: auto !important; 
 
 }
-
+:host>>>.p-datatable-scrollable-body {
+    min-height: 100% !important;
+    width: 100% !important;
+}
+:host>>>.p-paginator {
+padding: 0 !important;
+}
 :host>>>.p-paginator-bottom {
     background: transparent;
-    margin-bottom: 3rem;
+   /*  margin-bottom: 3rem; */
 }
 
 :host>>>.p-paginator-bottom .p-link {
@@ -83,4 +89,41 @@ width: 2px !important;
 }
 .width-200px{
     width:250px !important;
+}
+
+:host>>>.p-datatable .p-datatable-thead{
+    position: sticky;
+    position: -webkit-sticky;
+    top: -5px;
+    z-index: 1000;
+    background:#f1f6ff;
+    border-bottom:solid 2px #c6c6c6;
+}
+
+
+:host>>>.p-datatable .p-datatable-tfoot  {
+    position: sticky;
+    position: -webkit-sticky;
+    bottom: -5px;
+    z-index: 1000;
+    height:60px;
+}
+
+:host>>>.p-datatable .p-datatable-tfoot > tr > td {
+    text-align: center;
+    padding: 0.5rem 0.5rem;
+    border: 1px solid #cccccc;
+    border-width: 1px 0 0 0 !important;
+    font-weight: 600;
+    font-size:0.9rem;
+    color: #495057;
+    background: #f1f6ff;
+}
+
+.montantTtc{
+    position:absolute;
+    left:1rem;
+    top:0.5rem;
+    font-weight:300;
+    font-size:24px;
 }

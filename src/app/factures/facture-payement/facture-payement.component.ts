@@ -18,11 +18,11 @@ export class FacturePayementComponent implements OnInit {
     public config: DynamicDialogConfig,
     private _formBuider: FormBuilder,
     private _formatService: FormatService,
+    private _factureServiceProxy: FactureServiceProxy
   )
    { 
 
-    console.log("this.config.data.status")
-    console.log(this.config.data)
+
 
    }
 
@@ -67,5 +67,15 @@ export class FacturePayementComponent implements OnInit {
   dateIsSelected = false
   selectDate(){
     this.dateIsSelected = true
+  }
+
+  async updateAmountRest(event){
+
+    let totalPayments = await this._factureServiceProxy
+    .getRestOfAmount(this.config.data.factureId)
+    .toPromise()
+
+    this.config.data.restAmount = this.config.data.factureTtc - totalPayments
+
   }
 }

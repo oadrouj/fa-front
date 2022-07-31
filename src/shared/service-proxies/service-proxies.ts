@@ -1226,7 +1226,6 @@ export class CustomAccountServiceProxy {
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
-        console.log(`OUSSAMA LOG FROM CUSTOM ACCOUNT PROXY ${this.baseUrl}`);
     }
 
     /**
@@ -3829,7 +3828,6 @@ export class FileApiServiceProxy {
 
         const content_ = new FormData();
         if (file !== null && file !== undefined){
-            console.log("Test isset(File) ")
             content_.append("file", file.data, file.fileName ? file.fileName : "file");
         }
 
@@ -4376,7 +4374,6 @@ export class InfosEntrepriseServiceProxy {
         let url_ = this.baseUrl + "/api/services/app/InfosEntreprise/UpdateTvaAndCurrency";
         url_ = url_.replace(/[?&]$/, "");
 
-        console.log(body);
         const content_ = JSON.stringify(body);
 
         let options_ : any = {

@@ -20,7 +20,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
     menuItemsMap: { [key: number]: MenuItem } = {};
     activatedMenuItems: MenuItem[] = [];
     routerEvents: BehaviorSubject<RouterEvent> = new BehaviorSubject(undefined);
-    homeRoute = '/app/Clients';
+    homeRoute = '/app/Dashboard';
 
     constructor(injector: Injector, private router: Router) {
         super(injector);
@@ -44,13 +44,13 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
 
     getMenuItems(): MenuItem[] {
         return [
-            new MenuItem("Tableau de bord", '/app/Dashboard', '../assets/img/DashboardIcon.png'),
-            new MenuItem("Clients", '/app/Clients', '../assets/img/ClientMeniItemIcon.png'),
-            new MenuItem("Catalogue", '/app/Catalogue', '../assets/img/CatalogueIcon.png'),
-            new MenuItem("Devis", '/app/Devis', '../assets/img/DevisIcon.png'),
-            new MenuItem("Factures", '/app/Factures', '../assets/img/FactureIcon.png'),
-            new MenuItem("Mon profil", '/app/Profil', '../assets/img/MonProfilIcon.png'),
-            new MenuItem("Paramètres", '/app/Parametres', '../assets/img/ParametreIcon.png')
+            new MenuItem("Tableau de bord", '/app/Dashboard', '../assets/img/icone-dash.png'),
+            new MenuItem("Clients", '/app/Clients', '../assets/img/icone-client.svg'),
+            new MenuItem("Catalogue", '/app/Catalogue', '../assets/img/icone-catalogue.png'),
+            new MenuItem("Devis", '/app/Devis', '../assets/img/devis-icone.png'),
+            new MenuItem("Factures", '/app/Factures', '../assets/img/icone-facture.png'),
+            new MenuItem("Mon profil", '/app/Profil', '../assets/img/icone-profil.png'),
+            new MenuItem("Paramètres", '/app/Parametres', '../assets/img/icone-settings.png')
             // ,
             // new MenuItem(
             //     this.l('Roles'),

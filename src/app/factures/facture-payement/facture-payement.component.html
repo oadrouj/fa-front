@@ -40,7 +40,7 @@
             </form>
         </p-tabPanel>
         <p-tabPanel header="Tous les paiements" *ngIf="this.config.data.tabPanelShowMode == 'both' || this.config.data.tabPanelShowMode == 'historic'">
-            <app-payment-history [factureId]="this.config.data.factureId" [currency]="currency"></app-payment-history>
+            <app-payment-history [factureId]="this.config.data.factureId" [currency]="currency" (payementDeleted)="updateAmountRest($event)"></app-payment-history>
 
         </p-tabPanel>
     </p-tabView>

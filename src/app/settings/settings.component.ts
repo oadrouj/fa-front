@@ -19,6 +19,7 @@ export class SettingsComponent implements OnInit, OnDestroy  {
 
   dynamicTitle = 'Paramètres';
   favIcon: HTMLLinkElement = document.querySelector('#favIcon')
+  pageTitle: HTMLElement = document.querySelector('#pageTitle')
   public $destroyed = new Subject<any>();
   
   formGroup: FormGroup; 
@@ -80,7 +81,8 @@ export class SettingsComponent implements OnInit, OnDestroy  {
       this.dynamicTitle = res
     })
 
-    this.favIcon.href = 'assets/img/ParametreIcon.png'
+  /*   this.favIcon.href = 'assets/img/ParametreIcon.png' */
+   this.pageTitle.innerText = 'Facturi | Paramétres'
     this.initForm()
     this.initFormPass();
     this.initFormMail();
@@ -147,7 +149,7 @@ export class SettingsComponent implements OnInit, OnDestroy  {
           if(result.currency != null) this.selectedDevise = result.currency; 
           this.setValueForm();
         }else{
-          console.log("No infos found");
+        
         }
       },
       error: error =>{
@@ -253,7 +255,7 @@ export class SettingsComponent implements OnInit, OnDestroy  {
             detail: 'Votre mot de passe a été modifié avec succés.',
           })
         }else{
-          console.log("An error has occured")
+        
         }
        
       },
@@ -310,7 +312,7 @@ export class SettingsComponent implements OnInit, OnDestroy  {
   refreshUserInfo(){
     let observer = {
       next: result => {
-        console.log(result);
+       
         this.userSubject.next(result);
       },
       error: error =>{

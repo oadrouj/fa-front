@@ -26,7 +26,6 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           if(result.currency != null) this.Currency = result.currency; 
           
         }else{
-          console.log("No infos found");
         }
       },
       error: error =>{
@@ -44,16 +43,18 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
 
   favIcon: HTMLLinkElement = document.querySelector('#favIcon')
+  pageTitle: HTMLElement = document.querySelector('#pageTitle')
+
   primaryColor = "dashboard"
   ngOnInit() {
     this.globalEventsService.announcedThePageChangedColorSubject(
       `#5CBCA6`,
     )
+    this.pageTitle.innerText ="Facturi | Tableau de bord"
   }
 
   ngAfterViewInit(){
-    console.log(this.col1.nativeElement.offsetHeight);
-    console.log(this.col2.nativeElement.offsetHeight);
+
 
   }
 

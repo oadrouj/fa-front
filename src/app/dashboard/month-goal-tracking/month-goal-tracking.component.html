@@ -17,11 +17,11 @@
             <div class="grid pt-3 text-2xl ">
                 <div class="col-6 color-dashboard">
                     <span class="block">ACCOMPLI</span>
-                    <span>{{accomplishedAmount | number:'1.2-2' }} {{currency}}</span>
+                    <span>{{accomplishedAmount | number:'1.0-0' }} {{currency}}</span>
                 </div>
-                <div class="col-6 color-yellow" *ngIf="monthTargetAmount - accomplishedAmount > 0">
+                <div class="col-6 color-yellow" *ngIf="monthTargetAmount - accomplishedAmount >= 0">
                     <span class="block">RESTANT</span>
-                    <span>{{ monthTargetAmount - accomplishedAmount | number:'1.2-2' }} {{currency}}</span>
+                    <span>{{ monthTargetAmount - accomplishedAmount | number:'1.0-0' }} {{currency}}</span>
                 </div>
                 <div class="col-6 color-yellow" *ngIf="monthTargetAmount - accomplishedAmount < 0">
                     <span class="block">RESTANT</span>
@@ -31,7 +31,7 @@
         </div>
         <div class="col-4 relativeParent">
             <div class="customValueTooltip d-flex justify-content-center align-items-center">
-                <span class="inline-block">{{progressRate | number:'1.2-2'}} %</span>
+                <span class="inline-block">{{progressRate | number:'1.0-0'}}<span class="color-dashboard">%</span></span>
             </div>
           
             <div id="slider1" >

@@ -49,13 +49,12 @@ export class ActivityLogComponent implements OnInit {
          
         if(item.logType == 'catalog')
          item.amount = undefined;
-        
-        console.log(item)
+
         return item
       
     }) as any)
     this.activityLogItems=this.activityLogItems.slice(0,5)
-    console.log(this.activityLogItems)
+  
   })
   }
 
@@ -115,13 +114,11 @@ export class ActivityLogComponent implements OnInit {
           
          if(item.logType == 'catalog')
           item.amount = undefined;
-         
-         console.log(item)
+ 
          return item
        
      }) as any)
  
-     console.log(this.activityLogAllItems)
 })
 }
 }

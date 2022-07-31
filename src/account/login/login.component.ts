@@ -96,7 +96,7 @@ export class LoginComponent extends AppComponentBase implements OnInit {
   envoyerMail(): void {
     this.iconClassesMail="pi pi-spin pi-spinner";
 
-    console.log(this.emailAdress)
+
     this._customAccountService.sendResetPasswordMail(this.emailAdress)
     .pipe(finalize(() => {this.iconClassesMail=""; }))
     .subscribe({

@@ -6,7 +6,7 @@ import * as moment from 'moment'
   selector: 'app-periodic-tracking',
   templateUrl: './periodic-tracking.component.html',
   styleUrls: ['./periodic-tracking.component.css'],
-  host: {
+   host: {
     '(document:click)': 'onClick($event)',
   },
 })
@@ -28,6 +28,9 @@ export class PeriodicTrackingComponent implements OnInit {
   @ViewChild("start_date") start_date :ElementRef
   @ViewChild("end_date") end_date :ElementRef
 
+  /* @ViewChild("start_date") start_Date
+  @ViewChild("end_date") end_Date
+ */
   @Input() currency : string;
 
   constructor(private _statisticsServiceProxy: StatisticsServiceProxy) {}
@@ -67,7 +70,7 @@ export class PeriodicTrackingComponent implements OnInit {
       this.transformationPercentage = ((this.transformedInvoicesAmount * 100) / this.totalEstimatesAmount ) || 0
 
       this.bestsellerList = res.bestsellerPeriodicTrackingDto
-      console.log('res: '+JSON.stringify(res));
+   
       
       this.bestsellerTotalAmounts = this.bestsellerList.length && (res.bestsellerPeriodicTrackingDto
         .map((item) => item.amount)
@@ -75,13 +78,11 @@ export class PeriodicTrackingComponent implements OnInit {
 
       this.topClientsList = res.topClientsPeriodicTrackingDto
 
-      console.log("this.bestsellerList: "+ JSON.stringify(this.bestsellerList));
       
     })
   }
 
   getBestsellerPercentage(amount) {
-    console.log("getBestsellerPercentage: "+(amount * 100) / this.bestsellerTotalAmounts);
     return (amount * 100) / this.bestsellerTotalAmounts
   }
 
@@ -109,7 +110,34 @@ export class PeriodicTrackingComponent implements OnInit {
   }
 
   onClick(event) {
-      if (!this.start_date.nativeElement.contains(event.target)) console.log("Clcked outside calendar")    
+    if (!document.getElementById('start_date').contains(event.target) && !document.getElementById('start_date_btn').contains(event.target)){ // Clicked outside box
+      if(this.startDateInline) this.startDateInline = !this.startDateInline;
+    }
+    if (!document.getElementById('end_date').contains(event.target) && !document.getElementById('end_date_btn').contains(event.target)){ // Clicked outside box
+      if(this.endDateInline) this.endDateInline = !this.endDateInline;
+    }
+
+   
+
+
+
   }
+
+  clickedOutside(e){
+    
+    this.endDateInline = !this.endDateInline;
+  }
+
+ /*  openStartDate(event: any){
+    this.start_Date.showOverlay(this.start_Date.inputfieldViewChild.nativeElement);
+    event.stopPropagation();
+  }
+
+  openEndDate(event: any){
+    this.end_Date.showOverlay(this.end_Date.inputfieldViewChild.nativeElement);
+    event.stopPropagation();
+  }
+ */
+
   
 }

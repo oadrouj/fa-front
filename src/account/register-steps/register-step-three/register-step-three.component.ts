@@ -18,6 +18,7 @@ export class RegisterStepThreeComponent implements OnInit {
   code: number
   selectedMonth = 1
   handlePosition = '0%'
+  height: string
 
   constructor(
     private _authService: AppAuthService,
@@ -37,9 +38,13 @@ export class RegisterStepThreeComponent implements OnInit {
   }
 
   changeSlider(event) {
-    console.log(event)
     this.handlePosition = (document.querySelector(
       '.p-slider-handle',
     ) as HTMLElement).style.bottom
+
+    this.height = parseInt(this.handlePosition) * 33.5 / 100 + 'rem'
+  
+  
+
   }
 }

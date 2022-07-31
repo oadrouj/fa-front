@@ -11,13 +11,13 @@
             <div id="body-se-connecter" class="mt-6 mb-3 mx-6">
                 <div class="input-block">
                     <label for="input-nom-utilisateur" class="login-gray-color">Email</label>
-                    <input id="input-nom-utilisateur" type="text" pInputText name="userNameOrEmailAddress" placeholder="Votre nom d'utilisateur ici ..." [(ngModel)]="authService.authenticateModel.userNameOrEmailAddress">
+                    <input id="input-nom-utilisateur" type="text" pInputText name="userNameOrEmailAddress" placeholder="" [(ngModel)]="authService.authenticateModel.userNameOrEmailAddress">
                 </div>
                 <div class="input-block pt-2">
                     <label for="input-mdp" class="login-gray-color">Mot de passe</label>
                     <div class="p-inputgroup">
                         <input
-                        id="input-mdp" pInputText name="password" placeholder="Votre mot de passe ici ..." [(ngModel)]="authService.authenticateModel.password"
+                        id="input-mdp" pInputText name="password" placeholder="" [(ngModel)]="authService.authenticateModel.password"
                         class= "w-100"  [type]="hidePass ? 'password':'text'" />
                         <div class="p-inputgroup-addon">
                           <i  class="cursor-pointer fa" [ngClass]="{
@@ -56,7 +56,7 @@
                 </div>
             </div>
             <!-- <img src="../../assets/img/LogoFacturi.png" class="logo-facturi"> -->
-            <div class="mx-auto" style="width:85%;margin-top: 10px; padding-left: 2%;padding-right: 2%;">
+            <div class="w-100 px-4" style="margin-top: 10px;">
                 <p class="text" style="font-size:0.95rem;font-weight:600;text-align:left;">Saisisez l'adresse mail associée à votre compte, et nous vous y enverons les instructions pour réinitialiser votre mot de passe.</p>
             </div>
 
@@ -90,7 +90,7 @@
                 </div>
             </div>
             <!-- <img src="../../assets/img/LogoFacturi.png" class="logo-facturi"> -->
-            <div id="mail-sent-content" class="mx-auto mb-3" style="width:85%;margin-top: 10px; padding-left: 2%;padding-right: 2%;">
+            <div id="mail-sent-content" class="w-100 px-4 mb-3" style="margin-top: 10px;">
                 <p class="text" style="font-size:1.25rem;font-weight:600;text-align:center;">Lien de réinitialisation envoyé avec succés !</p>
                 <p class="text" style="font-size:1rem;font-weight:600;text-align:center;">Nous vous invitons à consulter votre boite email et cliquez sur le lien de réinitialisation</p>
             </div>
@@ -107,7 +107,7 @@
                 </div>
             </div>
             
-            <div class="mx-auto" style="width:85%;margin-top: 10px; padding-left: 2%;padding-right: 2%;">
+            <div class="w-100 px-4" style="margin-top: 10px;">
                 <p class="text" style="font-size:1.25rem;font-weight:600;text-align:left;">Saisisez votre nouveau mot de passe</p>
                 <p class="text" style="font-size:0.95rem;font-weight:600;text-align:left;">Votre mot de passe doit contenir en moins un caractère en miniscule, un caractère en majuscule, un chiffre et un caractère spécial.</p>
             </div>
@@ -115,7 +115,7 @@
 
               <!--   <p class="title">Saisisez votre nouveau mot de passe</p>
                 <p class="text">Votre mot de passe doit contenir en moins un caractère en miniscule, un caractère en majuscule, un chiffre et un caractère spécial.</p> -->
-                <div class="input-block px-5">
+                <div class="input-block px-4">
                   <!--   <label for="input-mdp-res text-left">Mot de passe</label> -->
                     <input required id="input-mdp-res" type="password" pInputText name="password$" placeholder="" [(ngModel)]="password" #password$="ngModel" (change)="validatePassword()" autocomplete="new-password">
                 </div>
@@ -125,13 +125,13 @@
                 <div *ngIf="password$.touched">
                     <span *ngIf="password$.errors?.required" class="validationMessage">Veuillez saisir un mot de passe</span>
                 </div>
-                <div class="mx-auto" style="width:85%;margin-top: 10px; padding-left: 2%;padding-right: 2%;">
+                <div class="w-100 px-4" style="margin-top: 10px;">
                     <p class="text" style="font-size:1.25rem;font-weight:600;text-align:left;">Saisisez votre nouveau mot de passe</p>
                     <p class="text" style="font-size:0.95rem;font-weight:600;text-align:left;">Votre mot de passe doit contenir en moins un caractère en miniscule, un caractère en majuscule, un chiffre et un caractère spécial.</p>
                 </div>
 
                 
-                <div class="input-block px-5" >
+                <div class="input-block px-4" >
                     <input required id="input-mdp-resc" type="password" pInputText name="passwordConfirm$"
                     placeholder="" [(ngModel)]="passwordConfirm" #passwordConfirm$="ngModel" (change)="validatePasswordConfirm()" autocomplete="new-password">
                 </div>
@@ -139,7 +139,7 @@
                     <span *ngIf="passwordConfirm$.errors?.required" class="validationMessage">Veuillez confirmer votre mot de passe</span>
                     <span class="validationMessage" *ngIf="passwordDontMatch">Les deux mots de passe ne correspondent pas !</span>
                 </div>
-                <div class="div-buttons px-5 mt-3 mb-3">
+                <div class="div-buttons px-4 mt-3 mb-3">
                     <p-button [disabled]="password$.invalid || passwordConfirm$.invalid || passwordDontMatch || passwordDidntRepectRegex" id="btn-se-connecter" label="Réinitialiser" (click)="reinitialiser()" styleClass="bg-purple" [icon]="iconClassesReset"></p-button>
                 </div>
            

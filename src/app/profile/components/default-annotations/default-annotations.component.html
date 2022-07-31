@@ -4,23 +4,23 @@
     <div class="grid pt-5">
         <ng-container *ngIf="this.formGroup.get('selectedType').value == 'Devis'; else elseTemplate">
             <div class="col-6">
-                <app-textarea-group [control]="this.formGroup.get('estimateIntroMessage')" [labelText]="'Message d’introduction'" [placeholder]="' A l’attention de M./Mme... '">
+                <app-textarea-group [control]="this.formGroup.get('estimateIntroMessage')" [labelText]="'Message d’introduction'" [placeholder]="''">
                 </app-textarea-group>
             </div>
 
             <div class="col-6">
-                <app-textarea-group [control]="this.formGroup.get('estimateFooter')" [labelText]="'Pied de page'" [placeholder]="'T.V.A non applicable (Art. 32 du C.G.I), Merci pour votre confiance'">
+                <app-textarea-group [control]="this.formGroup.get('estimateFooter')" [labelText]="'Pied de page'" [placeholder]="''">
                 </app-textarea-group>
             </div>
         </ng-container>
         <ng-template #elseTemplate>
             <div class="col-6">
-                <app-textarea-group [control]="this.formGroup.get('invoiceIntroMessage')" [labelText]="'Message d’introduction'" [placeholder]="' A l’attention de M./Mme... '">
+                <app-textarea-group [control]="this.formGroup.get('invoiceIntroMessage')" [labelText]="'Message d’introduction'" [placeholder]="''">
                 </app-textarea-group>
             </div>
 
             <div class="col-6">
-                <app-textarea-group [control]="this.formGroup.get('invoiceFooter')" [labelText]="'Pied de page'" [placeholder]="'T.V.A non applicable (Art. 32 du C.G.I), Merci pour votre confiance'">
+                <app-textarea-group [control]="this.formGroup.get('invoiceFooter')" [labelText]="'Pied de page'" [placeholder]="''">
                 </app-textarea-group>
             </div>
         </ng-template>

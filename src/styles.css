@@ -28,7 +28,7 @@
     --orange-color: #EBA20C;
     --light-orange-color: #F2E4C8;
     --light-orangee-color: #e6d6b8;
-
+    --light-yello-color: #e4e49d;
     --bg-color: #F1F6FF;
     --gray-color: #9A9FA8;
     --light-gray-color: #DDDDDD;
@@ -65,7 +65,9 @@
 .color-white {
     color: #fff !important;
 }
-
+.color-black {
+    color: #131313 !important;
+}
 .color-green {
     color: var(--green-color) !important;
 }
@@ -227,5 +229,5 @@ tr) {
   }
 
   .p-menu{
-    width: 13.5rem !important;
+    width: 180px !important;
   }

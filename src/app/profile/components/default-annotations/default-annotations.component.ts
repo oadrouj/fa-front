@@ -90,11 +90,8 @@ export class DefaultAnnotationsComponent implements OnInit {
   }
 
   changeProfileContainerTitle(){
-    console.log(this.dto)
+
     this._changeProfileContainerTitleService.changeTitleEvent(this.formGroup.get('selectedType').value)
-   
-
-
   }
 
 }

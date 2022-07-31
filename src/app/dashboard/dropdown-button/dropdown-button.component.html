@@ -1,16 +1,16 @@
 <div class="position-relative inline-flex">
-    <button pButton pRipple type="button" [label]="label" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg" (click)="toggleDropdown()">
+    <button id="drop-btn" pButton pRipple type="button" [label]="label" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg drop-btn" (click)="toggleDropdown()">
         <img [src]="getImageSrc()" alt="" class="mr-2">
     </button>
     <ng-container [ngSwitch]="dropdownType">
         <ng-container *ngSwitchCase="'calendar'">
-            <p-calendar class="z-1" [(ngModel)]="fullDate" [inline]="dateInline" (onSelect)="selectFullDate()">
+            <p-calendar id="drop-calendar" class="z-1" [(ngModel)]="fullDate" [inline]="dateInline" (onSelect)="selectFullDate()">
             </p-calendar>
         </ng-container>
 
         <ng-container class="z-1" *ngSwitchCase="'listBox'">
             <!-- <p-calendar [(ngModel)]="yearDate" [inline]="dateInline" view="year" dateFormat="yy" (onSelect)="selectYearDate()"></p-calendar> -->
-            <p-listbox #lst [options]="listOptions" [(ngModel)]="selectedOption" (onClick)="onListClick()" [display]="'none'"></p-listbox>
+            <p-listbox id="drop-list" class="drop-list" #lst [options]="listOptions" [(ngModel)]="selectedOption" (onClick)="onListClick()" [display]="'none'"></p-listbox>
 
         </ng-container>
 

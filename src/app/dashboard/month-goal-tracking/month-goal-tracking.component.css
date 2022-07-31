@@ -23,13 +23,15 @@
         transform: translate(-50%, -50%);
         line-height: 2.5rem;
         top: 43%;
-        margin-top: 0;
+        margin-top: 8px;
         margin-left: 0;
     }
     /*  */
     
     #slider1 {
-        margin-top: -0.75rem;
+      /*   margin-top: -0.75rem; */
+      position: absolute;
+      top:0;bottom:0;left:0;right:0;
     }
     .relativeParent {
         position:relative;
@@ -37,16 +39,18 @@
 
     .customValueTooltip{
         position: absolute;
-        top:-32px;bottom:0;left:0;right:25px;
+        top:0;bottom:0;left:0;right:0;
         display:flex;
         justify-content: center;
         align-items: center;
     }
 
-    .customValueTooltip span{
+    .customValueTooltip>span{
         display:inline-block;
-        font-size : 1.75rem;
+        font-size : 1.4rem;
         font-weight:700;
         line-height : 1.5rem;
         margin:auto;
+        transform: translate(0%, -30%);
+       
     }

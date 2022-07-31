@@ -60,7 +60,6 @@ export class AppAuthService {
 
     public saveAccessTokenAfterSignup(authenticateModel: AuthenticateModel){
         this._tokenAuthService.getAccessToken(authenticateModel).subscribe(res => {
-            console.log(res);
             this._tokenService.setToken(res.accessToken, new Date(new Date().getTime() + 1000 * res.expireInSeconds))
         })
     }

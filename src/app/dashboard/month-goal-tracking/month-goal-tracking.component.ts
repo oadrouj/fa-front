@@ -18,6 +18,9 @@ export class MonthGoalTrackingComponent implements OnInit {
   @ViewChild("inplace") inplace 
   accomplishedAmountPercentage: any;
   @Input() currency : string;
+  sliderPosY;
+  sliderWidth;
+  sliderHeight;
 
   constructor(
     private _statisticsServiceProxy: StatisticsServiceProxy,
@@ -29,12 +32,10 @@ export class MonthGoalTrackingComponent implements OnInit {
       this.monthTargetAmount = res.monthTargetAmount 
       this.accomplishedAmount = res.accomplishedAmount
 
-      console.log(this.accomplishedAmount)
-      console.log(this.monthTargetAmount)
-      console.log(this.accomplishedAmount * 100 / this.monthTargetAmount)
+
 
       this.progressRate = this.accomplishedAmount * 100 / this.monthTargetAmount;
-      console.log('OUSSAMA LOG: ',this.progressRate);
+   
 
        $("#slider1").roundSlider({
         value: this.progressRate,
@@ -61,6 +62,16 @@ export class MonthGoalTrackingComponent implements OnInit {
       });
       this.updateSlider(this.accomplishedAmount * 100 / this.monthTargetAmount)
       this.applySliderStyles() 
+      
+      this.sliderWidth = (document.getElementById('slider1') as HTMLElement).style.width;
+      this.sliderHeight = (document.getElementById('slider1') as HTMLElement).style.height;
+
+
+
+      (document.getElementsByClassName('relativeParent')[0] as HTMLElement).style.height = this.sliderHeight;
+      (document.getElementsByClassName('relativeParent')[0] as HTMLElement).style.width = this.sliderWidth;
+
+
     })
 
     
@@ -97,7 +108,7 @@ export class MonthGoalTrackingComponent implements OnInit {
     tooltip.style.fontSize = '1.75rem';
     tooltip.style.transform = 'translate(-50%, -50%)';
     tooltip.style.lineHeight = '1.5rem';
-    tooltip.style.top = '55% !important';
+    tooltip.style.top = '60% !important';
     tooltip.style.marginTop = '0';
     tooltip.style.marginLeft = '0';
   }
@@ -114,7 +125,6 @@ export class MonthGoalTrackingComponent implements OnInit {
      this._statisticsServiceProxy.createOrUpdateMonthTargetAmount(this.newMonthTargetAmount)
       .subscribe(res => {
         if(res){
-          console.log("Salama ya rbi");
           this.monthTargetAmount = this.newMonthTargetAmount
           this.progressRate = this.accomplishedAmount * 100 / this.monthTargetAmount;
 

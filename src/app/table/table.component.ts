@@ -44,6 +44,9 @@ export class TableComponent implements OnInit {
   @Input() highlightColorInput: string
   @Input() cols: any
   @Input() currency!: string
+  @Input() totalPending!: number
+  @Input() totalOverdue!: number
+
   @Input() styleClass!: string
   @Input() styleId!: string
   @Input() loadLazy!: (event: any) => void
@@ -128,8 +131,6 @@ export class TableComponent implements OnInit {
   onRowSelect(event: any) {
     this._lazyTableService.emitRowSelected = event.data
     this.selectedIndex=event.data.id;
-    console.log(this.selectedIndex);
-  
   }
 
   onRowUnselect() {
@@ -142,7 +143,7 @@ export class TableComponent implements OnInit {
       // this.tableData = Array.from({length: res.length})
       // this.tableData.splice(event.first, event.rows, ...res.items);
       // if(res.items.length){
-        console.log("Table data reloaded")
+       
         this.loading = false;
 
         this.tableData = [...res.items]
@@ -205,7 +206,7 @@ export class TableComponent implements OnInit {
   }
 
   customSort(event: SortEvent) {
-    console.log("Salam from sort")
+   
     event.data.sort((data1, data2) => {
         let value1 = data1[event.field];
         let value2 = data2[event.field];

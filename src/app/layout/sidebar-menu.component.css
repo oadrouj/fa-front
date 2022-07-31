@@ -2,3 +2,77 @@
     background-color: transparent;
     color: #2A95D1;
 }
+
+:host >>> .active-dashboard{
+    color: var(--dashboard-color);
+    background-color: transparent;
+}
+
+:host >>> .menu-dashboard:hover, :host >>> .menu-dashboard:focus{
+    color: var(--dashboard-color) !important;
+    background-color: transparent;
+    cursor:pointer;
+}
+
+:host >>> .active-client{
+    color: var(--blue-color);
+    background-color: transparent;
+}
+
+:host >>> .menu-client:hover, :host >>> .menu-client:focus{
+    color: var(--blue-color) !important;
+    background-color: transparent;
+    cursor:pointer;
+}
+:host >>> .active-catalogue{
+    color: var(--purple-color);
+    background-color: transparent;
+}
+
+:host >>> .menu-catalogue:hover, :host >>> .menu-catalogue:focus{
+    color: var(--purple-color) !important;
+    background-color: transparent;
+    cursor:pointer;
+}
+
+:host >>> .active-devis{
+    color: var(--green-600);
+    background-color: transparent;
+}
+
+:host >>> .menu-devis:hover, :host >>> .menu-devis:focus{
+    color: var(--green-600) !important;
+    background-color: transparent;
+    cursor:pointer;
+}
+
+:host >>> .active-facture{
+    color: var(--orange-color);
+    background-color: transparent;
+}
+
+:host >>> .menu-facture:hover, :host >>> .menu-facture:focus{
+    color: var(--orange-color) !important;
+    background-color: transparent;
+    cursor:pointer;
+}
+:host >>> .active-profil{
+    color: var(--dark-orange-color);
+    background-color: transparent;
+}
+
+:host >>> .menu-profil:hover, :host >>> .menu-profil:focus{
+    color: var(--dark-orange-color) !important;
+    background-color: transparent;
+    cursor:pointer;
+}
+:host >>> .active-settings{
+    color: var(--green-600);
+    background-color: transparent;
+}
+
+:host >>> .menu-settings:hover, :host >>> .menu-settings:focus{
+    color: var(--green-600) !important;
+    background-color: transparent;
+    cursor:pointer;
+}

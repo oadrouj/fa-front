@@ -71,13 +71,13 @@
 }
 
 .estimate-circle-percentage-text {
-    font-size: 0.45rem;
+    font-size: 0.35rem;
     transform: rotate(-22.5deg);
 }
 
 :host>>>.p-progressbar {
     display: inline-flex;
-    width: 50%;
+    width:30%;
     background: transparent;
     height: .35rem;
     background: rgba(92, 188, 166, .45);

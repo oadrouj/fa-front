@@ -4,25 +4,30 @@
         </h4>
         <div class="flex">
             <div class="position-relative mr-4">
-                <button pButton pRipple type="button" [label]="'Début'" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg" (click)="startDateInline=!startDateInline">
+                <button id="start_date_btn" pButton pRipple type="button" [label]="'Début'" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg" (click)="startDateInline = !startDateInline">
                     <img src="assets/img/dashbord-date.png" alt="" class="mr-2">
                 </button>
-                <p-calendar #start_date [(ngModel)]="startDate" [inline]="startDateInline" (onSelect)="selectStartDate()">
+                <p-calendar id="start_date" #start_date [(ngModel)]="startDate" [inline]="startDateInline" (onSelect)="selectStartDate()">
                 </p-calendar>
             </div>
             <div class="position-relative">
-                <button pButton pRipple type="button" [label]="'Fin'" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg" (click)="endDateInline=!endDateInline">
-                    <img src="assets/img/dashbord-date.png" alt="" class="mr-2">
+                <button id="end_date_btn" pButton pRipple type="button" [label]="'Fin'" icon="pi pi-chevron-down" iconPos="right" class="light-gray-bg" (click)="endDateInline =  !endDateInline">
+                    <img src="assets/img/dashbord-date.png" alt="" class="mr-2"> 
                 </button>
-                <p-calendar #end_date [(ngModel)]="endDate" [inline]="endDateInline" (onSelect)="selectEndDate()"></p-calendar>
+
+                <p-calendar id="end_date" #end_date [inline]="endDateInline" [(ngModel)]="endDate" (onSelect)="selectEndDate()"></p-calendar>
+           
+              
+             <!--    <p-calendar  #end_date [(ngModel)]="endDate" (onSelect)="selectEndDate()" [showIcon]="true" inputId="icon"></p-calendar> -->
+ 
             </div>
         </div>
 
     </div>
     <div class="grid pt-4">
         <div class="col-3">
-            <h4>Factures</h4>
-            <div>
+            <h4 class="">Factures</h4>
+            <div class="d-flex justify-content-center">
                 <svg viewBox="0 0 36 36" class="invoice-circular-chart text-an">
 
                     <path class="circle" stroke='#EFF3FB' [attr.stroke-dasharray]="[100]" d="M18 2.0845
@@ -94,8 +99,8 @@
                             a 15.9155 15.9155 0 0 1 0 -31.831" />
                         <text x="25%" y="18" class="estimate-circle-text ">Taux de </text>
                         <text x="25%" y="22" class="estimate-circle-text ">transformation</text>
-                        <text x="25%" y="31"
-                            class="estimate-circle-percentage-text ">{{(transformationPercentage || 0) | number:'1.2-2' }}%</text>
+                        <text x="29%" y="31"
+                            class="estimate-circle-percentage-text ">{{(transformationPercentage || 0) | number:'1.0-0'}}%</text>
                     </svg>
                 </div>
             </div>
@@ -104,14 +109,16 @@
                 <h4>Top Ventes</h4>
                 <div class="pl-2">
                     <div *ngFor="let item of bestsellerList" class="">
-                        <div class="w-6rem inline-flex">
-                            <span class="">{{item.catalogName | slice: 0:18}}</span>
-                        </div>
-                        <p-progressBar [value]="getBestsellerPercentage(item.amount)" [showValue]="true">
-                        </p-progressBar>
-                        <div class="product-price text-xl text-right inline-flex ml-3">
-                            <span>{{item.amount | number:'1.2-2' }} {{currency}}</span>
-                        </div>
+                        <ng-container *ngIf="item.amount > 0">
+                            <div class="inline-flex" style="width:33%;">
+                                <span class="" [title]="item.catalogName">{{item.catalogName | slice: 0:15}} <span *ngIf="item.catalogName.length > 15">...</span></span>
+                            </div>
+                            <p-progressBar [value]="getBestsellerPercentage(item.amount)" [showValue]="true">
+                            </p-progressBar>
+                            <div class="product-price text-xl text-right inline-flex ml-3" style="width:33%;">
+                                <span class="w-100">{{item.amount | number:'1.2-2' }} {{currency}}</span>
+                            </div>
+                        </ng-container>
                     </div>
                 </div>
             </div>
@@ -125,7 +132,7 @@
                 <div *ngFor="let item of topClientsList; let i=index" class="mt-2" [ngClass]="'text-' + topClientFontSizesList[i]">
                     <div>
                         <span class="order font-semibold">{{i + 1}} . </span>
-                        <span>{{item.clientName}}</span>
+                        <span [title]="item.clientName">{{item.clientName | slice: 0:20}} <span *ngIf="item.clientName.length > 20">...</span></span>
                     </div>
                     <span class="client-amount color-dashboard">{{item.amount}} {{currency}}</span>
                 </div>

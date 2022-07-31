@@ -1,6 +1,7 @@
 :host>>>.main-sidebar {
     width: 14% !important;
     overflow-y: hidden !important;
+    min-width: 150px;
 }
 
 :host>>>.sidebar {

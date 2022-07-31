@@ -5,7 +5,10 @@ import { Listbox } from 'primeng/listbox';
 @Component({
   selector: 'app-dropdown-button',
   templateUrl: './dropdown-button.component.html',
-  styleUrls: ['./dropdown-button.component.css']
+  styleUrls: ['./dropdown-button.component.css'],
+  host: {
+   '(document:click)': 'onClick($event)',
+ },
 })
 export class DropdownButtonComponent implements OnInit, AfterViewInit{
   listBoxDisplay: any
@@ -83,5 +86,35 @@ export class DropdownButtonComponent implements OnInit, AfterViewInit{
 
     else
       return 'assets/img/dashbord-date.png'
+  }
+
+
+  onClick(event) {
+    if(document.getElementById('drop-calendar')){
+
+      if (!document.getElementById('drop-btn').contains(event.target) && !document.getElementsByClassName('drop-calendar')[0].contains(event.target)){ // Clicked outside box
+        if(this.dateInline) this.dateInline = !this.dateInline;
+      }
+    }
+    if(document.getElementsByClassName('drop-list')[0]){
+
+      if (!document.getElementsByClassName('drop-btn')[0].contains(event.target) && !document.getElementsByClassName('drop-list')[0].contains(event.target)){ // Clicked outside box
+        (document.getElementsByClassName('drop-list')[0]as HTMLElement).style.display="none";
+   
+    }else{
+        (document.getElementsByClassName('drop-list')[0] as HTMLElement).style.display="block";
+    }
+    }
+    if(document.getElementsByClassName('drop-list')[1]){
+
+       if (!document.getElementsByClassName('drop-btn')[1].contains(event.target) && !document.getElementsByClassName('drop-list')[1].contains(event.target)){ // Clicked outside box
+          (document.getElementsByClassName('drop-list')[1]as HTMLElement).style.display="none";
+     
+      }else{
+          (document.getElementsByClassName('drop-list')[1] as HTMLElement).style.display="block";
+
+      }
+      
+    }
   }
 }

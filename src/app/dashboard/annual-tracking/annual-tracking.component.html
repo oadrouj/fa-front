@@ -39,7 +39,7 @@
         </div>
 
         <div>
-            <app-dropdown-button class="mr-4" [label]="busnissDocumentDropdownButtonLabel" [dropdownType]="'listBox'" [listOptions]="['Factures', 'Devis']" [imagesSrc]="busnissDocummentImagesSrc" (clickEventEmit)="updateBusnissDocumentValue($event)">
+            <app-dropdown-button id="doc_type" class="mr-4" [label]="busnissDocumentDropdownButtonLabel" [dropdownType]="'listBox'" [listOptions]="['Factures', 'Devis']" [imagesSrc]="busnissDocummentImagesSrc" (clickEventEmit)="updateBusnissDocumentValue($event)">
             </app-dropdown-button>
 
             <app-dropdown-button [label]="yearDropdownButtonLabel" [dropdownType]="'listBox'" [listOptions]="years" (clickEventEmit)="updateYearValue($event)"></app-dropdown-button>

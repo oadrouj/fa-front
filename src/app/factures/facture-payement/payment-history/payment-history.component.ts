@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FactureDto, FactureServiceProxy, FactureStatutEnum } from '@shared/service-proxies/service-proxies';
 import { FormatService } from '@shared/services/format.service';
 import { ToastService } from '@shared/services/toast.service';
@@ -20,6 +20,9 @@ export class PaymentHistoryComponent implements OnInit {
 
   @Input() currency = 'MAD'
   @Input() factureId: number;
+  @Output() payementDeleted = new EventEmitter<boolean>(); 
+  
+  
   paymentHistoryItems: any
   totalRecords
 
@@ -44,10 +47,11 @@ export class PaymentHistoryComponent implements OnInit {
   }
  
   deletePayement(facturePayement){
-    console.log(facturePayement);
+
 
     this._factureServiceProxy.deleteFactureInfosPaiement(facturePayement.id)
     .subscribe(res => {
+       this.payementDeleted.emit(true) 
       this._toastService.success({
         summary: 'Opération réussie',
         detail: 'Réglement supprimé avec succés',

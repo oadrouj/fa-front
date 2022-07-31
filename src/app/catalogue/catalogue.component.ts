@@ -48,7 +48,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
   selectedType: string
   cols = [
     {
-      header: 'REFERENCE',
+      header: 'RÉF',
       field: 'reference',
       type: 'text',
       format: (number, customPrefix) =>
@@ -58,7 +58,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
         ),
     },
     {
-      header: "DATE D'AJOUT",
+      header: "AJOUT",
       field: 'addedDate',
       type: 'date',
       format: (date) => date.toDate(),
@@ -86,7 +86,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
       suffix: '%',
     },
     {
-      header: 'TOTAL VENTES',
+      header: 'VENTES',
       field: 'totalSalesTTC',
       type: 'currency',
     },
@@ -99,6 +99,7 @@ export class CatalogueComponent implements OnInit, OnDestroy {
   tvaOptions = [7,10, 14, 20]
   unityOptions = ['Heures', 'Kg']
   favIcon: HTMLLinkElement = document.querySelector('#favIcon')
+  pageTitle: HTMLElement = document.querySelector('#pageTitle')
 
   constructor(
     private _formatService: FormatService,
@@ -114,13 +115,11 @@ export class CatalogueComponent implements OnInit, OnDestroy {
     let observer = {
       next: result=> {
         if (result){
-          console.log(result.tva);
           
           if(result.currency != null) this.Currency = result.currency; 
           if(result.tva != null) this.Tva =  parseInt(result.tva.slice(0, -1)); 
           
         }else{
-          console.log("No infos found");
         }
       },
       error: error =>{
@@ -144,7 +143,8 @@ export class CatalogueComponent implements OnInit, OnDestroy {
       `var(--${this.primaryColor}-color`,
     )
 
-    this.favIcon.href = 'assets/img/CatalogueLogo.png'
+   /*  this.favIcon.href = 'assets/img/CatalogueLogo.png' */
+   this.pageTitle.innerText ="Facturi | Catalogue"
 
     this.initiateFormGroup()
 

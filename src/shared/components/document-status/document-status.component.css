@@ -12,15 +12,20 @@
 .span-orange{
     background-color: var(--light-orangee-color);
 }
-
+.span-orange{
+    background-color: var(--light-orangee-color);
+}
 .span-red{
     background-color: var(--light-red);
-}
+ }
 .span-grey{
     background-color: #c6c6c6;
 }
 .span-blue{
     background-color: var(--light-yellow-color);
+}
+.span-yellow{
+    background-color: var(--light-yello-color) !important;
 }
 .tag-status{
     padding: 4px 10px;

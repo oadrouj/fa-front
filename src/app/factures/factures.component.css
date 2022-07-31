@@ -69,8 +69,8 @@ i.pi-search {
 :host>>>.filterContainer .p-calendar .p-inputtext,
 :host>>>.filterContainer .p-inputnumber-input {
     border: none;
-    margin-right: 6px;
-    width: 82px;
+    margin-right: 4px;
+    width: 68px;
 }
 
 :host>>>.filterContainer .p-inputtext,

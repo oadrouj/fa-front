@@ -119,11 +119,7 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
     this.uploadedImage = event.files[0]
     this.shouldShowDefaultImage = false
 
-    /* this.cropperCleanImageURL = this._sanitizer.bypassSecurityTrustUrl(event.files[0].objectURL);
-    console.log(this.cropperCleanImageURL);
-    console.log(this.cropperCleanImageURL.changingThisBreaksApplicationSecurity);
-    this.imageChangedEvent = event.originalEvent; */
-
+  
   }
 
   clear() {
@@ -249,17 +245,11 @@ export class GeneralInfoComponent implements OnInit, AfterViewInit {
         this._infosEntrepriseService.createInfosEntreprise(createInfosEntrepriseInput)
         .pipe(first(),finalize(() => {this.iconSpin=""; }))
         .subscribe((res) => {
-          // console.log(res);
-          // if (res) {
+          
             this._toastService.success({
               detail: 'Les informations générales sont ajoutées',
             })
-          // } 
-          // else {
-            // this._toastService.error({
-              // detail: 'Une erreur s\'est produite lors de l\' ajout',
-            // })
-          // }
+          
         })
       }
     

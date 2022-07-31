@@ -442,7 +442,7 @@ export class EstimateInvoiceDialogComponent implements OnInit {
           this.disableValidationClass()
           document.body.style.overflow = 'auto'
           this.devisOptionsFormGroup.get('remiseBtnIsChecked').setValue(false)
-          console.log(this.closeDevisConfirmDialog)
+    
           this.closeDevisConfirmDialog.close(event)
         },
         rejectCallback: () => {
@@ -918,7 +918,6 @@ export class EstimateInvoiceDialogComponent implements OnInit {
     factureItems.at(index).patchValue({
       catalogueId: 0,
     })
-    console.log(factureItems.at(index).value)
   }
 
   saveBrouillon() {

@@ -33,14 +33,14 @@
             </div>
         </div>
 
-        <app-table #dt1 [cols]="cols" [currency]="Currency" [styleClass]="'table'" [styleId]="'tableClients'" [highlightColorInput]="tableSelectionColor" [filterEvent]="filterSubject.asObservable()" [getListApi$]="chargerListeClients" [globalFilterFields]="['categorie','type']">
+        <app-table #dt1 [cols]="cols" [currency]="Currency" [styleClass]="'table'" [styleId]="'tableClients'" [highlightColorInput]="tableSelectionColor" [filterEvent]="filterSubject.asObservable()" [getListApi$]="chargerListeClients" [globalFilterFields]="['categorie','type']" [totalPending]="totalAmountPendingFactures" [totalOverdue]="totalAmountOverdueFactures">
         </app-table>
 
-        <div id="footerTable" class="grid mx-2">
+       <!--  <div id="footerTable" class="grid mx-2">
             <div id="totalTTC">Total TTC</div>
             <div id="totalEnAttente">{{ this.totalAmountPendingFactures | number:'1.2-2' }} {{' ' + Currency}}</div>
             <div id="totalPayees">{{ this.totalAmountOverdueFactures | number:'1.2-2' }} {{' ' + Currency}}</div>
-        </div>
+        </div> -->
 
     </div>
     <div id="blockApercu" class="pt-5 pr-3 pb-3">

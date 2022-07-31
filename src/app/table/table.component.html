@@ -10,7 +10,8 @@
                     'width-100px' : col.header == 'ÉMISSION',
                     'span-orange' : label == 'Converti' || label == 'Paiement en attente',
                     'span-red' : label == 'Rejeté' || label == 'Paiement en retard',
-                    'span-grey' : label == 'Brouillon'
+                    'span-grey' : label == 'Brouillon',
+                    'span-yellow' : label == 'Expiré'
                 }
             ">
                 {{col.header}}
@@ -31,7 +32,7 @@
 
                     <ng-container *ngSwitchCase="'currency'">
                         <td [colSpan]="colVar.colspan" mode="decimal">
-                            {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + (rowData['currency'] ? rowData['currency'] : currency)}}
+                            {{rowData[colVar.field] || 0 | number:'1.2-2' }} {{' ' + (rowData['currency'] ? rowData['currency'] : rowData['deviseFacturation'] ? rowData['deviseFacturation'] : currency)}}
                         </td>
                     </ng-container>
 
@@ -67,6 +68,47 @@
             </ng-container>
 
         </tr>
+    </ng-template>
+
+    <ng-template pTemplate="footer" let-columns >
+        <tr class="positon-relative">
+                <!-- <ng-container *ngFor="let col of columns" [ngSwitch]="colVar.field">
+                    <ng-container *ngSwitchCase="''">
+                        <td [colSpan]="colVar.colspan">
+                            {{colVar.format(rowData[colVar.field]) | date:'shortDate'}}
+                        </td>
+                    </ng-container>
+                </ng-container> -->
+
+                <ng-container *ngFor="let col of columns">
+                    
+                    <ng-container *ngIf="col.field == 'montantTtc'">
+                        <td [colSpan]="col.colspan" class="text-center color-gray">
+                            {{montantTotal | number:'1.2-2'}} {{currency}}
+                            <span class="montantTtc"> Total Ttc</span>
+                        </td>
+                    </ng-container>
+                    <ng-container *ngIf="col.field == 'pendingInvoicesAmount'">
+                        <td [colSpan]="col.colspan" class="text-center color-gray">
+                            {{totalPending | number:'1.2-2'}} {{currency}}
+                            <span class="montantTtc"> Total Ttc</span>
+                        </td>
+                    </ng-container>
+                    <ng-container *ngIf="col.field == 'overdueInvoicesAmount'">
+                        <td [colSpan]="col.colspan" class="text-center color-gray">
+                            {{totalOverdue | number:'1.2-2'}} {{currency}}
+                            <span class="montantTtc"> Total Ttc</span>
+                        </td>
+                    </ng-container>
+                    
+                    <ng-container *ngIf="col.field != 'montantTtc' && col.field != 'pendingInvoicesAmount' && col.field != 'overdueInvoicesAmount'">
+                        <td [colSpan]="col.colspan">
+                            
+                        </td>
+                    </ng-container>
+                </ng-container>
+        </tr>
+       
     </ng-template>
 
     <ng-template pTemplate="loadingbody" let-columns="columns">
